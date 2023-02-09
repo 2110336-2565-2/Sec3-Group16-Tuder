@@ -9,7 +9,7 @@ To start developing backend application run these following steps
 2. Start database instance using docker compose
 
    ```bash
-   docker-compose up -d database
+   docker-compose up -d
    ```
 
    For closing docker-compose
