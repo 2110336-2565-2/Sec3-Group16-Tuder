@@ -5,7 +5,9 @@ import { Link } from "react-router-dom";
 
 const FormT = {
     Div: styled.div`
-        width: 350px;
+        width:${(props) => {
+            return props.FormW
+        }};
         padding: 10px;
         display: flex;
         flex-direction: column;
@@ -35,7 +37,9 @@ const FormT = {
         justify-content: center;
     `,
     TextInput: styled.input`
-        width: 200px;
+        width: ${(props) => {
+            return props.BoxSize
+        }};
         padding: 10px 13px;
         border: 1px solid black;
         border-radius: 6px;
@@ -69,6 +73,17 @@ const FormT = {
         color: ${(props) => {
             return props.color
         }};
+    `,
+    Component: styled.div`
+        display: flex;
+        flex-direction: column;
+    `,
+    Label: styled.div`
+        margin-bottom: 0.5em;
+    `,
+    Space: styled.div`
+        padding-right: 5px;
+        padding-left: 5px;
     `
 }
 

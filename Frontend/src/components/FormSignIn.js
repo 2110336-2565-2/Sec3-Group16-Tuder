@@ -3,14 +3,14 @@ import FormT from './FormStyle.js';
 export default function FormSignIn(){
     return(
         <form>
-            <FormT.Div>
+            <FormT.Div FormW='350px'>
                 <FormT.Header>Sign In</FormT.Header>
                 <FormT.Content>Sign in and start managing your candidates!</FormT.Content>
                 <FormT.Content>
-                    <FormT.TextInput name='username' type='text' placeholder='Username'/>
+                    <FormT.TextInput BoxSize='200px' name='username' type='text' placeholder='Username'/>
                 </FormT.Content>
                 <FormT.Content>
-                    <FormT.TextInput name='password' type='password' placeholder='Password'/>
+                    <FormT.TextInput BoxSize='200px' name='password' type='password' placeholder='Password'/>
                 </FormT.Content>
                 <FormT.ContentInline>
                     <FormT.ContentSmall>

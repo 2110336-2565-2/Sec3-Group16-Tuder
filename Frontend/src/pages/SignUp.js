@@ -3,12 +3,12 @@ import FormSignUp from "../components/FormSignUp.js";
 
 export default function SignUp(){
     return(
-        <ContainerWithHeight margintop='100px'>
+        <ContainerWithHeight margintop='30px'>
             <SeperateSection>
-                <ItemGrid justify='center' columngrid='1 / 3'>
+                <ItemGrid justify='center' columngrid='1 / 2'>
                     <ImageTudor width='600px' src="/images/index.png" alt="seprate70" />
                 </ItemGrid>
-                <ItemGrid columngrid='4'>
+                <ItemGrid columngrid='2 / 4'>
                     <FormSignUp />
                 </ItemGrid>
             </SeperateSection>
