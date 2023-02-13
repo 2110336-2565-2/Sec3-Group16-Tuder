@@ -18,7 +18,8 @@ func init() {
 
 func main() {
 	e := echo.New()
+	port := ":" + os.Getenv("SERVER_PORT")
 	routes.InitUserRoutes(e)
-	e.Logger.Fatal(e.Start(os.Getenv("SERVER_PORT")))
+	e.Logger.Fatal(e.Start(port))
 
 }
