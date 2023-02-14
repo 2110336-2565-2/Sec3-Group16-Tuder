@@ -2,10 +2,8 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
-
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/migrate"
 	routes "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/routes"
@@ -13,6 +11,7 @@ import (
 	godotenv "github.com/joho/godotenv"
 	echo "github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
+	
 )
 
 func init() {
@@ -34,9 +33,8 @@ func main() {
 	db_name := os.Getenv("DB_NAME")
 	db_port := os.Getenv("DB_PORT")
 
-
-	client, err := ent.Open("postgres","host=" + host + " port=" + db_port + " user=" + db_user+" dbname=" + db_name + " password="+ db_pass + " sslmode=disable")
-    if err != nil {
+	client, err := ent.Open("postgres", "host="+host+" port="+db_port+" user="+db_user+" dbname="+db_name+" password="+db_pass+" sslmode=disable")
+	if err != nil {
 		log.Fatalf("failed opening connection to postgres: %v", err)
     }
 	
@@ -55,9 +53,6 @@ func main() {
 			Save(context.Background())
 	fmt.Println(utils.HashPassword("brightHee"))
 
-	routes.InitLoginRoutes(client,e)
-	
 	e.Logger.Fatal(e.Start(port))
 
 }
-
