@@ -18,15 +18,20 @@ func NewControllerLogin(service service.ServiceLogin) *controllerLogin {
 
 func (c * controllerLogin) LoginUser(ctx echo.Context) (err error) {
 
-	var userLogin schema.SchemaLogin
+	var userLogin *schema.SchemaLogin
 
 	if err := ctx.Bind(&userLogin); err != nil {
-		return ctx.JSON(http.StatusBadRequest, err)
+		ctx.JSON(http.StatusBadRequest, err)
+		return err
 	}
 
-	userLogin, err = c.service.LoginService(&userLogin)
+	userLogin, err = c.service.LoginService(userLogin)
 
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err)
+		return err
+	}
 
-	return ctx.JSON(http.StatusOK, userLogin)
-
+	ctx.JSON(http.StatusOK, userLogin)
+	return nil
 }

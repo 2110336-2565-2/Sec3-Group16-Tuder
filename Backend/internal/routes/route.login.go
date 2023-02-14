@@ -16,7 +16,6 @@ func InitLoginRoutes(client *ent.Client,e *echo.Echo){
 	serviceLogin := service.NewServiceLogin(repoLogin)
 	controllerLogin := controller.NewControllerLogin(serviceLogin)
 
-
 	login := e.Group("/api/v1")
 	login.POST("/login", controllerLogin.LoginUser)
 

@@ -3,7 +3,6 @@ package schema
 import (
 	"entgo.io/ent"
 	"github.com/google/uuid"
-	// "entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
