@@ -17,8 +17,3 @@ type SchemaRegister struct {
 	Gender          string    `json:"gender,omitempty"`
 }
 
-type SchemaRegisterResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-	Error   error  `json:"error"`
-}

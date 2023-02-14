@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
@@ -48,13 +47,13 @@ func main() {
     }
 	
 	// test
+	ps , _  := utils.HashPassword("brightHee")
 		client.User.Create().
 			SetUsername("hee").
-			SetPassword("test").
+			SetPassword(ps).
 			Save(context.Background())
-	fmt.Println(utils.HashPassword("brightHee"))
 
-	
+	routes.InitRoutes(client, e)
 
 	e.Logger.Fatal(e.Start(port))
 

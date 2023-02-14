@@ -1,10 +1,11 @@
 package controllers
 
-import(
+import (
 	"net/http"
-	echo "github.com/labstack/echo/v4"
+
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 	service "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/services"
+	echo "github.com/labstack/echo/v4"
 )
 
 
@@ -16,7 +17,7 @@ func NewControllerLogin(service service.ServiceLogin) *controllerLogin {
 	return &controllerLogin{service: service}
 }
 
-func (c * controllerLogin) LoginUser(ctx echo.Context) (err error) {
+func (cR * controllerLogin) LoginUser(c echo.Context) (err error) {
 	/*
 	 ***** 1 ) แก้ตัว return error  ให้เป็น error ที่เรากำหนดเอง SchemaError
 	 2 ) ใน Controller จะเป็นการรับค่าจาก Client แล้วส่งไปที่ Service
@@ -27,18 +28,30 @@ func (c * controllerLogin) LoginUser(ctx echo.Context) (err error) {
 
 	var userLogin *schema.SchemaLogin
 
-	if err := ctx.Bind(&userLogin); err != nil {
-		ctx.JSON(http.StatusBadRequest, err)
+	if err := c.Bind(&userLogin); err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaResponses{
+			Success : false,
+			Message : "invalid request payload",
+			Data : err.Error(),
+		})
 		return err
 	}
 
-	userLogin, err = c.service.LoginService(userLogin)
+	userLoginInfo, err := cR.service.LoginService(userLogin)
 
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, schema.SchemaResponses{
+			Success : false,
+			Message : err.Error(),
+			Data : nil,
+		})
 		return err
 	}
 
-	ctx.JSON(http.StatusOK, userLogin)
+	c.JSON(http.StatusOK, schema.SchemaResponses{
+		Success : true,
+		Message : "Login successfully",
+		Data : userLoginInfo,
+	})
 	return nil
 }
