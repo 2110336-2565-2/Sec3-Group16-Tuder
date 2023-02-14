@@ -14,9 +14,9 @@ type User struct {
 // Fields of the Todo.
 func (User) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("uuid", uuid.UUID{}).
-            Default(uuid.New),
-		field.String("username").NotEmpty(),
+		field.UUID("id", uuid.UUID{}).
+            Default(uuid.New).Unique().StorageKey("id"),
+		field.String("username").NotEmpty().Unique(),
 		field.String("password").NotEmpty(),
 	}
 }

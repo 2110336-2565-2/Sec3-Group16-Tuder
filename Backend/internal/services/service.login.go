@@ -2,10 +2,10 @@ package services
 
 import (
 	"fmt"
-
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
-	// "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/models"
+
 )
 
 type ServiceLogin interface {
@@ -29,13 +29,17 @@ func (s *serviceLogin)LoginService(userLogin *schemas.SchemaLogin) (*schemas.Sch
 	*/
 
 
-
-
+	
 	// check password
 	
 	user, err := s.repository.LoginRepository(userLogin)
+	if err != nil {
+		return nil, err
+	}
 
-	fmt.Println("USER LIST : ",user,"ERROR : ", err)
+	if !utils.CheckPasswordHash(userLogin.Password, user.Password){
+		return nil, fmt.Errorf("wrong password")
+	}
 
 	return userLogin, nil
 }

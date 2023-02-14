@@ -2,10 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
+
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/migrate"
 	routes "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/routes"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 	godotenv "github.com/joho/godotenv"
 	echo "github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
@@ -16,6 +20,8 @@ func init() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+
+	
 }
 
 func main() {
@@ -33,12 +39,21 @@ func main() {
     if err != nil {
 		log.Fatalf("failed opening connection to postgres: %v", err)
     }
-
+	
     defer client.Close()
-
-	if err := client.Schema.Create(context.Background()); err != nil {
-        log.Fatalf("failed creating schema resources: %v", err)
+	
+	if err := client.Schema.Create(context.Background(),
+		migrate.WithDropIndex(true),
+		migrate.WithDropColumn(true) ); err != nil {
+		log.Fatalf("failed creating schema resources: %v", err)
     }
+	
+	// test
+		client.User.Create().
+			SetUsername("hee").
+			SetPassword("test").
+			Save(context.Background())
+	fmt.Println(utils.HashPassword("brightHee"))
 
 	routes.InitLoginRoutes(client,e)
 	
