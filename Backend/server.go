@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
@@ -52,6 +53,8 @@ func main() {
 			SetPassword("test").
 			Save(context.Background())
 	fmt.Println(utils.HashPassword("brightHee"))
+
+	
 
 	e.Logger.Fatal(e.Start(port))
 
