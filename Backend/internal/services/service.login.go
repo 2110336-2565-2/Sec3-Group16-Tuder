@@ -21,10 +21,18 @@ func NewServiceLogin(repository repositorys.RepositoryLogin) *serviceLogin {
 }
 
 func (s *serviceLogin)LoginService(userLogin *schemas.SchemaLogin) (*schemas.SchemaLogin, error) {
-	
+	/* 
+	 1 ) ใน Service จะเป็นการรับค่าจาก Controller แล้วส่งไปที่ Repository
+	 2 ) ใน Service จะต้องส่ง Response กลับไปยัง Controller ในรูปแบบ Schema
+	 3 ) ใน Service จะต้องเช็คค่า userLogin ให้ตรง เช่น password ต้อง hash แล้วตรงกับ password ใน database
+	 4 ) ใน Service จะต้องเข้าถึง Database ผ่าน Repository เท่านั้น
+	*/
+
+
+
+
 	// check password
-	// if userLogin.Password == ""{
-	// }
+	
 	user, err := s.repository.LoginRepository(userLogin)
 
 	fmt.Println("USER LIST : ",user,"ERROR : ", err)

@@ -22,7 +22,9 @@ func NewRepositoryLogin(client *ent.Client) *repositoryLogin {
 
 
 func (r *repositoryLogin) LoginRepository(input *schema.SchemaLogin) ([]*ent.User, error) {
-
+	/*
+	1 )  ต้องดึง user จาก database ที่มี username ตรงกัน
+	*/
 	user, err := r.client.User.Query().All(r.ctx)
 
 	if err != nil {

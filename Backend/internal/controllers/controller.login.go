@@ -17,6 +17,13 @@ func NewControllerLogin(service service.ServiceLogin) *controllerLogin {
 }
 
 func (c * controllerLogin) LoginUser(ctx echo.Context) (err error) {
+	/*
+	 ***** 1 ) แก้ตัว return error  ให้เป็น error ที่เรากำหนดเอง SchemaError
+	 2 ) ใน Controller จะเป็นการรับค่าจาก Client แล้วส่งไปที่ Service
+	 3 ) ใน Controller จะต้องส่ง Response กลับไปยัง Client ในรูปแบบ JSON 
+	 4 ) ใน Controller จะต้องรับค่าจาก Client ในรูปแบบ JSON
+	*/
+
 
 	var userLogin *schema.SchemaLogin
 
