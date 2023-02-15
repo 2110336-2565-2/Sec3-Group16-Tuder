@@ -15,5 +15,8 @@ type SchemaRegister struct {
 	Phone           string    `json:"phone,omitempty"`
 	Birthdate       time.Time `json:"birthdate,omitempty"`
 	Gender          string    `json:"gender,omitempty"`
+	Description     string    `json:"description,omitempty"`
+	OmiseBankToken  string    `json:"omise_bank_token,omitempty"`
+	CitizenID       string    `json:"citizen_id,omitempty"`
+	As              string    `json:"as,omitempty"`
 }
-
