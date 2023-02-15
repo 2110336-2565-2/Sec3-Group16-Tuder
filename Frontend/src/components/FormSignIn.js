@@ -1,6 +1,6 @@
 import FormT from './FormStyle.js';
 import { useState } from 'react';
-import signInHandler from '../controllers/signInController.js';
+import signInHandler from '../handlers/signInHandler.js';
 
 export default function FormSignIn(){
     const [username, setUsername] = useState('');

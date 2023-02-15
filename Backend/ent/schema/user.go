@@ -18,6 +18,7 @@ func (User) Fields() []ent.Field {
             Default(uuid.New).Unique().StorageKey("id"),
 		field.String("username").NotEmpty().Unique(),
 		field.String("password").NotEmpty(),
+		field.Enum("role").Values("student", "tutor", "admin"),
 	}
 }
 

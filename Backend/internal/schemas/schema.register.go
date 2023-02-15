@@ -8,7 +8,7 @@ type SchemaRegister struct {
 	Username        string    `json:"username,omitempty"`
 	Password        string    `json:"password,omitempty"`
 	Email           string    `json:"email,omitempty"`
-	ConfirmPassword string    `json:"confirm_password,omitempty"`
+	ConfirmPassword string    `json:"confirmpassword,omitempty"`
 	Firstname       string    `json:"firstname,omitempty"`
 	Lastname        string    `json:"lastname,omitempty"`
 	Address         string    `json:"address,omitempty"`
