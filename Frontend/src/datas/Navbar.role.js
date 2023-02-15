@@ -5,15 +5,15 @@ const navbarContent = [
     },
     {
         role: 'tutor',
-        content: ['Home', 'Profile', 'Courses', 'Report', 'Logout']
+        content: ['Home', 'Profile', 'Courses', 'Report', 'Sign Out']
     },
     {
         role: 'student',
-        content: ['Home', 'Profile', 'Courses', 'Report', 'Logout']
+        content: ['Home', 'Profile', 'Courses', 'Report', 'Sign Out']
     },
     {
         role: 'admin',
-        content: ['Home', 'Courses', 'Teachers', 'Login', 'Sign Up']
+        content: ['Home', 'Courses', 'Teachers', 'Sign In', 'Sign Up']
     }
 ];
 

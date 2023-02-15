@@ -3,6 +3,8 @@
 package user
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 )
 
@@ -107,3 +109,27 @@ var (
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
+
+// Role defines the type for the "role" enum field.
+type Role string
+
+// Role values.
+const (
+	RoleStudent Role = "student"
+	RoleTutor   Role = "tutor"
+	RoleAdmin   Role = "admin"
+)
+
+func (r Role) String() string {
+	return string(r)
+}
+
+// RoleValidator is a validator for the "role" field enum values. It is called by the builders before save.
+func RoleValidator(r Role) error {
+	switch r {
+	case RoleStudent, RoleTutor, RoleAdmin:
+		return nil
+	default:
+		return fmt.Errorf("user: invalid enum value for role field: %q", r)
+	}
+}

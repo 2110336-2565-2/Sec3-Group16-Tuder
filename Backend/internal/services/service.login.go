@@ -2,6 +2,8 @@ package services
 
 import (
 	"errors"
+	"fmt"
+
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
@@ -31,10 +33,13 @@ func (s *serviceLogin)LoginService(userLogin *schemas.SchemaLogin) (*schemas.Sch
 		return nil, errors.New("the password isn't match")
 	}
 
-	token , _ := utils.GenerateToken(user.Username, true)
+	token , _ := utils.GenerateToken(user.Username,fmt.Sprint(user.Role), true)
+
 	return &schemas.SchemaLoginResponses{
 		Username: user.Username,
+		Role: fmt.Sprint(user.Role),
 		Token: token ,
+
 	}, nil
 }
 

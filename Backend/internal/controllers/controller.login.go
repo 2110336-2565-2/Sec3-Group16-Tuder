@@ -19,7 +19,6 @@ func NewControllerLogin(service service.ServiceLogin) *controllerLogin {
 
 func (cR * controllerLogin) LoginUser(c echo.Context) (err error) {
 
-
 	var userLogin *schema.SchemaLogin
 
 	if err := c.Bind(&userLogin); err != nil {

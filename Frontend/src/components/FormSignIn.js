@@ -1,16 +1,34 @@
 import FormT from './FormStyle.js';
 import { useState } from 'react';
-import signInHandler from '../controllers/signInController.js';
+import signInAction from '../handlers/signInHandler.js';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
+
 
 export default function FormSignIn(){
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+
+    async function submitHandler(e){
+        e.preventDefault();
+        const signInData = {
+            username,
+            password,
+        }
+        dispatch( (await signInAction(signInData, navigate)));
+    }
+
     return(
-        <form onSubmit={signInHandler}>
+        <form onSubmit={submitHandler}>
             <FormT.Div FormW='350px'>
                 <FormT.Header>Sign In</FormT.Header>
-                <FormT.Content>Sign in and start managing your candidates!</FormT.Content>
+                <FormT.Content>Sign In and start managing your candidates!</FormT.Content>
                 <FormT.Content>
                     <FormT.TextInput BoxSize='200px' name='username' type='text' placeholder='Username' value={username} onChange={(e) => setUsername(e.target.value)}/>
                 </FormT.Content>

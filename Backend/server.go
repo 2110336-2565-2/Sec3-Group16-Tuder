@@ -48,9 +48,17 @@ func main() {
 
 	// test
 	ps, _ := utils.HashPassword("brightHee")
+
 	client.User.Create().
 		SetUsername("hee").
 		SetPassword(ps).
+		SetRole("student").
+		Save(context.Background())
+
+	client.User.Create().
+		SetUsername("bighee").
+		SetPassword(ps).
+		SetRole("tutor").
 		Save(context.Background())
 
 	routes.InitRoutes(client, e)
