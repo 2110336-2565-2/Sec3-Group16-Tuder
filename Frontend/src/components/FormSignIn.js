@@ -1,13 +1,30 @@
 import FormT from './FormStyle.js';
 import { useState } from 'react';
-import signInHandler from '../handlers/signInHandler.js';
+import signInAction from '../handlers/signInHandler.js';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+
 
 export default function FormSignIn(){
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     
+    const dispatch = useDispatch();
+
+    const role = useSelector(state => state.role);
+
+    function submitHandler(e){
+        e.preventDefault();
+        const signInData = {
+            username,
+            password,
+        }
+        dispatch(signInAction(signInData));
+        console.log(role)
+    }
+
     return(
-        <form onSubmit={signInHandler}>
+        <form onSubmit={submitHandler}>
             <FormT.Div FormW='350px'>
                 <FormT.Header>Sign In</FormT.Header>
                 <FormT.Content>Sign in and start managing your candidates!</FormT.Content>

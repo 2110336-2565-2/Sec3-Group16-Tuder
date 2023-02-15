@@ -1,4 +1,4 @@
-import { useState } from 'react';
+
 // import css
 import './App.css';
 
@@ -14,10 +14,12 @@ import SignUp from './pages/SignUp.js';
 import Courses from './pages/Courses';
 import Report from './pages/Report';
 
+import { useSelector } from 'react-redux';
 
 
 function App() {
-  const [role, setRole] = useState('guest');
+
+  const {role} = useSelector(state => state.role);
   return (
     <BrowserRouter>
       <Routes>

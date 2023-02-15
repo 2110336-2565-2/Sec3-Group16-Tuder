@@ -13,7 +13,7 @@ const navbarContent = [
     },
     {
         role: 'admin',
-        content: ['Home', 'Courses', 'Teachers', 'Login', 'Sign Up']
+        content: ['Home', 'Courses', 'Teachers', 'Sign In', 'Sign Up']
     }
 ];
 
