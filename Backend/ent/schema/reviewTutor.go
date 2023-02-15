@@ -2,21 +2,27 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 )
 
 // Todo holds the schema definition for the Todo entity.
-type ReportTutor struct {
+type ReviewTutor struct {
 	ent.Schema
 }
 
 // Mixin of Tutor
 
-func (ReportTutor) Mixin() []ent.Mixin {
+func (ReviewTutor) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		ReportMixin{},
+		ReviewMixin{},
 	}
 }
 
-func (ReportTutor) Edges() []ent.Edge {
-	return nil
+func (ReviewTutor) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.From("tutor", Tutor.Type).
+			Ref("review_tutor").
+			Unique().
+			Required(),
+	}
 }

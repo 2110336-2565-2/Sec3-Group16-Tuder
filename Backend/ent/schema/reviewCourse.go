@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 )
 
 // Todo holds the schema definition for the Todo entity.
@@ -13,10 +14,15 @@ type ReviewCourse struct {
 
 func (ReviewCourse) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		ReportMixin{},
+		ReviewMixin{},
 	}
 }
 
 func (ReviewCourse) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("course", Course.Type).
+			Ref("review_course").
+			Unique().
+			Required(),
+	}
 }

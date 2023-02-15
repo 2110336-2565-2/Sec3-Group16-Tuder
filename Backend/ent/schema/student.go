@@ -2,7 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
-	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/edge"
 )
 
 // Todo holds the schema definition for the Todo entity.
@@ -19,10 +19,16 @@ func (Student) Mixin() []ent.Mixin {
 // Fields of the Todo.
 func (Student) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("school").NotEmpty(),
+		// field.String("school").NotEmpty(),
 	}
 }
 
 func (Student) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.To("issue_report", IssueReport.Type),
+		edge.To("course", Course.Type).
+			Unique(),
+		edge.To("class", Class.Type).
+			Unique(),
+	}
 }

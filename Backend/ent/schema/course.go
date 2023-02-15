@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 
 	"github.com/google/uuid"
@@ -18,7 +19,7 @@ func (Course) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).Unique().StorageKey("id").Immutable(),
 		field.String("title").NotEmpty(),
-		field.String("estimated_time").NotEmpty(),
+		field.Time("estimated_time"),
 		field.String("description").NotEmpty(),
 		field.String("course_status").NotEmpty(),
 		field.Int("price_per_hour").Positive(),
@@ -28,5 +29,16 @@ func (Course) Fields() []ent.Field {
 }
 
 func (Course) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.To("review_course", ReviewCourse.Type),
+		edge.To("class", Class.Type).
+			Unique(),
+		edge.From("student", Student.Type).
+			Ref("course").
+			Unique(),
+		edge.From("tutor", Tutor.Type).
+			Ref("course").
+			Unique().
+			Required(),
+	}
 }

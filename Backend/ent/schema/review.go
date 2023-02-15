@@ -7,12 +7,12 @@ import (
 )
 
 // Todo holds the schema definition for the Todo entity.
-type ReportMixin struct {
+type ReviewMixin struct {
 	mixin.Schema
 }
 
 // Fields of the Todo.
-func (ReportMixin) Fields() []ent.Field {
+func (ReviewMixin) Fields() []ent.Field {
 	return []ent.Field{
 		field.Float32("score").Positive().Nillable().Optional(),
 		field.String("review_msg").Optional().Nillable(),
