@@ -16,6 +16,7 @@ import Report from './pages/Report';
 import ForgetPassword from './pages/ForgetPassword';
 
 
+
 function App() {
   const [role, setRole] = useState('guest');
   const [signUpRole, setSignUpRole] = useState('student');
@@ -34,5 +35,4 @@ function App() {
     </BrowserRouter>
   );
 }
-
 export default App;
