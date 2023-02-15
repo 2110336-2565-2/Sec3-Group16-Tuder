@@ -5,7 +5,7 @@ const api = axios.create({
   });
 
 
-async function loginHandler(event) {
+async function signInHandler(event) {
 
     // Input validation
     //
@@ -13,30 +13,30 @@ async function loginHandler(event) {
     // Prevent the default action of the event
     event.preventDefault();
 
-    let username = event.target.username;
-    let password = event.target.password;
-    console.log(username);
     // Get the form data from the event object
-    const response = await api.post('/api/v1/login', { username:"hee", password:"brightHee"})
+    let username = event.target.username.value;
+    let password = event.target.password.value;
+    
+    // Post to api
+    const response = await api.post('/api/v1/login', { username:username, password:password })
     .then(function(response){
-
+        
         let res = response.data;
         
-        console.log(res.message);
+        // if login success, MOO will set token
         if (res.success === true) {
-            // do something from MOO
-
-        } else {
-            // do something from MOO
+            let token = response.data.data.token;
+            localStorage.setItem('jwtToken', token); 
+            console.log(res.message);
         }
-        
-        let token = response.data.data.token;
-        localStorage.setItem('jwtToken', token); 
 
     }).catch(function(error){
         // if internal error occurs, MOO will return error message
-        console.error(error);
+        if (error.response) {
+            let res = error.response.data;
+            console.log(res.message);
+        }
     });
 };
 
-export default loginHandler;
+export default signInHandler;

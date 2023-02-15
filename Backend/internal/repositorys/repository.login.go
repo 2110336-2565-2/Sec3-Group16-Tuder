@@ -2,7 +2,7 @@ package repositorys
 
 import (
 	"context"
-
+	"errors"
 	"entgo.io/ent/dialect/sql"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -30,7 +30,7 @@ func (r *repositoryLogin) LoginRepository(input *schema.SchemaLogin) (*ent.User,
 		Only(r.ctx)
 
 	if err != nil {
-		return nil, err
+		return nil, errors.New("the username isn't match")
 	}
 
 	return user, nil

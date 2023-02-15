@@ -1,22 +1,21 @@
 import FormT from './FormStyle.js';
 import { useState } from 'react';
-import loginHandler from '../controllers/signInController.js';
+import signInHandler from '../controllers/signInController.js';
 
 export default function FormSignIn(){
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-
     
     return(
-        <form onSubmit={loginHandler}>
+        <form onSubmit={signInHandler}>
             <FormT.Div FormW='350px'>
                 <FormT.Header>Sign In</FormT.Header>
                 <FormT.Content>Sign in and start managing your candidates!</FormT.Content>
                 <FormT.Content>
-                    <FormT.TextInput BoxSize='200px' name='username' type='text' placeholder='Username'/>
+                    <FormT.TextInput BoxSize='200px' name='username' type='text' placeholder='Username' value={username} onChange={(e) => setUsername(e.target.value)}/>
                 </FormT.Content>
                 <FormT.Content>
-                    <FormT.TextInput BoxSize='200px' name='password' type='password' placeholder='Password'/>
+                    <FormT.TextInput  BoxSize='200px' name='password' type='password' placeholder='Password' value={password} onChange={(e) => setPassword(e.target.value)}/>
                 </FormT.Content>
                 <FormT.ContentInline>
                     <FormT.ContentSmall>
