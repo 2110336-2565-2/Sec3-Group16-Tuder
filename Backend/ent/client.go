@@ -11,7 +11,16 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/migrate"
 	"github.com/google/uuid"
 
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reporttutor"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -22,8 +31,26 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
-	// User is the client for interacting with the User builders.
-	User *UserClient
+	// Class is the client for interacting with the Class builders.
+	Class *ClassClient
+	// Course is the client for interacting with the Course builders.
+	Course *CourseClient
+	// IssueReport is the client for interacting with the IssueReport builders.
+	IssueReport *IssueReportClient
+	// Payment is the client for interacting with the Payment builders.
+	Payment *PaymentClient
+	// PaymentHistory is the client for interacting with the PaymentHistory builders.
+	PaymentHistory *PaymentHistoryClient
+	// ReportTutor is the client for interacting with the ReportTutor builders.
+	ReportTutor *ReportTutorClient
+	// ReviewCourse is the client for interacting with the ReviewCourse builders.
+	ReviewCourse *ReviewCourseClient
+	// Schedule is the client for interacting with the Schedule builders.
+	Schedule *ScheduleClient
+	// Student is the client for interacting with the Student builders.
+	Student *StudentClient
+	// Tutor is the client for interacting with the Tutor builders.
+	Tutor *TutorClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -37,7 +64,16 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
-	c.User = NewUserClient(c.config)
+	c.Class = NewClassClient(c.config)
+	c.Course = NewCourseClient(c.config)
+	c.IssueReport = NewIssueReportClient(c.config)
+	c.Payment = NewPaymentClient(c.config)
+	c.PaymentHistory = NewPaymentHistoryClient(c.config)
+	c.ReportTutor = NewReportTutorClient(c.config)
+	c.ReviewCourse = NewReviewCourseClient(c.config)
+	c.Schedule = NewScheduleClient(c.config)
+	c.Student = NewStudentClient(c.config)
+	c.Tutor = NewTutorClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -69,9 +105,18 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		User:   NewUserClient(cfg),
+		ctx:            ctx,
+		config:         cfg,
+		Class:          NewClassClient(cfg),
+		Course:         NewCourseClient(cfg),
+		IssueReport:    NewIssueReportClient(cfg),
+		Payment:        NewPaymentClient(cfg),
+		PaymentHistory: NewPaymentHistoryClient(cfg),
+		ReportTutor:    NewReportTutorClient(cfg),
+		ReviewCourse:   NewReviewCourseClient(cfg),
+		Schedule:       NewScheduleClient(cfg),
+		Student:        NewStudentClient(cfg),
+		Tutor:          NewTutorClient(cfg),
 	}, nil
 }
 
@@ -89,16 +134,25 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		User:   NewUserClient(cfg),
+		ctx:            ctx,
+		config:         cfg,
+		Class:          NewClassClient(cfg),
+		Course:         NewCourseClient(cfg),
+		IssueReport:    NewIssueReportClient(cfg),
+		Payment:        NewPaymentClient(cfg),
+		PaymentHistory: NewPaymentHistoryClient(cfg),
+		ReportTutor:    NewReportTutorClient(cfg),
+		ReviewCourse:   NewReviewCourseClient(cfg),
+		Schedule:       NewScheduleClient(cfg),
+		Student:        NewStudentClient(cfg),
+		Tutor:          NewTutorClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		User.
+//		Class.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -120,111 +174,147 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.User.Use(hooks...)
+	c.Class.Use(hooks...)
+	c.Course.Use(hooks...)
+	c.IssueReport.Use(hooks...)
+	c.Payment.Use(hooks...)
+	c.PaymentHistory.Use(hooks...)
+	c.ReportTutor.Use(hooks...)
+	c.ReviewCourse.Use(hooks...)
+	c.Schedule.Use(hooks...)
+	c.Student.Use(hooks...)
+	c.Tutor.Use(hooks...)
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.User.Intercept(interceptors...)
+	c.Class.Intercept(interceptors...)
+	c.Course.Intercept(interceptors...)
+	c.IssueReport.Intercept(interceptors...)
+	c.Payment.Intercept(interceptors...)
+	c.PaymentHistory.Intercept(interceptors...)
+	c.ReportTutor.Intercept(interceptors...)
+	c.ReviewCourse.Intercept(interceptors...)
+	c.Schedule.Intercept(interceptors...)
+	c.Student.Intercept(interceptors...)
+	c.Tutor.Intercept(interceptors...)
 }
 
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
-	case *UserMutation:
-		return c.User.mutate(ctx, m)
+	case *ClassMutation:
+		return c.Class.mutate(ctx, m)
+	case *CourseMutation:
+		return c.Course.mutate(ctx, m)
+	case *IssueReportMutation:
+		return c.IssueReport.mutate(ctx, m)
+	case *PaymentMutation:
+		return c.Payment.mutate(ctx, m)
+	case *PaymentHistoryMutation:
+		return c.PaymentHistory.mutate(ctx, m)
+	case *ReportTutorMutation:
+		return c.ReportTutor.mutate(ctx, m)
+	case *ReviewCourseMutation:
+		return c.ReviewCourse.mutate(ctx, m)
+	case *ScheduleMutation:
+		return c.Schedule.mutate(ctx, m)
+	case *StudentMutation:
+		return c.Student.mutate(ctx, m)
+	case *TutorMutation:
+		return c.Tutor.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
 }
 
-// UserClient is a client for the User schema.
-type UserClient struct {
+// ClassClient is a client for the Class schema.
+type ClassClient struct {
 	config
 }
 
-// NewUserClient returns a client for the User from the given config.
-func NewUserClient(c config) *UserClient {
-	return &UserClient{config: c}
+// NewClassClient returns a client for the Class from the given config.
+func NewClassClient(c config) *ClassClient {
+	return &ClassClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `user.Hooks(f(g(h())))`.
-func (c *UserClient) Use(hooks ...Hook) {
-	c.hooks.User = append(c.hooks.User, hooks...)
+// A call to `Use(f, g, h)` equals to `class.Hooks(f(g(h())))`.
+func (c *ClassClient) Use(hooks ...Hook) {
+	c.hooks.Class = append(c.hooks.Class, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `user.Intercept(f(g(h())))`.
-func (c *UserClient) Intercept(interceptors ...Interceptor) {
-	c.inters.User = append(c.inters.User, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `class.Intercept(f(g(h())))`.
+func (c *ClassClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Class = append(c.inters.Class, interceptors...)
 }
 
-// Create returns a builder for creating a User entity.
-func (c *UserClient) Create() *UserCreate {
-	mutation := newUserMutation(c.config, OpCreate)
-	return &UserCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a Class entity.
+func (c *ClassClient) Create() *ClassCreate {
+	mutation := newClassMutation(c.config, OpCreate)
+	return &ClassCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of User entities.
-func (c *UserClient) CreateBulk(builders ...*UserCreate) *UserCreateBulk {
-	return &UserCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of Class entities.
+func (c *ClassClient) CreateBulk(builders ...*ClassCreate) *ClassCreateBulk {
+	return &ClassCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for User.
-func (c *UserClient) Update() *UserUpdate {
-	mutation := newUserMutation(c.config, OpUpdate)
-	return &UserUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for Class.
+func (c *ClassClient) Update() *ClassUpdate {
+	mutation := newClassMutation(c.config, OpUpdate)
+	return &ClassUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *UserClient) UpdateOne(u *User) *UserUpdateOne {
-	mutation := newUserMutation(c.config, OpUpdateOne, withUser(u))
-	return &UserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *ClassClient) UpdateOne(cl *Class) *ClassUpdateOne {
+	mutation := newClassMutation(c.config, OpUpdateOne, withClass(cl))
+	return &ClassUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *UserClient) UpdateOneID(id uuid.UUID) *UserUpdateOne {
-	mutation := newUserMutation(c.config, OpUpdateOne, withUserID(id))
-	return &UserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *ClassClient) UpdateOneID(id uuid.UUID) *ClassUpdateOne {
+	mutation := newClassMutation(c.config, OpUpdateOne, withClassID(id))
+	return &ClassUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for User.
-func (c *UserClient) Delete() *UserDelete {
-	mutation := newUserMutation(c.config, OpDelete)
-	return &UserDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for Class.
+func (c *ClassClient) Delete() *ClassDelete {
+	mutation := newClassMutation(c.config, OpDelete)
+	return &ClassDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *UserClient) DeleteOne(u *User) *UserDeleteOne {
-	return c.DeleteOneID(u.ID)
+func (c *ClassClient) DeleteOne(cl *Class) *ClassDeleteOne {
+	return c.DeleteOneID(cl.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *UserClient) DeleteOneID(id uuid.UUID) *UserDeleteOne {
-	builder := c.Delete().Where(user.ID(id))
+func (c *ClassClient) DeleteOneID(id uuid.UUID) *ClassDeleteOne {
+	builder := c.Delete().Where(class.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &UserDeleteOne{builder}
+	return &ClassDeleteOne{builder}
 }
 
-// Query returns a query builder for User.
-func (c *UserClient) Query() *UserQuery {
-	return &UserQuery{
+// Query returns a query builder for Class.
+func (c *ClassClient) Query() *ClassQuery {
+	return &ClassQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeUser},
+		ctx:    &QueryContext{Type: TypeClass},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a User entity by its id.
-func (c *UserClient) Get(ctx context.Context, id uuid.UUID) (*User, error) {
-	return c.Query().Where(user.ID(id)).Only(ctx)
+// Get returns a Class entity by its id.
+func (c *ClassClient) Get(ctx context.Context, id uuid.UUID) (*Class, error) {
+	return c.Query().Where(class.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *UserClient) GetX(ctx context.Context, id uuid.UUID) *User {
+func (c *ClassClient) GetX(ctx context.Context, id uuid.UUID) *Class {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -233,26 +323,1088 @@ func (c *UserClient) GetX(ctx context.Context, id uuid.UUID) *User {
 }
 
 // Hooks returns the client hooks.
-func (c *UserClient) Hooks() []Hook {
-	return c.hooks.User
+func (c *ClassClient) Hooks() []Hook {
+	return c.hooks.Class
 }
 
 // Interceptors returns the client interceptors.
-func (c *UserClient) Interceptors() []Interceptor {
-	return c.inters.User
+func (c *ClassClient) Interceptors() []Interceptor {
+	return c.inters.Class
 }
 
-func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error) {
+func (c *ClassClient) mutate(ctx context.Context, m *ClassMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&UserCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ClassCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&UserUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ClassUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&UserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ClassUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&UserDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&ClassDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown User mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown Class mutation op: %q", m.Op())
+	}
+}
+
+// CourseClient is a client for the Course schema.
+type CourseClient struct {
+	config
+}
+
+// NewCourseClient returns a client for the Course from the given config.
+func NewCourseClient(c config) *CourseClient {
+	return &CourseClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `course.Hooks(f(g(h())))`.
+func (c *CourseClient) Use(hooks ...Hook) {
+	c.hooks.Course = append(c.hooks.Course, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `course.Intercept(f(g(h())))`.
+func (c *CourseClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Course = append(c.inters.Course, interceptors...)
+}
+
+// Create returns a builder for creating a Course entity.
+func (c *CourseClient) Create() *CourseCreate {
+	mutation := newCourseMutation(c.config, OpCreate)
+	return &CourseCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Course entities.
+func (c *CourseClient) CreateBulk(builders ...*CourseCreate) *CourseCreateBulk {
+	return &CourseCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Course.
+func (c *CourseClient) Update() *CourseUpdate {
+	mutation := newCourseMutation(c.config, OpUpdate)
+	return &CourseUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CourseClient) UpdateOne(co *Course) *CourseUpdateOne {
+	mutation := newCourseMutation(c.config, OpUpdateOne, withCourse(co))
+	return &CourseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CourseClient) UpdateOneID(id uuid.UUID) *CourseUpdateOne {
+	mutation := newCourseMutation(c.config, OpUpdateOne, withCourseID(id))
+	return &CourseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Course.
+func (c *CourseClient) Delete() *CourseDelete {
+	mutation := newCourseMutation(c.config, OpDelete)
+	return &CourseDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CourseClient) DeleteOne(co *Course) *CourseDeleteOne {
+	return c.DeleteOneID(co.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *CourseClient) DeleteOneID(id uuid.UUID) *CourseDeleteOne {
+	builder := c.Delete().Where(course.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CourseDeleteOne{builder}
+}
+
+// Query returns a query builder for Course.
+func (c *CourseClient) Query() *CourseQuery {
+	return &CourseQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCourse},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Course entity by its id.
+func (c *CourseClient) Get(ctx context.Context, id uuid.UUID) (*Course, error) {
+	return c.Query().Where(course.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CourseClient) GetX(ctx context.Context, id uuid.UUID) *Course {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *CourseClient) Hooks() []Hook {
+	return c.hooks.Course
+}
+
+// Interceptors returns the client interceptors.
+func (c *CourseClient) Interceptors() []Interceptor {
+	return c.inters.Course
+}
+
+func (c *CourseClient) mutate(ctx context.Context, m *CourseMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CourseCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CourseUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CourseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CourseDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Course mutation op: %q", m.Op())
+	}
+}
+
+// IssueReportClient is a client for the IssueReport schema.
+type IssueReportClient struct {
+	config
+}
+
+// NewIssueReportClient returns a client for the IssueReport from the given config.
+func NewIssueReportClient(c config) *IssueReportClient {
+	return &IssueReportClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `issuereport.Hooks(f(g(h())))`.
+func (c *IssueReportClient) Use(hooks ...Hook) {
+	c.hooks.IssueReport = append(c.hooks.IssueReport, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `issuereport.Intercept(f(g(h())))`.
+func (c *IssueReportClient) Intercept(interceptors ...Interceptor) {
+	c.inters.IssueReport = append(c.inters.IssueReport, interceptors...)
+}
+
+// Create returns a builder for creating a IssueReport entity.
+func (c *IssueReportClient) Create() *IssueReportCreate {
+	mutation := newIssueReportMutation(c.config, OpCreate)
+	return &IssueReportCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of IssueReport entities.
+func (c *IssueReportClient) CreateBulk(builders ...*IssueReportCreate) *IssueReportCreateBulk {
+	return &IssueReportCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for IssueReport.
+func (c *IssueReportClient) Update() *IssueReportUpdate {
+	mutation := newIssueReportMutation(c.config, OpUpdate)
+	return &IssueReportUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *IssueReportClient) UpdateOne(ir *IssueReport) *IssueReportUpdateOne {
+	mutation := newIssueReportMutation(c.config, OpUpdateOne, withIssueReport(ir))
+	return &IssueReportUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *IssueReportClient) UpdateOneID(id uuid.UUID) *IssueReportUpdateOne {
+	mutation := newIssueReportMutation(c.config, OpUpdateOne, withIssueReportID(id))
+	return &IssueReportUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for IssueReport.
+func (c *IssueReportClient) Delete() *IssueReportDelete {
+	mutation := newIssueReportMutation(c.config, OpDelete)
+	return &IssueReportDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *IssueReportClient) DeleteOne(ir *IssueReport) *IssueReportDeleteOne {
+	return c.DeleteOneID(ir.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *IssueReportClient) DeleteOneID(id uuid.UUID) *IssueReportDeleteOne {
+	builder := c.Delete().Where(issuereport.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &IssueReportDeleteOne{builder}
+}
+
+// Query returns a query builder for IssueReport.
+func (c *IssueReportClient) Query() *IssueReportQuery {
+	return &IssueReportQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeIssueReport},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a IssueReport entity by its id.
+func (c *IssueReportClient) Get(ctx context.Context, id uuid.UUID) (*IssueReport, error) {
+	return c.Query().Where(issuereport.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *IssueReportClient) GetX(ctx context.Context, id uuid.UUID) *IssueReport {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *IssueReportClient) Hooks() []Hook {
+	return c.hooks.IssueReport
+}
+
+// Interceptors returns the client interceptors.
+func (c *IssueReportClient) Interceptors() []Interceptor {
+	return c.inters.IssueReport
+}
+
+func (c *IssueReportClient) mutate(ctx context.Context, m *IssueReportMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&IssueReportCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&IssueReportUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&IssueReportUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&IssueReportDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown IssueReport mutation op: %q", m.Op())
+	}
+}
+
+// PaymentClient is a client for the Payment schema.
+type PaymentClient struct {
+	config
+}
+
+// NewPaymentClient returns a client for the Payment from the given config.
+func NewPaymentClient(c config) *PaymentClient {
+	return &PaymentClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `payment.Hooks(f(g(h())))`.
+func (c *PaymentClient) Use(hooks ...Hook) {
+	c.hooks.Payment = append(c.hooks.Payment, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `payment.Intercept(f(g(h())))`.
+func (c *PaymentClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Payment = append(c.inters.Payment, interceptors...)
+}
+
+// Create returns a builder for creating a Payment entity.
+func (c *PaymentClient) Create() *PaymentCreate {
+	mutation := newPaymentMutation(c.config, OpCreate)
+	return &PaymentCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Payment entities.
+func (c *PaymentClient) CreateBulk(builders ...*PaymentCreate) *PaymentCreateBulk {
+	return &PaymentCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Payment.
+func (c *PaymentClient) Update() *PaymentUpdate {
+	mutation := newPaymentMutation(c.config, OpUpdate)
+	return &PaymentUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PaymentClient) UpdateOne(pa *Payment) *PaymentUpdateOne {
+	mutation := newPaymentMutation(c.config, OpUpdateOne, withPayment(pa))
+	return &PaymentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PaymentClient) UpdateOneID(id uuid.UUID) *PaymentUpdateOne {
+	mutation := newPaymentMutation(c.config, OpUpdateOne, withPaymentID(id))
+	return &PaymentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Payment.
+func (c *PaymentClient) Delete() *PaymentDelete {
+	mutation := newPaymentMutation(c.config, OpDelete)
+	return &PaymentDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *PaymentClient) DeleteOne(pa *Payment) *PaymentDeleteOne {
+	return c.DeleteOneID(pa.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *PaymentClient) DeleteOneID(id uuid.UUID) *PaymentDeleteOne {
+	builder := c.Delete().Where(payment.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PaymentDeleteOne{builder}
+}
+
+// Query returns a query builder for Payment.
+func (c *PaymentClient) Query() *PaymentQuery {
+	return &PaymentQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypePayment},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Payment entity by its id.
+func (c *PaymentClient) Get(ctx context.Context, id uuid.UUID) (*Payment, error) {
+	return c.Query().Where(payment.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PaymentClient) GetX(ctx context.Context, id uuid.UUID) *Payment {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *PaymentClient) Hooks() []Hook {
+	return c.hooks.Payment
+}
+
+// Interceptors returns the client interceptors.
+func (c *PaymentClient) Interceptors() []Interceptor {
+	return c.inters.Payment
+}
+
+func (c *PaymentClient) mutate(ctx context.Context, m *PaymentMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PaymentCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PaymentUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PaymentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PaymentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Payment mutation op: %q", m.Op())
+	}
+}
+
+// PaymentHistoryClient is a client for the PaymentHistory schema.
+type PaymentHistoryClient struct {
+	config
+}
+
+// NewPaymentHistoryClient returns a client for the PaymentHistory from the given config.
+func NewPaymentHistoryClient(c config) *PaymentHistoryClient {
+	return &PaymentHistoryClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `paymenthistory.Hooks(f(g(h())))`.
+func (c *PaymentHistoryClient) Use(hooks ...Hook) {
+	c.hooks.PaymentHistory = append(c.hooks.PaymentHistory, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `paymenthistory.Intercept(f(g(h())))`.
+func (c *PaymentHistoryClient) Intercept(interceptors ...Interceptor) {
+	c.inters.PaymentHistory = append(c.inters.PaymentHistory, interceptors...)
+}
+
+// Create returns a builder for creating a PaymentHistory entity.
+func (c *PaymentHistoryClient) Create() *PaymentHistoryCreate {
+	mutation := newPaymentHistoryMutation(c.config, OpCreate)
+	return &PaymentHistoryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of PaymentHistory entities.
+func (c *PaymentHistoryClient) CreateBulk(builders ...*PaymentHistoryCreate) *PaymentHistoryCreateBulk {
+	return &PaymentHistoryCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for PaymentHistory.
+func (c *PaymentHistoryClient) Update() *PaymentHistoryUpdate {
+	mutation := newPaymentHistoryMutation(c.config, OpUpdate)
+	return &PaymentHistoryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PaymentHistoryClient) UpdateOne(ph *PaymentHistory) *PaymentHistoryUpdateOne {
+	mutation := newPaymentHistoryMutation(c.config, OpUpdateOne, withPaymentHistory(ph))
+	return &PaymentHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PaymentHistoryClient) UpdateOneID(id uuid.UUID) *PaymentHistoryUpdateOne {
+	mutation := newPaymentHistoryMutation(c.config, OpUpdateOne, withPaymentHistoryID(id))
+	return &PaymentHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for PaymentHistory.
+func (c *PaymentHistoryClient) Delete() *PaymentHistoryDelete {
+	mutation := newPaymentHistoryMutation(c.config, OpDelete)
+	return &PaymentHistoryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *PaymentHistoryClient) DeleteOne(ph *PaymentHistory) *PaymentHistoryDeleteOne {
+	return c.DeleteOneID(ph.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *PaymentHistoryClient) DeleteOneID(id uuid.UUID) *PaymentHistoryDeleteOne {
+	builder := c.Delete().Where(paymenthistory.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PaymentHistoryDeleteOne{builder}
+}
+
+// Query returns a query builder for PaymentHistory.
+func (c *PaymentHistoryClient) Query() *PaymentHistoryQuery {
+	return &PaymentHistoryQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypePaymentHistory},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a PaymentHistory entity by its id.
+func (c *PaymentHistoryClient) Get(ctx context.Context, id uuid.UUID) (*PaymentHistory, error) {
+	return c.Query().Where(paymenthistory.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PaymentHistoryClient) GetX(ctx context.Context, id uuid.UUID) *PaymentHistory {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *PaymentHistoryClient) Hooks() []Hook {
+	return c.hooks.PaymentHistory
+}
+
+// Interceptors returns the client interceptors.
+func (c *PaymentHistoryClient) Interceptors() []Interceptor {
+	return c.inters.PaymentHistory
+}
+
+func (c *PaymentHistoryClient) mutate(ctx context.Context, m *PaymentHistoryMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PaymentHistoryCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PaymentHistoryUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PaymentHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PaymentHistoryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown PaymentHistory mutation op: %q", m.Op())
+	}
+}
+
+// ReportTutorClient is a client for the ReportTutor schema.
+type ReportTutorClient struct {
+	config
+}
+
+// NewReportTutorClient returns a client for the ReportTutor from the given config.
+func NewReportTutorClient(c config) *ReportTutorClient {
+	return &ReportTutorClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `reporttutor.Hooks(f(g(h())))`.
+func (c *ReportTutorClient) Use(hooks ...Hook) {
+	c.hooks.ReportTutor = append(c.hooks.ReportTutor, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `reporttutor.Intercept(f(g(h())))`.
+func (c *ReportTutorClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ReportTutor = append(c.inters.ReportTutor, interceptors...)
+}
+
+// Create returns a builder for creating a ReportTutor entity.
+func (c *ReportTutorClient) Create() *ReportTutorCreate {
+	mutation := newReportTutorMutation(c.config, OpCreate)
+	return &ReportTutorCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ReportTutor entities.
+func (c *ReportTutorClient) CreateBulk(builders ...*ReportTutorCreate) *ReportTutorCreateBulk {
+	return &ReportTutorCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ReportTutor.
+func (c *ReportTutorClient) Update() *ReportTutorUpdate {
+	mutation := newReportTutorMutation(c.config, OpUpdate)
+	return &ReportTutorUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ReportTutorClient) UpdateOne(rt *ReportTutor) *ReportTutorUpdateOne {
+	mutation := newReportTutorMutation(c.config, OpUpdateOne, withReportTutor(rt))
+	return &ReportTutorUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ReportTutorClient) UpdateOneID(id int) *ReportTutorUpdateOne {
+	mutation := newReportTutorMutation(c.config, OpUpdateOne, withReportTutorID(id))
+	return &ReportTutorUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ReportTutor.
+func (c *ReportTutorClient) Delete() *ReportTutorDelete {
+	mutation := newReportTutorMutation(c.config, OpDelete)
+	return &ReportTutorDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ReportTutorClient) DeleteOne(rt *ReportTutor) *ReportTutorDeleteOne {
+	return c.DeleteOneID(rt.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ReportTutorClient) DeleteOneID(id int) *ReportTutorDeleteOne {
+	builder := c.Delete().Where(reporttutor.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ReportTutorDeleteOne{builder}
+}
+
+// Query returns a query builder for ReportTutor.
+func (c *ReportTutorClient) Query() *ReportTutorQuery {
+	return &ReportTutorQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeReportTutor},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ReportTutor entity by its id.
+func (c *ReportTutorClient) Get(ctx context.Context, id int) (*ReportTutor, error) {
+	return c.Query().Where(reporttutor.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ReportTutorClient) GetX(ctx context.Context, id int) *ReportTutor {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ReportTutorClient) Hooks() []Hook {
+	return c.hooks.ReportTutor
+}
+
+// Interceptors returns the client interceptors.
+func (c *ReportTutorClient) Interceptors() []Interceptor {
+	return c.inters.ReportTutor
+}
+
+func (c *ReportTutorClient) mutate(ctx context.Context, m *ReportTutorMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ReportTutorCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ReportTutorUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ReportTutorUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ReportTutorDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ReportTutor mutation op: %q", m.Op())
+	}
+}
+
+// ReviewCourseClient is a client for the ReviewCourse schema.
+type ReviewCourseClient struct {
+	config
+}
+
+// NewReviewCourseClient returns a client for the ReviewCourse from the given config.
+func NewReviewCourseClient(c config) *ReviewCourseClient {
+	return &ReviewCourseClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `reviewcourse.Hooks(f(g(h())))`.
+func (c *ReviewCourseClient) Use(hooks ...Hook) {
+	c.hooks.ReviewCourse = append(c.hooks.ReviewCourse, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `reviewcourse.Intercept(f(g(h())))`.
+func (c *ReviewCourseClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ReviewCourse = append(c.inters.ReviewCourse, interceptors...)
+}
+
+// Create returns a builder for creating a ReviewCourse entity.
+func (c *ReviewCourseClient) Create() *ReviewCourseCreate {
+	mutation := newReviewCourseMutation(c.config, OpCreate)
+	return &ReviewCourseCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ReviewCourse entities.
+func (c *ReviewCourseClient) CreateBulk(builders ...*ReviewCourseCreate) *ReviewCourseCreateBulk {
+	return &ReviewCourseCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ReviewCourse.
+func (c *ReviewCourseClient) Update() *ReviewCourseUpdate {
+	mutation := newReviewCourseMutation(c.config, OpUpdate)
+	return &ReviewCourseUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ReviewCourseClient) UpdateOne(rc *ReviewCourse) *ReviewCourseUpdateOne {
+	mutation := newReviewCourseMutation(c.config, OpUpdateOne, withReviewCourse(rc))
+	return &ReviewCourseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ReviewCourseClient) UpdateOneID(id int) *ReviewCourseUpdateOne {
+	mutation := newReviewCourseMutation(c.config, OpUpdateOne, withReviewCourseID(id))
+	return &ReviewCourseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ReviewCourse.
+func (c *ReviewCourseClient) Delete() *ReviewCourseDelete {
+	mutation := newReviewCourseMutation(c.config, OpDelete)
+	return &ReviewCourseDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ReviewCourseClient) DeleteOne(rc *ReviewCourse) *ReviewCourseDeleteOne {
+	return c.DeleteOneID(rc.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ReviewCourseClient) DeleteOneID(id int) *ReviewCourseDeleteOne {
+	builder := c.Delete().Where(reviewcourse.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ReviewCourseDeleteOne{builder}
+}
+
+// Query returns a query builder for ReviewCourse.
+func (c *ReviewCourseClient) Query() *ReviewCourseQuery {
+	return &ReviewCourseQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeReviewCourse},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ReviewCourse entity by its id.
+func (c *ReviewCourseClient) Get(ctx context.Context, id int) (*ReviewCourse, error) {
+	return c.Query().Where(reviewcourse.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ReviewCourseClient) GetX(ctx context.Context, id int) *ReviewCourse {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ReviewCourseClient) Hooks() []Hook {
+	return c.hooks.ReviewCourse
+}
+
+// Interceptors returns the client interceptors.
+func (c *ReviewCourseClient) Interceptors() []Interceptor {
+	return c.inters.ReviewCourse
+}
+
+func (c *ReviewCourseClient) mutate(ctx context.Context, m *ReviewCourseMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ReviewCourseCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ReviewCourseUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ReviewCourseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ReviewCourseDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ReviewCourse mutation op: %q", m.Op())
+	}
+}
+
+// ScheduleClient is a client for the Schedule schema.
+type ScheduleClient struct {
+	config
+}
+
+// NewScheduleClient returns a client for the Schedule from the given config.
+func NewScheduleClient(c config) *ScheduleClient {
+	return &ScheduleClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `schedule.Hooks(f(g(h())))`.
+func (c *ScheduleClient) Use(hooks ...Hook) {
+	c.hooks.Schedule = append(c.hooks.Schedule, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `schedule.Intercept(f(g(h())))`.
+func (c *ScheduleClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Schedule = append(c.inters.Schedule, interceptors...)
+}
+
+// Create returns a builder for creating a Schedule entity.
+func (c *ScheduleClient) Create() *ScheduleCreate {
+	mutation := newScheduleMutation(c.config, OpCreate)
+	return &ScheduleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Schedule entities.
+func (c *ScheduleClient) CreateBulk(builders ...*ScheduleCreate) *ScheduleCreateBulk {
+	return &ScheduleCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Schedule.
+func (c *ScheduleClient) Update() *ScheduleUpdate {
+	mutation := newScheduleMutation(c.config, OpUpdate)
+	return &ScheduleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ScheduleClient) UpdateOne(s *Schedule) *ScheduleUpdateOne {
+	mutation := newScheduleMutation(c.config, OpUpdateOne, withSchedule(s))
+	return &ScheduleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ScheduleClient) UpdateOneID(id uuid.UUID) *ScheduleUpdateOne {
+	mutation := newScheduleMutation(c.config, OpUpdateOne, withScheduleID(id))
+	return &ScheduleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Schedule.
+func (c *ScheduleClient) Delete() *ScheduleDelete {
+	mutation := newScheduleMutation(c.config, OpDelete)
+	return &ScheduleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ScheduleClient) DeleteOne(s *Schedule) *ScheduleDeleteOne {
+	return c.DeleteOneID(s.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ScheduleClient) DeleteOneID(id uuid.UUID) *ScheduleDeleteOne {
+	builder := c.Delete().Where(schedule.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ScheduleDeleteOne{builder}
+}
+
+// Query returns a query builder for Schedule.
+func (c *ScheduleClient) Query() *ScheduleQuery {
+	return &ScheduleQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSchedule},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Schedule entity by its id.
+func (c *ScheduleClient) Get(ctx context.Context, id uuid.UUID) (*Schedule, error) {
+	return c.Query().Where(schedule.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ScheduleClient) GetX(ctx context.Context, id uuid.UUID) *Schedule {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ScheduleClient) Hooks() []Hook {
+	return c.hooks.Schedule
+}
+
+// Interceptors returns the client interceptors.
+func (c *ScheduleClient) Interceptors() []Interceptor {
+	return c.inters.Schedule
+}
+
+func (c *ScheduleClient) mutate(ctx context.Context, m *ScheduleMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ScheduleCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ScheduleUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ScheduleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ScheduleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Schedule mutation op: %q", m.Op())
+	}
+}
+
+// StudentClient is a client for the Student schema.
+type StudentClient struct {
+	config
+}
+
+// NewStudentClient returns a client for the Student from the given config.
+func NewStudentClient(c config) *StudentClient {
+	return &StudentClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `student.Hooks(f(g(h())))`.
+func (c *StudentClient) Use(hooks ...Hook) {
+	c.hooks.Student = append(c.hooks.Student, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `student.Intercept(f(g(h())))`.
+func (c *StudentClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Student = append(c.inters.Student, interceptors...)
+}
+
+// Create returns a builder for creating a Student entity.
+func (c *StudentClient) Create() *StudentCreate {
+	mutation := newStudentMutation(c.config, OpCreate)
+	return &StudentCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Student entities.
+func (c *StudentClient) CreateBulk(builders ...*StudentCreate) *StudentCreateBulk {
+	return &StudentCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Student.
+func (c *StudentClient) Update() *StudentUpdate {
+	mutation := newStudentMutation(c.config, OpUpdate)
+	return &StudentUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *StudentClient) UpdateOne(s *Student) *StudentUpdateOne {
+	mutation := newStudentMutation(c.config, OpUpdateOne, withStudent(s))
+	return &StudentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *StudentClient) UpdateOneID(id uuid.UUID) *StudentUpdateOne {
+	mutation := newStudentMutation(c.config, OpUpdateOne, withStudentID(id))
+	return &StudentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Student.
+func (c *StudentClient) Delete() *StudentDelete {
+	mutation := newStudentMutation(c.config, OpDelete)
+	return &StudentDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *StudentClient) DeleteOne(s *Student) *StudentDeleteOne {
+	return c.DeleteOneID(s.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *StudentClient) DeleteOneID(id uuid.UUID) *StudentDeleteOne {
+	builder := c.Delete().Where(student.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &StudentDeleteOne{builder}
+}
+
+// Query returns a query builder for Student.
+func (c *StudentClient) Query() *StudentQuery {
+	return &StudentQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeStudent},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Student entity by its id.
+func (c *StudentClient) Get(ctx context.Context, id uuid.UUID) (*Student, error) {
+	return c.Query().Where(student.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *StudentClient) GetX(ctx context.Context, id uuid.UUID) *Student {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *StudentClient) Hooks() []Hook {
+	return c.hooks.Student
+}
+
+// Interceptors returns the client interceptors.
+func (c *StudentClient) Interceptors() []Interceptor {
+	return c.inters.Student
+}
+
+func (c *StudentClient) mutate(ctx context.Context, m *StudentMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&StudentCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&StudentUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&StudentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&StudentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Student mutation op: %q", m.Op())
+	}
+}
+
+// TutorClient is a client for the Tutor schema.
+type TutorClient struct {
+	config
+}
+
+// NewTutorClient returns a client for the Tutor from the given config.
+func NewTutorClient(c config) *TutorClient {
+	return &TutorClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `tutor.Hooks(f(g(h())))`.
+func (c *TutorClient) Use(hooks ...Hook) {
+	c.hooks.Tutor = append(c.hooks.Tutor, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `tutor.Intercept(f(g(h())))`.
+func (c *TutorClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Tutor = append(c.inters.Tutor, interceptors...)
+}
+
+// Create returns a builder for creating a Tutor entity.
+func (c *TutorClient) Create() *TutorCreate {
+	mutation := newTutorMutation(c.config, OpCreate)
+	return &TutorCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Tutor entities.
+func (c *TutorClient) CreateBulk(builders ...*TutorCreate) *TutorCreateBulk {
+	return &TutorCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Tutor.
+func (c *TutorClient) Update() *TutorUpdate {
+	mutation := newTutorMutation(c.config, OpUpdate)
+	return &TutorUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TutorClient) UpdateOne(t *Tutor) *TutorUpdateOne {
+	mutation := newTutorMutation(c.config, OpUpdateOne, withTutor(t))
+	return &TutorUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TutorClient) UpdateOneID(id uuid.UUID) *TutorUpdateOne {
+	mutation := newTutorMutation(c.config, OpUpdateOne, withTutorID(id))
+	return &TutorUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Tutor.
+func (c *TutorClient) Delete() *TutorDelete {
+	mutation := newTutorMutation(c.config, OpDelete)
+	return &TutorDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TutorClient) DeleteOne(t *Tutor) *TutorDeleteOne {
+	return c.DeleteOneID(t.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TutorClient) DeleteOneID(id uuid.UUID) *TutorDeleteOne {
+	builder := c.Delete().Where(tutor.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TutorDeleteOne{builder}
+}
+
+// Query returns a query builder for Tutor.
+func (c *TutorClient) Query() *TutorQuery {
+	return &TutorQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTutor},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Tutor entity by its id.
+func (c *TutorClient) Get(ctx context.Context, id uuid.UUID) (*Tutor, error) {
+	return c.Query().Where(tutor.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TutorClient) GetX(ctx context.Context, id uuid.UUID) *Tutor {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *TutorClient) Hooks() []Hook {
+	return c.hooks.Tutor
+}
+
+// Interceptors returns the client interceptors.
+func (c *TutorClient) Interceptors() []Interceptor {
+	return c.inters.Tutor
+}
+
+func (c *TutorClient) mutate(ctx context.Context, m *TutorMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TutorCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TutorUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TutorUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TutorDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Tutor mutation op: %q", m.Op())
 	}
 }

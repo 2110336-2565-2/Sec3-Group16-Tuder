@@ -8,21 +8,170 @@ import (
 )
 
 var (
-	// UsersColumns holds the columns for the "users" table.
-	UsersColumns = []*schema.Column{
+	// ClassesColumns holds the columns for the "classes" table.
+	ClassesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "review_avaliable", Type: field.TypeBool, Default: true},
+		{Name: "total_hour", Type: field.TypeString},
+		{Name: "success_hour", Type: field.TypeString},
+	}
+	// ClassesTable holds the schema information for the "classes" table.
+	ClassesTable = &schema.Table{
+		Name:       "classes",
+		Columns:    ClassesColumns,
+		PrimaryKey: []*schema.Column{ClassesColumns[0]},
+	}
+	// CoursesColumns holds the columns for the "courses" table.
+	CoursesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "title", Type: field.TypeString},
+		{Name: "estimated_time", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString},
+		{Name: "course_status", Type: field.TypeString},
+		{Name: "price_per_hour", Type: field.TypeInt},
+		{Name: "level_id", Type: field.TypeString},
+		{Name: "course_picture_url", Type: field.TypeString, Nullable: true},
+	}
+	// CoursesTable holds the schema information for the "courses" table.
+	CoursesTable = &schema.Table{
+		Name:       "courses",
+		Columns:    CoursesColumns,
+		PrimaryKey: []*schema.Column{CoursesColumns[0]},
+	}
+	// IssueReportsColumns holds the columns for the "issue_reports" table.
+	IssueReportsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "title", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString},
+		{Name: "report_date", Type: field.TypeString},
+		{Name: "status", Type: field.TypeString},
+	}
+	// IssueReportsTable holds the schema information for the "issue_reports" table.
+	IssueReportsTable = &schema.Table{
+		Name:       "issue_reports",
+		Columns:    IssueReportsColumns,
+		PrimaryKey: []*schema.Column{IssueReportsColumns[0]},
+	}
+	// PaymentsColumns holds the columns for the "payments" table.
+	PaymentsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "qr_picture_url", Type: field.TypeString, Nullable: true},
+	}
+	// PaymentsTable holds the schema information for the "payments" table.
+	PaymentsTable = &schema.Table{
+		Name:       "payments",
+		Columns:    PaymentsColumns,
+		PrimaryKey: []*schema.Column{PaymentsColumns[0]},
+	}
+	// PaymentHistoriesColumns holds the columns for the "payment_histories" table.
+	PaymentHistoriesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "amount", Type: field.TypeFloat64, Nullable: true},
+		{Name: "type", Type: field.TypeString},
+	}
+	// PaymentHistoriesTable holds the schema information for the "payment_histories" table.
+	PaymentHistoriesTable = &schema.Table{
+		Name:       "payment_histories",
+		Columns:    PaymentHistoriesColumns,
+		PrimaryKey: []*schema.Column{PaymentHistoriesColumns[0]},
+	}
+	// ReportTutorsColumns holds the columns for the "report_tutors" table.
+	ReportTutorsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "score", Type: field.TypeFloat32, Nullable: true},
+		{Name: "review_msg", Type: field.TypeString, Nullable: true},
+	}
+	// ReportTutorsTable holds the schema information for the "report_tutors" table.
+	ReportTutorsTable = &schema.Table{
+		Name:       "report_tutors",
+		Columns:    ReportTutorsColumns,
+		PrimaryKey: []*schema.Column{ReportTutorsColumns[0]},
+	}
+	// ReviewCoursesColumns holds the columns for the "review_courses" table.
+	ReviewCoursesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "score", Type: field.TypeFloat32, Nullable: true},
+		{Name: "review_msg", Type: field.TypeString, Nullable: true},
+	}
+	// ReviewCoursesTable holds the schema information for the "review_courses" table.
+	ReviewCoursesTable = &schema.Table{
+		Name:       "review_courses",
+		Columns:    ReviewCoursesColumns,
+		PrimaryKey: []*schema.Column{ReviewCoursesColumns[0]},
+	}
+	// SchedulesColumns holds the columns for the "schedules" table.
+	SchedulesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "day_0", Type: field.TypeBool, Nullable: true, Default: false},
+		{Name: "day_1", Type: field.TypeBool, Nullable: true, Default: false},
+		{Name: "day_2", Type: field.TypeBool, Nullable: true, Default: false},
+		{Name: "day_3", Type: field.TypeBool, Nullable: true, Default: false},
+		{Name: "day_4", Type: field.TypeBool, Nullable: true, Default: false},
+		{Name: "day_5", Type: field.TypeBool, Nullable: true, Default: false},
+		{Name: "day_6", Type: field.TypeBool, Nullable: true, Default: false},
+	}
+	// SchedulesTable holds the schema information for the "schedules" table.
+	SchedulesTable = &schema.Table{
+		Name:       "schedules",
+		Columns:    SchedulesColumns,
+		PrimaryKey: []*schema.Column{SchedulesColumns[0]},
+	}
+	// StudentsColumns holds the columns for the "students" table.
+	StudentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "username", Type: field.TypeString, Unique: true},
 		{Name: "password", Type: field.TypeString},
+		{Name: "email", Type: field.TypeString},
+		{Name: "first_name", Type: field.TypeString},
+		{Name: "last_name", Type: field.TypeString},
+		{Name: "address", Type: field.TypeString},
+		{Name: "phone", Type: field.TypeString},
+		{Name: "birth_date", Type: field.TypeTime},
+		{Name: "gender", Type: field.TypeString},
+		{Name: "profile_picture_url", Type: field.TypeString, Nullable: true},
+		{Name: "school", Type: field.TypeString},
 	}
-	// UsersTable holds the schema information for the "users" table.
-	UsersTable = &schema.Table{
-		Name:       "users",
-		Columns:    UsersColumns,
-		PrimaryKey: []*schema.Column{UsersColumns[0]},
+	// StudentsTable holds the schema information for the "students" table.
+	StudentsTable = &schema.Table{
+		Name:       "students",
+		Columns:    StudentsColumns,
+		PrimaryKey: []*schema.Column{StudentsColumns[0]},
+	}
+	// TutorsColumns holds the columns for the "tutors" table.
+	TutorsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "username", Type: field.TypeString, Unique: true},
+		{Name: "password", Type: field.TypeString},
+		{Name: "email", Type: field.TypeString},
+		{Name: "first_name", Type: field.TypeString},
+		{Name: "last_name", Type: field.TypeString},
+		{Name: "address", Type: field.TypeString},
+		{Name: "phone", Type: field.TypeString},
+		{Name: "birth_date", Type: field.TypeTime},
+		{Name: "gender", Type: field.TypeString},
+		{Name: "profile_picture_url", Type: field.TypeString, Nullable: true},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "omise_bank_token", Type: field.TypeString, Nullable: true},
+		{Name: "citizen_id", Type: field.TypeString, Unique: true},
+	}
+	// TutorsTable holds the schema information for the "tutors" table.
+	TutorsTable = &schema.Table{
+		Name:       "tutors",
+		Columns:    TutorsColumns,
+		PrimaryKey: []*schema.Column{TutorsColumns[0]},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		UsersTable,
+		ClassesTable,
+		CoursesTable,
+		IssueReportsTable,
+		PaymentsTable,
+		PaymentHistoriesTable,
+		ReportTutorsTable,
+		ReviewCoursesTable,
+		SchedulesTable,
+		StudentsTable,
+		TutorsTable,
 	}
 )
 

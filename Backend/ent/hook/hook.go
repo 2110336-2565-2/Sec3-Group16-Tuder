@@ -9,16 +9,124 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 )
 
-// The UserFunc type is an adapter to allow the use of ordinary
-// function as User mutator.
-type UserFunc func(context.Context, *ent.UserMutation) (ent.Value, error)
+// The ClassFunc type is an adapter to allow the use of ordinary
+// function as Class mutator.
+type ClassFunc func(context.Context, *ent.ClassMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f UserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.UserMutation); ok {
+func (f ClassFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ClassMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ClassMutation", m)
+}
+
+// The CourseFunc type is an adapter to allow the use of ordinary
+// function as Course mutator.
+type CourseFunc func(context.Context, *ent.CourseMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CourseFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.CourseMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CourseMutation", m)
+}
+
+// The IssueReportFunc type is an adapter to allow the use of ordinary
+// function as IssueReport mutator.
+type IssueReportFunc func(context.Context, *ent.IssueReportMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f IssueReportFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.IssueReportMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.IssueReportMutation", m)
+}
+
+// The PaymentFunc type is an adapter to allow the use of ordinary
+// function as Payment mutator.
+type PaymentFunc func(context.Context, *ent.PaymentMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f PaymentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.PaymentMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PaymentMutation", m)
+}
+
+// The PaymentHistoryFunc type is an adapter to allow the use of ordinary
+// function as PaymentHistory mutator.
+type PaymentHistoryFunc func(context.Context, *ent.PaymentHistoryMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f PaymentHistoryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.PaymentHistoryMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PaymentHistoryMutation", m)
+}
+
+// The ReportTutorFunc type is an adapter to allow the use of ordinary
+// function as ReportTutor mutator.
+type ReportTutorFunc func(context.Context, *ent.ReportTutorMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ReportTutorFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ReportTutorMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ReportTutorMutation", m)
+}
+
+// The ReviewCourseFunc type is an adapter to allow the use of ordinary
+// function as ReviewCourse mutator.
+type ReviewCourseFunc func(context.Context, *ent.ReviewCourseMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ReviewCourseFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ReviewCourseMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ReviewCourseMutation", m)
+}
+
+// The ScheduleFunc type is an adapter to allow the use of ordinary
+// function as Schedule mutator.
+type ScheduleFunc func(context.Context, *ent.ScheduleMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ScheduleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ScheduleMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ScheduleMutation", m)
+}
+
+// The StudentFunc type is an adapter to allow the use of ordinary
+// function as Student mutator.
+type StudentFunc func(context.Context, *ent.StudentMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f StudentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.StudentMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.StudentMutation", m)
+}
+
+// The TutorFunc type is an adapter to allow the use of ordinary
+// function as Tutor mutator.
+type TutorFunc func(context.Context, *ent.TutorMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TutorFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TutorMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TutorMutation", m)
 }
 
 // Condition is a hook condition function.

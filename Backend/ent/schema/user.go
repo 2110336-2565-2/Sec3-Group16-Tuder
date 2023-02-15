@@ -25,7 +25,7 @@ func (UserMixin) Fields() []ent.Field {
 		field.String("last_name").NotEmpty(),
 		field.String("address").NotEmpty(),
 		field.String("phone").NotEmpty(),
-		field.String("birth_date").NotEmpty(),
+		field.Time("birth_date"),
 		field.String("gender").NotEmpty(),
 		field.String("profile_picture_URL").Optional().Nillable(),
 	}

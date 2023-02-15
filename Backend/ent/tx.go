@@ -12,8 +12,26 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
-	// User is the client for interacting with the User builders.
-	User *UserClient
+	// Class is the client for interacting with the Class builders.
+	Class *ClassClient
+	// Course is the client for interacting with the Course builders.
+	Course *CourseClient
+	// IssueReport is the client for interacting with the IssueReport builders.
+	IssueReport *IssueReportClient
+	// Payment is the client for interacting with the Payment builders.
+	Payment *PaymentClient
+	// PaymentHistory is the client for interacting with the PaymentHistory builders.
+	PaymentHistory *PaymentHistoryClient
+	// ReportTutor is the client for interacting with the ReportTutor builders.
+	ReportTutor *ReportTutorClient
+	// ReviewCourse is the client for interacting with the ReviewCourse builders.
+	ReviewCourse *ReviewCourseClient
+	// Schedule is the client for interacting with the Schedule builders.
+	Schedule *ScheduleClient
+	// Student is the client for interacting with the Student builders.
+	Student *StudentClient
+	// Tutor is the client for interacting with the Tutor builders.
+	Tutor *TutorClient
 
 	// lazily loaded.
 	client     *Client
@@ -145,7 +163,16 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
-	tx.User = NewUserClient(tx.config)
+	tx.Class = NewClassClient(tx.config)
+	tx.Course = NewCourseClient(tx.config)
+	tx.IssueReport = NewIssueReportClient(tx.config)
+	tx.Payment = NewPaymentClient(tx.config)
+	tx.PaymentHistory = NewPaymentHistoryClient(tx.config)
+	tx.ReportTutor = NewReportTutorClient(tx.config)
+	tx.ReviewCourse = NewReviewCourseClient(tx.config)
+	tx.Schedule = NewScheduleClient(tx.config)
+	tx.Student = NewStudentClient(tx.config)
+	tx.Tutor = NewTutorClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
@@ -155,7 +182,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: User.QueryXXX(), the query will be executed
+// applies a query, for example: Class.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.
