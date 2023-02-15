@@ -2,6 +2,7 @@ import { Outlet, Link } from 'react-router-dom';
 import navbarContent from '../datas/Navbar.role.js';
 import styled from 'styled-components';
 import { useState } from 'react';
+import { Fragment } from 'react';
 
 export default function Navbar(props){
     // choose Navbar contents array from role 
@@ -36,7 +37,7 @@ export default function Navbar(props){
     });
 
     return (
-        <>
+        <Fragment>
             <NavbarSection>
                 <NavbarHeader>Tuder</NavbarHeader>
                 <NavbarItems>
@@ -46,7 +47,7 @@ export default function Navbar(props){
             <Outlet  context={{
                 role, setRole 
             }}/>    
-        </>
+        </Fragment>
     )
 }
 
