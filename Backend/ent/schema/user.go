@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/mixin"
 
@@ -31,7 +32,7 @@ func (UserMixin) Fields() []ent.Field {
 	}
 }
 
-// func (UserMixin) Edges() []ent.Edge {
+// func (UserMixin) MixinEdges() []ent.Edge {
 // 	return []ent.Edge{
 // 		edge.To("issue_report", IssueReport.Type),
 // 	}
@@ -44,5 +45,11 @@ type User struct {
 func (User) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		UserMixin{},
+	}
+}
+
+func (User) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("issue_report", IssueReport.Type),
 	}
 }

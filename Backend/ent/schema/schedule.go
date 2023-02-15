@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 
 	"github.com/google/uuid"
@@ -28,5 +29,14 @@ func (Schedule) Fields() []ent.Field {
 }
 
 func (Schedule) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("tutor", Tutor.Type).
+			Ref("schedule").
+			Unique().
+			Required(),
+		edge.From("class", Class.Type).
+			Ref("schedule").
+			Unique().
+			Required(),
+	}
 }
