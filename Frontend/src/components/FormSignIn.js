@@ -1,49 +1,28 @@
 import FormT from './FormStyle.js';
 import { useState } from 'react';
-import axios from 'axios';
 
-const api = axios.create({
-    baseURL: 'http://localhost:8080' // replace with the URL of your locally running server
-  });
+import signInController from "../controllers/signInController"
+
 
 export default function FormSignIn(){
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-
-    async function handleSubmit(event) {
-
-        event.preventDefault();
-       
-            //console.log({username})
-            const response = await api.post('/api/v1/login', { username:"hee", password:"brightHee"})
-            .then(function(response){
-                console.log(response)
-                const token = response.data.data.token;
-               
-                localStorage.setItem('jwtToken', token); 
-                const tokencheck = localStorage.getItem('jwtToken');
-                console.log(tokencheck);
-            // Redirect to the home page
-            // window.location.href = '/';
-            }).catch(function(error){
-                console.error(error);
-            });
-           
-           
-
-        
-    };
     
+const handleSubmit = (event) => {
+    event.preventDefault(); // Prevent the default form submit behavior
+    signInController(username, password); // Call signInController with username and password
+}
+
     return(
-        <form >
+        <form onSubmit={handleSubmit}>
             <FormT.Div FormW='350px'>
                 <FormT.Header>Sign In</FormT.Header>
                 <FormT.Content>Sign in and start managing your candidates!</FormT.Content>
                 <FormT.Content>
-                    <FormT.TextInput BoxSize='200px' name='username' type='text' placeholder='Username'/>
+                    <FormT.TextInput BoxSize='200px' name='username' type='text' placeholder='Username' value={username} onChange={(e) => setUsername(e.target.value)}/>
                 </FormT.Content>
                 <FormT.Content>
-                    <FormT.TextInput BoxSize='200px' name='password' type='password' placeholder='Password'/>
+                    <FormT.TextInput  BoxSize='200px' name='password' type='password' placeholder='Password' value={password} onChange={(e) => setPassword(e.target.value)}/>
                 </FormT.Content>
                 <FormT.ContentInline>
                     <FormT.ContentSmall>
@@ -57,7 +36,7 @@ export default function FormSignIn(){
                     </FormT.ContentSmall>
                 </FormT.ContentInline>
                 <FormT.Content>
-                    <FormT.Button onClick= {handleSubmit} type='submit'>Sign in</FormT.Button>
+                    <FormT.Button type='submit'>Sign in</FormT.Button>
                 </FormT.Content>
                 <FormT.Content>
                     <FormT.ContentSmall>
