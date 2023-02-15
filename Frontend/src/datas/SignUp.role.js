@@ -1,13 +1,13 @@
 const signupContent = [
     {
         as: 'student',
-        contents: ['First Name', 'Last Name', 'Username', 'Email', 'Password', 'Confirm Password', 
-                    'Address', 'Contact Number', 'Gender', 'Birth Date', 'School']
+        contents: [['First Name', 'Last Name'], ['Username'], ['Email'], ['Password', 'Confirm Password'], 
+                    ['Address'], ['Contact Number'], ['Gender', 'Birth Date'], ['School']]
     },
     {
         as: 'tutor',
-        contents: ['First Name', 'Last Name', 'Username', 'Email', 'Password', 'Confirm Password', 
-                    'Address', 'Contact Number', 'Gender', 'Birth Date']
+        contents: [['First Name', 'Last Name'], ['Username'], ['Email'], ['Password', 'Confirm Password'], 
+                    ['Address'], ['Contact Number'], ['Gender', 'Birth Date']]
     }
 ];
 

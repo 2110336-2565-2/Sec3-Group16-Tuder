@@ -36,7 +36,7 @@ export default function Navbar(props){
     return (
         <>
             <NavbarSection>
-                <NavbarHeader>Tudor</NavbarHeader>
+                <NavbarHeader>Tuder</NavbarHeader>
                 <NavbarItems>
                     {contentElement}
                 </NavbarItems>
