@@ -15,6 +15,7 @@ import Courses from './pages/Courses';
 import Report from './pages/Report';
 
 
+
 function App() {
   const [role, setRole] = useState('guest');
   return (
@@ -31,24 +32,4 @@ function App() {
     </BrowserRouter>
   );
 }
-
-/*
-const getData = async () => {
-  const token = localStorage.getItem('jwtToken');
-
-  const response = await fetch('/protected', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (response.ok) {
-    const data = await response.json();
-    console.log(data);
-  } else {
-    console.error('Failed to fetch data');
-  }
-};
-
-*/
 export default App;
