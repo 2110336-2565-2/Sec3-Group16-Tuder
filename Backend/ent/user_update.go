@@ -6,15 +6,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
-	"github.com/google/uuid"
 )
 
 // UserUpdate is the builder for updating User entities.
@@ -42,107 +39,9 @@ func (uu *UserUpdate) SetPassword(s string) *UserUpdate {
 	return uu
 }
 
-// SetEmail sets the "email" field.
-func (uu *UserUpdate) SetEmail(s string) *UserUpdate {
-	uu.mutation.SetEmail(s)
-	return uu
-}
-
-// SetFirstName sets the "first_name" field.
-func (uu *UserUpdate) SetFirstName(s string) *UserUpdate {
-	uu.mutation.SetFirstName(s)
-	return uu
-}
-
-// SetLastName sets the "last_name" field.
-func (uu *UserUpdate) SetLastName(s string) *UserUpdate {
-	uu.mutation.SetLastName(s)
-	return uu
-}
-
-// SetAddress sets the "address" field.
-func (uu *UserUpdate) SetAddress(s string) *UserUpdate {
-	uu.mutation.SetAddress(s)
-	return uu
-}
-
-// SetPhone sets the "phone" field.
-func (uu *UserUpdate) SetPhone(s string) *UserUpdate {
-	uu.mutation.SetPhone(s)
-	return uu
-}
-
-// SetBirthDate sets the "birth_date" field.
-func (uu *UserUpdate) SetBirthDate(t time.Time) *UserUpdate {
-	uu.mutation.SetBirthDate(t)
-	return uu
-}
-
-// SetGender sets the "gender" field.
-func (uu *UserUpdate) SetGender(s string) *UserUpdate {
-	uu.mutation.SetGender(s)
-	return uu
-}
-
-// SetProfilePictureURL sets the "profile_picture_URL" field.
-func (uu *UserUpdate) SetProfilePictureURL(s string) *UserUpdate {
-	uu.mutation.SetProfilePictureURL(s)
-	return uu
-}
-
-// SetNillableProfilePictureURL sets the "profile_picture_URL" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableProfilePictureURL(s *string) *UserUpdate {
-	if s != nil {
-		uu.SetProfilePictureURL(*s)
-	}
-	return uu
-}
-
-// ClearProfilePictureURL clears the value of the "profile_picture_URL" field.
-func (uu *UserUpdate) ClearProfilePictureURL() *UserUpdate {
-	uu.mutation.ClearProfilePictureURL()
-	return uu
-}
-
-// AddIssueReportIDs adds the "issue_report" edge to the IssueReport entity by IDs.
-func (uu *UserUpdate) AddIssueReportIDs(ids ...uuid.UUID) *UserUpdate {
-	uu.mutation.AddIssueReportIDs(ids...)
-	return uu
-}
-
-// AddIssueReport adds the "issue_report" edges to the IssueReport entity.
-func (uu *UserUpdate) AddIssueReport(i ...*IssueReport) *UserUpdate {
-	ids := make([]uuid.UUID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return uu.AddIssueReportIDs(ids...)
-}
-
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
-}
-
-// ClearIssueReport clears all "issue_report" edges to the IssueReport entity.
-func (uu *UserUpdate) ClearIssueReport() *UserUpdate {
-	uu.mutation.ClearIssueReport()
-	return uu
-}
-
-// RemoveIssueReportIDs removes the "issue_report" edge to IssueReport entities by IDs.
-func (uu *UserUpdate) RemoveIssueReportIDs(ids ...uuid.UUID) *UserUpdate {
-	uu.mutation.RemoveIssueReportIDs(ids...)
-	return uu
-}
-
-// RemoveIssueReport removes "issue_report" edges to IssueReport entities.
-func (uu *UserUpdate) RemoveIssueReport(i ...*IssueReport) *UserUpdate {
-	ids := make([]uuid.UUID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return uu.RemoveIssueReportIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -184,36 +83,6 @@ func (uu *UserUpdate) check() error {
 			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "User.password": %w`, err)}
 		}
 	}
-	if v, ok := uu.mutation.Email(); ok {
-		if err := user.EmailValidator(v); err != nil {
-			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "User.email": %w`, err)}
-		}
-	}
-	if v, ok := uu.mutation.FirstName(); ok {
-		if err := user.FirstNameValidator(v); err != nil {
-			return &ValidationError{Name: "first_name", err: fmt.Errorf(`ent: validator failed for field "User.first_name": %w`, err)}
-		}
-	}
-	if v, ok := uu.mutation.LastName(); ok {
-		if err := user.LastNameValidator(v); err != nil {
-			return &ValidationError{Name: "last_name", err: fmt.Errorf(`ent: validator failed for field "User.last_name": %w`, err)}
-		}
-	}
-	if v, ok := uu.mutation.Address(); ok {
-		if err := user.AddressValidator(v); err != nil {
-			return &ValidationError{Name: "address", err: fmt.Errorf(`ent: validator failed for field "User.address": %w`, err)}
-		}
-	}
-	if v, ok := uu.mutation.Phone(); ok {
-		if err := user.PhoneValidator(v); err != nil {
-			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "User.phone": %w`, err)}
-		}
-	}
-	if v, ok := uu.mutation.Gender(); ok {
-		if err := user.GenderValidator(v); err != nil {
-			return &ValidationError{Name: "gender", err: fmt.Errorf(`ent: validator failed for field "User.gender": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -234,87 +103,6 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := uu.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
-	}
-	if value, ok := uu.mutation.Email(); ok {
-		_spec.SetField(user.FieldEmail, field.TypeString, value)
-	}
-	if value, ok := uu.mutation.FirstName(); ok {
-		_spec.SetField(user.FieldFirstName, field.TypeString, value)
-	}
-	if value, ok := uu.mutation.LastName(); ok {
-		_spec.SetField(user.FieldLastName, field.TypeString, value)
-	}
-	if value, ok := uu.mutation.Address(); ok {
-		_spec.SetField(user.FieldAddress, field.TypeString, value)
-	}
-	if value, ok := uu.mutation.Phone(); ok {
-		_spec.SetField(user.FieldPhone, field.TypeString, value)
-	}
-	if value, ok := uu.mutation.BirthDate(); ok {
-		_spec.SetField(user.FieldBirthDate, field.TypeTime, value)
-	}
-	if value, ok := uu.mutation.Gender(); ok {
-		_spec.SetField(user.FieldGender, field.TypeString, value)
-	}
-	if value, ok := uu.mutation.ProfilePictureURL(); ok {
-		_spec.SetField(user.FieldProfilePictureURL, field.TypeString, value)
-	}
-	if uu.mutation.ProfilePictureURLCleared() {
-		_spec.ClearField(user.FieldProfilePictureURL, field.TypeString)
-	}
-	if uu.mutation.IssueReportCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.IssueReportTable,
-			Columns: []string{user.IssueReportColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: issuereport.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uu.mutation.RemovedIssueReportIDs(); len(nodes) > 0 && !uu.mutation.IssueReportCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.IssueReportTable,
-			Columns: []string{user.IssueReportColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: issuereport.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uu.mutation.IssueReportIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.IssueReportTable,
-			Columns: []string{user.IssueReportColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: issuereport.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -348,107 +136,9 @@ func (uuo *UserUpdateOne) SetPassword(s string) *UserUpdateOne {
 	return uuo
 }
 
-// SetEmail sets the "email" field.
-func (uuo *UserUpdateOne) SetEmail(s string) *UserUpdateOne {
-	uuo.mutation.SetEmail(s)
-	return uuo
-}
-
-// SetFirstName sets the "first_name" field.
-func (uuo *UserUpdateOne) SetFirstName(s string) *UserUpdateOne {
-	uuo.mutation.SetFirstName(s)
-	return uuo
-}
-
-// SetLastName sets the "last_name" field.
-func (uuo *UserUpdateOne) SetLastName(s string) *UserUpdateOne {
-	uuo.mutation.SetLastName(s)
-	return uuo
-}
-
-// SetAddress sets the "address" field.
-func (uuo *UserUpdateOne) SetAddress(s string) *UserUpdateOne {
-	uuo.mutation.SetAddress(s)
-	return uuo
-}
-
-// SetPhone sets the "phone" field.
-func (uuo *UserUpdateOne) SetPhone(s string) *UserUpdateOne {
-	uuo.mutation.SetPhone(s)
-	return uuo
-}
-
-// SetBirthDate sets the "birth_date" field.
-func (uuo *UserUpdateOne) SetBirthDate(t time.Time) *UserUpdateOne {
-	uuo.mutation.SetBirthDate(t)
-	return uuo
-}
-
-// SetGender sets the "gender" field.
-func (uuo *UserUpdateOne) SetGender(s string) *UserUpdateOne {
-	uuo.mutation.SetGender(s)
-	return uuo
-}
-
-// SetProfilePictureURL sets the "profile_picture_URL" field.
-func (uuo *UserUpdateOne) SetProfilePictureURL(s string) *UserUpdateOne {
-	uuo.mutation.SetProfilePictureURL(s)
-	return uuo
-}
-
-// SetNillableProfilePictureURL sets the "profile_picture_URL" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableProfilePictureURL(s *string) *UserUpdateOne {
-	if s != nil {
-		uuo.SetProfilePictureURL(*s)
-	}
-	return uuo
-}
-
-// ClearProfilePictureURL clears the value of the "profile_picture_URL" field.
-func (uuo *UserUpdateOne) ClearProfilePictureURL() *UserUpdateOne {
-	uuo.mutation.ClearProfilePictureURL()
-	return uuo
-}
-
-// AddIssueReportIDs adds the "issue_report" edge to the IssueReport entity by IDs.
-func (uuo *UserUpdateOne) AddIssueReportIDs(ids ...uuid.UUID) *UserUpdateOne {
-	uuo.mutation.AddIssueReportIDs(ids...)
-	return uuo
-}
-
-// AddIssueReport adds the "issue_report" edges to the IssueReport entity.
-func (uuo *UserUpdateOne) AddIssueReport(i ...*IssueReport) *UserUpdateOne {
-	ids := make([]uuid.UUID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return uuo.AddIssueReportIDs(ids...)
-}
-
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
-}
-
-// ClearIssueReport clears all "issue_report" edges to the IssueReport entity.
-func (uuo *UserUpdateOne) ClearIssueReport() *UserUpdateOne {
-	uuo.mutation.ClearIssueReport()
-	return uuo
-}
-
-// RemoveIssueReportIDs removes the "issue_report" edge to IssueReport entities by IDs.
-func (uuo *UserUpdateOne) RemoveIssueReportIDs(ids ...uuid.UUID) *UserUpdateOne {
-	uuo.mutation.RemoveIssueReportIDs(ids...)
-	return uuo
-}
-
-// RemoveIssueReport removes "issue_report" edges to IssueReport entities.
-func (uuo *UserUpdateOne) RemoveIssueReport(i ...*IssueReport) *UserUpdateOne {
-	ids := make([]uuid.UUID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return uuo.RemoveIssueReportIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -503,36 +193,6 @@ func (uuo *UserUpdateOne) check() error {
 			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "User.password": %w`, err)}
 		}
 	}
-	if v, ok := uuo.mutation.Email(); ok {
-		if err := user.EmailValidator(v); err != nil {
-			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "User.email": %w`, err)}
-		}
-	}
-	if v, ok := uuo.mutation.FirstName(); ok {
-		if err := user.FirstNameValidator(v); err != nil {
-			return &ValidationError{Name: "first_name", err: fmt.Errorf(`ent: validator failed for field "User.first_name": %w`, err)}
-		}
-	}
-	if v, ok := uuo.mutation.LastName(); ok {
-		if err := user.LastNameValidator(v); err != nil {
-			return &ValidationError{Name: "last_name", err: fmt.Errorf(`ent: validator failed for field "User.last_name": %w`, err)}
-		}
-	}
-	if v, ok := uuo.mutation.Address(); ok {
-		if err := user.AddressValidator(v); err != nil {
-			return &ValidationError{Name: "address", err: fmt.Errorf(`ent: validator failed for field "User.address": %w`, err)}
-		}
-	}
-	if v, ok := uuo.mutation.Phone(); ok {
-		if err := user.PhoneValidator(v); err != nil {
-			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "User.phone": %w`, err)}
-		}
-	}
-	if v, ok := uuo.mutation.Gender(); ok {
-		if err := user.GenderValidator(v); err != nil {
-			return &ValidationError{Name: "gender", err: fmt.Errorf(`ent: validator failed for field "User.gender": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -570,87 +230,6 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
-	}
-	if value, ok := uuo.mutation.Email(); ok {
-		_spec.SetField(user.FieldEmail, field.TypeString, value)
-	}
-	if value, ok := uuo.mutation.FirstName(); ok {
-		_spec.SetField(user.FieldFirstName, field.TypeString, value)
-	}
-	if value, ok := uuo.mutation.LastName(); ok {
-		_spec.SetField(user.FieldLastName, field.TypeString, value)
-	}
-	if value, ok := uuo.mutation.Address(); ok {
-		_spec.SetField(user.FieldAddress, field.TypeString, value)
-	}
-	if value, ok := uuo.mutation.Phone(); ok {
-		_spec.SetField(user.FieldPhone, field.TypeString, value)
-	}
-	if value, ok := uuo.mutation.BirthDate(); ok {
-		_spec.SetField(user.FieldBirthDate, field.TypeTime, value)
-	}
-	if value, ok := uuo.mutation.Gender(); ok {
-		_spec.SetField(user.FieldGender, field.TypeString, value)
-	}
-	if value, ok := uuo.mutation.ProfilePictureURL(); ok {
-		_spec.SetField(user.FieldProfilePictureURL, field.TypeString, value)
-	}
-	if uuo.mutation.ProfilePictureURLCleared() {
-		_spec.ClearField(user.FieldProfilePictureURL, field.TypeString)
-	}
-	if uuo.mutation.IssueReportCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.IssueReportTable,
-			Columns: []string{user.IssueReportColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: issuereport.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uuo.mutation.RemovedIssueReportIDs(); len(nodes) > 0 && !uuo.mutation.IssueReportCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.IssueReportTable,
-			Columns: []string{user.IssueReportColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: issuereport.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uuo.mutation.IssueReportIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.IssueReportTable,
-			Columns: []string{user.IssueReportColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: issuereport.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &User{config: uuo.config}
 	_spec.Assign = _node.assignValues
