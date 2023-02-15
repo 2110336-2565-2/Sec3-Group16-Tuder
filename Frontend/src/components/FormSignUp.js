@@ -2,17 +2,9 @@ import FormT from './FormStyle.js';
 import signupContent from "../datas/SignUp.role.js";
 import styled from 'styled-components';
 
-export default function FormSignUp(props){
-    const {role} = props
+export default function FormSignUp(){
 
-    let signupRole = null
-    if(role === 'student'){
-        signupRole = signupContent[0]
-    }else{
-        signupRole = signupContent[1]
-    }
-    const signupContents = signupRole.contents;
-  
+    const signupContents = signupContent.contents;
     const signupContentElement = signupContents.map((content, index) => {
         return (
             <FormT.Content key={index}>
@@ -51,12 +43,14 @@ export default function FormSignUp(props){
                                 <FormT.DateInput BoxSize={boxsize} name={name} type={type} placeholder={pholder} />
                             </FormT.Component>
                         )
-                    // need to solve this problem today
                     }else if(element === 'Gender'){
                         return(
                             <FormT.Component key={elementindex}>
                                 <FormT.Label>{element} :</FormT.Label>
-                                <FormT.TextInput BoxSize={boxsize} name={name} type={type} placeholder={pholder} />
+                                <FormT.Select BoxSize='170px' name={name}>
+                                    <FormT.Option value='male'>male</FormT.Option>
+                                    <FormT.Option value='female'>female</FormT.Option>
+                                </FormT.Select>
                             </FormT.Component>
                         )
                     }else{
@@ -78,6 +72,15 @@ export default function FormSignUp(props){
                 <FormT.Content>Sign in and start managing your candidates!</FormT.Content>
                 {signupContentElement}
                 <FormT.Content>
+                    <FormT.Component>
+                        <FormT.Label>As :</FormT.Label>
+                        <FormT.Select BoxSize='343px' name='as'>
+                            <FormT.Option value='student'>Student</FormT.Option>
+                            <FormT.Option value='tutor'>Tutor</FormT.Option>
+                        </FormT.Select>
+                    </FormT.Component>
+                </FormT.Content>
+                <FormT.Content>
                     <FormT.Button type='submit'>Sign Up</FormT.Button>
                 </FormT.Content>
                 <FormT.Content>
@@ -96,3 +99,4 @@ const SignUpForm = styled.form`
     display: flex;
     justify-content: center;
 `;
+

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 // import css
 import './App.css';
 
@@ -18,17 +17,16 @@ import ForgetPassword from './pages/ForgetPassword';
 
 
 function App() {
-  const [role, setRole] = useState('guest');
-  const [signUpRole, setSignUpRole] = useState('student');
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navbar role={role} />}>
+        <Route path="/" element={<Navbar/>}>
           <Route index element={<Home />}></Route>
           <Route path="Report" element={<Report />}></Route>
           <Route path="Courses" element={<Courses />}></Route>
           <Route path="SignIn" element={<SignIn />}></Route>
-          <Route path="SignUp" element={<SignUp role={signUpRole}/>}></Route>
+          <Route path="SignUp" element={<SignUp />}></Route>
           <Route path="Forgetpassword" element={<ForgetPassword />}></Route>
         </Route>
       </Routes>

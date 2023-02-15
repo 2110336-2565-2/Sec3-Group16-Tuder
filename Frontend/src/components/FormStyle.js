@@ -58,9 +58,6 @@ const FormT = {
         border-radius: 6px;
         background-color: white;
         color: black;
-        &::placeholder{
-            color:black;
-        }
     `,
     Checkbox: styled.input`
         margin-right: 5px;
@@ -95,7 +92,24 @@ const FormT = {
     `,
     Label: styled.div`
         margin-bottom: 0.5em;
+        font-size: 13px;
     `,
+    Select: styled.select`
+        -webkit-appearance: none;
+        padding: 7px 40px 7px 12px;
+        width: ${(props) => {
+            return props.BoxSize
+        }};
+        height: 34px;
+        border: 1px solid black;
+        border-radius: 6px;
+        background: white;
+        font-size: 13px;
+    `,
+    Option: styled.option`
+        color: black;
+        background: white;
+    `
 }
 
 export default FormT;

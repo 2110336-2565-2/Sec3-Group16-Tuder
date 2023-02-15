@@ -1,10 +1,12 @@
 import { Outlet, Link } from 'react-router-dom';
 import navbarContent from '../datas/Navbar.role.js';
 import styled from 'styled-components';
+import { useState } from 'react';
 
 export default function Navbar(props){
     // choose Navbar contents array from role 
-    const {role} = props;
+    const [role, setRole] = useState('guest');
+
     let navbarRole = null
     if(role === 'guest'){
         navbarRole = navbarContent[0]
@@ -41,7 +43,9 @@ export default function Navbar(props){
                     {contentElement}
                 </NavbarItems>
             </NavbarSection>   
-            <Outlet />    
+            <Outlet  context={{
+                role, setRole 
+            }}/>    
         </>
     )
 }

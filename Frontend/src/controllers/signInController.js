@@ -5,11 +5,11 @@ const api = axios.create({
   });
 
 
+
 async function signInHandler(event) {
 
     // Input validation
-    //
-
+    
     // Prevent the default action of the event
     event.preventDefault();
 
