@@ -2,13 +2,17 @@ package main
 
 import (
 	"context"
+	"log"
+	"os"
+
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/migrate"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/middlewares"
 	routes "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/routes"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 	godotenv "github.com/joho/godotenv"
 	echo "github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
-	"log"
-	"os"
 )
 
 func init() {
@@ -16,6 +20,7 @@ func init() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+
 }
 
 func main() {
@@ -35,12 +40,21 @@ func main() {
 
 	defer client.Close()
 
-	if err := client.Schema.Create(context.Background()); err != nil {
+	if err := client.Schema.Create(context.Background(),
+		migrate.WithDropIndex(true),
+		migrate.WithDropColumn(true)); err != nil {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
-	routes.InitRoutes(client, e)
+	// test
+	ps, _ := utils.HashPassword("brightHee")
+	client.User.Create().
+		SetUsername("hee").
+		SetPassword(ps).
+		Save(context.Background())
 
+	routes.InitRoutes(client, e)
+	e.Use(middlewares.CorsMiddleware)
 	e.Logger.Fatal(e.Start(port))
 
 }
