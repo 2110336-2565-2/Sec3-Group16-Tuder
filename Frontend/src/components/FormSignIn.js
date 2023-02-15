@@ -11,22 +11,31 @@ export default function FormSignIn(){
     const [password, setPassword] = useState('');
 
     async function handleSubmit(event) {
-        console.log("asadfsd")
+
         event.preventDefault();
-        try {
-            const response = await api.post('/api/v1/login', { username, password });
-            const token = response.data.token;
-            localStorage.setItem('jwtToken', token);
-            console.log(token);
+       
+            //console.log({username})
+            const response = await api.post('/api/v1/login', { username:"hee", password:"brightHee"})
+            .then(function(response){
+                console.log(response)
+                const token = response.data.data.token;
+               
+                localStorage.setItem('jwtToken', token); 
+                const tokencheck = localStorage.getItem('jwtToken');
+                console.log(tokencheck);
             // Redirect to the home page
-            //window.location.href = '/';
-        } catch (error) {
-            console.error(error);
-        }
+            // window.location.href = '/';
+            }).catch(function(error){
+                console.error(error);
+            });
+           
+           
+
+        
     };
     
     return(
-        <form onSubmit={handleSubmit}>
+        <form >
             <FormT.Div FormW='350px'>
                 <FormT.Header>Sign In</FormT.Header>
                 <FormT.Content>Sign in and start managing your candidates!</FormT.Content>
