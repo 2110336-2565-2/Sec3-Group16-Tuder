@@ -6,14 +6,3 @@ const api = axios.create({
   });
 
 export    default api;
-
-
-// const updateRole = (trigger,data) => {
-//   useEffect(() => {
-//     if 
-
-
-
-//   })
-
-// }

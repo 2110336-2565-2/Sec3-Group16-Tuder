@@ -4,16 +4,16 @@ const initialState = {
     role : "guest"
 }
 
-export const roleSlice = createSlice({
+export  const roleSlice = createSlice({
     name : 'role',
     initialState,
     reducers:{
-        setRole : (state, action) => {
-            return action.payload;
-        },
-    },
+        setRole: (state, action) => {
+            return { ...state, role: action.payload }
+          }
+    }
 })
 
 export const {setRole} = roleSlice.actions;
 
-export default roleSlice.reducer;
+export const {roleReducer} = roleSlice.reducer;

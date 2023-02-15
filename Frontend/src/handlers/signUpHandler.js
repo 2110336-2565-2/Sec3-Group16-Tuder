@@ -1,5 +1,10 @@
 import api from './apiHandler';
 
+export async function signUp(signUpData){
+    return  await api.post('/api/v1/signUp', signUpData)
+}
+
+
 async function signUpHandler(event) {
 
     

@@ -1,11 +1,31 @@
 import { Outlet, Link } from 'react-router-dom';
 import navbarContent from '../datas/Navbar.role.js';
 import styled from 'styled-components';
-import {useSelector} from 'react-redux'
+import {useSelector, connect} from 'react-redux'
+import {signOutAction} from '../handlers/signOutHandler';
+import { useDispatch } from 'react-redux';
+import {useNavigate} from 'react-router-dom';
 
-export default function Navbar(props){
+
+function mapStateToProps(state) {
+    return {
+        role: state.role
+    }
+}
+
+function Navbar(props){
     // choose Navbar contents array from role 
-    const role = useSelector(state => state.role);
+    const dispatch = useDispatch();
+    const role = props.role;
+    const navigate = useNavigate();
+
+    
+    function signOutHandler(e) {
+        e.preventDefault();
+        
+        dispatch( signOutAction(navigate));
+    }
+
     let navbarRole = null
     if(role === 'guest'){
         navbarRole = navbarContent[0]
@@ -26,8 +46,8 @@ export default function Navbar(props){
             return <NavbarItem><TuderButton type='tudor-button' to="/SignUp" key={index}>{content}</TuderButton></NavbarItem>
         }else if(content === 'Sign In'){
             return <NavbarItem><TuderLinkNav to='/SignIn' key={index}>{content}</TuderLinkNav></NavbarItem>
-        }else if(content === 'Logout'){
-            return <NavbarItem><TuderButton type='red-button' to="/Logout" key={index}>{content}</TuderButton></NavbarItem>
+        }else if(content === 'Sign Out'){
+            return <NavbarItem><TuderButton type='red-button' onClick={signOutHandler} key={index}>{content}</TuderButton></NavbarItem>
         }else{
             let urlLink = "/" + content
             return <NavbarItem><TuderLinkNav to= {urlLink} key={index}>{content}</TuderLinkNav></NavbarItem>
@@ -46,6 +66,10 @@ export default function Navbar(props){
         </>
     )
 }
+
+
+export default connect(mapStateToProps)(Navbar);
+
 
 
 // styled-components for Navbar components

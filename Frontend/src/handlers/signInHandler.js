@@ -1,14 +1,14 @@
 import api from './apiHandler';
-import setRole from '../features/role/roleSlice'
+import {setRole} from '../features/role/roleSlice'
 
-export function signIn(signInData){
-    return  api.post('/api/v1/login', signInData)
+export async function signIn(signInData){
+    return  await api.post('/api/v1/login', signInData)
 }
 
-export default function signInAction(data){
-    return (dispatch) => {
+export default async function signInAction(data, navigate){
+    return async (dispatch) => {
 
-        signIn(data).then((response) => {
+        await signIn(data).then((response) => {
         
             let res = response.data;
             
@@ -21,10 +21,13 @@ export default function signInAction(data){
 
                 // redux state
                 let role = res.data.role
-                console.log("user role: "+ role)
+              
                 dispatch(
-                    setRole("hee")
+                    setRole(role)
                 )
+
+                navigate('/')
+                
             }
 
         }).catch(function(error){
