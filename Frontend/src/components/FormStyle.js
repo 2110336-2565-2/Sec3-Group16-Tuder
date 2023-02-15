@@ -49,6 +49,19 @@ const FormT = {
             color:black;
         }
     `,
+    DateInput: styled.input`
+        width: ${(props) => {
+            return props.BoxSize
+        }};
+        padding: 8px 13px;
+        border: 1px solid black;
+        border-radius: 6px;
+        background-color: white;
+        color: black;
+        &::placeholder{
+            color:black;
+        }
+    `,
     Checkbox: styled.input`
         margin-right: 5px;
         accent-color: #EB7B42;
@@ -77,14 +90,12 @@ const FormT = {
     Component: styled.div`
         display: flex;
         flex-direction: column;
+        padding-right: 2.5px;
+        padding-left: 2.5px;
     `,
     Label: styled.div`
         margin-bottom: 0.5em;
     `,
-    Space: styled.div`
-        padding-right: 5px;
-        padding-left: 5px;
-    `
 }
 
 export default FormT;

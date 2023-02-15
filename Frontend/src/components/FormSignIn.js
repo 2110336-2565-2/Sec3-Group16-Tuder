@@ -1,8 +1,9 @@
 import FormT from './FormStyle.js';
 
 export default function FormSignIn(){
+
     return(
-        <form>
+        <form action='/signincontroller' method='post'>
             <FormT.Div FormW='350px'>
                 <FormT.Header>Sign In</FormT.Header>
                 <FormT.Content>Sign in and start managing your candidates!</FormT.Content>
