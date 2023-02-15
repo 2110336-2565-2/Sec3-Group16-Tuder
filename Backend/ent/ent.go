@@ -11,6 +11,16 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewtutor"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 )
 
@@ -39,7 +49,17 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		user.Table: user.ValidColumn,
+		class.Table:          class.ValidColumn,
+		course.Table:         course.ValidColumn,
+		issuereport.Table:    issuereport.ValidColumn,
+		payment.Table:        payment.ValidColumn,
+		paymenthistory.Table: paymenthistory.ValidColumn,
+		reviewcourse.Table:   reviewcourse.ValidColumn,
+		reviewtutor.Table:    reviewtutor.ValidColumn,
+		schedule.Table:       schedule.ValidColumn,
+		student.Table:        student.ValidColumn,
+		tutor.Table:          tutor.ValidColumn,
+		user.Table:           user.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

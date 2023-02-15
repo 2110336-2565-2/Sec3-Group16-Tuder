@@ -15,8 +15,51 @@ const (
 	FieldUsername = "username"
 	// FieldPassword holds the string denoting the password field in the database.
 	FieldPassword = "password"
+	// FieldEmail holds the string denoting the email field in the database.
+	FieldEmail = "email"
+	// FieldFirstName holds the string denoting the first_name field in the database.
+	FieldFirstName = "first_name"
+	// FieldLastName holds the string denoting the last_name field in the database.
+	FieldLastName = "last_name"
+	// FieldAddress holds the string denoting the address field in the database.
+	FieldAddress = "address"
+	// FieldPhone holds the string denoting the phone field in the database.
+	FieldPhone = "phone"
+	// FieldBirthDate holds the string denoting the birth_date field in the database.
+	FieldBirthDate = "birth_date"
+	// FieldGender holds the string denoting the gender field in the database.
+	FieldGender = "gender"
+	// FieldProfilePictureURL holds the string denoting the profile_picture_url field in the database.
+	FieldProfilePictureURL = "profile_picture_url"
+	// EdgeIssueReport holds the string denoting the issue_report edge name in mutations.
+	EdgeIssueReport = "issue_report"
+	// EdgePayment holds the string denoting the payment edge name in mutations.
+	EdgePayment = "payment"
+	// EdgePaymentHistory holds the string denoting the payment_history edge name in mutations.
+	EdgePaymentHistory = "payment_history"
 	// Table holds the table name of the user in the database.
 	Table = "users"
+	// IssueReportTable is the table that holds the issue_report relation/edge.
+	IssueReportTable = "issue_reports"
+	// IssueReportInverseTable is the table name for the IssueReport entity.
+	// It exists in this package in order to avoid circular dependency with the "issuereport" package.
+	IssueReportInverseTable = "issue_reports"
+	// IssueReportColumn is the table column denoting the issue_report relation/edge.
+	IssueReportColumn = "user_issue_report"
+	// PaymentTable is the table that holds the payment relation/edge.
+	PaymentTable = "payments"
+	// PaymentInverseTable is the table name for the Payment entity.
+	// It exists in this package in order to avoid circular dependency with the "payment" package.
+	PaymentInverseTable = "payments"
+	// PaymentColumn is the table column denoting the payment relation/edge.
+	PaymentColumn = "user_payment"
+	// PaymentHistoryTable is the table that holds the payment_history relation/edge.
+	PaymentHistoryTable = "payment_histories"
+	// PaymentHistoryInverseTable is the table name for the PaymentHistory entity.
+	// It exists in this package in order to avoid circular dependency with the "paymenthistory" package.
+	PaymentHistoryInverseTable = "payment_histories"
+	// PaymentHistoryColumn is the table column denoting the payment_history relation/edge.
+	PaymentHistoryColumn = "user_payment_history"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -24,6 +67,14 @@ var Columns = []string{
 	FieldID,
 	FieldUsername,
 	FieldPassword,
+	FieldEmail,
+	FieldFirstName,
+	FieldLastName,
+	FieldAddress,
+	FieldPhone,
+	FieldBirthDate,
+	FieldGender,
+	FieldProfilePictureURL,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -41,6 +92,18 @@ var (
 	UsernameValidator func(string) error
 	// PasswordValidator is a validator for the "password" field. It is called by the builders before save.
 	PasswordValidator func(string) error
+	// EmailValidator is a validator for the "email" field. It is called by the builders before save.
+	EmailValidator func(string) error
+	// FirstNameValidator is a validator for the "first_name" field. It is called by the builders before save.
+	FirstNameValidator func(string) error
+	// LastNameValidator is a validator for the "last_name" field. It is called by the builders before save.
+	LastNameValidator func(string) error
+	// AddressValidator is a validator for the "address" field. It is called by the builders before save.
+	AddressValidator func(string) error
+	// PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
+	PhoneValidator func(string) error
+	// GenderValidator is a validator for the "gender" field. It is called by the builders before save.
+	GenderValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )

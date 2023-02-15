@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
@@ -19,7 +20,66 @@ type User struct {
 	// Username holds the value of the "username" field.
 	Username string `json:"username,omitempty"`
 	// Password holds the value of the "password" field.
-	Password string `json:"password,omitempty"`
+	Password string `json:"-"`
+	// Email holds the value of the "email" field.
+	Email string `json:"email,omitempty"`
+	// FirstName holds the value of the "first_name" field.
+	FirstName string `json:"first_name,omitempty"`
+	// LastName holds the value of the "last_name" field.
+	LastName string `json:"last_name,omitempty"`
+	// Address holds the value of the "address" field.
+	Address string `json:"address,omitempty"`
+	// Phone holds the value of the "phone" field.
+	Phone string `json:"phone,omitempty"`
+	// BirthDate holds the value of the "birth_date" field.
+	BirthDate time.Time `json:"birth_date,omitempty"`
+	// Gender holds the value of the "gender" field.
+	Gender string `json:"gender,omitempty"`
+	// ProfilePictureURL holds the value of the "profile_picture_URL" field.
+	ProfilePictureURL *string `json:"profile_picture_URL,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UserQuery when eager-loading is set.
+	Edges UserEdges `json:"edges"`
+}
+
+// UserEdges holds the relations/edges for other nodes in the graph.
+type UserEdges struct {
+	// IssueReport holds the value of the issue_report edge.
+	IssueReport []*IssueReport `json:"issue_report,omitempty"`
+	// Payment holds the value of the payment edge.
+	Payment []*Payment `json:"payment,omitempty"`
+	// PaymentHistory holds the value of the payment_history edge.
+	PaymentHistory []*PaymentHistory `json:"payment_history,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [3]bool
+}
+
+// IssueReportOrErr returns the IssueReport value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) IssueReportOrErr() ([]*IssueReport, error) {
+	if e.loadedTypes[0] {
+		return e.IssueReport, nil
+	}
+	return nil, &NotLoadedError{edge: "issue_report"}
+}
+
+// PaymentOrErr returns the Payment value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) PaymentOrErr() ([]*Payment, error) {
+	if e.loadedTypes[1] {
+		return e.Payment, nil
+	}
+	return nil, &NotLoadedError{edge: "payment"}
+}
+
+// PaymentHistoryOrErr returns the PaymentHistory value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) PaymentHistoryOrErr() ([]*PaymentHistory, error) {
+	if e.loadedTypes[2] {
+		return e.PaymentHistory, nil
+	}
+	return nil, &NotLoadedError{edge: "payment_history"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -27,8 +87,10 @@ func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldUsername, user.FieldPassword:
+		case user.FieldUsername, user.FieldPassword, user.FieldEmail, user.FieldFirstName, user.FieldLastName, user.FieldAddress, user.FieldPhone, user.FieldGender, user.FieldProfilePictureURL:
 			values[i] = new(sql.NullString)
+		case user.FieldBirthDate:
+			values[i] = new(sql.NullTime)
 		case user.FieldID:
 			values[i] = new(uuid.UUID)
 		default:
@@ -64,9 +126,73 @@ func (u *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.Password = value.String
 			}
+		case user.FieldEmail:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field email", values[i])
+			} else if value.Valid {
+				u.Email = value.String
+			}
+		case user.FieldFirstName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field first_name", values[i])
+			} else if value.Valid {
+				u.FirstName = value.String
+			}
+		case user.FieldLastName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field last_name", values[i])
+			} else if value.Valid {
+				u.LastName = value.String
+			}
+		case user.FieldAddress:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field address", values[i])
+			} else if value.Valid {
+				u.Address = value.String
+			}
+		case user.FieldPhone:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field phone", values[i])
+			} else if value.Valid {
+				u.Phone = value.String
+			}
+		case user.FieldBirthDate:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field birth_date", values[i])
+			} else if value.Valid {
+				u.BirthDate = value.Time
+			}
+		case user.FieldGender:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field gender", values[i])
+			} else if value.Valid {
+				u.Gender = value.String
+			}
+		case user.FieldProfilePictureURL:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field profile_picture_URL", values[i])
+			} else if value.Valid {
+				u.ProfilePictureURL = new(string)
+				*u.ProfilePictureURL = value.String
+			}
 		}
 	}
 	return nil
+}
+
+// QueryIssueReport queries the "issue_report" edge of the User entity.
+func (u *User) QueryIssueReport() *IssueReportQuery {
+	return NewUserClient(u.config).QueryIssueReport(u)
+}
+
+// QueryPayment queries the "payment" edge of the User entity.
+func (u *User) QueryPayment() *PaymentQuery {
+	return NewUserClient(u.config).QueryPayment(u)
+}
+
+// QueryPaymentHistory queries the "payment_history" edge of the User entity.
+func (u *User) QueryPaymentHistory() *PaymentHistoryQuery {
+	return NewUserClient(u.config).QueryPaymentHistory(u)
 }
 
 // Update returns a builder for updating this User.
@@ -95,8 +221,33 @@ func (u *User) String() string {
 	builder.WriteString("username=")
 	builder.WriteString(u.Username)
 	builder.WriteString(", ")
-	builder.WriteString("password=")
-	builder.WriteString(u.Password)
+	builder.WriteString("password=<sensitive>")
+	builder.WriteString(", ")
+	builder.WriteString("email=")
+	builder.WriteString(u.Email)
+	builder.WriteString(", ")
+	builder.WriteString("first_name=")
+	builder.WriteString(u.FirstName)
+	builder.WriteString(", ")
+	builder.WriteString("last_name=")
+	builder.WriteString(u.LastName)
+	builder.WriteString(", ")
+	builder.WriteString("address=")
+	builder.WriteString(u.Address)
+	builder.WriteString(", ")
+	builder.WriteString("phone=")
+	builder.WriteString(u.Phone)
+	builder.WriteString(", ")
+	builder.WriteString("birth_date=")
+	builder.WriteString(u.BirthDate.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("gender=")
+	builder.WriteString(u.Gender)
+	builder.WriteString(", ")
+	if v := u.ProfilePictureURL; v != nil {
+		builder.WriteString("profile_picture_URL=")
+		builder.WriteString(*v)
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }
