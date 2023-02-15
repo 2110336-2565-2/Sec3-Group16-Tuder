@@ -10,18 +10,23 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
 )
 
 // PaymentHistoryQuery is the builder for querying PaymentHistory entities.
 type PaymentHistoryQuery struct {
 	config
-	ctx        *QueryContext
-	order      []OrderFunc
-	inters     []Interceptor
-	predicates []predicate.PaymentHistory
+	ctx         *QueryContext
+	order       []OrderFunc
+	inters      []Interceptor
+	predicates  []predicate.PaymentHistory
+	withUser    *UserQuery
+	withPayment *PaymentQuery
+	withFKs     bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -56,6 +61,50 @@ func (phq *PaymentHistoryQuery) Unique(unique bool) *PaymentHistoryQuery {
 func (phq *PaymentHistoryQuery) Order(o ...OrderFunc) *PaymentHistoryQuery {
 	phq.order = append(phq.order, o...)
 	return phq
+}
+
+// QueryUser chains the current query on the "user" edge.
+func (phq *PaymentHistoryQuery) QueryUser() *UserQuery {
+	query := (&UserClient{config: phq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := phq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := phq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(paymenthistory.Table, paymenthistory.FieldID, selector),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, paymenthistory.UserTable, paymenthistory.UserColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(phq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryPayment chains the current query on the "payment" edge.
+func (phq *PaymentHistoryQuery) QueryPayment() *PaymentQuery {
+	query := (&PaymentClient{config: phq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := phq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := phq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(paymenthistory.Table, paymenthistory.FieldID, selector),
+			sqlgraph.To(payment.Table, payment.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, paymenthistory.PaymentTable, paymenthistory.PaymentColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(phq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first PaymentHistory entity from the query.
@@ -245,15 +294,39 @@ func (phq *PaymentHistoryQuery) Clone() *PaymentHistoryQuery {
 		return nil
 	}
 	return &PaymentHistoryQuery{
-		config:     phq.config,
-		ctx:        phq.ctx.Clone(),
-		order:      append([]OrderFunc{}, phq.order...),
-		inters:     append([]Interceptor{}, phq.inters...),
-		predicates: append([]predicate.PaymentHistory{}, phq.predicates...),
+		config:      phq.config,
+		ctx:         phq.ctx.Clone(),
+		order:       append([]OrderFunc{}, phq.order...),
+		inters:      append([]Interceptor{}, phq.inters...),
+		predicates:  append([]predicate.PaymentHistory{}, phq.predicates...),
+		withUser:    phq.withUser.Clone(),
+		withPayment: phq.withPayment.Clone(),
 		// clone intermediate query.
 		sql:  phq.sql.Clone(),
 		path: phq.path,
 	}
+}
+
+// WithUser tells the query-builder to eager-load the nodes that are connected to
+// the "user" edge. The optional arguments are used to configure the query builder of the edge.
+func (phq *PaymentHistoryQuery) WithUser(opts ...func(*UserQuery)) *PaymentHistoryQuery {
+	query := (&UserClient{config: phq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	phq.withUser = query
+	return phq
+}
+
+// WithPayment tells the query-builder to eager-load the nodes that are connected to
+// the "payment" edge. The optional arguments are used to configure the query builder of the edge.
+func (phq *PaymentHistoryQuery) WithPayment(opts ...func(*PaymentQuery)) *PaymentHistoryQuery {
+	query := (&PaymentClient{config: phq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	phq.withPayment = query
+	return phq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -332,15 +405,27 @@ func (phq *PaymentHistoryQuery) prepareQuery(ctx context.Context) error {
 
 func (phq *PaymentHistoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*PaymentHistory, error) {
 	var (
-		nodes = []*PaymentHistory{}
-		_spec = phq.querySpec()
+		nodes       = []*PaymentHistory{}
+		withFKs     = phq.withFKs
+		_spec       = phq.querySpec()
+		loadedTypes = [2]bool{
+			phq.withUser != nil,
+			phq.withPayment != nil,
+		}
 	)
+	if phq.withUser != nil || phq.withPayment != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, paymenthistory.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*PaymentHistory).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &PaymentHistory{config: phq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -352,7 +437,84 @@ func (phq *PaymentHistoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) 
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := phq.withUser; query != nil {
+		if err := phq.loadUser(ctx, query, nodes, nil,
+			func(n *PaymentHistory, e *User) { n.Edges.User = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := phq.withPayment; query != nil {
+		if err := phq.loadPayment(ctx, query, nodes, nil,
+			func(n *PaymentHistory, e *Payment) { n.Edges.Payment = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (phq *PaymentHistoryQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*PaymentHistory, init func(*PaymentHistory), assign func(*PaymentHistory, *User)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*PaymentHistory)
+	for i := range nodes {
+		if nodes[i].user_payment_history == nil {
+			continue
+		}
+		fk := *nodes[i].user_payment_history
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(user.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "user_payment_history" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (phq *PaymentHistoryQuery) loadPayment(ctx context.Context, query *PaymentQuery, nodes []*PaymentHistory, init func(*PaymentHistory), assign func(*PaymentHistory, *Payment)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*PaymentHistory)
+	for i := range nodes {
+		if nodes[i].payment_payment_history == nil {
+			continue
+		}
+		fk := *nodes[i].payment_payment_history
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(payment.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "payment_payment_history" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
 }
 
 func (phq *PaymentHistoryQuery) sqlCount(ctx context.Context) (int, error) {

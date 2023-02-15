@@ -4,28 +4,31 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reporttutor"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewtutor"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
+	"github.com/google/uuid"
 )
 
-// ReportTutorCreate is the builder for creating a ReportTutor entity.
-type ReportTutorCreate struct {
+// ReviewTutorCreate is the builder for creating a ReviewTutor entity.
+type ReviewTutorCreate struct {
 	config
-	mutation *ReportTutorMutation
+	mutation *ReviewTutorMutation
 	hooks    []Hook
 }
 
 // SetScore sets the "score" field.
-func (rtc *ReportTutorCreate) SetScore(f float32) *ReportTutorCreate {
+func (rtc *ReviewTutorCreate) SetScore(f float32) *ReviewTutorCreate {
 	rtc.mutation.SetScore(f)
 	return rtc
 }
 
 // SetNillableScore sets the "score" field if the given value is not nil.
-func (rtc *ReportTutorCreate) SetNillableScore(f *float32) *ReportTutorCreate {
+func (rtc *ReviewTutorCreate) SetNillableScore(f *float32) *ReviewTutorCreate {
 	if f != nil {
 		rtc.SetScore(*f)
 	}
@@ -33,31 +36,42 @@ func (rtc *ReportTutorCreate) SetNillableScore(f *float32) *ReportTutorCreate {
 }
 
 // SetReviewMsg sets the "review_msg" field.
-func (rtc *ReportTutorCreate) SetReviewMsg(s string) *ReportTutorCreate {
+func (rtc *ReviewTutorCreate) SetReviewMsg(s string) *ReviewTutorCreate {
 	rtc.mutation.SetReviewMsg(s)
 	return rtc
 }
 
 // SetNillableReviewMsg sets the "review_msg" field if the given value is not nil.
-func (rtc *ReportTutorCreate) SetNillableReviewMsg(s *string) *ReportTutorCreate {
+func (rtc *ReviewTutorCreate) SetNillableReviewMsg(s *string) *ReviewTutorCreate {
 	if s != nil {
 		rtc.SetReviewMsg(*s)
 	}
 	return rtc
 }
 
-// Mutation returns the ReportTutorMutation object of the builder.
-func (rtc *ReportTutorCreate) Mutation() *ReportTutorMutation {
+// SetTutorID sets the "tutor" edge to the Tutor entity by ID.
+func (rtc *ReviewTutorCreate) SetTutorID(id uuid.UUID) *ReviewTutorCreate {
+	rtc.mutation.SetTutorID(id)
+	return rtc
+}
+
+// SetTutor sets the "tutor" edge to the Tutor entity.
+func (rtc *ReviewTutorCreate) SetTutor(t *Tutor) *ReviewTutorCreate {
+	return rtc.SetTutorID(t.ID)
+}
+
+// Mutation returns the ReviewTutorMutation object of the builder.
+func (rtc *ReviewTutorCreate) Mutation() *ReviewTutorMutation {
 	return rtc.mutation
 }
 
-// Save creates the ReportTutor in the database.
-func (rtc *ReportTutorCreate) Save(ctx context.Context) (*ReportTutor, error) {
-	return withHooks[*ReportTutor, ReportTutorMutation](ctx, rtc.sqlSave, rtc.mutation, rtc.hooks)
+// Save creates the ReviewTutor in the database.
+func (rtc *ReviewTutorCreate) Save(ctx context.Context) (*ReviewTutor, error) {
+	return withHooks[*ReviewTutor, ReviewTutorMutation](ctx, rtc.sqlSave, rtc.mutation, rtc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (rtc *ReportTutorCreate) SaveX(ctx context.Context) *ReportTutor {
+func (rtc *ReviewTutorCreate) SaveX(ctx context.Context) *ReviewTutor {
 	v, err := rtc.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -66,29 +80,32 @@ func (rtc *ReportTutorCreate) SaveX(ctx context.Context) *ReportTutor {
 }
 
 // Exec executes the query.
-func (rtc *ReportTutorCreate) Exec(ctx context.Context) error {
+func (rtc *ReviewTutorCreate) Exec(ctx context.Context) error {
 	_, err := rtc.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (rtc *ReportTutorCreate) ExecX(ctx context.Context) {
+func (rtc *ReviewTutorCreate) ExecX(ctx context.Context) {
 	if err := rtc.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (rtc *ReportTutorCreate) check() error {
+func (rtc *ReviewTutorCreate) check() error {
 	if v, ok := rtc.mutation.Score(); ok {
-		if err := reporttutor.ScoreValidator(v); err != nil {
-			return &ValidationError{Name: "score", err: fmt.Errorf(`ent: validator failed for field "ReportTutor.score": %w`, err)}
+		if err := reviewtutor.ScoreValidator(v); err != nil {
+			return &ValidationError{Name: "score", err: fmt.Errorf(`ent: validator failed for field "ReviewTutor.score": %w`, err)}
 		}
+	}
+	if _, ok := rtc.mutation.TutorID(); !ok {
+		return &ValidationError{Name: "tutor", err: errors.New(`ent: missing required edge "ReviewTutor.tutor"`)}
 	}
 	return nil
 }
 
-func (rtc *ReportTutorCreate) sqlSave(ctx context.Context) (*ReportTutor, error) {
+func (rtc *ReviewTutorCreate) sqlSave(ctx context.Context) (*ReviewTutor, error) {
 	if err := rtc.check(); err != nil {
 		return nil, err
 	}
@@ -106,38 +123,58 @@ func (rtc *ReportTutorCreate) sqlSave(ctx context.Context) (*ReportTutor, error)
 	return _node, nil
 }
 
-func (rtc *ReportTutorCreate) createSpec() (*ReportTutor, *sqlgraph.CreateSpec) {
+func (rtc *ReviewTutorCreate) createSpec() (*ReviewTutor, *sqlgraph.CreateSpec) {
 	var (
-		_node = &ReportTutor{config: rtc.config}
-		_spec = sqlgraph.NewCreateSpec(reporttutor.Table, sqlgraph.NewFieldSpec(reporttutor.FieldID, field.TypeInt))
+		_node = &ReviewTutor{config: rtc.config}
+		_spec = sqlgraph.NewCreateSpec(reviewtutor.Table, sqlgraph.NewFieldSpec(reviewtutor.FieldID, field.TypeInt))
 	)
 	if value, ok := rtc.mutation.Score(); ok {
-		_spec.SetField(reporttutor.FieldScore, field.TypeFloat32, value)
+		_spec.SetField(reviewtutor.FieldScore, field.TypeFloat32, value)
 		_node.Score = &value
 	}
 	if value, ok := rtc.mutation.ReviewMsg(); ok {
-		_spec.SetField(reporttutor.FieldReviewMsg, field.TypeString, value)
+		_spec.SetField(reviewtutor.FieldReviewMsg, field.TypeString, value)
 		_node.ReviewMsg = &value
+	}
+	if nodes := rtc.mutation.TutorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   reviewtutor.TutorTable,
+			Columns: []string{reviewtutor.TutorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tutor.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.tutor_review_tutor = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
 
-// ReportTutorCreateBulk is the builder for creating many ReportTutor entities in bulk.
-type ReportTutorCreateBulk struct {
+// ReviewTutorCreateBulk is the builder for creating many ReviewTutor entities in bulk.
+type ReviewTutorCreateBulk struct {
 	config
-	builders []*ReportTutorCreate
+	builders []*ReviewTutorCreate
 }
 
-// Save creates the ReportTutor entities in the database.
-func (rtcb *ReportTutorCreateBulk) Save(ctx context.Context) ([]*ReportTutor, error) {
+// Save creates the ReviewTutor entities in the database.
+func (rtcb *ReviewTutorCreateBulk) Save(ctx context.Context) ([]*ReviewTutor, error) {
 	specs := make([]*sqlgraph.CreateSpec, len(rtcb.builders))
-	nodes := make([]*ReportTutor, len(rtcb.builders))
+	nodes := make([]*ReviewTutor, len(rtcb.builders))
 	mutators := make([]Mutator, len(rtcb.builders))
 	for i := range rtcb.builders {
 		func(i int, root context.Context) {
 			builder := rtcb.builders[i]
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-				mutation, ok := m.(*ReportTutorMutation)
+				mutation, ok := m.(*ReviewTutorMutation)
 				if !ok {
 					return nil, fmt.Errorf("unexpected mutation type %T", m)
 				}
@@ -184,7 +221,7 @@ func (rtcb *ReportTutorCreateBulk) Save(ctx context.Context) ([]*ReportTutor, er
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (rtcb *ReportTutorCreateBulk) SaveX(ctx context.Context) []*ReportTutor {
+func (rtcb *ReviewTutorCreateBulk) SaveX(ctx context.Context) []*ReviewTutor {
 	v, err := rtcb.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -193,13 +230,13 @@ func (rtcb *ReportTutorCreateBulk) SaveX(ctx context.Context) []*ReportTutor {
 }
 
 // Exec executes the query.
-func (rtcb *ReportTutorCreateBulk) Exec(ctx context.Context) error {
+func (rtcb *ReviewTutorCreateBulk) Exec(ctx context.Context) error {
 	_, err := rtcb.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (rtcb *ReportTutorCreateBulk) ExecX(ctx context.Context) {
+func (rtcb *ReviewTutorCreateBulk) ExecX(ctx context.Context) {
 	if err := rtcb.Exec(ctx); err != nil {
 		panic(err)
 	}

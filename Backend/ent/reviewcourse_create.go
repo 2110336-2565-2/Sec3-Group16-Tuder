@@ -4,11 +4,14 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
+	"github.com/google/uuid"
 )
 
 // ReviewCourseCreate is the builder for creating a ReviewCourse entity.
@@ -44,6 +47,17 @@ func (rcc *ReviewCourseCreate) SetNillableReviewMsg(s *string) *ReviewCourseCrea
 		rcc.SetReviewMsg(*s)
 	}
 	return rcc
+}
+
+// SetCourseID sets the "course" edge to the Course entity by ID.
+func (rcc *ReviewCourseCreate) SetCourseID(id uuid.UUID) *ReviewCourseCreate {
+	rcc.mutation.SetCourseID(id)
+	return rcc
+}
+
+// SetCourse sets the "course" edge to the Course entity.
+func (rcc *ReviewCourseCreate) SetCourse(c *Course) *ReviewCourseCreate {
+	return rcc.SetCourseID(c.ID)
 }
 
 // Mutation returns the ReviewCourseMutation object of the builder.
@@ -85,6 +99,9 @@ func (rcc *ReviewCourseCreate) check() error {
 			return &ValidationError{Name: "score", err: fmt.Errorf(`ent: validator failed for field "ReviewCourse.score": %w`, err)}
 		}
 	}
+	if _, ok := rcc.mutation.CourseID(); !ok {
+		return &ValidationError{Name: "course", err: errors.New(`ent: missing required edge "ReviewCourse.course"`)}
+	}
 	return nil
 }
 
@@ -118,6 +135,26 @@ func (rcc *ReviewCourseCreate) createSpec() (*ReviewCourse, *sqlgraph.CreateSpec
 	if value, ok := rcc.mutation.ReviewMsg(); ok {
 		_spec.SetField(reviewcourse.FieldReviewMsg, field.TypeString, value)
 		_node.ReviewMsg = &value
+	}
+	if nodes := rcc.mutation.CourseIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   reviewcourse.CourseTable,
+			Columns: []string{reviewcourse.CourseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: course.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.course_review_course = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
 )
 
@@ -18,6 +19,43 @@ type Payment struct {
 	ID uuid.UUID `json:"id,omitempty"`
 	// QrPictureURL holds the value of the "qr_picture_url" field.
 	QrPictureURL *string `json:"qr_picture_url,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the PaymentQuery when eager-loading is set.
+	Edges        PaymentEdges `json:"edges"`
+	user_payment *uuid.UUID
+}
+
+// PaymentEdges holds the relations/edges for other nodes in the graph.
+type PaymentEdges struct {
+	// User holds the value of the user edge.
+	User *User `json:"user,omitempty"`
+	// PaymentHistory holds the value of the payment_history edge.
+	PaymentHistory []*PaymentHistory `json:"payment_history,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+}
+
+// UserOrErr returns the User value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e PaymentEdges) UserOrErr() (*User, error) {
+	if e.loadedTypes[0] {
+		if e.User == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: user.Label}
+		}
+		return e.User, nil
+	}
+	return nil, &NotLoadedError{edge: "user"}
+}
+
+// PaymentHistoryOrErr returns the PaymentHistory value or an error if the edge
+// was not loaded in eager-loading.
+func (e PaymentEdges) PaymentHistoryOrErr() ([]*PaymentHistory, error) {
+	if e.loadedTypes[1] {
+		return e.PaymentHistory, nil
+	}
+	return nil, &NotLoadedError{edge: "payment_history"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -29,6 +67,8 @@ func (*Payment) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case payment.FieldID:
 			values[i] = new(uuid.UUID)
+		case payment.ForeignKeys[0]: // user_payment
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Payment", columns[i])
 		}
@@ -57,9 +97,26 @@ func (pa *Payment) assignValues(columns []string, values []any) error {
 				pa.QrPictureURL = new(string)
 				*pa.QrPictureURL = value.String
 			}
+		case payment.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field user_payment", values[i])
+			} else if value.Valid {
+				pa.user_payment = new(uuid.UUID)
+				*pa.user_payment = *value.S.(*uuid.UUID)
+			}
 		}
 	}
 	return nil
+}
+
+// QueryUser queries the "user" edge of the Payment entity.
+func (pa *Payment) QueryUser() *UserQuery {
+	return NewPaymentClient(pa.config).QueryUser(pa)
+}
+
+// QueryPaymentHistory queries the "payment_history" edge of the Payment entity.
+func (pa *Payment) QueryPaymentHistory() *PaymentHistoryQuery {
+	return NewPaymentClient(pa.config).QueryPaymentHistory(pa)
 }
 
 // Update returns a builder for updating this Payment.

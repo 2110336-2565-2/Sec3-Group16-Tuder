@@ -16,11 +16,12 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reporttutor"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewtutor"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -53,11 +54,12 @@ func columnChecker(table string) func(string) error {
 		issuereport.Table:    issuereport.ValidColumn,
 		payment.Table:        payment.ValidColumn,
 		paymenthistory.Table: paymenthistory.ValidColumn,
-		reporttutor.Table:    reporttutor.ValidColumn,
 		reviewcourse.Table:   reviewcourse.ValidColumn,
+		reviewtutor.Table:    reviewtutor.ValidColumn,
 		schedule.Table:       schedule.ValidColumn,
 		student.Table:        student.ValidColumn,
 		tutor.Table:          tutor.ValidColumn,
+		user.Table:           user.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

@@ -11,67 +11,93 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reporttutor"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewtutor"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
+	"github.com/google/uuid"
 )
 
-// ReportTutorQuery is the builder for querying ReportTutor entities.
-type ReportTutorQuery struct {
+// ReviewTutorQuery is the builder for querying ReviewTutor entities.
+type ReviewTutorQuery struct {
 	config
 	ctx        *QueryContext
 	order      []OrderFunc
 	inters     []Interceptor
-	predicates []predicate.ReportTutor
+	predicates []predicate.ReviewTutor
+	withTutor  *TutorQuery
+	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
 }
 
-// Where adds a new predicate for the ReportTutorQuery builder.
-func (rtq *ReportTutorQuery) Where(ps ...predicate.ReportTutor) *ReportTutorQuery {
+// Where adds a new predicate for the ReviewTutorQuery builder.
+func (rtq *ReviewTutorQuery) Where(ps ...predicate.ReviewTutor) *ReviewTutorQuery {
 	rtq.predicates = append(rtq.predicates, ps...)
 	return rtq
 }
 
 // Limit the number of records to be returned by this query.
-func (rtq *ReportTutorQuery) Limit(limit int) *ReportTutorQuery {
+func (rtq *ReviewTutorQuery) Limit(limit int) *ReviewTutorQuery {
 	rtq.ctx.Limit = &limit
 	return rtq
 }
 
 // Offset to start from.
-func (rtq *ReportTutorQuery) Offset(offset int) *ReportTutorQuery {
+func (rtq *ReviewTutorQuery) Offset(offset int) *ReviewTutorQuery {
 	rtq.ctx.Offset = &offset
 	return rtq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (rtq *ReportTutorQuery) Unique(unique bool) *ReportTutorQuery {
+func (rtq *ReviewTutorQuery) Unique(unique bool) *ReviewTutorQuery {
 	rtq.ctx.Unique = &unique
 	return rtq
 }
 
 // Order specifies how the records should be ordered.
-func (rtq *ReportTutorQuery) Order(o ...OrderFunc) *ReportTutorQuery {
+func (rtq *ReviewTutorQuery) Order(o ...OrderFunc) *ReviewTutorQuery {
 	rtq.order = append(rtq.order, o...)
 	return rtq
 }
 
-// First returns the first ReportTutor entity from the query.
-// Returns a *NotFoundError when no ReportTutor was found.
-func (rtq *ReportTutorQuery) First(ctx context.Context) (*ReportTutor, error) {
+// QueryTutor chains the current query on the "tutor" edge.
+func (rtq *ReviewTutorQuery) QueryTutor() *TutorQuery {
+	query := (&TutorClient{config: rtq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := rtq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := rtq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(reviewtutor.Table, reviewtutor.FieldID, selector),
+			sqlgraph.To(tutor.Table, tutor.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, reviewtutor.TutorTable, reviewtutor.TutorColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(rtq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// First returns the first ReviewTutor entity from the query.
+// Returns a *NotFoundError when no ReviewTutor was found.
+func (rtq *ReviewTutorQuery) First(ctx context.Context) (*ReviewTutor, error) {
 	nodes, err := rtq.Limit(1).All(setContextOp(ctx, rtq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
-		return nil, &NotFoundError{reporttutor.Label}
+		return nil, &NotFoundError{reviewtutor.Label}
 	}
 	return nodes[0], nil
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (rtq *ReportTutorQuery) FirstX(ctx context.Context) *ReportTutor {
+func (rtq *ReviewTutorQuery) FirstX(ctx context.Context) *ReviewTutor {
 	node, err := rtq.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -79,22 +105,22 @@ func (rtq *ReportTutorQuery) FirstX(ctx context.Context) *ReportTutor {
 	return node
 }
 
-// FirstID returns the first ReportTutor ID from the query.
-// Returns a *NotFoundError when no ReportTutor ID was found.
-func (rtq *ReportTutorQuery) FirstID(ctx context.Context) (id int, err error) {
+// FirstID returns the first ReviewTutor ID from the query.
+// Returns a *NotFoundError when no ReviewTutor ID was found.
+func (rtq *ReviewTutorQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = rtq.Limit(1).IDs(setContextOp(ctx, rtq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
-		err = &NotFoundError{reporttutor.Label}
+		err = &NotFoundError{reviewtutor.Label}
 		return
 	}
 	return ids[0], nil
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (rtq *ReportTutorQuery) FirstIDX(ctx context.Context) int {
+func (rtq *ReviewTutorQuery) FirstIDX(ctx context.Context) int {
 	id, err := rtq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -102,10 +128,10 @@ func (rtq *ReportTutorQuery) FirstIDX(ctx context.Context) int {
 	return id
 }
 
-// Only returns a single ReportTutor entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one ReportTutor entity is found.
-// Returns a *NotFoundError when no ReportTutor entities are found.
-func (rtq *ReportTutorQuery) Only(ctx context.Context) (*ReportTutor, error) {
+// Only returns a single ReviewTutor entity found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one ReviewTutor entity is found.
+// Returns a *NotFoundError when no ReviewTutor entities are found.
+func (rtq *ReviewTutorQuery) Only(ctx context.Context) (*ReviewTutor, error) {
 	nodes, err := rtq.Limit(2).All(setContextOp(ctx, rtq.ctx, "Only"))
 	if err != nil {
 		return nil, err
@@ -114,14 +140,14 @@ func (rtq *ReportTutorQuery) Only(ctx context.Context) (*ReportTutor, error) {
 	case 1:
 		return nodes[0], nil
 	case 0:
-		return nil, &NotFoundError{reporttutor.Label}
+		return nil, &NotFoundError{reviewtutor.Label}
 	default:
-		return nil, &NotSingularError{reporttutor.Label}
+		return nil, &NotSingularError{reviewtutor.Label}
 	}
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (rtq *ReportTutorQuery) OnlyX(ctx context.Context) *ReportTutor {
+func (rtq *ReviewTutorQuery) OnlyX(ctx context.Context) *ReviewTutor {
 	node, err := rtq.Only(ctx)
 	if err != nil {
 		panic(err)
@@ -129,10 +155,10 @@ func (rtq *ReportTutorQuery) OnlyX(ctx context.Context) *ReportTutor {
 	return node
 }
 
-// OnlyID is like Only, but returns the only ReportTutor ID in the query.
-// Returns a *NotSingularError when more than one ReportTutor ID is found.
+// OnlyID is like Only, but returns the only ReviewTutor ID in the query.
+// Returns a *NotSingularError when more than one ReviewTutor ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (rtq *ReportTutorQuery) OnlyID(ctx context.Context) (id int, err error) {
+func (rtq *ReviewTutorQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = rtq.Limit(2).IDs(setContextOp(ctx, rtq.ctx, "OnlyID")); err != nil {
 		return
@@ -141,15 +167,15 @@ func (rtq *ReportTutorQuery) OnlyID(ctx context.Context) (id int, err error) {
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &NotFoundError{reporttutor.Label}
+		err = &NotFoundError{reviewtutor.Label}
 	default:
-		err = &NotSingularError{reporttutor.Label}
+		err = &NotSingularError{reviewtutor.Label}
 	}
 	return
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (rtq *ReportTutorQuery) OnlyIDX(ctx context.Context) int {
+func (rtq *ReviewTutorQuery) OnlyIDX(ctx context.Context) int {
 	id, err := rtq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -157,18 +183,18 @@ func (rtq *ReportTutorQuery) OnlyIDX(ctx context.Context) int {
 	return id
 }
 
-// All executes the query and returns a list of ReportTutors.
-func (rtq *ReportTutorQuery) All(ctx context.Context) ([]*ReportTutor, error) {
+// All executes the query and returns a list of ReviewTutors.
+func (rtq *ReviewTutorQuery) All(ctx context.Context) ([]*ReviewTutor, error) {
 	ctx = setContextOp(ctx, rtq.ctx, "All")
 	if err := rtq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	qr := querierAll[[]*ReportTutor, *ReportTutorQuery]()
-	return withInterceptors[[]*ReportTutor](ctx, rtq, qr, rtq.inters)
+	qr := querierAll[[]*ReviewTutor, *ReviewTutorQuery]()
+	return withInterceptors[[]*ReviewTutor](ctx, rtq, qr, rtq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (rtq *ReportTutorQuery) AllX(ctx context.Context) []*ReportTutor {
+func (rtq *ReviewTutorQuery) AllX(ctx context.Context) []*ReviewTutor {
 	nodes, err := rtq.All(ctx)
 	if err != nil {
 		panic(err)
@@ -176,20 +202,20 @@ func (rtq *ReportTutorQuery) AllX(ctx context.Context) []*ReportTutor {
 	return nodes
 }
 
-// IDs executes the query and returns a list of ReportTutor IDs.
-func (rtq *ReportTutorQuery) IDs(ctx context.Context) (ids []int, err error) {
+// IDs executes the query and returns a list of ReviewTutor IDs.
+func (rtq *ReviewTutorQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if rtq.ctx.Unique == nil && rtq.path != nil {
 		rtq.Unique(true)
 	}
 	ctx = setContextOp(ctx, rtq.ctx, "IDs")
-	if err = rtq.Select(reporttutor.FieldID).Scan(ctx, &ids); err != nil {
+	if err = rtq.Select(reviewtutor.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (rtq *ReportTutorQuery) IDsX(ctx context.Context) []int {
+func (rtq *ReviewTutorQuery) IDsX(ctx context.Context) []int {
 	ids, err := rtq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -198,16 +224,16 @@ func (rtq *ReportTutorQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (rtq *ReportTutorQuery) Count(ctx context.Context) (int, error) {
+func (rtq *ReviewTutorQuery) Count(ctx context.Context) (int, error) {
 	ctx = setContextOp(ctx, rtq.ctx, "Count")
 	if err := rtq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, rtq, querierCount[*ReportTutorQuery](), rtq.inters)
+	return withInterceptors[int](ctx, rtq, querierCount[*ReviewTutorQuery](), rtq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (rtq *ReportTutorQuery) CountX(ctx context.Context) int {
+func (rtq *ReviewTutorQuery) CountX(ctx context.Context) int {
 	count, err := rtq.Count(ctx)
 	if err != nil {
 		panic(err)
@@ -216,7 +242,7 @@ func (rtq *ReportTutorQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (rtq *ReportTutorQuery) Exist(ctx context.Context) (bool, error) {
+func (rtq *ReviewTutorQuery) Exist(ctx context.Context) (bool, error) {
 	ctx = setContextOp(ctx, rtq.ctx, "Exist")
 	switch _, err := rtq.FirstID(ctx); {
 	case IsNotFound(err):
@@ -229,7 +255,7 @@ func (rtq *ReportTutorQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (rtq *ReportTutorQuery) ExistX(ctx context.Context) bool {
+func (rtq *ReviewTutorQuery) ExistX(ctx context.Context) bool {
 	exist, err := rtq.Exist(ctx)
 	if err != nil {
 		panic(err)
@@ -237,22 +263,34 @@ func (rtq *ReportTutorQuery) ExistX(ctx context.Context) bool {
 	return exist
 }
 
-// Clone returns a duplicate of the ReportTutorQuery builder, including all associated steps. It can be
+// Clone returns a duplicate of the ReviewTutorQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (rtq *ReportTutorQuery) Clone() *ReportTutorQuery {
+func (rtq *ReviewTutorQuery) Clone() *ReviewTutorQuery {
 	if rtq == nil {
 		return nil
 	}
-	return &ReportTutorQuery{
+	return &ReviewTutorQuery{
 		config:     rtq.config,
 		ctx:        rtq.ctx.Clone(),
 		order:      append([]OrderFunc{}, rtq.order...),
 		inters:     append([]Interceptor{}, rtq.inters...),
-		predicates: append([]predicate.ReportTutor{}, rtq.predicates...),
+		predicates: append([]predicate.ReviewTutor{}, rtq.predicates...),
+		withTutor:  rtq.withTutor.Clone(),
 		// clone intermediate query.
 		sql:  rtq.sql.Clone(),
 		path: rtq.path,
 	}
+}
+
+// WithTutor tells the query-builder to eager-load the nodes that are connected to
+// the "tutor" edge. The optional arguments are used to configure the query builder of the edge.
+func (rtq *ReviewTutorQuery) WithTutor(opts ...func(*TutorQuery)) *ReviewTutorQuery {
+	query := (&TutorClient{config: rtq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	rtq.withTutor = query
+	return rtq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -265,15 +303,15 @@ func (rtq *ReportTutorQuery) Clone() *ReportTutorQuery {
 //		Count int `json:"count,omitempty"`
 //	}
 //
-//	client.ReportTutor.Query().
-//		GroupBy(reporttutor.FieldScore).
+//	client.ReviewTutor.Query().
+//		GroupBy(reviewtutor.FieldScore).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (rtq *ReportTutorQuery) GroupBy(field string, fields ...string) *ReportTutorGroupBy {
+func (rtq *ReviewTutorQuery) GroupBy(field string, fields ...string) *ReviewTutorGroupBy {
 	rtq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &ReportTutorGroupBy{build: rtq}
+	grbuild := &ReviewTutorGroupBy{build: rtq}
 	grbuild.flds = &rtq.ctx.Fields
-	grbuild.label = reporttutor.Label
+	grbuild.label = reviewtutor.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
 }
@@ -287,23 +325,23 @@ func (rtq *ReportTutorQuery) GroupBy(field string, fields ...string) *ReportTuto
 //		Score float32 `json:"score,omitempty"`
 //	}
 //
-//	client.ReportTutor.Query().
-//		Select(reporttutor.FieldScore).
+//	client.ReviewTutor.Query().
+//		Select(reviewtutor.FieldScore).
 //		Scan(ctx, &v)
-func (rtq *ReportTutorQuery) Select(fields ...string) *ReportTutorSelect {
+func (rtq *ReviewTutorQuery) Select(fields ...string) *ReviewTutorSelect {
 	rtq.ctx.Fields = append(rtq.ctx.Fields, fields...)
-	sbuild := &ReportTutorSelect{ReportTutorQuery: rtq}
-	sbuild.label = reporttutor.Label
+	sbuild := &ReviewTutorSelect{ReviewTutorQuery: rtq}
+	sbuild.label = reviewtutor.Label
 	sbuild.flds, sbuild.scan = &rtq.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
-// Aggregate returns a ReportTutorSelect configured with the given aggregations.
-func (rtq *ReportTutorQuery) Aggregate(fns ...AggregateFunc) *ReportTutorSelect {
+// Aggregate returns a ReviewTutorSelect configured with the given aggregations.
+func (rtq *ReviewTutorQuery) Aggregate(fns ...AggregateFunc) *ReviewTutorSelect {
 	return rtq.Select().Aggregate(fns...)
 }
 
-func (rtq *ReportTutorQuery) prepareQuery(ctx context.Context) error {
+func (rtq *ReviewTutorQuery) prepareQuery(ctx context.Context) error {
 	for _, inter := range rtq.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
@@ -315,7 +353,7 @@ func (rtq *ReportTutorQuery) prepareQuery(ctx context.Context) error {
 		}
 	}
 	for _, f := range rtq.ctx.Fields {
-		if !reporttutor.ValidColumn(f) {
+		if !reviewtutor.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
@@ -329,17 +367,28 @@ func (rtq *ReportTutorQuery) prepareQuery(ctx context.Context) error {
 	return nil
 }
 
-func (rtq *ReportTutorQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*ReportTutor, error) {
+func (rtq *ReviewTutorQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*ReviewTutor, error) {
 	var (
-		nodes = []*ReportTutor{}
-		_spec = rtq.querySpec()
+		nodes       = []*ReviewTutor{}
+		withFKs     = rtq.withFKs
+		_spec       = rtq.querySpec()
+		loadedTypes = [1]bool{
+			rtq.withTutor != nil,
+		}
 	)
+	if rtq.withTutor != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, reviewtutor.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
-		return (*ReportTutor).scanValues(nil, columns)
+		return (*ReviewTutor).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &ReportTutor{config: rtq.config}
+		node := &ReviewTutor{config: rtq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -351,10 +400,49 @@ func (rtq *ReportTutorQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := rtq.withTutor; query != nil {
+		if err := rtq.loadTutor(ctx, query, nodes, nil,
+			func(n *ReviewTutor, e *Tutor) { n.Edges.Tutor = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
 }
 
-func (rtq *ReportTutorQuery) sqlCount(ctx context.Context) (int, error) {
+func (rtq *ReviewTutorQuery) loadTutor(ctx context.Context, query *TutorQuery, nodes []*ReviewTutor, init func(*ReviewTutor), assign func(*ReviewTutor, *Tutor)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*ReviewTutor)
+	for i := range nodes {
+		if nodes[i].tutor_review_tutor == nil {
+			continue
+		}
+		fk := *nodes[i].tutor_review_tutor
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(tutor.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "tutor_review_tutor" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+
+func (rtq *ReviewTutorQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := rtq.querySpec()
 	_spec.Node.Columns = rtq.ctx.Fields
 	if len(rtq.ctx.Fields) > 0 {
@@ -363,8 +451,8 @@ func (rtq *ReportTutorQuery) sqlCount(ctx context.Context) (int, error) {
 	return sqlgraph.CountNodes(ctx, rtq.driver, _spec)
 }
 
-func (rtq *ReportTutorQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(reporttutor.Table, reporttutor.Columns, sqlgraph.NewFieldSpec(reporttutor.FieldID, field.TypeInt))
+func (rtq *ReviewTutorQuery) querySpec() *sqlgraph.QuerySpec {
+	_spec := sqlgraph.NewQuerySpec(reviewtutor.Table, reviewtutor.Columns, sqlgraph.NewFieldSpec(reviewtutor.FieldID, field.TypeInt))
 	_spec.From = rtq.sql
 	if unique := rtq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -373,9 +461,9 @@ func (rtq *ReportTutorQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := rtq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, reporttutor.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, reviewtutor.FieldID)
 		for i := range fields {
-			if fields[i] != reporttutor.FieldID {
+			if fields[i] != reviewtutor.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
@@ -403,12 +491,12 @@ func (rtq *ReportTutorQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (rtq *ReportTutorQuery) sqlQuery(ctx context.Context) *sql.Selector {
+func (rtq *ReviewTutorQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(rtq.driver.Dialect())
-	t1 := builder.Table(reporttutor.Table)
+	t1 := builder.Table(reviewtutor.Table)
 	columns := rtq.ctx.Fields
 	if len(columns) == 0 {
-		columns = reporttutor.Columns
+		columns = reviewtutor.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
 	if rtq.sql != nil {
@@ -435,28 +523,28 @@ func (rtq *ReportTutorQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
-// ReportTutorGroupBy is the group-by builder for ReportTutor entities.
-type ReportTutorGroupBy struct {
+// ReviewTutorGroupBy is the group-by builder for ReviewTutor entities.
+type ReviewTutorGroupBy struct {
 	selector
-	build *ReportTutorQuery
+	build *ReviewTutorQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (rtgb *ReportTutorGroupBy) Aggregate(fns ...AggregateFunc) *ReportTutorGroupBy {
+func (rtgb *ReviewTutorGroupBy) Aggregate(fns ...AggregateFunc) *ReviewTutorGroupBy {
 	rtgb.fns = append(rtgb.fns, fns...)
 	return rtgb
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (rtgb *ReportTutorGroupBy) Scan(ctx context.Context, v any) error {
+func (rtgb *ReviewTutorGroupBy) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, rtgb.build.ctx, "GroupBy")
 	if err := rtgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*ReportTutorQuery, *ReportTutorGroupBy](ctx, rtgb.build, rtgb, rtgb.build.inters, v)
+	return scanWithInterceptors[*ReviewTutorQuery, *ReviewTutorGroupBy](ctx, rtgb.build, rtgb, rtgb.build.inters, v)
 }
 
-func (rtgb *ReportTutorGroupBy) sqlScan(ctx context.Context, root *ReportTutorQuery, v any) error {
+func (rtgb *ReviewTutorGroupBy) sqlScan(ctx context.Context, root *ReviewTutorQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
 	aggregation := make([]string, 0, len(rtgb.fns))
 	for _, fn := range rtgb.fns {
@@ -483,28 +571,28 @@ func (rtgb *ReportTutorGroupBy) sqlScan(ctx context.Context, root *ReportTutorQu
 	return sql.ScanSlice(rows, v)
 }
 
-// ReportTutorSelect is the builder for selecting fields of ReportTutor entities.
-type ReportTutorSelect struct {
-	*ReportTutorQuery
+// ReviewTutorSelect is the builder for selecting fields of ReviewTutor entities.
+type ReviewTutorSelect struct {
+	*ReviewTutorQuery
 	selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (rts *ReportTutorSelect) Aggregate(fns ...AggregateFunc) *ReportTutorSelect {
+func (rts *ReviewTutorSelect) Aggregate(fns ...AggregateFunc) *ReviewTutorSelect {
 	rts.fns = append(rts.fns, fns...)
 	return rts
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (rts *ReportTutorSelect) Scan(ctx context.Context, v any) error {
+func (rts *ReviewTutorSelect) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, rts.ctx, "Select")
 	if err := rts.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*ReportTutorQuery, *ReportTutorSelect](ctx, rts.ReportTutorQuery, rts, rts.inters, v)
+	return scanWithInterceptors[*ReviewTutorQuery, *ReviewTutorSelect](ctx, rts.ReviewTutorQuery, rts, rts.inters, v)
 }
 
-func (rts *ReportTutorSelect) sqlScan(ctx context.Context, root *ReportTutorQuery, v any) error {
+func (rts *ReviewTutorSelect) sqlScan(ctx context.Context, root *ReviewTutorQuery, v any) error {
 	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(rts.fns))
 	for _, fn := range rts.fns {

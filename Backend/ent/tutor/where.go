@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
 	"github.com/google/uuid"
 )
@@ -968,6 +969,114 @@ func CitizenIDEqualFold(v string) predicate.Tutor {
 // CitizenIDContainsFold applies the ContainsFold predicate on the "citizen_id" field.
 func CitizenIDContainsFold(v string) predicate.Tutor {
 	return predicate.Tutor(sql.FieldContainsFold(FieldCitizenID, v))
+}
+
+// HasIssueReport applies the HasEdge predicate on the "issue_report" edge.
+func HasIssueReport() predicate.Tutor {
+	return predicate.Tutor(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, IssueReportTable, IssueReportColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasIssueReportWith applies the HasEdge predicate on the "issue_report" edge with a given conditions (other predicates).
+func HasIssueReportWith(preds ...predicate.IssueReport) predicate.Tutor {
+	return predicate.Tutor(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(IssueReportInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, IssueReportTable, IssueReportColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasCourse applies the HasEdge predicate on the "course" edge.
+func HasCourse() predicate.Tutor {
+	return predicate.Tutor(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, CourseTable, CourseColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCourseWith applies the HasEdge predicate on the "course" edge with a given conditions (other predicates).
+func HasCourseWith(preds ...predicate.Course) predicate.Tutor {
+	return predicate.Tutor(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(CourseInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, CourseTable, CourseColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasReviewTutor applies the HasEdge predicate on the "review_tutor" edge.
+func HasReviewTutor() predicate.Tutor {
+	return predicate.Tutor(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ReviewTutorTable, ReviewTutorColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasReviewTutorWith applies the HasEdge predicate on the "review_tutor" edge with a given conditions (other predicates).
+func HasReviewTutorWith(preds ...predicate.ReviewTutor) predicate.Tutor {
+	return predicate.Tutor(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ReviewTutorInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ReviewTutorTable, ReviewTutorColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSchedule applies the HasEdge predicate on the "schedule" edge.
+func HasSchedule() predicate.Tutor {
+	return predicate.Tutor(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ScheduleTable, ScheduleColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasScheduleWith applies the HasEdge predicate on the "schedule" edge with a given conditions (other predicates).
+func HasScheduleWith(preds ...predicate.Schedule) predicate.Tutor {
+	return predicate.Tutor(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ScheduleInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ScheduleTable, ScheduleColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

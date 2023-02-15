@@ -8,14 +8,12 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
 )
 
-// Student is the model entity for the Student schema.
-type Student struct {
+// User is the model entity for the User schema.
+type User struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
@@ -40,18 +38,18 @@ type Student struct {
 	// ProfilePictureURL holds the value of the "profile_picture_URL" field.
 	ProfilePictureURL *string `json:"profile_picture_URL,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the StudentQuery when eager-loading is set.
-	Edges StudentEdges `json:"edges"`
+	// The values are being populated by the UserQuery when eager-loading is set.
+	Edges UserEdges `json:"edges"`
 }
 
-// StudentEdges holds the relations/edges for other nodes in the graph.
-type StudentEdges struct {
+// UserEdges holds the relations/edges for other nodes in the graph.
+type UserEdges struct {
 	// IssueReport holds the value of the issue_report edge.
 	IssueReport []*IssueReport `json:"issue_report,omitempty"`
-	// Course holds the value of the course edge.
-	Course *Course `json:"course,omitempty"`
-	// Class holds the value of the class edge.
-	Class *Class `json:"class,omitempty"`
+	// Payment holds the value of the payment edge.
+	Payment []*Payment `json:"payment,omitempty"`
+	// PaymentHistory holds the value of the payment_history edge.
+	PaymentHistory []*PaymentHistory `json:"payment_history,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [3]bool
@@ -59,202 +57,194 @@ type StudentEdges struct {
 
 // IssueReportOrErr returns the IssueReport value or an error if the edge
 // was not loaded in eager-loading.
-func (e StudentEdges) IssueReportOrErr() ([]*IssueReport, error) {
+func (e UserEdges) IssueReportOrErr() ([]*IssueReport, error) {
 	if e.loadedTypes[0] {
 		return e.IssueReport, nil
 	}
 	return nil, &NotLoadedError{edge: "issue_report"}
 }
 
-// CourseOrErr returns the Course value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e StudentEdges) CourseOrErr() (*Course, error) {
+// PaymentOrErr returns the Payment value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) PaymentOrErr() ([]*Payment, error) {
 	if e.loadedTypes[1] {
-		if e.Course == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: course.Label}
-		}
-		return e.Course, nil
+		return e.Payment, nil
 	}
-	return nil, &NotLoadedError{edge: "course"}
+	return nil, &NotLoadedError{edge: "payment"}
 }
 
-// ClassOrErr returns the Class value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e StudentEdges) ClassOrErr() (*Class, error) {
+// PaymentHistoryOrErr returns the PaymentHistory value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) PaymentHistoryOrErr() ([]*PaymentHistory, error) {
 	if e.loadedTypes[2] {
-		if e.Class == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: class.Label}
-		}
-		return e.Class, nil
+		return e.PaymentHistory, nil
 	}
-	return nil, &NotLoadedError{edge: "class"}
+	return nil, &NotLoadedError{edge: "payment_history"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*Student) scanValues(columns []string) ([]any, error) {
+func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case student.FieldUsername, student.FieldPassword, student.FieldEmail, student.FieldFirstName, student.FieldLastName, student.FieldAddress, student.FieldPhone, student.FieldGender, student.FieldProfilePictureURL:
+		case user.FieldUsername, user.FieldPassword, user.FieldEmail, user.FieldFirstName, user.FieldLastName, user.FieldAddress, user.FieldPhone, user.FieldGender, user.FieldProfilePictureURL:
 			values[i] = new(sql.NullString)
-		case student.FieldBirthDate:
+		case user.FieldBirthDate:
 			values[i] = new(sql.NullTime)
-		case student.FieldID:
+		case user.FieldID:
 			values[i] = new(uuid.UUID)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Student", columns[i])
+			return nil, fmt.Errorf("unexpected column %q for type User", columns[i])
 		}
 	}
 	return values, nil
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the Student fields.
-func (s *Student) assignValues(columns []string, values []any) error {
+// to the User fields.
+func (u *User) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case student.FieldID:
+		case user.FieldID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				s.ID = *value
+				u.ID = *value
 			}
-		case student.FieldUsername:
+		case user.FieldUsername:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field username", values[i])
 			} else if value.Valid {
-				s.Username = value.String
+				u.Username = value.String
 			}
-		case student.FieldPassword:
+		case user.FieldPassword:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field password", values[i])
 			} else if value.Valid {
-				s.Password = value.String
+				u.Password = value.String
 			}
-		case student.FieldEmail:
+		case user.FieldEmail:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field email", values[i])
 			} else if value.Valid {
-				s.Email = value.String
+				u.Email = value.String
 			}
-		case student.FieldFirstName:
+		case user.FieldFirstName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field first_name", values[i])
 			} else if value.Valid {
-				s.FirstName = value.String
+				u.FirstName = value.String
 			}
-		case student.FieldLastName:
+		case user.FieldLastName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field last_name", values[i])
 			} else if value.Valid {
-				s.LastName = value.String
+				u.LastName = value.String
 			}
-		case student.FieldAddress:
+		case user.FieldAddress:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field address", values[i])
 			} else if value.Valid {
-				s.Address = value.String
+				u.Address = value.String
 			}
-		case student.FieldPhone:
+		case user.FieldPhone:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field phone", values[i])
 			} else if value.Valid {
-				s.Phone = value.String
+				u.Phone = value.String
 			}
-		case student.FieldBirthDate:
+		case user.FieldBirthDate:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field birth_date", values[i])
 			} else if value.Valid {
-				s.BirthDate = value.Time
+				u.BirthDate = value.Time
 			}
-		case student.FieldGender:
+		case user.FieldGender:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field gender", values[i])
 			} else if value.Valid {
-				s.Gender = value.String
+				u.Gender = value.String
 			}
-		case student.FieldProfilePictureURL:
+		case user.FieldProfilePictureURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field profile_picture_URL", values[i])
 			} else if value.Valid {
-				s.ProfilePictureURL = new(string)
-				*s.ProfilePictureURL = value.String
+				u.ProfilePictureURL = new(string)
+				*u.ProfilePictureURL = value.String
 			}
 		}
 	}
 	return nil
 }
 
-// QueryIssueReport queries the "issue_report" edge of the Student entity.
-func (s *Student) QueryIssueReport() *IssueReportQuery {
-	return NewStudentClient(s.config).QueryIssueReport(s)
+// QueryIssueReport queries the "issue_report" edge of the User entity.
+func (u *User) QueryIssueReport() *IssueReportQuery {
+	return NewUserClient(u.config).QueryIssueReport(u)
 }
 
-// QueryCourse queries the "course" edge of the Student entity.
-func (s *Student) QueryCourse() *CourseQuery {
-	return NewStudentClient(s.config).QueryCourse(s)
+// QueryPayment queries the "payment" edge of the User entity.
+func (u *User) QueryPayment() *PaymentQuery {
+	return NewUserClient(u.config).QueryPayment(u)
 }
 
-// QueryClass queries the "class" edge of the Student entity.
-func (s *Student) QueryClass() *ClassQuery {
-	return NewStudentClient(s.config).QueryClass(s)
+// QueryPaymentHistory queries the "payment_history" edge of the User entity.
+func (u *User) QueryPaymentHistory() *PaymentHistoryQuery {
+	return NewUserClient(u.config).QueryPaymentHistory(u)
 }
 
-// Update returns a builder for updating this Student.
-// Note that you need to call Student.Unwrap() before calling this method if this Student
+// Update returns a builder for updating this User.
+// Note that you need to call User.Unwrap() before calling this method if this User
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (s *Student) Update() *StudentUpdateOne {
-	return NewStudentClient(s.config).UpdateOne(s)
+func (u *User) Update() *UserUpdateOne {
+	return NewUserClient(u.config).UpdateOne(u)
 }
 
-// Unwrap unwraps the Student entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the User entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (s *Student) Unwrap() *Student {
-	_tx, ok := s.config.driver.(*txDriver)
+func (u *User) Unwrap() *User {
+	_tx, ok := u.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: Student is not a transactional entity")
+		panic("ent: User is not a transactional entity")
 	}
-	s.config.driver = _tx.drv
-	return s
+	u.config.driver = _tx.drv
+	return u
 }
 
 // String implements the fmt.Stringer.
-func (s *Student) String() string {
+func (u *User) String() string {
 	var builder strings.Builder
-	builder.WriteString("Student(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", s.ID))
+	builder.WriteString("User(")
+	builder.WriteString(fmt.Sprintf("id=%v, ", u.ID))
 	builder.WriteString("username=")
-	builder.WriteString(s.Username)
+	builder.WriteString(u.Username)
 	builder.WriteString(", ")
 	builder.WriteString("password=<sensitive>")
 	builder.WriteString(", ")
 	builder.WriteString("email=")
-	builder.WriteString(s.Email)
+	builder.WriteString(u.Email)
 	builder.WriteString(", ")
 	builder.WriteString("first_name=")
-	builder.WriteString(s.FirstName)
+	builder.WriteString(u.FirstName)
 	builder.WriteString(", ")
 	builder.WriteString("last_name=")
-	builder.WriteString(s.LastName)
+	builder.WriteString(u.LastName)
 	builder.WriteString(", ")
 	builder.WriteString("address=")
-	builder.WriteString(s.Address)
+	builder.WriteString(u.Address)
 	builder.WriteString(", ")
 	builder.WriteString("phone=")
-	builder.WriteString(s.Phone)
+	builder.WriteString(u.Phone)
 	builder.WriteString(", ")
 	builder.WriteString("birth_date=")
-	builder.WriteString(s.BirthDate.Format(time.ANSIC))
+	builder.WriteString(u.BirthDate.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("gender=")
-	builder.WriteString(s.Gender)
+	builder.WriteString(u.Gender)
 	builder.WriteString(", ")
-	if v := s.ProfilePictureURL; v != nil {
+	if v := u.ProfilePictureURL; v != nil {
 		builder.WriteString("profile_picture_URL=")
 		builder.WriteString(*v)
 	}
@@ -262,5 +252,5 @@ func (s *Student) String() string {
 	return builder.String()
 }
 
-// Students is a parsable slice of Student.
-type Students []*Student
+// Users is a parsable slice of User.
+type Users []*User

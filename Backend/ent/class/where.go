@@ -3,7 +3,10 @@
 package class
 
 import (
+	"time"
+
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
 	"github.com/google/uuid"
 )
@@ -59,12 +62,12 @@ func ReviewAvaliable(v bool) predicate.Class {
 }
 
 // TotalHour applies equality check predicate on the "total_hour" field. It's identical to TotalHourEQ.
-func TotalHour(v string) predicate.Class {
+func TotalHour(v time.Time) predicate.Class {
 	return predicate.Class(sql.FieldEQ(FieldTotalHour, v))
 }
 
 // SuccessHour applies equality check predicate on the "success_hour" field. It's identical to SuccessHourEQ.
-func SuccessHour(v string) predicate.Class {
+func SuccessHour(v time.Time) predicate.Class {
 	return predicate.Class(sql.FieldEQ(FieldSuccessHour, v))
 }
 
@@ -79,133 +82,164 @@ func ReviewAvaliableNEQ(v bool) predicate.Class {
 }
 
 // TotalHourEQ applies the EQ predicate on the "total_hour" field.
-func TotalHourEQ(v string) predicate.Class {
+func TotalHourEQ(v time.Time) predicate.Class {
 	return predicate.Class(sql.FieldEQ(FieldTotalHour, v))
 }
 
 // TotalHourNEQ applies the NEQ predicate on the "total_hour" field.
-func TotalHourNEQ(v string) predicate.Class {
+func TotalHourNEQ(v time.Time) predicate.Class {
 	return predicate.Class(sql.FieldNEQ(FieldTotalHour, v))
 }
 
 // TotalHourIn applies the In predicate on the "total_hour" field.
-func TotalHourIn(vs ...string) predicate.Class {
+func TotalHourIn(vs ...time.Time) predicate.Class {
 	return predicate.Class(sql.FieldIn(FieldTotalHour, vs...))
 }
 
 // TotalHourNotIn applies the NotIn predicate on the "total_hour" field.
-func TotalHourNotIn(vs ...string) predicate.Class {
+func TotalHourNotIn(vs ...time.Time) predicate.Class {
 	return predicate.Class(sql.FieldNotIn(FieldTotalHour, vs...))
 }
 
 // TotalHourGT applies the GT predicate on the "total_hour" field.
-func TotalHourGT(v string) predicate.Class {
+func TotalHourGT(v time.Time) predicate.Class {
 	return predicate.Class(sql.FieldGT(FieldTotalHour, v))
 }
 
 // TotalHourGTE applies the GTE predicate on the "total_hour" field.
-func TotalHourGTE(v string) predicate.Class {
+func TotalHourGTE(v time.Time) predicate.Class {
 	return predicate.Class(sql.FieldGTE(FieldTotalHour, v))
 }
 
 // TotalHourLT applies the LT predicate on the "total_hour" field.
-func TotalHourLT(v string) predicate.Class {
+func TotalHourLT(v time.Time) predicate.Class {
 	return predicate.Class(sql.FieldLT(FieldTotalHour, v))
 }
 
 // TotalHourLTE applies the LTE predicate on the "total_hour" field.
-func TotalHourLTE(v string) predicate.Class {
+func TotalHourLTE(v time.Time) predicate.Class {
 	return predicate.Class(sql.FieldLTE(FieldTotalHour, v))
 }
 
-// TotalHourContains applies the Contains predicate on the "total_hour" field.
-func TotalHourContains(v string) predicate.Class {
-	return predicate.Class(sql.FieldContains(FieldTotalHour, v))
-}
-
-// TotalHourHasPrefix applies the HasPrefix predicate on the "total_hour" field.
-func TotalHourHasPrefix(v string) predicate.Class {
-	return predicate.Class(sql.FieldHasPrefix(FieldTotalHour, v))
-}
-
-// TotalHourHasSuffix applies the HasSuffix predicate on the "total_hour" field.
-func TotalHourHasSuffix(v string) predicate.Class {
-	return predicate.Class(sql.FieldHasSuffix(FieldTotalHour, v))
-}
-
-// TotalHourEqualFold applies the EqualFold predicate on the "total_hour" field.
-func TotalHourEqualFold(v string) predicate.Class {
-	return predicate.Class(sql.FieldEqualFold(FieldTotalHour, v))
-}
-
-// TotalHourContainsFold applies the ContainsFold predicate on the "total_hour" field.
-func TotalHourContainsFold(v string) predicate.Class {
-	return predicate.Class(sql.FieldContainsFold(FieldTotalHour, v))
-}
-
 // SuccessHourEQ applies the EQ predicate on the "success_hour" field.
-func SuccessHourEQ(v string) predicate.Class {
+func SuccessHourEQ(v time.Time) predicate.Class {
 	return predicate.Class(sql.FieldEQ(FieldSuccessHour, v))
 }
 
 // SuccessHourNEQ applies the NEQ predicate on the "success_hour" field.
-func SuccessHourNEQ(v string) predicate.Class {
+func SuccessHourNEQ(v time.Time) predicate.Class {
 	return predicate.Class(sql.FieldNEQ(FieldSuccessHour, v))
 }
 
 // SuccessHourIn applies the In predicate on the "success_hour" field.
-func SuccessHourIn(vs ...string) predicate.Class {
+func SuccessHourIn(vs ...time.Time) predicate.Class {
 	return predicate.Class(sql.FieldIn(FieldSuccessHour, vs...))
 }
 
 // SuccessHourNotIn applies the NotIn predicate on the "success_hour" field.
-func SuccessHourNotIn(vs ...string) predicate.Class {
+func SuccessHourNotIn(vs ...time.Time) predicate.Class {
 	return predicate.Class(sql.FieldNotIn(FieldSuccessHour, vs...))
 }
 
 // SuccessHourGT applies the GT predicate on the "success_hour" field.
-func SuccessHourGT(v string) predicate.Class {
+func SuccessHourGT(v time.Time) predicate.Class {
 	return predicate.Class(sql.FieldGT(FieldSuccessHour, v))
 }
 
 // SuccessHourGTE applies the GTE predicate on the "success_hour" field.
-func SuccessHourGTE(v string) predicate.Class {
+func SuccessHourGTE(v time.Time) predicate.Class {
 	return predicate.Class(sql.FieldGTE(FieldSuccessHour, v))
 }
 
 // SuccessHourLT applies the LT predicate on the "success_hour" field.
-func SuccessHourLT(v string) predicate.Class {
+func SuccessHourLT(v time.Time) predicate.Class {
 	return predicate.Class(sql.FieldLT(FieldSuccessHour, v))
 }
 
 // SuccessHourLTE applies the LTE predicate on the "success_hour" field.
-func SuccessHourLTE(v string) predicate.Class {
+func SuccessHourLTE(v time.Time) predicate.Class {
 	return predicate.Class(sql.FieldLTE(FieldSuccessHour, v))
 }
 
-// SuccessHourContains applies the Contains predicate on the "success_hour" field.
-func SuccessHourContains(v string) predicate.Class {
-	return predicate.Class(sql.FieldContains(FieldSuccessHour, v))
+// HasSchedule applies the HasEdge predicate on the "schedule" edge.
+func HasSchedule() predicate.Class {
+	return predicate.Class(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, ScheduleTable, ScheduleColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
 }
 
-// SuccessHourHasPrefix applies the HasPrefix predicate on the "success_hour" field.
-func SuccessHourHasPrefix(v string) predicate.Class {
-	return predicate.Class(sql.FieldHasPrefix(FieldSuccessHour, v))
+// HasScheduleWith applies the HasEdge predicate on the "schedule" edge with a given conditions (other predicates).
+func HasScheduleWith(preds ...predicate.Schedule) predicate.Class {
+	return predicate.Class(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ScheduleInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, ScheduleTable, ScheduleColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
-// SuccessHourHasSuffix applies the HasSuffix predicate on the "success_hour" field.
-func SuccessHourHasSuffix(v string) predicate.Class {
-	return predicate.Class(sql.FieldHasSuffix(FieldSuccessHour, v))
+// HasStudent applies the HasEdge predicate on the "student" edge.
+func HasStudent() predicate.Class {
+	return predicate.Class(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, StudentTable, StudentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
 }
 
-// SuccessHourEqualFold applies the EqualFold predicate on the "success_hour" field.
-func SuccessHourEqualFold(v string) predicate.Class {
-	return predicate.Class(sql.FieldEqualFold(FieldSuccessHour, v))
+// HasStudentWith applies the HasEdge predicate on the "student" edge with a given conditions (other predicates).
+func HasStudentWith(preds ...predicate.Student) predicate.Class {
+	return predicate.Class(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(StudentInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, StudentTable, StudentColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
-// SuccessHourContainsFold applies the ContainsFold predicate on the "success_hour" field.
-func SuccessHourContainsFold(v string) predicate.Class {
-	return predicate.Class(sql.FieldContainsFold(FieldSuccessHour, v))
+// HasCourse applies the HasEdge predicate on the "course" edge.
+func HasCourse() predicate.Class {
+	return predicate.Class(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, CourseTable, CourseColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCourseWith applies the HasEdge predicate on the "course" edge with a given conditions (other predicates).
+func HasCourseWith(preds ...predicate.Course) predicate.Class {
+	return predicate.Class(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(CourseInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, CourseTable, CourseColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

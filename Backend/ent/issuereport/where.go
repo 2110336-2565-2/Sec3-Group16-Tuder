@@ -3,7 +3,10 @@
 package issuereport
 
 import (
+	"time"
+
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
 	"github.com/google/uuid"
 )
@@ -64,7 +67,7 @@ func Description(v string) predicate.IssueReport {
 }
 
 // ReportDate applies equality check predicate on the "report_date" field. It's identical to ReportDateEQ.
-func ReportDate(v string) predicate.IssueReport {
+func ReportDate(v time.Time) predicate.IssueReport {
 	return predicate.IssueReport(sql.FieldEQ(FieldReportDate, v))
 }
 
@@ -204,68 +207,43 @@ func DescriptionContainsFold(v string) predicate.IssueReport {
 }
 
 // ReportDateEQ applies the EQ predicate on the "report_date" field.
-func ReportDateEQ(v string) predicate.IssueReport {
+func ReportDateEQ(v time.Time) predicate.IssueReport {
 	return predicate.IssueReport(sql.FieldEQ(FieldReportDate, v))
 }
 
 // ReportDateNEQ applies the NEQ predicate on the "report_date" field.
-func ReportDateNEQ(v string) predicate.IssueReport {
+func ReportDateNEQ(v time.Time) predicate.IssueReport {
 	return predicate.IssueReport(sql.FieldNEQ(FieldReportDate, v))
 }
 
 // ReportDateIn applies the In predicate on the "report_date" field.
-func ReportDateIn(vs ...string) predicate.IssueReport {
+func ReportDateIn(vs ...time.Time) predicate.IssueReport {
 	return predicate.IssueReport(sql.FieldIn(FieldReportDate, vs...))
 }
 
 // ReportDateNotIn applies the NotIn predicate on the "report_date" field.
-func ReportDateNotIn(vs ...string) predicate.IssueReport {
+func ReportDateNotIn(vs ...time.Time) predicate.IssueReport {
 	return predicate.IssueReport(sql.FieldNotIn(FieldReportDate, vs...))
 }
 
 // ReportDateGT applies the GT predicate on the "report_date" field.
-func ReportDateGT(v string) predicate.IssueReport {
+func ReportDateGT(v time.Time) predicate.IssueReport {
 	return predicate.IssueReport(sql.FieldGT(FieldReportDate, v))
 }
 
 // ReportDateGTE applies the GTE predicate on the "report_date" field.
-func ReportDateGTE(v string) predicate.IssueReport {
+func ReportDateGTE(v time.Time) predicate.IssueReport {
 	return predicate.IssueReport(sql.FieldGTE(FieldReportDate, v))
 }
 
 // ReportDateLT applies the LT predicate on the "report_date" field.
-func ReportDateLT(v string) predicate.IssueReport {
+func ReportDateLT(v time.Time) predicate.IssueReport {
 	return predicate.IssueReport(sql.FieldLT(FieldReportDate, v))
 }
 
 // ReportDateLTE applies the LTE predicate on the "report_date" field.
-func ReportDateLTE(v string) predicate.IssueReport {
+func ReportDateLTE(v time.Time) predicate.IssueReport {
 	return predicate.IssueReport(sql.FieldLTE(FieldReportDate, v))
-}
-
-// ReportDateContains applies the Contains predicate on the "report_date" field.
-func ReportDateContains(v string) predicate.IssueReport {
-	return predicate.IssueReport(sql.FieldContains(FieldReportDate, v))
-}
-
-// ReportDateHasPrefix applies the HasPrefix predicate on the "report_date" field.
-func ReportDateHasPrefix(v string) predicate.IssueReport {
-	return predicate.IssueReport(sql.FieldHasPrefix(FieldReportDate, v))
-}
-
-// ReportDateHasSuffix applies the HasSuffix predicate on the "report_date" field.
-func ReportDateHasSuffix(v string) predicate.IssueReport {
-	return predicate.IssueReport(sql.FieldHasSuffix(FieldReportDate, v))
-}
-
-// ReportDateEqualFold applies the EqualFold predicate on the "report_date" field.
-func ReportDateEqualFold(v string) predicate.IssueReport {
-	return predicate.IssueReport(sql.FieldEqualFold(FieldReportDate, v))
-}
-
-// ReportDateContainsFold applies the ContainsFold predicate on the "report_date" field.
-func ReportDateContainsFold(v string) predicate.IssueReport {
-	return predicate.IssueReport(sql.FieldContainsFold(FieldReportDate, v))
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.
@@ -331,6 +309,60 @@ func StatusEqualFold(v string) predicate.IssueReport {
 // StatusContainsFold applies the ContainsFold predicate on the "status" field.
 func StatusContainsFold(v string) predicate.IssueReport {
 	return predicate.IssueReport(sql.FieldContainsFold(FieldStatus, v))
+}
+
+// HasStudent applies the HasEdge predicate on the "student" edge.
+func HasStudent() predicate.IssueReport {
+	return predicate.IssueReport(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, StudentTable, StudentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasStudentWith applies the HasEdge predicate on the "student" edge with a given conditions (other predicates).
+func HasStudentWith(preds ...predicate.Student) predicate.IssueReport {
+	return predicate.IssueReport(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(StudentInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, StudentTable, StudentColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasTutor applies the HasEdge predicate on the "tutor" edge.
+func HasTutor() predicate.IssueReport {
+	return predicate.IssueReport(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, TutorTable, TutorColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasTutorWith applies the HasEdge predicate on the "tutor" edge with a given conditions (other predicates).
+func HasTutorWith(preds ...predicate.Tutor) predicate.IssueReport {
+	return predicate.IssueReport(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(TutorInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, TutorTable, TutorColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

@@ -6,10 +6,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/google/uuid"
 )
 
@@ -35,14 +39,14 @@ func (cc *ClassCreate) SetNillableReviewAvaliable(b *bool) *ClassCreate {
 }
 
 // SetTotalHour sets the "total_hour" field.
-func (cc *ClassCreate) SetTotalHour(s string) *ClassCreate {
-	cc.mutation.SetTotalHour(s)
+func (cc *ClassCreate) SetTotalHour(t time.Time) *ClassCreate {
+	cc.mutation.SetTotalHour(t)
 	return cc
 }
 
 // SetSuccessHour sets the "success_hour" field.
-func (cc *ClassCreate) SetSuccessHour(s string) *ClassCreate {
-	cc.mutation.SetSuccessHour(s)
+func (cc *ClassCreate) SetSuccessHour(t time.Time) *ClassCreate {
+	cc.mutation.SetSuccessHour(t)
 	return cc
 }
 
@@ -58,6 +62,47 @@ func (cc *ClassCreate) SetNillableID(u *uuid.UUID) *ClassCreate {
 		cc.SetID(*u)
 	}
 	return cc
+}
+
+// SetScheduleID sets the "schedule" edge to the Schedule entity by ID.
+func (cc *ClassCreate) SetScheduleID(id uuid.UUID) *ClassCreate {
+	cc.mutation.SetScheduleID(id)
+	return cc
+}
+
+// SetNillableScheduleID sets the "schedule" edge to the Schedule entity by ID if the given value is not nil.
+func (cc *ClassCreate) SetNillableScheduleID(id *uuid.UUID) *ClassCreate {
+	if id != nil {
+		cc = cc.SetScheduleID(*id)
+	}
+	return cc
+}
+
+// SetSchedule sets the "schedule" edge to the Schedule entity.
+func (cc *ClassCreate) SetSchedule(s *Schedule) *ClassCreate {
+	return cc.SetScheduleID(s.ID)
+}
+
+// SetStudentID sets the "student" edge to the Student entity by ID.
+func (cc *ClassCreate) SetStudentID(id uuid.UUID) *ClassCreate {
+	cc.mutation.SetStudentID(id)
+	return cc
+}
+
+// SetStudent sets the "student" edge to the Student entity.
+func (cc *ClassCreate) SetStudent(s *Student) *ClassCreate {
+	return cc.SetStudentID(s.ID)
+}
+
+// SetCourseID sets the "course" edge to the Course entity by ID.
+func (cc *ClassCreate) SetCourseID(id uuid.UUID) *ClassCreate {
+	cc.mutation.SetCourseID(id)
+	return cc
+}
+
+// SetCourse sets the "course" edge to the Course entity.
+func (cc *ClassCreate) SetCourse(c *Course) *ClassCreate {
+	return cc.SetCourseID(c.ID)
 }
 
 // Mutation returns the ClassMutation object of the builder.
@@ -113,18 +158,14 @@ func (cc *ClassCreate) check() error {
 	if _, ok := cc.mutation.TotalHour(); !ok {
 		return &ValidationError{Name: "total_hour", err: errors.New(`ent: missing required field "Class.total_hour"`)}
 	}
-	if v, ok := cc.mutation.TotalHour(); ok {
-		if err := class.TotalHourValidator(v); err != nil {
-			return &ValidationError{Name: "total_hour", err: fmt.Errorf(`ent: validator failed for field "Class.total_hour": %w`, err)}
-		}
-	}
 	if _, ok := cc.mutation.SuccessHour(); !ok {
 		return &ValidationError{Name: "success_hour", err: errors.New(`ent: missing required field "Class.success_hour"`)}
 	}
-	if v, ok := cc.mutation.SuccessHour(); ok {
-		if err := class.SuccessHourValidator(v); err != nil {
-			return &ValidationError{Name: "success_hour", err: fmt.Errorf(`ent: validator failed for field "Class.success_hour": %w`, err)}
-		}
+	if _, ok := cc.mutation.StudentID(); !ok {
+		return &ValidationError{Name: "student", err: errors.New(`ent: missing required edge "Class.student"`)}
+	}
+	if _, ok := cc.mutation.CourseID(); !ok {
+		return &ValidationError{Name: "course", err: errors.New(`ent: missing required edge "Class.course"`)}
 	}
 	return nil
 }
@@ -166,12 +207,71 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 		_node.ReviewAvaliable = value
 	}
 	if value, ok := cc.mutation.TotalHour(); ok {
-		_spec.SetField(class.FieldTotalHour, field.TypeString, value)
+		_spec.SetField(class.FieldTotalHour, field.TypeTime, value)
 		_node.TotalHour = value
 	}
 	if value, ok := cc.mutation.SuccessHour(); ok {
-		_spec.SetField(class.FieldSuccessHour, field.TypeString, value)
+		_spec.SetField(class.FieldSuccessHour, field.TypeTime, value)
 		_node.SuccessHour = value
+	}
+	if nodes := cc.mutation.ScheduleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   class.ScheduleTable,
+			Columns: []string{class.ScheduleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: schedule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.StudentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   class.StudentTable,
+			Columns: []string{class.StudentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: student.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.student_class = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.CourseIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   class.CourseTable,
+			Columns: []string{class.CourseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: course.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.course_class = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

@@ -6,10 +6,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/google/uuid"
 )
 
@@ -27,8 +32,8 @@ func (cc *CourseCreate) SetTitle(s string) *CourseCreate {
 }
 
 // SetEstimatedTime sets the "estimated_time" field.
-func (cc *CourseCreate) SetEstimatedTime(s string) *CourseCreate {
-	cc.mutation.SetEstimatedTime(s)
+func (cc *CourseCreate) SetEstimatedTime(t time.Time) *CourseCreate {
+	cc.mutation.SetEstimatedTime(t)
 	return cc
 }
 
@@ -82,6 +87,70 @@ func (cc *CourseCreate) SetNillableID(u *uuid.UUID) *CourseCreate {
 		cc.SetID(*u)
 	}
 	return cc
+}
+
+// AddReviewCourseIDs adds the "review_course" edge to the ReviewCourse entity by IDs.
+func (cc *CourseCreate) AddReviewCourseIDs(ids ...int) *CourseCreate {
+	cc.mutation.AddReviewCourseIDs(ids...)
+	return cc
+}
+
+// AddReviewCourse adds the "review_course" edges to the ReviewCourse entity.
+func (cc *CourseCreate) AddReviewCourse(r ...*ReviewCourse) *CourseCreate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return cc.AddReviewCourseIDs(ids...)
+}
+
+// SetClassID sets the "class" edge to the Class entity by ID.
+func (cc *CourseCreate) SetClassID(id uuid.UUID) *CourseCreate {
+	cc.mutation.SetClassID(id)
+	return cc
+}
+
+// SetNillableClassID sets the "class" edge to the Class entity by ID if the given value is not nil.
+func (cc *CourseCreate) SetNillableClassID(id *uuid.UUID) *CourseCreate {
+	if id != nil {
+		cc = cc.SetClassID(*id)
+	}
+	return cc
+}
+
+// SetClass sets the "class" edge to the Class entity.
+func (cc *CourseCreate) SetClass(c *Class) *CourseCreate {
+	return cc.SetClassID(c.ID)
+}
+
+// SetStudentID sets the "student" edge to the Student entity by ID.
+func (cc *CourseCreate) SetStudentID(id uuid.UUID) *CourseCreate {
+	cc.mutation.SetStudentID(id)
+	return cc
+}
+
+// SetNillableStudentID sets the "student" edge to the Student entity by ID if the given value is not nil.
+func (cc *CourseCreate) SetNillableStudentID(id *uuid.UUID) *CourseCreate {
+	if id != nil {
+		cc = cc.SetStudentID(*id)
+	}
+	return cc
+}
+
+// SetStudent sets the "student" edge to the Student entity.
+func (cc *CourseCreate) SetStudent(s *Student) *CourseCreate {
+	return cc.SetStudentID(s.ID)
+}
+
+// SetTutorID sets the "tutor" edge to the Tutor entity by ID.
+func (cc *CourseCreate) SetTutorID(id uuid.UUID) *CourseCreate {
+	cc.mutation.SetTutorID(id)
+	return cc
+}
+
+// SetTutor sets the "tutor" edge to the Tutor entity.
+func (cc *CourseCreate) SetTutor(t *Tutor) *CourseCreate {
+	return cc.SetTutorID(t.ID)
 }
 
 // Mutation returns the CourseMutation object of the builder.
@@ -138,11 +207,6 @@ func (cc *CourseCreate) check() error {
 	if _, ok := cc.mutation.EstimatedTime(); !ok {
 		return &ValidationError{Name: "estimated_time", err: errors.New(`ent: missing required field "Course.estimated_time"`)}
 	}
-	if v, ok := cc.mutation.EstimatedTime(); ok {
-		if err := course.EstimatedTimeValidator(v); err != nil {
-			return &ValidationError{Name: "estimated_time", err: fmt.Errorf(`ent: validator failed for field "Course.estimated_time": %w`, err)}
-		}
-	}
 	if _, ok := cc.mutation.Description(); !ok {
 		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Course.description"`)}
 	}
@@ -174,6 +238,9 @@ func (cc *CourseCreate) check() error {
 		if err := course.LevelIDValidator(v); err != nil {
 			return &ValidationError{Name: "level_id", err: fmt.Errorf(`ent: validator failed for field "Course.level_id": %w`, err)}
 		}
+	}
+	if _, ok := cc.mutation.TutorID(); !ok {
+		return &ValidationError{Name: "tutor", err: errors.New(`ent: missing required edge "Course.tutor"`)}
 	}
 	return nil
 }
@@ -215,7 +282,7 @@ func (cc *CourseCreate) createSpec() (*Course, *sqlgraph.CreateSpec) {
 		_node.Title = value
 	}
 	if value, ok := cc.mutation.EstimatedTime(); ok {
-		_spec.SetField(course.FieldEstimatedTime, field.TypeString, value)
+		_spec.SetField(course.FieldEstimatedTime, field.TypeTime, value)
 		_node.EstimatedTime = value
 	}
 	if value, ok := cc.mutation.Description(); ok {
@@ -237,6 +304,84 @@ func (cc *CourseCreate) createSpec() (*Course, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.CoursePictureURL(); ok {
 		_spec.SetField(course.FieldCoursePictureURL, field.TypeString, value)
 		_node.CoursePictureURL = &value
+	}
+	if nodes := cc.mutation.ReviewCourseIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   course.ReviewCourseTable,
+			Columns: []string{course.ReviewCourseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: reviewcourse.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   course.ClassTable,
+			Columns: []string{course.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: class.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.StudentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   course.StudentTable,
+			Columns: []string{course.StudentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: student.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.student_course = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.TutorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   course.TutorTable,
+			Columns: []string{course.TutorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tutor.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.tutor_course = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -11,17 +12,24 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/google/uuid"
 )
 
 // ClassQuery is the builder for querying Class entities.
 type ClassQuery struct {
 	config
-	ctx        *QueryContext
-	order      []OrderFunc
-	inters     []Interceptor
-	predicates []predicate.Class
+	ctx          *QueryContext
+	order        []OrderFunc
+	inters       []Interceptor
+	predicates   []predicate.Class
+	withSchedule *ScheduleQuery
+	withStudent  *StudentQuery
+	withCourse   *CourseQuery
+	withFKs      bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -56,6 +64,72 @@ func (cq *ClassQuery) Unique(unique bool) *ClassQuery {
 func (cq *ClassQuery) Order(o ...OrderFunc) *ClassQuery {
 	cq.order = append(cq.order, o...)
 	return cq
+}
+
+// QuerySchedule chains the current query on the "schedule" edge.
+func (cq *ClassQuery) QuerySchedule() *ScheduleQuery {
+	query := (&ScheduleClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(class.Table, class.FieldID, selector),
+			sqlgraph.To(schedule.Table, schedule.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, class.ScheduleTable, class.ScheduleColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryStudent chains the current query on the "student" edge.
+func (cq *ClassQuery) QueryStudent() *StudentQuery {
+	query := (&StudentClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(class.Table, class.FieldID, selector),
+			sqlgraph.To(student.Table, student.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, class.StudentTable, class.StudentColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCourse chains the current query on the "course" edge.
+func (cq *ClassQuery) QueryCourse() *CourseQuery {
+	query := (&CourseClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(class.Table, class.FieldID, selector),
+			sqlgraph.To(course.Table, course.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, class.CourseTable, class.CourseColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Class entity from the query.
@@ -245,15 +319,51 @@ func (cq *ClassQuery) Clone() *ClassQuery {
 		return nil
 	}
 	return &ClassQuery{
-		config:     cq.config,
-		ctx:        cq.ctx.Clone(),
-		order:      append([]OrderFunc{}, cq.order...),
-		inters:     append([]Interceptor{}, cq.inters...),
-		predicates: append([]predicate.Class{}, cq.predicates...),
+		config:       cq.config,
+		ctx:          cq.ctx.Clone(),
+		order:        append([]OrderFunc{}, cq.order...),
+		inters:       append([]Interceptor{}, cq.inters...),
+		predicates:   append([]predicate.Class{}, cq.predicates...),
+		withSchedule: cq.withSchedule.Clone(),
+		withStudent:  cq.withStudent.Clone(),
+		withCourse:   cq.withCourse.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
 	}
+}
+
+// WithSchedule tells the query-builder to eager-load the nodes that are connected to
+// the "schedule" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *ClassQuery) WithSchedule(opts ...func(*ScheduleQuery)) *ClassQuery {
+	query := (&ScheduleClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withSchedule = query
+	return cq
+}
+
+// WithStudent tells the query-builder to eager-load the nodes that are connected to
+// the "student" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *ClassQuery) WithStudent(opts ...func(*StudentQuery)) *ClassQuery {
+	query := (&StudentClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withStudent = query
+	return cq
+}
+
+// WithCourse tells the query-builder to eager-load the nodes that are connected to
+// the "course" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *ClassQuery) WithCourse(opts ...func(*CourseQuery)) *ClassQuery {
+	query := (&CourseClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withCourse = query
+	return cq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -332,15 +442,28 @@ func (cq *ClassQuery) prepareQuery(ctx context.Context) error {
 
 func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class, error) {
 	var (
-		nodes = []*Class{}
-		_spec = cq.querySpec()
+		nodes       = []*Class{}
+		withFKs     = cq.withFKs
+		_spec       = cq.querySpec()
+		loadedTypes = [3]bool{
+			cq.withSchedule != nil,
+			cq.withStudent != nil,
+			cq.withCourse != nil,
+		}
 	)
+	if cq.withStudent != nil || cq.withCourse != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, class.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Class).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Class{config: cq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -352,7 +475,118 @@ func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := cq.withSchedule; query != nil {
+		if err := cq.loadSchedule(ctx, query, nodes, nil,
+			func(n *Class, e *Schedule) { n.Edges.Schedule = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := cq.withStudent; query != nil {
+		if err := cq.loadStudent(ctx, query, nodes, nil,
+			func(n *Class, e *Student) { n.Edges.Student = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := cq.withCourse; query != nil {
+		if err := cq.loadCourse(ctx, query, nodes, nil,
+			func(n *Class, e *Course) { n.Edges.Course = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (cq *ClassQuery) loadSchedule(ctx context.Context, query *ScheduleQuery, nodes []*Class, init func(*Class), assign func(*Class, *Schedule)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Class)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+	}
+	query.withFKs = true
+	query.Where(predicate.Schedule(func(s *sql.Selector) {
+		s.Where(sql.InValues(class.ScheduleColumn, fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.class_schedule
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "class_schedule" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "class_schedule" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (cq *ClassQuery) loadStudent(ctx context.Context, query *StudentQuery, nodes []*Class, init func(*Class), assign func(*Class, *Student)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Class)
+	for i := range nodes {
+		if nodes[i].student_class == nil {
+			continue
+		}
+		fk := *nodes[i].student_class
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(student.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "student_class" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (cq *ClassQuery) loadCourse(ctx context.Context, query *CourseQuery, nodes []*Class, init func(*Class), assign func(*Class, *Course)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Class)
+	for i := range nodes {
+		if nodes[i].course_class == nil {
+			continue
+		}
+		fk := *nodes[i].course_class
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(course.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "course_class" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
 }
 
 func (cq *ClassQuery) sqlCount(ctx context.Context) (int, error) {

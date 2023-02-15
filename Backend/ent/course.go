@@ -5,9 +5,13 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/google/uuid"
 )
 
@@ -19,7 +23,7 @@ type Course struct {
 	// Title holds the value of the "title" field.
 	Title string `json:"title,omitempty"`
 	// EstimatedTime holds the value of the "estimated_time" field.
-	EstimatedTime string `json:"estimated_time,omitempty"`
+	EstimatedTime time.Time `json:"estimated_time,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
 	// CourseStatus holds the value of the "course_status" field.
@@ -30,6 +34,74 @@ type Course struct {
 	LevelID string `json:"level_id,omitempty"`
 	// CoursePictureURL holds the value of the "course_picture_url" field.
 	CoursePictureURL *string `json:"course_picture_url,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the CourseQuery when eager-loading is set.
+	Edges          CourseEdges `json:"edges"`
+	student_course *uuid.UUID
+	tutor_course   *uuid.UUID
+}
+
+// CourseEdges holds the relations/edges for other nodes in the graph.
+type CourseEdges struct {
+	// ReviewCourse holds the value of the review_course edge.
+	ReviewCourse []*ReviewCourse `json:"review_course,omitempty"`
+	// Class holds the value of the class edge.
+	Class *Class `json:"class,omitempty"`
+	// Student holds the value of the student edge.
+	Student *Student `json:"student,omitempty"`
+	// Tutor holds the value of the tutor edge.
+	Tutor *Tutor `json:"tutor,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [4]bool
+}
+
+// ReviewCourseOrErr returns the ReviewCourse value or an error if the edge
+// was not loaded in eager-loading.
+func (e CourseEdges) ReviewCourseOrErr() ([]*ReviewCourse, error) {
+	if e.loadedTypes[0] {
+		return e.ReviewCourse, nil
+	}
+	return nil, &NotLoadedError{edge: "review_course"}
+}
+
+// ClassOrErr returns the Class value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CourseEdges) ClassOrErr() (*Class, error) {
+	if e.loadedTypes[1] {
+		if e.Class == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: class.Label}
+		}
+		return e.Class, nil
+	}
+	return nil, &NotLoadedError{edge: "class"}
+}
+
+// StudentOrErr returns the Student value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CourseEdges) StudentOrErr() (*Student, error) {
+	if e.loadedTypes[2] {
+		if e.Student == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: student.Label}
+		}
+		return e.Student, nil
+	}
+	return nil, &NotLoadedError{edge: "student"}
+}
+
+// TutorOrErr returns the Tutor value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CourseEdges) TutorOrErr() (*Tutor, error) {
+	if e.loadedTypes[3] {
+		if e.Tutor == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: tutor.Label}
+		}
+		return e.Tutor, nil
+	}
+	return nil, &NotLoadedError{edge: "tutor"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -39,10 +111,16 @@ func (*Course) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case course.FieldPricePerHour:
 			values[i] = new(sql.NullInt64)
-		case course.FieldTitle, course.FieldEstimatedTime, course.FieldDescription, course.FieldCourseStatus, course.FieldLevelID, course.FieldCoursePictureURL:
+		case course.FieldTitle, course.FieldDescription, course.FieldCourseStatus, course.FieldLevelID, course.FieldCoursePictureURL:
 			values[i] = new(sql.NullString)
+		case course.FieldEstimatedTime:
+			values[i] = new(sql.NullTime)
 		case course.FieldID:
 			values[i] = new(uuid.UUID)
+		case course.ForeignKeys[0]: // student_course
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case course.ForeignKeys[1]: // tutor_course
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Course", columns[i])
 		}
@@ -71,10 +149,10 @@ func (c *Course) assignValues(columns []string, values []any) error {
 				c.Title = value.String
 			}
 		case course.FieldEstimatedTime:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field estimated_time", values[i])
 			} else if value.Valid {
-				c.EstimatedTime = value.String
+				c.EstimatedTime = value.Time
 			}
 		case course.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -107,9 +185,43 @@ func (c *Course) assignValues(columns []string, values []any) error {
 				c.CoursePictureURL = new(string)
 				*c.CoursePictureURL = value.String
 			}
+		case course.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field student_course", values[i])
+			} else if value.Valid {
+				c.student_course = new(uuid.UUID)
+				*c.student_course = *value.S.(*uuid.UUID)
+			}
+		case course.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field tutor_course", values[i])
+			} else if value.Valid {
+				c.tutor_course = new(uuid.UUID)
+				*c.tutor_course = *value.S.(*uuid.UUID)
+			}
 		}
 	}
 	return nil
+}
+
+// QueryReviewCourse queries the "review_course" edge of the Course entity.
+func (c *Course) QueryReviewCourse() *ReviewCourseQuery {
+	return NewCourseClient(c.config).QueryReviewCourse(c)
+}
+
+// QueryClass queries the "class" edge of the Course entity.
+func (c *Course) QueryClass() *ClassQuery {
+	return NewCourseClient(c.config).QueryClass(c)
+}
+
+// QueryStudent queries the "student" edge of the Course entity.
+func (c *Course) QueryStudent() *StudentQuery {
+	return NewCourseClient(c.config).QueryStudent(c)
+}
+
+// QueryTutor queries the "tutor" edge of the Course entity.
+func (c *Course) QueryTutor() *TutorQuery {
+	return NewCourseClient(c.config).QueryTutor(c)
 }
 
 // Update returns a builder for updating this Course.
@@ -139,7 +251,7 @@ func (c *Course) String() string {
 	builder.WriteString(c.Title)
 	builder.WriteString(", ")
 	builder.WriteString("estimated_time=")
-	builder.WriteString(c.EstimatedTime)
+	builder.WriteString(c.EstimatedTime.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(c.Description)

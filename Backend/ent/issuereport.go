@@ -5,9 +5,12 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/google/uuid"
 )
 
@@ -21,9 +24,52 @@ type IssueReport struct {
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
 	// ReportDate holds the value of the "report_date" field.
-	ReportDate string `json:"report_date,omitempty"`
+	ReportDate time.Time `json:"report_date,omitempty"`
 	// Status holds the value of the "status" field.
 	Status string `json:"status,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the IssueReportQuery when eager-loading is set.
+	Edges                IssueReportEdges `json:"edges"`
+	student_issue_report *uuid.UUID
+	tutor_issue_report   *uuid.UUID
+	user_issue_report    *uuid.UUID
+}
+
+// IssueReportEdges holds the relations/edges for other nodes in the graph.
+type IssueReportEdges struct {
+	// Student holds the value of the student edge.
+	Student *Student `json:"student,omitempty"`
+	// Tutor holds the value of the tutor edge.
+	Tutor *Tutor `json:"tutor,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+}
+
+// StudentOrErr returns the Student value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e IssueReportEdges) StudentOrErr() (*Student, error) {
+	if e.loadedTypes[0] {
+		if e.Student == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: student.Label}
+		}
+		return e.Student, nil
+	}
+	return nil, &NotLoadedError{edge: "student"}
+}
+
+// TutorOrErr returns the Tutor value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e IssueReportEdges) TutorOrErr() (*Tutor, error) {
+	if e.loadedTypes[1] {
+		if e.Tutor == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: tutor.Label}
+		}
+		return e.Tutor, nil
+	}
+	return nil, &NotLoadedError{edge: "tutor"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -31,10 +77,18 @@ func (*IssueReport) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case issuereport.FieldTitle, issuereport.FieldDescription, issuereport.FieldReportDate, issuereport.FieldStatus:
+		case issuereport.FieldTitle, issuereport.FieldDescription, issuereport.FieldStatus:
 			values[i] = new(sql.NullString)
+		case issuereport.FieldReportDate:
+			values[i] = new(sql.NullTime)
 		case issuereport.FieldID:
 			values[i] = new(uuid.UUID)
+		case issuereport.ForeignKeys[0]: // student_issue_report
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case issuereport.ForeignKeys[1]: // tutor_issue_report
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case issuereport.ForeignKeys[2]: // user_issue_report
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type IssueReport", columns[i])
 		}
@@ -69,10 +123,10 @@ func (ir *IssueReport) assignValues(columns []string, values []any) error {
 				ir.Description = value.String
 			}
 		case issuereport.FieldReportDate:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field report_date", values[i])
 			} else if value.Valid {
-				ir.ReportDate = value.String
+				ir.ReportDate = value.Time
 			}
 		case issuereport.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -80,9 +134,40 @@ func (ir *IssueReport) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				ir.Status = value.String
 			}
+		case issuereport.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field student_issue_report", values[i])
+			} else if value.Valid {
+				ir.student_issue_report = new(uuid.UUID)
+				*ir.student_issue_report = *value.S.(*uuid.UUID)
+			}
+		case issuereport.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field tutor_issue_report", values[i])
+			} else if value.Valid {
+				ir.tutor_issue_report = new(uuid.UUID)
+				*ir.tutor_issue_report = *value.S.(*uuid.UUID)
+			}
+		case issuereport.ForeignKeys[2]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field user_issue_report", values[i])
+			} else if value.Valid {
+				ir.user_issue_report = new(uuid.UUID)
+				*ir.user_issue_report = *value.S.(*uuid.UUID)
+			}
 		}
 	}
 	return nil
+}
+
+// QueryStudent queries the "student" edge of the IssueReport entity.
+func (ir *IssueReport) QueryStudent() *StudentQuery {
+	return NewIssueReportClient(ir.config).QueryStudent(ir)
+}
+
+// QueryTutor queries the "tutor" edge of the IssueReport entity.
+func (ir *IssueReport) QueryTutor() *TutorQuery {
+	return NewIssueReportClient(ir.config).QueryTutor(ir)
 }
 
 // Update returns a builder for updating this IssueReport.
@@ -115,7 +200,7 @@ func (ir *IssueReport) String() string {
 	builder.WriteString(ir.Description)
 	builder.WriteString(", ")
 	builder.WriteString("report_date=")
-	builder.WriteString(ir.ReportDate)
+	builder.WriteString(ir.ReportDate.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(ir.Status)

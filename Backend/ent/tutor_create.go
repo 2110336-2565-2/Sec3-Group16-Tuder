@@ -10,6 +10,10 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewtutor"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/google/uuid"
 )
@@ -135,6 +139,66 @@ func (tc *TutorCreate) SetNillableID(u *uuid.UUID) *TutorCreate {
 		tc.SetID(*u)
 	}
 	return tc
+}
+
+// AddIssueReportIDs adds the "issue_report" edge to the IssueReport entity by IDs.
+func (tc *TutorCreate) AddIssueReportIDs(ids ...uuid.UUID) *TutorCreate {
+	tc.mutation.AddIssueReportIDs(ids...)
+	return tc
+}
+
+// AddIssueReport adds the "issue_report" edges to the IssueReport entity.
+func (tc *TutorCreate) AddIssueReport(i ...*IssueReport) *TutorCreate {
+	ids := make([]uuid.UUID, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return tc.AddIssueReportIDs(ids...)
+}
+
+// AddCourseIDs adds the "course" edge to the Course entity by IDs.
+func (tc *TutorCreate) AddCourseIDs(ids ...uuid.UUID) *TutorCreate {
+	tc.mutation.AddCourseIDs(ids...)
+	return tc
+}
+
+// AddCourse adds the "course" edges to the Course entity.
+func (tc *TutorCreate) AddCourse(c ...*Course) *TutorCreate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return tc.AddCourseIDs(ids...)
+}
+
+// AddReviewTutorIDs adds the "review_tutor" edge to the ReviewTutor entity by IDs.
+func (tc *TutorCreate) AddReviewTutorIDs(ids ...int) *TutorCreate {
+	tc.mutation.AddReviewTutorIDs(ids...)
+	return tc
+}
+
+// AddReviewTutor adds the "review_tutor" edges to the ReviewTutor entity.
+func (tc *TutorCreate) AddReviewTutor(r ...*ReviewTutor) *TutorCreate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return tc.AddReviewTutorIDs(ids...)
+}
+
+// AddScheduleIDs adds the "schedule" edge to the Schedule entity by IDs.
+func (tc *TutorCreate) AddScheduleIDs(ids ...uuid.UUID) *TutorCreate {
+	tc.mutation.AddScheduleIDs(ids...)
+	return tc
+}
+
+// AddSchedule adds the "schedule" edges to the Schedule entity.
+func (tc *TutorCreate) AddSchedule(s ...*Schedule) *TutorCreate {
+	ids := make([]uuid.UUID, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return tc.AddScheduleIDs(ids...)
 }
 
 // Mutation returns the TutorMutation object of the builder.
@@ -341,6 +405,82 @@ func (tc *TutorCreate) createSpec() (*Tutor, *sqlgraph.CreateSpec) {
 	if value, ok := tc.mutation.CitizenID(); ok {
 		_spec.SetField(tutor.FieldCitizenID, field.TypeString, value)
 		_node.CitizenID = value
+	}
+	if nodes := tc.mutation.IssueReportIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   tutor.IssueReportTable,
+			Columns: []string{tutor.IssueReportColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: issuereport.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := tc.mutation.CourseIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   tutor.CourseTable,
+			Columns: []string{tutor.CourseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: course.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := tc.mutation.ReviewTutorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   tutor.ReviewTutorTable,
+			Columns: []string{tutor.ReviewTutorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: reviewtutor.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := tc.mutation.ScheduleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   tutor.ScheduleTable,
+			Columns: []string{tutor.ScheduleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: schedule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

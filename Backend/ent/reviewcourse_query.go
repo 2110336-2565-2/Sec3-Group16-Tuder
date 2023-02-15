@@ -10,8 +10,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
+	"github.com/google/uuid"
 )
 
 // ReviewCourseQuery is the builder for querying ReviewCourse entities.
@@ -21,6 +23,8 @@ type ReviewCourseQuery struct {
 	order      []OrderFunc
 	inters     []Interceptor
 	predicates []predicate.ReviewCourse
+	withCourse *CourseQuery
+	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -55,6 +59,28 @@ func (rcq *ReviewCourseQuery) Unique(unique bool) *ReviewCourseQuery {
 func (rcq *ReviewCourseQuery) Order(o ...OrderFunc) *ReviewCourseQuery {
 	rcq.order = append(rcq.order, o...)
 	return rcq
+}
+
+// QueryCourse chains the current query on the "course" edge.
+func (rcq *ReviewCourseQuery) QueryCourse() *CourseQuery {
+	query := (&CourseClient{config: rcq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := rcq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := rcq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(reviewcourse.Table, reviewcourse.FieldID, selector),
+			sqlgraph.To(course.Table, course.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, reviewcourse.CourseTable, reviewcourse.CourseColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(rcq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first ReviewCourse entity from the query.
@@ -249,10 +275,22 @@ func (rcq *ReviewCourseQuery) Clone() *ReviewCourseQuery {
 		order:      append([]OrderFunc{}, rcq.order...),
 		inters:     append([]Interceptor{}, rcq.inters...),
 		predicates: append([]predicate.ReviewCourse{}, rcq.predicates...),
+		withCourse: rcq.withCourse.Clone(),
 		// clone intermediate query.
 		sql:  rcq.sql.Clone(),
 		path: rcq.path,
 	}
+}
+
+// WithCourse tells the query-builder to eager-load the nodes that are connected to
+// the "course" edge. The optional arguments are used to configure the query builder of the edge.
+func (rcq *ReviewCourseQuery) WithCourse(opts ...func(*CourseQuery)) *ReviewCourseQuery {
+	query := (&CourseClient{config: rcq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	rcq.withCourse = query
+	return rcq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -331,15 +369,26 @@ func (rcq *ReviewCourseQuery) prepareQuery(ctx context.Context) error {
 
 func (rcq *ReviewCourseQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*ReviewCourse, error) {
 	var (
-		nodes = []*ReviewCourse{}
-		_spec = rcq.querySpec()
+		nodes       = []*ReviewCourse{}
+		withFKs     = rcq.withFKs
+		_spec       = rcq.querySpec()
+		loadedTypes = [1]bool{
+			rcq.withCourse != nil,
+		}
 	)
+	if rcq.withCourse != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, reviewcourse.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*ReviewCourse).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &ReviewCourse{config: rcq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -351,7 +400,46 @@ func (rcq *ReviewCourseQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := rcq.withCourse; query != nil {
+		if err := rcq.loadCourse(ctx, query, nodes, nil,
+			func(n *ReviewCourse, e *Course) { n.Edges.Course = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (rcq *ReviewCourseQuery) loadCourse(ctx context.Context, query *CourseQuery, nodes []*ReviewCourse, init func(*ReviewCourse), assign func(*ReviewCourse, *Course)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*ReviewCourse)
+	for i := range nodes {
+		if nodes[i].course_review_course == nil {
+			continue
+		}
+		fk := *nodes[i].course_review_course
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(course.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "course_review_course" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
 }
 
 func (rcq *ReviewCourseQuery) sqlCount(ctx context.Context) (int, error) {

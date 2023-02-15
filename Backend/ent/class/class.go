@@ -17,8 +17,35 @@ const (
 	FieldTotalHour = "total_hour"
 	// FieldSuccessHour holds the string denoting the success_hour field in the database.
 	FieldSuccessHour = "success_hour"
+	// EdgeSchedule holds the string denoting the schedule edge name in mutations.
+	EdgeSchedule = "schedule"
+	// EdgeStudent holds the string denoting the student edge name in mutations.
+	EdgeStudent = "student"
+	// EdgeCourse holds the string denoting the course edge name in mutations.
+	EdgeCourse = "course"
 	// Table holds the table name of the class in the database.
 	Table = "classes"
+	// ScheduleTable is the table that holds the schedule relation/edge.
+	ScheduleTable = "schedules"
+	// ScheduleInverseTable is the table name for the Schedule entity.
+	// It exists in this package in order to avoid circular dependency with the "schedule" package.
+	ScheduleInverseTable = "schedules"
+	// ScheduleColumn is the table column denoting the schedule relation/edge.
+	ScheduleColumn = "class_schedule"
+	// StudentTable is the table that holds the student relation/edge.
+	StudentTable = "classes"
+	// StudentInverseTable is the table name for the Student entity.
+	// It exists in this package in order to avoid circular dependency with the "student" package.
+	StudentInverseTable = "students"
+	// StudentColumn is the table column denoting the student relation/edge.
+	StudentColumn = "student_class"
+	// CourseTable is the table that holds the course relation/edge.
+	CourseTable = "classes"
+	// CourseInverseTable is the table name for the Course entity.
+	// It exists in this package in order to avoid circular dependency with the "course" package.
+	CourseInverseTable = "courses"
+	// CourseColumn is the table column denoting the course relation/edge.
+	CourseColumn = "course_class"
 )
 
 // Columns holds all SQL columns for class fields.
@@ -29,10 +56,22 @@ var Columns = []string{
 	FieldSuccessHour,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the "classes"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"course_class",
+	"student_class",
+}
+
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -42,10 +81,6 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultReviewAvaliable holds the default value on creation for the "review_avaliable" field.
 	DefaultReviewAvaliable bool
-	// TotalHourValidator is a validator for the "total_hour" field. It is called by the builders before save.
-	TotalHourValidator func(string) error
-	// SuccessHourValidator is a validator for the "success_hour" field. It is called by the builders before save.
-	SuccessHourValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )

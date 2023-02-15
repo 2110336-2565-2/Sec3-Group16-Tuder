@@ -10,8 +10,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
+	"github.com/google/uuid"
 )
 
 // ReviewCourseUpdate is the builder for updating ReviewCourse entities.
@@ -74,9 +76,26 @@ func (rcu *ReviewCourseUpdate) ClearReviewMsg() *ReviewCourseUpdate {
 	return rcu
 }
 
+// SetCourseID sets the "course" edge to the Course entity by ID.
+func (rcu *ReviewCourseUpdate) SetCourseID(id uuid.UUID) *ReviewCourseUpdate {
+	rcu.mutation.SetCourseID(id)
+	return rcu
+}
+
+// SetCourse sets the "course" edge to the Course entity.
+func (rcu *ReviewCourseUpdate) SetCourse(c *Course) *ReviewCourseUpdate {
+	return rcu.SetCourseID(c.ID)
+}
+
 // Mutation returns the ReviewCourseMutation object of the builder.
 func (rcu *ReviewCourseUpdate) Mutation() *ReviewCourseMutation {
 	return rcu.mutation
+}
+
+// ClearCourse clears the "course" edge to the Course entity.
+func (rcu *ReviewCourseUpdate) ClearCourse() *ReviewCourseUpdate {
+	rcu.mutation.ClearCourse()
+	return rcu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -113,6 +132,9 @@ func (rcu *ReviewCourseUpdate) check() error {
 			return &ValidationError{Name: "score", err: fmt.Errorf(`ent: validator failed for field "ReviewCourse.score": %w`, err)}
 		}
 	}
+	if _, ok := rcu.mutation.CourseID(); rcu.mutation.CourseCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ReviewCourse.course"`)
+	}
 	return nil
 }
 
@@ -142,6 +164,41 @@ func (rcu *ReviewCourseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if rcu.mutation.ReviewMsgCleared() {
 		_spec.ClearField(reviewcourse.FieldReviewMsg, field.TypeString)
+	}
+	if rcu.mutation.CourseCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   reviewcourse.CourseTable,
+			Columns: []string{reviewcourse.CourseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: course.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := rcu.mutation.CourseIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   reviewcourse.CourseTable,
+			Columns: []string{reviewcourse.CourseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: course.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, rcu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -210,9 +267,26 @@ func (rcuo *ReviewCourseUpdateOne) ClearReviewMsg() *ReviewCourseUpdateOne {
 	return rcuo
 }
 
+// SetCourseID sets the "course" edge to the Course entity by ID.
+func (rcuo *ReviewCourseUpdateOne) SetCourseID(id uuid.UUID) *ReviewCourseUpdateOne {
+	rcuo.mutation.SetCourseID(id)
+	return rcuo
+}
+
+// SetCourse sets the "course" edge to the Course entity.
+func (rcuo *ReviewCourseUpdateOne) SetCourse(c *Course) *ReviewCourseUpdateOne {
+	return rcuo.SetCourseID(c.ID)
+}
+
 // Mutation returns the ReviewCourseMutation object of the builder.
 func (rcuo *ReviewCourseUpdateOne) Mutation() *ReviewCourseMutation {
 	return rcuo.mutation
+}
+
+// ClearCourse clears the "course" edge to the Course entity.
+func (rcuo *ReviewCourseUpdateOne) ClearCourse() *ReviewCourseUpdateOne {
+	rcuo.mutation.ClearCourse()
+	return rcuo
 }
 
 // Where appends a list predicates to the ReviewCourseUpdate builder.
@@ -262,6 +336,9 @@ func (rcuo *ReviewCourseUpdateOne) check() error {
 			return &ValidationError{Name: "score", err: fmt.Errorf(`ent: validator failed for field "ReviewCourse.score": %w`, err)}
 		}
 	}
+	if _, ok := rcuo.mutation.CourseID(); rcuo.mutation.CourseCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ReviewCourse.course"`)
+	}
 	return nil
 }
 
@@ -308,6 +385,41 @@ func (rcuo *ReviewCourseUpdateOne) sqlSave(ctx context.Context) (_node *ReviewCo
 	}
 	if rcuo.mutation.ReviewMsgCleared() {
 		_spec.ClearField(reviewcourse.FieldReviewMsg, field.TypeString)
+	}
+	if rcuo.mutation.CourseCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   reviewcourse.CourseTable,
+			Columns: []string{reviewcourse.CourseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: course.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := rcuo.mutation.CourseIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   reviewcourse.CourseTable,
+			Columns: []string{reviewcourse.CourseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: course.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &ReviewCourse{config: rcuo.config}
 	_spec.Assign = _node.assignValues

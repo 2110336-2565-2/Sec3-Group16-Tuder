@@ -3,7 +3,10 @@
 package course
 
 import (
+	"time"
+
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
 	"github.com/google/uuid"
 )
@@ -59,7 +62,7 @@ func Title(v string) predicate.Course {
 }
 
 // EstimatedTime applies equality check predicate on the "estimated_time" field. It's identical to EstimatedTimeEQ.
-func EstimatedTime(v string) predicate.Course {
+func EstimatedTime(v time.Time) predicate.Course {
 	return predicate.Course(sql.FieldEQ(FieldEstimatedTime, v))
 }
 
@@ -154,68 +157,43 @@ func TitleContainsFold(v string) predicate.Course {
 }
 
 // EstimatedTimeEQ applies the EQ predicate on the "estimated_time" field.
-func EstimatedTimeEQ(v string) predicate.Course {
+func EstimatedTimeEQ(v time.Time) predicate.Course {
 	return predicate.Course(sql.FieldEQ(FieldEstimatedTime, v))
 }
 
 // EstimatedTimeNEQ applies the NEQ predicate on the "estimated_time" field.
-func EstimatedTimeNEQ(v string) predicate.Course {
+func EstimatedTimeNEQ(v time.Time) predicate.Course {
 	return predicate.Course(sql.FieldNEQ(FieldEstimatedTime, v))
 }
 
 // EstimatedTimeIn applies the In predicate on the "estimated_time" field.
-func EstimatedTimeIn(vs ...string) predicate.Course {
+func EstimatedTimeIn(vs ...time.Time) predicate.Course {
 	return predicate.Course(sql.FieldIn(FieldEstimatedTime, vs...))
 }
 
 // EstimatedTimeNotIn applies the NotIn predicate on the "estimated_time" field.
-func EstimatedTimeNotIn(vs ...string) predicate.Course {
+func EstimatedTimeNotIn(vs ...time.Time) predicate.Course {
 	return predicate.Course(sql.FieldNotIn(FieldEstimatedTime, vs...))
 }
 
 // EstimatedTimeGT applies the GT predicate on the "estimated_time" field.
-func EstimatedTimeGT(v string) predicate.Course {
+func EstimatedTimeGT(v time.Time) predicate.Course {
 	return predicate.Course(sql.FieldGT(FieldEstimatedTime, v))
 }
 
 // EstimatedTimeGTE applies the GTE predicate on the "estimated_time" field.
-func EstimatedTimeGTE(v string) predicate.Course {
+func EstimatedTimeGTE(v time.Time) predicate.Course {
 	return predicate.Course(sql.FieldGTE(FieldEstimatedTime, v))
 }
 
 // EstimatedTimeLT applies the LT predicate on the "estimated_time" field.
-func EstimatedTimeLT(v string) predicate.Course {
+func EstimatedTimeLT(v time.Time) predicate.Course {
 	return predicate.Course(sql.FieldLT(FieldEstimatedTime, v))
 }
 
 // EstimatedTimeLTE applies the LTE predicate on the "estimated_time" field.
-func EstimatedTimeLTE(v string) predicate.Course {
+func EstimatedTimeLTE(v time.Time) predicate.Course {
 	return predicate.Course(sql.FieldLTE(FieldEstimatedTime, v))
-}
-
-// EstimatedTimeContains applies the Contains predicate on the "estimated_time" field.
-func EstimatedTimeContains(v string) predicate.Course {
-	return predicate.Course(sql.FieldContains(FieldEstimatedTime, v))
-}
-
-// EstimatedTimeHasPrefix applies the HasPrefix predicate on the "estimated_time" field.
-func EstimatedTimeHasPrefix(v string) predicate.Course {
-	return predicate.Course(sql.FieldHasPrefix(FieldEstimatedTime, v))
-}
-
-// EstimatedTimeHasSuffix applies the HasSuffix predicate on the "estimated_time" field.
-func EstimatedTimeHasSuffix(v string) predicate.Course {
-	return predicate.Course(sql.FieldHasSuffix(FieldEstimatedTime, v))
-}
-
-// EstimatedTimeEqualFold applies the EqualFold predicate on the "estimated_time" field.
-func EstimatedTimeEqualFold(v string) predicate.Course {
-	return predicate.Course(sql.FieldEqualFold(FieldEstimatedTime, v))
-}
-
-// EstimatedTimeContainsFold applies the ContainsFold predicate on the "estimated_time" field.
-func EstimatedTimeContainsFold(v string) predicate.Course {
-	return predicate.Course(sql.FieldContainsFold(FieldEstimatedTime, v))
 }
 
 // DescriptionEQ applies the EQ predicate on the "description" field.
@@ -526,6 +504,114 @@ func CoursePictureURLEqualFold(v string) predicate.Course {
 // CoursePictureURLContainsFold applies the ContainsFold predicate on the "course_picture_url" field.
 func CoursePictureURLContainsFold(v string) predicate.Course {
 	return predicate.Course(sql.FieldContainsFold(FieldCoursePictureURL, v))
+}
+
+// HasReviewCourse applies the HasEdge predicate on the "review_course" edge.
+func HasReviewCourse() predicate.Course {
+	return predicate.Course(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ReviewCourseTable, ReviewCourseColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasReviewCourseWith applies the HasEdge predicate on the "review_course" edge with a given conditions (other predicates).
+func HasReviewCourseWith(preds ...predicate.ReviewCourse) predicate.Course {
+	return predicate.Course(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ReviewCourseInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ReviewCourseTable, ReviewCourseColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasClass applies the HasEdge predicate on the "class" edge.
+func HasClass() predicate.Course {
+	return predicate.Course(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, ClassTable, ClassColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasClassWith applies the HasEdge predicate on the "class" edge with a given conditions (other predicates).
+func HasClassWith(preds ...predicate.Class) predicate.Course {
+	return predicate.Course(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ClassInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, ClassTable, ClassColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasStudent applies the HasEdge predicate on the "student" edge.
+func HasStudent() predicate.Course {
+	return predicate.Course(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, StudentTable, StudentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasStudentWith applies the HasEdge predicate on the "student" edge with a given conditions (other predicates).
+func HasStudentWith(preds ...predicate.Student) predicate.Course {
+	return predicate.Course(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(StudentInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, StudentTable, StudentColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasTutor applies the HasEdge predicate on the "tutor" edge.
+func HasTutor() predicate.Course {
+	return predicate.Course(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, TutorTable, TutorColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasTutorWith applies the HasEdge predicate on the "tutor" edge with a given conditions (other predicates).
+func HasTutorWith(preds ...predicate.Tutor) predicate.Course {
+	return predicate.Course(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(TutorInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, TutorTable, TutorColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

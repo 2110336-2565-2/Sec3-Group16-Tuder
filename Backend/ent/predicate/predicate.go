@@ -21,11 +21,11 @@ type Payment func(*sql.Selector)
 // PaymentHistory is the predicate function for paymenthistory builders.
 type PaymentHistory func(*sql.Selector)
 
-// ReportTutor is the predicate function for reporttutor builders.
-type ReportTutor func(*sql.Selector)
-
 // ReviewCourse is the predicate function for reviewcourse builders.
 type ReviewCourse func(*sql.Selector)
+
+// ReviewTutor is the predicate function for reviewtutor builders.
+type ReviewTutor func(*sql.Selector)
 
 // Schedule is the predicate function for schedule builders.
 type Schedule func(*sql.Selector)
@@ -35,3 +35,6 @@ type Student func(*sql.Selector)
 
 // Tutor is the predicate function for tutor builders.
 type Tutor func(*sql.Selector)
+
+// User is the predicate function for user builders.
+type User func(*sql.Selector)

@@ -22,16 +22,18 @@ type Tx struct {
 	Payment *PaymentClient
 	// PaymentHistory is the client for interacting with the PaymentHistory builders.
 	PaymentHistory *PaymentHistoryClient
-	// ReportTutor is the client for interacting with the ReportTutor builders.
-	ReportTutor *ReportTutorClient
 	// ReviewCourse is the client for interacting with the ReviewCourse builders.
 	ReviewCourse *ReviewCourseClient
+	// ReviewTutor is the client for interacting with the ReviewTutor builders.
+	ReviewTutor *ReviewTutorClient
 	// Schedule is the client for interacting with the Schedule builders.
 	Schedule *ScheduleClient
 	// Student is the client for interacting with the Student builders.
 	Student *StudentClient
 	// Tutor is the client for interacting with the Tutor builders.
 	Tutor *TutorClient
+	// User is the client for interacting with the User builders.
+	User *UserClient
 
 	// lazily loaded.
 	client     *Client
@@ -168,11 +170,12 @@ func (tx *Tx) init() {
 	tx.IssueReport = NewIssueReportClient(tx.config)
 	tx.Payment = NewPaymentClient(tx.config)
 	tx.PaymentHistory = NewPaymentHistoryClient(tx.config)
-	tx.ReportTutor = NewReportTutorClient(tx.config)
 	tx.ReviewCourse = NewReviewCourseClient(tx.config)
+	tx.ReviewTutor = NewReviewTutorClient(tx.config)
 	tx.Schedule = NewScheduleClient(tx.config)
 	tx.Student = NewStudentClient(tx.config)
 	tx.Tutor = NewTutorClient(tx.config)
+	tx.User = NewUserClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

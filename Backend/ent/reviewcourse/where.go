@@ -4,6 +4,7 @@ package reviewcourse
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
 )
 
@@ -185,6 +186,33 @@ func ReviewMsgEqualFold(v string) predicate.ReviewCourse {
 // ReviewMsgContainsFold applies the ContainsFold predicate on the "review_msg" field.
 func ReviewMsgContainsFold(v string) predicate.ReviewCourse {
 	return predicate.ReviewCourse(sql.FieldContainsFold(FieldReviewMsg, v))
+}
+
+// HasCourse applies the HasEdge predicate on the "course" edge.
+func HasCourse() predicate.ReviewCourse {
+	return predicate.ReviewCourse(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, CourseTable, CourseColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCourseWith applies the HasEdge predicate on the "course" edge with a given conditions (other predicates).
+func HasCourseWith(preds ...predicate.Course) predicate.ReviewCourse {
+	return predicate.ReviewCourse(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(CourseInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, CourseTable, CourseColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

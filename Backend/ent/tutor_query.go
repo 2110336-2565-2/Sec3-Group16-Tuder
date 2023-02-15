@@ -4,13 +4,18 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewtutor"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/google/uuid"
 )
@@ -18,10 +23,14 @@ import (
 // TutorQuery is the builder for querying Tutor entities.
 type TutorQuery struct {
 	config
-	ctx        *QueryContext
-	order      []OrderFunc
-	inters     []Interceptor
-	predicates []predicate.Tutor
+	ctx             *QueryContext
+	order           []OrderFunc
+	inters          []Interceptor
+	predicates      []predicate.Tutor
+	withIssueReport *IssueReportQuery
+	withCourse      *CourseQuery
+	withReviewTutor *ReviewTutorQuery
+	withSchedule    *ScheduleQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -56,6 +65,94 @@ func (tq *TutorQuery) Unique(unique bool) *TutorQuery {
 func (tq *TutorQuery) Order(o ...OrderFunc) *TutorQuery {
 	tq.order = append(tq.order, o...)
 	return tq
+}
+
+// QueryIssueReport chains the current query on the "issue_report" edge.
+func (tq *TutorQuery) QueryIssueReport() *IssueReportQuery {
+	query := (&IssueReportClient{config: tq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := tq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := tq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(tutor.Table, tutor.FieldID, selector),
+			sqlgraph.To(issuereport.Table, issuereport.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, tutor.IssueReportTable, tutor.IssueReportColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCourse chains the current query on the "course" edge.
+func (tq *TutorQuery) QueryCourse() *CourseQuery {
+	query := (&CourseClient{config: tq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := tq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := tq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(tutor.Table, tutor.FieldID, selector),
+			sqlgraph.To(course.Table, course.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, tutor.CourseTable, tutor.CourseColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryReviewTutor chains the current query on the "review_tutor" edge.
+func (tq *TutorQuery) QueryReviewTutor() *ReviewTutorQuery {
+	query := (&ReviewTutorClient{config: tq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := tq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := tq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(tutor.Table, tutor.FieldID, selector),
+			sqlgraph.To(reviewtutor.Table, reviewtutor.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, tutor.ReviewTutorTable, tutor.ReviewTutorColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySchedule chains the current query on the "schedule" edge.
+func (tq *TutorQuery) QuerySchedule() *ScheduleQuery {
+	query := (&ScheduleClient{config: tq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := tq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := tq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(tutor.Table, tutor.FieldID, selector),
+			sqlgraph.To(schedule.Table, schedule.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, tutor.ScheduleTable, tutor.ScheduleColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Tutor entity from the query.
@@ -245,15 +342,63 @@ func (tq *TutorQuery) Clone() *TutorQuery {
 		return nil
 	}
 	return &TutorQuery{
-		config:     tq.config,
-		ctx:        tq.ctx.Clone(),
-		order:      append([]OrderFunc{}, tq.order...),
-		inters:     append([]Interceptor{}, tq.inters...),
-		predicates: append([]predicate.Tutor{}, tq.predicates...),
+		config:          tq.config,
+		ctx:             tq.ctx.Clone(),
+		order:           append([]OrderFunc{}, tq.order...),
+		inters:          append([]Interceptor{}, tq.inters...),
+		predicates:      append([]predicate.Tutor{}, tq.predicates...),
+		withIssueReport: tq.withIssueReport.Clone(),
+		withCourse:      tq.withCourse.Clone(),
+		withReviewTutor: tq.withReviewTutor.Clone(),
+		withSchedule:    tq.withSchedule.Clone(),
 		// clone intermediate query.
 		sql:  tq.sql.Clone(),
 		path: tq.path,
 	}
+}
+
+// WithIssueReport tells the query-builder to eager-load the nodes that are connected to
+// the "issue_report" edge. The optional arguments are used to configure the query builder of the edge.
+func (tq *TutorQuery) WithIssueReport(opts ...func(*IssueReportQuery)) *TutorQuery {
+	query := (&IssueReportClient{config: tq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	tq.withIssueReport = query
+	return tq
+}
+
+// WithCourse tells the query-builder to eager-load the nodes that are connected to
+// the "course" edge. The optional arguments are used to configure the query builder of the edge.
+func (tq *TutorQuery) WithCourse(opts ...func(*CourseQuery)) *TutorQuery {
+	query := (&CourseClient{config: tq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	tq.withCourse = query
+	return tq
+}
+
+// WithReviewTutor tells the query-builder to eager-load the nodes that are connected to
+// the "review_tutor" edge. The optional arguments are used to configure the query builder of the edge.
+func (tq *TutorQuery) WithReviewTutor(opts ...func(*ReviewTutorQuery)) *TutorQuery {
+	query := (&ReviewTutorClient{config: tq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	tq.withReviewTutor = query
+	return tq
+}
+
+// WithSchedule tells the query-builder to eager-load the nodes that are connected to
+// the "schedule" edge. The optional arguments are used to configure the query builder of the edge.
+func (tq *TutorQuery) WithSchedule(opts ...func(*ScheduleQuery)) *TutorQuery {
+	query := (&ScheduleClient{config: tq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	tq.withSchedule = query
+	return tq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -332,8 +477,14 @@ func (tq *TutorQuery) prepareQuery(ctx context.Context) error {
 
 func (tq *TutorQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tutor, error) {
 	var (
-		nodes = []*Tutor{}
-		_spec = tq.querySpec()
+		nodes       = []*Tutor{}
+		_spec       = tq.querySpec()
+		loadedTypes = [4]bool{
+			tq.withIssueReport != nil,
+			tq.withCourse != nil,
+			tq.withReviewTutor != nil,
+			tq.withSchedule != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Tutor).scanValues(nil, columns)
@@ -341,6 +492,7 @@ func (tq *TutorQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tutor,
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Tutor{config: tq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -352,7 +504,160 @@ func (tq *TutorQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tutor,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := tq.withIssueReport; query != nil {
+		if err := tq.loadIssueReport(ctx, query, nodes,
+			func(n *Tutor) { n.Edges.IssueReport = []*IssueReport{} },
+			func(n *Tutor, e *IssueReport) { n.Edges.IssueReport = append(n.Edges.IssueReport, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := tq.withCourse; query != nil {
+		if err := tq.loadCourse(ctx, query, nodes,
+			func(n *Tutor) { n.Edges.Course = []*Course{} },
+			func(n *Tutor, e *Course) { n.Edges.Course = append(n.Edges.Course, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := tq.withReviewTutor; query != nil {
+		if err := tq.loadReviewTutor(ctx, query, nodes,
+			func(n *Tutor) { n.Edges.ReviewTutor = []*ReviewTutor{} },
+			func(n *Tutor, e *ReviewTutor) { n.Edges.ReviewTutor = append(n.Edges.ReviewTutor, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := tq.withSchedule; query != nil {
+		if err := tq.loadSchedule(ctx, query, nodes,
+			func(n *Tutor) { n.Edges.Schedule = []*Schedule{} },
+			func(n *Tutor, e *Schedule) { n.Edges.Schedule = append(n.Edges.Schedule, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (tq *TutorQuery) loadIssueReport(ctx context.Context, query *IssueReportQuery, nodes []*Tutor, init func(*Tutor), assign func(*Tutor, *IssueReport)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Tutor)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.IssueReport(func(s *sql.Selector) {
+		s.Where(sql.InValues(tutor.IssueReportColumn, fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.tutor_issue_report
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "tutor_issue_report" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "tutor_issue_report" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (tq *TutorQuery) loadCourse(ctx context.Context, query *CourseQuery, nodes []*Tutor, init func(*Tutor), assign func(*Tutor, *Course)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Tutor)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Course(func(s *sql.Selector) {
+		s.Where(sql.InValues(tutor.CourseColumn, fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.tutor_course
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "tutor_course" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "tutor_course" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (tq *TutorQuery) loadReviewTutor(ctx context.Context, query *ReviewTutorQuery, nodes []*Tutor, init func(*Tutor), assign func(*Tutor, *ReviewTutor)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Tutor)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.ReviewTutor(func(s *sql.Selector) {
+		s.Where(sql.InValues(tutor.ReviewTutorColumn, fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.tutor_review_tutor
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "tutor_review_tutor" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "tutor_review_tutor" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (tq *TutorQuery) loadSchedule(ctx context.Context, query *ScheduleQuery, nodes []*Tutor, init func(*Tutor), assign func(*Tutor, *Schedule)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Tutor)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Schedule(func(s *sql.Selector) {
+		s.Where(sql.InValues(tutor.ScheduleColumn, fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.tutor_schedule
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "tutor_schedule" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "tutor_schedule" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
 }
 
 func (tq *TutorQuery) sqlCount(ctx context.Context) (int, error) {

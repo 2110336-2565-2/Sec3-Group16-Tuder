@@ -12,92 +12,190 @@ var (
 	ClassesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "review_avaliable", Type: field.TypeBool, Default: true},
-		{Name: "total_hour", Type: field.TypeString},
-		{Name: "success_hour", Type: field.TypeString},
+		{Name: "total_hour", Type: field.TypeTime},
+		{Name: "success_hour", Type: field.TypeTime},
+		{Name: "course_class", Type: field.TypeUUID, Unique: true},
+		{Name: "student_class", Type: field.TypeUUID, Unique: true},
 	}
 	// ClassesTable holds the schema information for the "classes" table.
 	ClassesTable = &schema.Table{
 		Name:       "classes",
 		Columns:    ClassesColumns,
 		PrimaryKey: []*schema.Column{ClassesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "classes_courses_class",
+				Columns:    []*schema.Column{ClassesColumns[4]},
+				RefColumns: []*schema.Column{CoursesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "classes_students_class",
+				Columns:    []*schema.Column{ClassesColumns[5]},
+				RefColumns: []*schema.Column{StudentsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
 	}
 	// CoursesColumns holds the columns for the "courses" table.
 	CoursesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "title", Type: field.TypeString},
-		{Name: "estimated_time", Type: field.TypeString},
+		{Name: "estimated_time", Type: field.TypeTime},
 		{Name: "description", Type: field.TypeString},
 		{Name: "course_status", Type: field.TypeString},
 		{Name: "price_per_hour", Type: field.TypeInt},
 		{Name: "level_id", Type: field.TypeString},
 		{Name: "course_picture_url", Type: field.TypeString, Nullable: true},
+		{Name: "student_course", Type: field.TypeUUID, Unique: true, Nullable: true},
+		{Name: "tutor_course", Type: field.TypeUUID},
 	}
 	// CoursesTable holds the schema information for the "courses" table.
 	CoursesTable = &schema.Table{
 		Name:       "courses",
 		Columns:    CoursesColumns,
 		PrimaryKey: []*schema.Column{CoursesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "courses_students_course",
+				Columns:    []*schema.Column{CoursesColumns[8]},
+				RefColumns: []*schema.Column{StudentsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "courses_tutors_course",
+				Columns:    []*schema.Column{CoursesColumns[9]},
+				RefColumns: []*schema.Column{TutorsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
 	}
 	// IssueReportsColumns holds the columns for the "issue_reports" table.
 	IssueReportsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "title", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString},
-		{Name: "report_date", Type: field.TypeString},
+		{Name: "report_date", Type: field.TypeTime},
 		{Name: "status", Type: field.TypeString},
+		{Name: "student_issue_report", Type: field.TypeUUID},
+		{Name: "tutor_issue_report", Type: field.TypeUUID},
+		{Name: "user_issue_report", Type: field.TypeUUID, Nullable: true},
 	}
 	// IssueReportsTable holds the schema information for the "issue_reports" table.
 	IssueReportsTable = &schema.Table{
 		Name:       "issue_reports",
 		Columns:    IssueReportsColumns,
 		PrimaryKey: []*schema.Column{IssueReportsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "issue_reports_students_issue_report",
+				Columns:    []*schema.Column{IssueReportsColumns[5]},
+				RefColumns: []*schema.Column{StudentsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "issue_reports_tutors_issue_report",
+				Columns:    []*schema.Column{IssueReportsColumns[6]},
+				RefColumns: []*schema.Column{TutorsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "issue_reports_users_issue_report",
+				Columns:    []*schema.Column{IssueReportsColumns[7]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// PaymentsColumns holds the columns for the "payments" table.
 	PaymentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "qr_picture_url", Type: field.TypeString, Nullable: true},
+		{Name: "user_payment", Type: field.TypeUUID},
 	}
 	// PaymentsTable holds the schema information for the "payments" table.
 	PaymentsTable = &schema.Table{
 		Name:       "payments",
 		Columns:    PaymentsColumns,
 		PrimaryKey: []*schema.Column{PaymentsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "payments_users_payment",
+				Columns:    []*schema.Column{PaymentsColumns[2]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
 	}
 	// PaymentHistoriesColumns holds the columns for the "payment_histories" table.
 	PaymentHistoriesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "amount", Type: field.TypeFloat64, Nullable: true},
 		{Name: "type", Type: field.TypeString},
+		{Name: "payment_payment_history", Type: field.TypeUUID},
+		{Name: "user_payment_history", Type: field.TypeUUID},
 	}
 	// PaymentHistoriesTable holds the schema information for the "payment_histories" table.
 	PaymentHistoriesTable = &schema.Table{
 		Name:       "payment_histories",
 		Columns:    PaymentHistoriesColumns,
 		PrimaryKey: []*schema.Column{PaymentHistoriesColumns[0]},
-	}
-	// ReportTutorsColumns holds the columns for the "report_tutors" table.
-	ReportTutorsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "score", Type: field.TypeFloat32, Nullable: true},
-		{Name: "review_msg", Type: field.TypeString, Nullable: true},
-	}
-	// ReportTutorsTable holds the schema information for the "report_tutors" table.
-	ReportTutorsTable = &schema.Table{
-		Name:       "report_tutors",
-		Columns:    ReportTutorsColumns,
-		PrimaryKey: []*schema.Column{ReportTutorsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "payment_histories_payments_payment_history",
+				Columns:    []*schema.Column{PaymentHistoriesColumns[3]},
+				RefColumns: []*schema.Column{PaymentsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "payment_histories_users_payment_history",
+				Columns:    []*schema.Column{PaymentHistoriesColumns[4]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
 	}
 	// ReviewCoursesColumns holds the columns for the "review_courses" table.
 	ReviewCoursesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "score", Type: field.TypeFloat32, Nullable: true},
 		{Name: "review_msg", Type: field.TypeString, Nullable: true},
+		{Name: "course_review_course", Type: field.TypeUUID},
 	}
 	// ReviewCoursesTable holds the schema information for the "review_courses" table.
 	ReviewCoursesTable = &schema.Table{
 		Name:       "review_courses",
 		Columns:    ReviewCoursesColumns,
 		PrimaryKey: []*schema.Column{ReviewCoursesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "review_courses_courses_review_course",
+				Columns:    []*schema.Column{ReviewCoursesColumns[3]},
+				RefColumns: []*schema.Column{CoursesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// ReviewTutorsColumns holds the columns for the "review_tutors" table.
+	ReviewTutorsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "score", Type: field.TypeFloat32, Nullable: true},
+		{Name: "review_msg", Type: field.TypeString, Nullable: true},
+		{Name: "tutor_review_tutor", Type: field.TypeUUID},
+	}
+	// ReviewTutorsTable holds the schema information for the "review_tutors" table.
+	ReviewTutorsTable = &schema.Table{
+		Name:       "review_tutors",
+		Columns:    ReviewTutorsColumns,
+		PrimaryKey: []*schema.Column{ReviewTutorsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "review_tutors_tutors_review_tutor",
+				Columns:    []*schema.Column{ReviewTutorsColumns[3]},
+				RefColumns: []*schema.Column{TutorsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
 	}
 	// SchedulesColumns holds the columns for the "schedules" table.
 	SchedulesColumns = []*schema.Column{
@@ -109,12 +207,28 @@ var (
 		{Name: "day_4", Type: field.TypeBool, Nullable: true, Default: false},
 		{Name: "day_5", Type: field.TypeBool, Nullable: true, Default: false},
 		{Name: "day_6", Type: field.TypeBool, Nullable: true, Default: false},
+		{Name: "class_schedule", Type: field.TypeUUID, Unique: true},
+		{Name: "tutor_schedule", Type: field.TypeUUID},
 	}
 	// SchedulesTable holds the schema information for the "schedules" table.
 	SchedulesTable = &schema.Table{
 		Name:       "schedules",
 		Columns:    SchedulesColumns,
 		PrimaryKey: []*schema.Column{SchedulesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "schedules_classes_schedule",
+				Columns:    []*schema.Column{SchedulesColumns[8]},
+				RefColumns: []*schema.Column{ClassesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "schedules_tutors_schedule",
+				Columns:    []*schema.Column{SchedulesColumns[9]},
+				RefColumns: []*schema.Column{TutorsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
 	}
 	// StudentsColumns holds the columns for the "students" table.
 	StudentsColumns = []*schema.Column{
@@ -129,7 +243,6 @@ var (
 		{Name: "birth_date", Type: field.TypeTime},
 		{Name: "gender", Type: field.TypeString},
 		{Name: "profile_picture_url", Type: field.TypeString, Nullable: true},
-		{Name: "school", Type: field.TypeString},
 	}
 	// StudentsTable holds the schema information for the "students" table.
 	StudentsTable = &schema.Table{
@@ -160,6 +273,26 @@ var (
 		Columns:    TutorsColumns,
 		PrimaryKey: []*schema.Column{TutorsColumns[0]},
 	}
+	// UsersColumns holds the columns for the "users" table.
+	UsersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "username", Type: field.TypeString, Unique: true},
+		{Name: "password", Type: field.TypeString},
+		{Name: "email", Type: field.TypeString},
+		{Name: "first_name", Type: field.TypeString},
+		{Name: "last_name", Type: field.TypeString},
+		{Name: "address", Type: field.TypeString},
+		{Name: "phone", Type: field.TypeString},
+		{Name: "birth_date", Type: field.TypeTime},
+		{Name: "gender", Type: field.TypeString},
+		{Name: "profile_picture_url", Type: field.TypeString, Nullable: true},
+	}
+	// UsersTable holds the schema information for the "users" table.
+	UsersTable = &schema.Table{
+		Name:       "users",
+		Columns:    UsersColumns,
+		PrimaryKey: []*schema.Column{UsersColumns[0]},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		ClassesTable,
@@ -167,13 +300,28 @@ var (
 		IssueReportsTable,
 		PaymentsTable,
 		PaymentHistoriesTable,
-		ReportTutorsTable,
 		ReviewCoursesTable,
+		ReviewTutorsTable,
 		SchedulesTable,
 		StudentsTable,
 		TutorsTable,
+		UsersTable,
 	}
 )
 
 func init() {
+	ClassesTable.ForeignKeys[0].RefTable = CoursesTable
+	ClassesTable.ForeignKeys[1].RefTable = StudentsTable
+	CoursesTable.ForeignKeys[0].RefTable = StudentsTable
+	CoursesTable.ForeignKeys[1].RefTable = TutorsTable
+	IssueReportsTable.ForeignKeys[0].RefTable = StudentsTable
+	IssueReportsTable.ForeignKeys[1].RefTable = TutorsTable
+	IssueReportsTable.ForeignKeys[2].RefTable = UsersTable
+	PaymentsTable.ForeignKeys[0].RefTable = UsersTable
+	PaymentHistoriesTable.ForeignKeys[0].RefTable = PaymentsTable
+	PaymentHistoriesTable.ForeignKeys[1].RefTable = UsersTable
+	ReviewCoursesTable.ForeignKeys[0].RefTable = CoursesTable
+	ReviewTutorsTable.ForeignKeys[0].RefTable = TutorsTable
+	SchedulesTable.ForeignKeys[0].RefTable = ClassesTable
+	SchedulesTable.ForeignKeys[1].RefTable = TutorsTable
 }

@@ -7,7 +7,9 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/google/uuid"
 )
 
@@ -30,6 +32,48 @@ type Schedule struct {
 	Day5 *bool `json:"day_5,omitempty"`
 	// Day6 holds the value of the "day_6" field.
 	Day6 *bool `json:"day_6,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the ScheduleQuery when eager-loading is set.
+	Edges          ScheduleEdges `json:"edges"`
+	class_schedule *uuid.UUID
+	tutor_schedule *uuid.UUID
+}
+
+// ScheduleEdges holds the relations/edges for other nodes in the graph.
+type ScheduleEdges struct {
+	// Tutor holds the value of the tutor edge.
+	Tutor *Tutor `json:"tutor,omitempty"`
+	// Class holds the value of the class edge.
+	Class *Class `json:"class,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+}
+
+// TutorOrErr returns the Tutor value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ScheduleEdges) TutorOrErr() (*Tutor, error) {
+	if e.loadedTypes[0] {
+		if e.Tutor == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: tutor.Label}
+		}
+		return e.Tutor, nil
+	}
+	return nil, &NotLoadedError{edge: "tutor"}
+}
+
+// ClassOrErr returns the Class value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ScheduleEdges) ClassOrErr() (*Class, error) {
+	if e.loadedTypes[1] {
+		if e.Class == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: class.Label}
+		}
+		return e.Class, nil
+	}
+	return nil, &NotLoadedError{edge: "class"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -41,6 +85,10 @@ func (*Schedule) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case schedule.FieldID:
 			values[i] = new(uuid.UUID)
+		case schedule.ForeignKeys[0]: // class_schedule
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case schedule.ForeignKeys[1]: // tutor_schedule
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Schedule", columns[i])
 		}
@@ -111,9 +159,33 @@ func (s *Schedule) assignValues(columns []string, values []any) error {
 				s.Day6 = new(bool)
 				*s.Day6 = value.Bool
 			}
+		case schedule.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field class_schedule", values[i])
+			} else if value.Valid {
+				s.class_schedule = new(uuid.UUID)
+				*s.class_schedule = *value.S.(*uuid.UUID)
+			}
+		case schedule.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field tutor_schedule", values[i])
+			} else if value.Valid {
+				s.tutor_schedule = new(uuid.UUID)
+				*s.tutor_schedule = *value.S.(*uuid.UUID)
+			}
 		}
 	}
 	return nil
+}
+
+// QueryTutor queries the "tutor" edge of the Schedule entity.
+func (s *Schedule) QueryTutor() *TutorQuery {
+	return NewScheduleClient(s.config).QueryTutor(s)
+}
+
+// QueryClass queries the "class" edge of the Schedule entity.
+func (s *Schedule) QueryClass() *ClassQuery {
+	return NewScheduleClient(s.config).QueryClass(s)
 }
 
 // Update returns a builder for updating this Schedule.

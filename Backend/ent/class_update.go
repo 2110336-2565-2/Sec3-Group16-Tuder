@@ -6,12 +6,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
+	"github.com/google/uuid"
 )
 
 // ClassUpdate is the builder for updating Class entities.
@@ -42,20 +47,79 @@ func (cu *ClassUpdate) SetNillableReviewAvaliable(b *bool) *ClassUpdate {
 }
 
 // SetTotalHour sets the "total_hour" field.
-func (cu *ClassUpdate) SetTotalHour(s string) *ClassUpdate {
-	cu.mutation.SetTotalHour(s)
+func (cu *ClassUpdate) SetTotalHour(t time.Time) *ClassUpdate {
+	cu.mutation.SetTotalHour(t)
 	return cu
 }
 
 // SetSuccessHour sets the "success_hour" field.
-func (cu *ClassUpdate) SetSuccessHour(s string) *ClassUpdate {
-	cu.mutation.SetSuccessHour(s)
+func (cu *ClassUpdate) SetSuccessHour(t time.Time) *ClassUpdate {
+	cu.mutation.SetSuccessHour(t)
 	return cu
+}
+
+// SetScheduleID sets the "schedule" edge to the Schedule entity by ID.
+func (cu *ClassUpdate) SetScheduleID(id uuid.UUID) *ClassUpdate {
+	cu.mutation.SetScheduleID(id)
+	return cu
+}
+
+// SetNillableScheduleID sets the "schedule" edge to the Schedule entity by ID if the given value is not nil.
+func (cu *ClassUpdate) SetNillableScheduleID(id *uuid.UUID) *ClassUpdate {
+	if id != nil {
+		cu = cu.SetScheduleID(*id)
+	}
+	return cu
+}
+
+// SetSchedule sets the "schedule" edge to the Schedule entity.
+func (cu *ClassUpdate) SetSchedule(s *Schedule) *ClassUpdate {
+	return cu.SetScheduleID(s.ID)
+}
+
+// SetStudentID sets the "student" edge to the Student entity by ID.
+func (cu *ClassUpdate) SetStudentID(id uuid.UUID) *ClassUpdate {
+	cu.mutation.SetStudentID(id)
+	return cu
+}
+
+// SetStudent sets the "student" edge to the Student entity.
+func (cu *ClassUpdate) SetStudent(s *Student) *ClassUpdate {
+	return cu.SetStudentID(s.ID)
+}
+
+// SetCourseID sets the "course" edge to the Course entity by ID.
+func (cu *ClassUpdate) SetCourseID(id uuid.UUID) *ClassUpdate {
+	cu.mutation.SetCourseID(id)
+	return cu
+}
+
+// SetCourse sets the "course" edge to the Course entity.
+func (cu *ClassUpdate) SetCourse(c *Course) *ClassUpdate {
+	return cu.SetCourseID(c.ID)
 }
 
 // Mutation returns the ClassMutation object of the builder.
 func (cu *ClassUpdate) Mutation() *ClassMutation {
 	return cu.mutation
+}
+
+// ClearSchedule clears the "schedule" edge to the Schedule entity.
+func (cu *ClassUpdate) ClearSchedule() *ClassUpdate {
+	cu.mutation.ClearSchedule()
+	return cu
+}
+
+// ClearStudent clears the "student" edge to the Student entity.
+func (cu *ClassUpdate) ClearStudent() *ClassUpdate {
+	cu.mutation.ClearStudent()
+	return cu
+}
+
+// ClearCourse clears the "course" edge to the Course entity.
+func (cu *ClassUpdate) ClearCourse() *ClassUpdate {
+	cu.mutation.ClearCourse()
+	return cu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -87,15 +151,11 @@ func (cu *ClassUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cu *ClassUpdate) check() error {
-	if v, ok := cu.mutation.TotalHour(); ok {
-		if err := class.TotalHourValidator(v); err != nil {
-			return &ValidationError{Name: "total_hour", err: fmt.Errorf(`ent: validator failed for field "Class.total_hour": %w`, err)}
-		}
+	if _, ok := cu.mutation.StudentID(); cu.mutation.StudentCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Class.student"`)
 	}
-	if v, ok := cu.mutation.SuccessHour(); ok {
-		if err := class.SuccessHourValidator(v); err != nil {
-			return &ValidationError{Name: "success_hour", err: fmt.Errorf(`ent: validator failed for field "Class.success_hour": %w`, err)}
-		}
+	if _, ok := cu.mutation.CourseID(); cu.mutation.CourseCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Class.course"`)
 	}
 	return nil
 }
@@ -116,10 +176,115 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(class.FieldReviewAvaliable, field.TypeBool, value)
 	}
 	if value, ok := cu.mutation.TotalHour(); ok {
-		_spec.SetField(class.FieldTotalHour, field.TypeString, value)
+		_spec.SetField(class.FieldTotalHour, field.TypeTime, value)
 	}
 	if value, ok := cu.mutation.SuccessHour(); ok {
-		_spec.SetField(class.FieldSuccessHour, field.TypeString, value)
+		_spec.SetField(class.FieldSuccessHour, field.TypeTime, value)
+	}
+	if cu.mutation.ScheduleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   class.ScheduleTable,
+			Columns: []string{class.ScheduleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: schedule.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.ScheduleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   class.ScheduleTable,
+			Columns: []string{class.ScheduleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: schedule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cu.mutation.StudentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   class.StudentTable,
+			Columns: []string{class.StudentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: student.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.StudentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   class.StudentTable,
+			Columns: []string{class.StudentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: student.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cu.mutation.CourseCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   class.CourseTable,
+			Columns: []string{class.CourseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: course.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.CourseIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   class.CourseTable,
+			Columns: []string{class.CourseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: course.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -156,20 +321,79 @@ func (cuo *ClassUpdateOne) SetNillableReviewAvaliable(b *bool) *ClassUpdateOne {
 }
 
 // SetTotalHour sets the "total_hour" field.
-func (cuo *ClassUpdateOne) SetTotalHour(s string) *ClassUpdateOne {
-	cuo.mutation.SetTotalHour(s)
+func (cuo *ClassUpdateOne) SetTotalHour(t time.Time) *ClassUpdateOne {
+	cuo.mutation.SetTotalHour(t)
 	return cuo
 }
 
 // SetSuccessHour sets the "success_hour" field.
-func (cuo *ClassUpdateOne) SetSuccessHour(s string) *ClassUpdateOne {
-	cuo.mutation.SetSuccessHour(s)
+func (cuo *ClassUpdateOne) SetSuccessHour(t time.Time) *ClassUpdateOne {
+	cuo.mutation.SetSuccessHour(t)
 	return cuo
+}
+
+// SetScheduleID sets the "schedule" edge to the Schedule entity by ID.
+func (cuo *ClassUpdateOne) SetScheduleID(id uuid.UUID) *ClassUpdateOne {
+	cuo.mutation.SetScheduleID(id)
+	return cuo
+}
+
+// SetNillableScheduleID sets the "schedule" edge to the Schedule entity by ID if the given value is not nil.
+func (cuo *ClassUpdateOne) SetNillableScheduleID(id *uuid.UUID) *ClassUpdateOne {
+	if id != nil {
+		cuo = cuo.SetScheduleID(*id)
+	}
+	return cuo
+}
+
+// SetSchedule sets the "schedule" edge to the Schedule entity.
+func (cuo *ClassUpdateOne) SetSchedule(s *Schedule) *ClassUpdateOne {
+	return cuo.SetScheduleID(s.ID)
+}
+
+// SetStudentID sets the "student" edge to the Student entity by ID.
+func (cuo *ClassUpdateOne) SetStudentID(id uuid.UUID) *ClassUpdateOne {
+	cuo.mutation.SetStudentID(id)
+	return cuo
+}
+
+// SetStudent sets the "student" edge to the Student entity.
+func (cuo *ClassUpdateOne) SetStudent(s *Student) *ClassUpdateOne {
+	return cuo.SetStudentID(s.ID)
+}
+
+// SetCourseID sets the "course" edge to the Course entity by ID.
+func (cuo *ClassUpdateOne) SetCourseID(id uuid.UUID) *ClassUpdateOne {
+	cuo.mutation.SetCourseID(id)
+	return cuo
+}
+
+// SetCourse sets the "course" edge to the Course entity.
+func (cuo *ClassUpdateOne) SetCourse(c *Course) *ClassUpdateOne {
+	return cuo.SetCourseID(c.ID)
 }
 
 // Mutation returns the ClassMutation object of the builder.
 func (cuo *ClassUpdateOne) Mutation() *ClassMutation {
 	return cuo.mutation
+}
+
+// ClearSchedule clears the "schedule" edge to the Schedule entity.
+func (cuo *ClassUpdateOne) ClearSchedule() *ClassUpdateOne {
+	cuo.mutation.ClearSchedule()
+	return cuo
+}
+
+// ClearStudent clears the "student" edge to the Student entity.
+func (cuo *ClassUpdateOne) ClearStudent() *ClassUpdateOne {
+	cuo.mutation.ClearStudent()
+	return cuo
+}
+
+// ClearCourse clears the "course" edge to the Course entity.
+func (cuo *ClassUpdateOne) ClearCourse() *ClassUpdateOne {
+	cuo.mutation.ClearCourse()
+	return cuo
 }
 
 // Where appends a list predicates to the ClassUpdate builder.
@@ -214,15 +438,11 @@ func (cuo *ClassUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cuo *ClassUpdateOne) check() error {
-	if v, ok := cuo.mutation.TotalHour(); ok {
-		if err := class.TotalHourValidator(v); err != nil {
-			return &ValidationError{Name: "total_hour", err: fmt.Errorf(`ent: validator failed for field "Class.total_hour": %w`, err)}
-		}
+	if _, ok := cuo.mutation.StudentID(); cuo.mutation.StudentCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Class.student"`)
 	}
-	if v, ok := cuo.mutation.SuccessHour(); ok {
-		if err := class.SuccessHourValidator(v); err != nil {
-			return &ValidationError{Name: "success_hour", err: fmt.Errorf(`ent: validator failed for field "Class.success_hour": %w`, err)}
-		}
+	if _, ok := cuo.mutation.CourseID(); cuo.mutation.CourseCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Class.course"`)
 	}
 	return nil
 }
@@ -260,10 +480,115 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 		_spec.SetField(class.FieldReviewAvaliable, field.TypeBool, value)
 	}
 	if value, ok := cuo.mutation.TotalHour(); ok {
-		_spec.SetField(class.FieldTotalHour, field.TypeString, value)
+		_spec.SetField(class.FieldTotalHour, field.TypeTime, value)
 	}
 	if value, ok := cuo.mutation.SuccessHour(); ok {
-		_spec.SetField(class.FieldSuccessHour, field.TypeString, value)
+		_spec.SetField(class.FieldSuccessHour, field.TypeTime, value)
+	}
+	if cuo.mutation.ScheduleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   class.ScheduleTable,
+			Columns: []string{class.ScheduleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: schedule.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.ScheduleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   class.ScheduleTable,
+			Columns: []string{class.ScheduleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: schedule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.StudentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   class.StudentTable,
+			Columns: []string{class.StudentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: student.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.StudentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   class.StudentTable,
+			Columns: []string{class.StudentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: student.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.CourseCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   class.CourseTable,
+			Columns: []string{class.CourseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: course.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.CourseIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   class.CourseTable,
+			Columns: []string{class.CourseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: course.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Class{config: cuo.config}
 	_spec.Assign = _node.assignValues

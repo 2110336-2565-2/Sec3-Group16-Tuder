@@ -43,6 +43,60 @@ type Tutor struct {
 	OmiseBankToken *string `json:"omise_bank_token,omitempty"`
 	// CitizenID holds the value of the "citizen_id" field.
 	CitizenID string `json:"citizen_id,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the TutorQuery when eager-loading is set.
+	Edges TutorEdges `json:"edges"`
+}
+
+// TutorEdges holds the relations/edges for other nodes in the graph.
+type TutorEdges struct {
+	// IssueReport holds the value of the issue_report edge.
+	IssueReport []*IssueReport `json:"issue_report,omitempty"`
+	// Course holds the value of the course edge.
+	Course []*Course `json:"course,omitempty"`
+	// ReviewTutor holds the value of the review_tutor edge.
+	ReviewTutor []*ReviewTutor `json:"review_tutor,omitempty"`
+	// Schedule holds the value of the schedule edge.
+	Schedule []*Schedule `json:"schedule,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [4]bool
+}
+
+// IssueReportOrErr returns the IssueReport value or an error if the edge
+// was not loaded in eager-loading.
+func (e TutorEdges) IssueReportOrErr() ([]*IssueReport, error) {
+	if e.loadedTypes[0] {
+		return e.IssueReport, nil
+	}
+	return nil, &NotLoadedError{edge: "issue_report"}
+}
+
+// CourseOrErr returns the Course value or an error if the edge
+// was not loaded in eager-loading.
+func (e TutorEdges) CourseOrErr() ([]*Course, error) {
+	if e.loadedTypes[1] {
+		return e.Course, nil
+	}
+	return nil, &NotLoadedError{edge: "course"}
+}
+
+// ReviewTutorOrErr returns the ReviewTutor value or an error if the edge
+// was not loaded in eager-loading.
+func (e TutorEdges) ReviewTutorOrErr() ([]*ReviewTutor, error) {
+	if e.loadedTypes[2] {
+		return e.ReviewTutor, nil
+	}
+	return nil, &NotLoadedError{edge: "review_tutor"}
+}
+
+// ScheduleOrErr returns the Schedule value or an error if the edge
+// was not loaded in eager-loading.
+func (e TutorEdges) ScheduleOrErr() ([]*Schedule, error) {
+	if e.loadedTypes[3] {
+		return e.Schedule, nil
+	}
+	return nil, &NotLoadedError{edge: "schedule"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -161,6 +215,26 @@ func (t *Tutor) assignValues(columns []string, values []any) error {
 		}
 	}
 	return nil
+}
+
+// QueryIssueReport queries the "issue_report" edge of the Tutor entity.
+func (t *Tutor) QueryIssueReport() *IssueReportQuery {
+	return NewTutorClient(t.config).QueryIssueReport(t)
+}
+
+// QueryCourse queries the "course" edge of the Tutor entity.
+func (t *Tutor) QueryCourse() *CourseQuery {
+	return NewTutorClient(t.config).QueryCourse(t)
+}
+
+// QueryReviewTutor queries the "review_tutor" edge of the Tutor entity.
+func (t *Tutor) QueryReviewTutor() *ReviewTutorQuery {
+	return NewTutorClient(t.config).QueryReviewTutor(t)
+}
+
+// QuerySchedule queries the "schedule" edge of the Tutor entity.
+func (t *Tutor) QuerySchedule() *ScheduleQuery {
+	return NewTutorClient(t.config).QuerySchedule(t)
 }
 
 // Update returns a builder for updating this Tutor.

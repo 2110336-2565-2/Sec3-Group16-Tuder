@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
 	"github.com/google/uuid"
 )
@@ -103,11 +104,6 @@ func Gender(v string) predicate.Student {
 // ProfilePictureURL applies equality check predicate on the "profile_picture_URL" field. It's identical to ProfilePictureURLEQ.
 func ProfilePictureURL(v string) predicate.Student {
 	return predicate.Student(sql.FieldEQ(FieldProfilePictureURL, v))
-}
-
-// School applies equality check predicate on the "school" field. It's identical to SchoolEQ.
-func School(v string) predicate.Student {
-	return predicate.Student(sql.FieldEQ(FieldSchool, v))
 }
 
 // UsernameEQ applies the EQ predicate on the "username" field.
@@ -745,69 +741,85 @@ func ProfilePictureURLContainsFold(v string) predicate.Student {
 	return predicate.Student(sql.FieldContainsFold(FieldProfilePictureURL, v))
 }
 
-// SchoolEQ applies the EQ predicate on the "school" field.
-func SchoolEQ(v string) predicate.Student {
-	return predicate.Student(sql.FieldEQ(FieldSchool, v))
+// HasIssueReport applies the HasEdge predicate on the "issue_report" edge.
+func HasIssueReport() predicate.Student {
+	return predicate.Student(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, IssueReportTable, IssueReportColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
 }
 
-// SchoolNEQ applies the NEQ predicate on the "school" field.
-func SchoolNEQ(v string) predicate.Student {
-	return predicate.Student(sql.FieldNEQ(FieldSchool, v))
+// HasIssueReportWith applies the HasEdge predicate on the "issue_report" edge with a given conditions (other predicates).
+func HasIssueReportWith(preds ...predicate.IssueReport) predicate.Student {
+	return predicate.Student(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(IssueReportInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, IssueReportTable, IssueReportColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
-// SchoolIn applies the In predicate on the "school" field.
-func SchoolIn(vs ...string) predicate.Student {
-	return predicate.Student(sql.FieldIn(FieldSchool, vs...))
+// HasCourse applies the HasEdge predicate on the "course" edge.
+func HasCourse() predicate.Student {
+	return predicate.Student(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, CourseTable, CourseColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
 }
 
-// SchoolNotIn applies the NotIn predicate on the "school" field.
-func SchoolNotIn(vs ...string) predicate.Student {
-	return predicate.Student(sql.FieldNotIn(FieldSchool, vs...))
+// HasCourseWith applies the HasEdge predicate on the "course" edge with a given conditions (other predicates).
+func HasCourseWith(preds ...predicate.Course) predicate.Student {
+	return predicate.Student(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(CourseInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, CourseTable, CourseColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
-// SchoolGT applies the GT predicate on the "school" field.
-func SchoolGT(v string) predicate.Student {
-	return predicate.Student(sql.FieldGT(FieldSchool, v))
+// HasClass applies the HasEdge predicate on the "class" edge.
+func HasClass() predicate.Student {
+	return predicate.Student(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, ClassTable, ClassColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
 }
 
-// SchoolGTE applies the GTE predicate on the "school" field.
-func SchoolGTE(v string) predicate.Student {
-	return predicate.Student(sql.FieldGTE(FieldSchool, v))
-}
-
-// SchoolLT applies the LT predicate on the "school" field.
-func SchoolLT(v string) predicate.Student {
-	return predicate.Student(sql.FieldLT(FieldSchool, v))
-}
-
-// SchoolLTE applies the LTE predicate on the "school" field.
-func SchoolLTE(v string) predicate.Student {
-	return predicate.Student(sql.FieldLTE(FieldSchool, v))
-}
-
-// SchoolContains applies the Contains predicate on the "school" field.
-func SchoolContains(v string) predicate.Student {
-	return predicate.Student(sql.FieldContains(FieldSchool, v))
-}
-
-// SchoolHasPrefix applies the HasPrefix predicate on the "school" field.
-func SchoolHasPrefix(v string) predicate.Student {
-	return predicate.Student(sql.FieldHasPrefix(FieldSchool, v))
-}
-
-// SchoolHasSuffix applies the HasSuffix predicate on the "school" field.
-func SchoolHasSuffix(v string) predicate.Student {
-	return predicate.Student(sql.FieldHasSuffix(FieldSchool, v))
-}
-
-// SchoolEqualFold applies the EqualFold predicate on the "school" field.
-func SchoolEqualFold(v string) predicate.Student {
-	return predicate.Student(sql.FieldEqualFold(FieldSchool, v))
-}
-
-// SchoolContainsFold applies the ContainsFold predicate on the "school" field.
-func SchoolContainsFold(v string) predicate.Student {
-	return predicate.Student(sql.FieldContainsFold(FieldSchool, v))
+// HasClassWith applies the HasEdge predicate on the "class" edge with a given conditions (other predicates).
+func HasClassWith(preds ...predicate.Class) predicate.Student {
+	return predicate.Student(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ClassInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, ClassTable, ClassColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

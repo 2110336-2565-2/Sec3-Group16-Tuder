@@ -4,11 +4,14 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/google/uuid"
 )
 
@@ -131,6 +134,28 @@ func (sc *ScheduleCreate) SetNillableID(u *uuid.UUID) *ScheduleCreate {
 	return sc
 }
 
+// SetTutorID sets the "tutor" edge to the Tutor entity by ID.
+func (sc *ScheduleCreate) SetTutorID(id uuid.UUID) *ScheduleCreate {
+	sc.mutation.SetTutorID(id)
+	return sc
+}
+
+// SetTutor sets the "tutor" edge to the Tutor entity.
+func (sc *ScheduleCreate) SetTutor(t *Tutor) *ScheduleCreate {
+	return sc.SetTutorID(t.ID)
+}
+
+// SetClassID sets the "class" edge to the Class entity by ID.
+func (sc *ScheduleCreate) SetClassID(id uuid.UUID) *ScheduleCreate {
+	sc.mutation.SetClassID(id)
+	return sc
+}
+
+// SetClass sets the "class" edge to the Class entity.
+func (sc *ScheduleCreate) SetClass(c *Class) *ScheduleCreate {
+	return sc.SetClassID(c.ID)
+}
+
 // Mutation returns the ScheduleMutation object of the builder.
 func (sc *ScheduleCreate) Mutation() *ScheduleMutation {
 	return sc.mutation
@@ -202,6 +227,12 @@ func (sc *ScheduleCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (sc *ScheduleCreate) check() error {
+	if _, ok := sc.mutation.TutorID(); !ok {
+		return &ValidationError{Name: "tutor", err: errors.New(`ent: missing required edge "Schedule.tutor"`)}
+	}
+	if _, ok := sc.mutation.ClassID(); !ok {
+		return &ValidationError{Name: "class", err: errors.New(`ent: missing required edge "Schedule.class"`)}
+	}
 	return nil
 }
 
@@ -264,6 +295,46 @@ func (sc *ScheduleCreate) createSpec() (*Schedule, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.Day6(); ok {
 		_spec.SetField(schedule.FieldDay6, field.TypeBool, value)
 		_node.Day6 = &value
+	}
+	if nodes := sc.mutation.TutorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   schedule.TutorTable,
+			Columns: []string{schedule.TutorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tutor.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.tutor_schedule = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   schedule.ClassTable,
+			Columns: []string{schedule.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: class.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.class_schedule = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

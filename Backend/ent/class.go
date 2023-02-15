@@ -5,9 +5,13 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/google/uuid"
 )
 
@@ -19,9 +23,66 @@ type Class struct {
 	// ReviewAvaliable holds the value of the "review_avaliable" field.
 	ReviewAvaliable bool `json:"review_avaliable,omitempty"`
 	// TotalHour holds the value of the "total_hour" field.
-	TotalHour string `json:"total_hour,omitempty"`
+	TotalHour time.Time `json:"total_hour,omitempty"`
 	// SuccessHour holds the value of the "success_hour" field.
-	SuccessHour string `json:"success_hour,omitempty"`
+	SuccessHour time.Time `json:"success_hour,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the ClassQuery when eager-loading is set.
+	Edges         ClassEdges `json:"edges"`
+	course_class  *uuid.UUID
+	student_class *uuid.UUID
+}
+
+// ClassEdges holds the relations/edges for other nodes in the graph.
+type ClassEdges struct {
+	// Schedule holds the value of the schedule edge.
+	Schedule *Schedule `json:"schedule,omitempty"`
+	// Student holds the value of the student edge.
+	Student *Student `json:"student,omitempty"`
+	// Course holds the value of the course edge.
+	Course *Course `json:"course,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [3]bool
+}
+
+// ScheduleOrErr returns the Schedule value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ClassEdges) ScheduleOrErr() (*Schedule, error) {
+	if e.loadedTypes[0] {
+		if e.Schedule == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: schedule.Label}
+		}
+		return e.Schedule, nil
+	}
+	return nil, &NotLoadedError{edge: "schedule"}
+}
+
+// StudentOrErr returns the Student value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ClassEdges) StudentOrErr() (*Student, error) {
+	if e.loadedTypes[1] {
+		if e.Student == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: student.Label}
+		}
+		return e.Student, nil
+	}
+	return nil, &NotLoadedError{edge: "student"}
+}
+
+// CourseOrErr returns the Course value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ClassEdges) CourseOrErr() (*Course, error) {
+	if e.loadedTypes[2] {
+		if e.Course == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: course.Label}
+		}
+		return e.Course, nil
+	}
+	return nil, &NotLoadedError{edge: "course"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -32,9 +93,13 @@ func (*Class) scanValues(columns []string) ([]any, error) {
 		case class.FieldReviewAvaliable:
 			values[i] = new(sql.NullBool)
 		case class.FieldTotalHour, class.FieldSuccessHour:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.NullTime)
 		case class.FieldID:
 			values[i] = new(uuid.UUID)
+		case class.ForeignKeys[0]: // course_class
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case class.ForeignKeys[1]: // student_class
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Class", columns[i])
 		}
@@ -63,20 +128,49 @@ func (c *Class) assignValues(columns []string, values []any) error {
 				c.ReviewAvaliable = value.Bool
 			}
 		case class.FieldTotalHour:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field total_hour", values[i])
 			} else if value.Valid {
-				c.TotalHour = value.String
+				c.TotalHour = value.Time
 			}
 		case class.FieldSuccessHour:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field success_hour", values[i])
 			} else if value.Valid {
-				c.SuccessHour = value.String
+				c.SuccessHour = value.Time
+			}
+		case class.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field course_class", values[i])
+			} else if value.Valid {
+				c.course_class = new(uuid.UUID)
+				*c.course_class = *value.S.(*uuid.UUID)
+			}
+		case class.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field student_class", values[i])
+			} else if value.Valid {
+				c.student_class = new(uuid.UUID)
+				*c.student_class = *value.S.(*uuid.UUID)
 			}
 		}
 	}
 	return nil
+}
+
+// QuerySchedule queries the "schedule" edge of the Class entity.
+func (c *Class) QuerySchedule() *ScheduleQuery {
+	return NewClassClient(c.config).QuerySchedule(c)
+}
+
+// QueryStudent queries the "student" edge of the Class entity.
+func (c *Class) QueryStudent() *StudentQuery {
+	return NewClassClient(c.config).QueryStudent(c)
+}
+
+// QueryCourse queries the "course" edge of the Class entity.
+func (c *Class) QueryCourse() *CourseQuery {
+	return NewClassClient(c.config).QueryCourse(c)
 }
 
 // Update returns a builder for updating this Class.
@@ -106,10 +200,10 @@ func (c *Class) String() string {
 	builder.WriteString(fmt.Sprintf("%v", c.ReviewAvaliable))
 	builder.WriteString(", ")
 	builder.WriteString("total_hour=")
-	builder.WriteString(c.TotalHour)
+	builder.WriteString(c.TotalHour.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("success_hour=")
-	builder.WriteString(c.SuccessHour)
+	builder.WriteString(c.SuccessHour.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

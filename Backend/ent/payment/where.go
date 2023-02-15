@@ -4,6 +4,7 @@ package payment
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
 	"github.com/google/uuid"
 )
@@ -131,6 +132,60 @@ func QrPictureURLEqualFold(v string) predicate.Payment {
 // QrPictureURLContainsFold applies the ContainsFold predicate on the "qr_picture_url" field.
 func QrPictureURLContainsFold(v string) predicate.Payment {
 	return predicate.Payment(sql.FieldContainsFold(FieldQrPictureURL, v))
+}
+
+// HasUser applies the HasEdge predicate on the "user" edge.
+func HasUser() predicate.Payment {
+	return predicate.Payment(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUserWith applies the HasEdge predicate on the "user" edge with a given conditions (other predicates).
+func HasUserWith(preds ...predicate.User) predicate.Payment {
+	return predicate.Payment(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(UserInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasPaymentHistory applies the HasEdge predicate on the "payment_history" edge.
+func HasPaymentHistory() predicate.Payment {
+	return predicate.Payment(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, PaymentHistoryTable, PaymentHistoryColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPaymentHistoryWith applies the HasEdge predicate on the "payment_history" edge with a given conditions (other predicates).
+func HasPaymentHistoryWith(preds ...predicate.PaymentHistory) predicate.Payment {
+	return predicate.Payment(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(PaymentHistoryInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, PaymentHistoryTable, PaymentHistoryColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

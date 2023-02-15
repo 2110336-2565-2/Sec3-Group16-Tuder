@@ -10,6 +10,9 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/google/uuid"
 )
@@ -89,12 +92,6 @@ func (sc *StudentCreate) SetNillableProfilePictureURL(s *string) *StudentCreate 
 	return sc
 }
 
-// SetSchool sets the "school" field.
-func (sc *StudentCreate) SetSchool(s string) *StudentCreate {
-	sc.mutation.SetSchool(s)
-	return sc
-}
-
 // SetID sets the "id" field.
 func (sc *StudentCreate) SetID(u uuid.UUID) *StudentCreate {
 	sc.mutation.SetID(u)
@@ -107,6 +104,59 @@ func (sc *StudentCreate) SetNillableID(u *uuid.UUID) *StudentCreate {
 		sc.SetID(*u)
 	}
 	return sc
+}
+
+// AddIssueReportIDs adds the "issue_report" edge to the IssueReport entity by IDs.
+func (sc *StudentCreate) AddIssueReportIDs(ids ...uuid.UUID) *StudentCreate {
+	sc.mutation.AddIssueReportIDs(ids...)
+	return sc
+}
+
+// AddIssueReport adds the "issue_report" edges to the IssueReport entity.
+func (sc *StudentCreate) AddIssueReport(i ...*IssueReport) *StudentCreate {
+	ids := make([]uuid.UUID, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return sc.AddIssueReportIDs(ids...)
+}
+
+// SetCourseID sets the "course" edge to the Course entity by ID.
+func (sc *StudentCreate) SetCourseID(id uuid.UUID) *StudentCreate {
+	sc.mutation.SetCourseID(id)
+	return sc
+}
+
+// SetNillableCourseID sets the "course" edge to the Course entity by ID if the given value is not nil.
+func (sc *StudentCreate) SetNillableCourseID(id *uuid.UUID) *StudentCreate {
+	if id != nil {
+		sc = sc.SetCourseID(*id)
+	}
+	return sc
+}
+
+// SetCourse sets the "course" edge to the Course entity.
+func (sc *StudentCreate) SetCourse(c *Course) *StudentCreate {
+	return sc.SetCourseID(c.ID)
+}
+
+// SetClassID sets the "class" edge to the Class entity by ID.
+func (sc *StudentCreate) SetClassID(id uuid.UUID) *StudentCreate {
+	sc.mutation.SetClassID(id)
+	return sc
+}
+
+// SetNillableClassID sets the "class" edge to the Class entity by ID if the given value is not nil.
+func (sc *StudentCreate) SetNillableClassID(id *uuid.UUID) *StudentCreate {
+	if id != nil {
+		sc = sc.SetClassID(*id)
+	}
+	return sc
+}
+
+// SetClass sets the "class" edge to the Class entity.
+func (sc *StudentCreate) SetClass(c *Class) *StudentCreate {
+	return sc.SetClassID(c.ID)
 }
 
 // Mutation returns the StudentMutation object of the builder.
@@ -219,14 +269,6 @@ func (sc *StudentCreate) check() error {
 			return &ValidationError{Name: "gender", err: fmt.Errorf(`ent: validator failed for field "Student.gender": %w`, err)}
 		}
 	}
-	if _, ok := sc.mutation.School(); !ok {
-		return &ValidationError{Name: "school", err: errors.New(`ent: missing required field "Student.school"`)}
-	}
-	if v, ok := sc.mutation.School(); ok {
-		if err := student.SchoolValidator(v); err != nil {
-			return &ValidationError{Name: "school", err: fmt.Errorf(`ent: validator failed for field "Student.school": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -302,9 +344,62 @@ func (sc *StudentCreate) createSpec() (*Student, *sqlgraph.CreateSpec) {
 		_spec.SetField(student.FieldProfilePictureURL, field.TypeString, value)
 		_node.ProfilePictureURL = &value
 	}
-	if value, ok := sc.mutation.School(); ok {
-		_spec.SetField(student.FieldSchool, field.TypeString, value)
-		_node.School = value
+	if nodes := sc.mutation.IssueReportIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   student.IssueReportTable,
+			Columns: []string{student.IssueReportColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: issuereport.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.CourseIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   student.CourseTable,
+			Columns: []string{student.CourseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: course.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   student.ClassTable,
+			Columns: []string{student.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: class.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

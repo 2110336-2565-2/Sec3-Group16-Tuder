@@ -32,11 +32,12 @@ type (
 		IssueReport    []ent.Hook
 		Payment        []ent.Hook
 		PaymentHistory []ent.Hook
-		ReportTutor    []ent.Hook
 		ReviewCourse   []ent.Hook
+		ReviewTutor    []ent.Hook
 		Schedule       []ent.Hook
 		Student        []ent.Hook
 		Tutor          []ent.Hook
+		User           []ent.Hook
 	}
 	inters struct {
 		Class          []ent.Interceptor
@@ -44,11 +45,12 @@ type (
 		IssueReport    []ent.Interceptor
 		Payment        []ent.Interceptor
 		PaymentHistory []ent.Interceptor
-		ReportTutor    []ent.Interceptor
 		ReviewCourse   []ent.Interceptor
+		ReviewTutor    []ent.Interceptor
 		Schedule       []ent.Interceptor
 		Student        []ent.Interceptor
 		Tutor          []ent.Interceptor
+		User           []ent.Interceptor
 	}
 )
 

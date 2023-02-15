@@ -31,10 +31,35 @@ const (
 	FieldGender = "gender"
 	// FieldProfilePictureURL holds the string denoting the profile_picture_url field in the database.
 	FieldProfilePictureURL = "profile_picture_url"
-	// FieldSchool holds the string denoting the school field in the database.
-	FieldSchool = "school"
+	// EdgeIssueReport holds the string denoting the issue_report edge name in mutations.
+	EdgeIssueReport = "issue_report"
+	// EdgeCourse holds the string denoting the course edge name in mutations.
+	EdgeCourse = "course"
+	// EdgeClass holds the string denoting the class edge name in mutations.
+	EdgeClass = "class"
 	// Table holds the table name of the student in the database.
 	Table = "students"
+	// IssueReportTable is the table that holds the issue_report relation/edge.
+	IssueReportTable = "issue_reports"
+	// IssueReportInverseTable is the table name for the IssueReport entity.
+	// It exists in this package in order to avoid circular dependency with the "issuereport" package.
+	IssueReportInverseTable = "issue_reports"
+	// IssueReportColumn is the table column denoting the issue_report relation/edge.
+	IssueReportColumn = "student_issue_report"
+	// CourseTable is the table that holds the course relation/edge.
+	CourseTable = "courses"
+	// CourseInverseTable is the table name for the Course entity.
+	// It exists in this package in order to avoid circular dependency with the "course" package.
+	CourseInverseTable = "courses"
+	// CourseColumn is the table column denoting the course relation/edge.
+	CourseColumn = "student_course"
+	// ClassTable is the table that holds the class relation/edge.
+	ClassTable = "classes"
+	// ClassInverseTable is the table name for the Class entity.
+	// It exists in this package in order to avoid circular dependency with the "class" package.
+	ClassInverseTable = "classes"
+	// ClassColumn is the table column denoting the class relation/edge.
+	ClassColumn = "student_class"
 )
 
 // Columns holds all SQL columns for student fields.
@@ -50,7 +75,6 @@ var Columns = []string{
 	FieldBirthDate,
 	FieldGender,
 	FieldProfilePictureURL,
-	FieldSchool,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -80,8 +104,6 @@ var (
 	PhoneValidator func(string) error
 	// GenderValidator is a validator for the "gender" field. It is called by the builders before save.
 	GenderValidator func(string) error
-	// SchoolValidator is a validator for the "school" field. It is called by the builders before save.
-	SchoolValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )

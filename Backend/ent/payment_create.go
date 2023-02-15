@@ -4,11 +4,14 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
 )
 
@@ -45,6 +48,32 @@ func (pc *PaymentCreate) SetNillableID(u *uuid.UUID) *PaymentCreate {
 		pc.SetID(*u)
 	}
 	return pc
+}
+
+// SetUserID sets the "user" edge to the User entity by ID.
+func (pc *PaymentCreate) SetUserID(id uuid.UUID) *PaymentCreate {
+	pc.mutation.SetUserID(id)
+	return pc
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (pc *PaymentCreate) SetUser(u *User) *PaymentCreate {
+	return pc.SetUserID(u.ID)
+}
+
+// AddPaymentHistoryIDs adds the "payment_history" edge to the PaymentHistory entity by IDs.
+func (pc *PaymentCreate) AddPaymentHistoryIDs(ids ...uuid.UUID) *PaymentCreate {
+	pc.mutation.AddPaymentHistoryIDs(ids...)
+	return pc
+}
+
+// AddPaymentHistory adds the "payment_history" edges to the PaymentHistory entity.
+func (pc *PaymentCreate) AddPaymentHistory(p ...*PaymentHistory) *PaymentCreate {
+	ids := make([]uuid.UUID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return pc.AddPaymentHistoryIDs(ids...)
 }
 
 // Mutation returns the PaymentMutation object of the builder.
@@ -90,6 +119,9 @@ func (pc *PaymentCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (pc *PaymentCreate) check() error {
+	if _, ok := pc.mutation.UserID(); !ok {
+		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "Payment.user"`)}
+	}
 	return nil
 }
 
@@ -128,6 +160,45 @@ func (pc *PaymentCreate) createSpec() (*Payment, *sqlgraph.CreateSpec) {
 	if value, ok := pc.mutation.QrPictureURL(); ok {
 		_spec.SetField(payment.FieldQrPictureURL, field.TypeString, value)
 		_node.QrPictureURL = &value
+	}
+	if nodes := pc.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   payment.UserTable,
+			Columns: []string{payment.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.user_payment = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.PaymentHistoryIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   payment.PaymentHistoryTable,
+			Columns: []string{payment.PaymentHistoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: paymenthistory.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

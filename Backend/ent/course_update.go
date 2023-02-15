@@ -6,12 +6,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
+	"github.com/google/uuid"
 )
 
 // CourseUpdate is the builder for updating Course entities.
@@ -34,8 +40,8 @@ func (cu *CourseUpdate) SetTitle(s string) *CourseUpdate {
 }
 
 // SetEstimatedTime sets the "estimated_time" field.
-func (cu *CourseUpdate) SetEstimatedTime(s string) *CourseUpdate {
-	cu.mutation.SetEstimatedTime(s)
+func (cu *CourseUpdate) SetEstimatedTime(t time.Time) *CourseUpdate {
+	cu.mutation.SetEstimatedTime(t)
 	return cu
 }
 
@@ -90,9 +96,112 @@ func (cu *CourseUpdate) ClearCoursePictureURL() *CourseUpdate {
 	return cu
 }
 
+// AddReviewCourseIDs adds the "review_course" edge to the ReviewCourse entity by IDs.
+func (cu *CourseUpdate) AddReviewCourseIDs(ids ...int) *CourseUpdate {
+	cu.mutation.AddReviewCourseIDs(ids...)
+	return cu
+}
+
+// AddReviewCourse adds the "review_course" edges to the ReviewCourse entity.
+func (cu *CourseUpdate) AddReviewCourse(r ...*ReviewCourse) *CourseUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return cu.AddReviewCourseIDs(ids...)
+}
+
+// SetClassID sets the "class" edge to the Class entity by ID.
+func (cu *CourseUpdate) SetClassID(id uuid.UUID) *CourseUpdate {
+	cu.mutation.SetClassID(id)
+	return cu
+}
+
+// SetNillableClassID sets the "class" edge to the Class entity by ID if the given value is not nil.
+func (cu *CourseUpdate) SetNillableClassID(id *uuid.UUID) *CourseUpdate {
+	if id != nil {
+		cu = cu.SetClassID(*id)
+	}
+	return cu
+}
+
+// SetClass sets the "class" edge to the Class entity.
+func (cu *CourseUpdate) SetClass(c *Class) *CourseUpdate {
+	return cu.SetClassID(c.ID)
+}
+
+// SetStudentID sets the "student" edge to the Student entity by ID.
+func (cu *CourseUpdate) SetStudentID(id uuid.UUID) *CourseUpdate {
+	cu.mutation.SetStudentID(id)
+	return cu
+}
+
+// SetNillableStudentID sets the "student" edge to the Student entity by ID if the given value is not nil.
+func (cu *CourseUpdate) SetNillableStudentID(id *uuid.UUID) *CourseUpdate {
+	if id != nil {
+		cu = cu.SetStudentID(*id)
+	}
+	return cu
+}
+
+// SetStudent sets the "student" edge to the Student entity.
+func (cu *CourseUpdate) SetStudent(s *Student) *CourseUpdate {
+	return cu.SetStudentID(s.ID)
+}
+
+// SetTutorID sets the "tutor" edge to the Tutor entity by ID.
+func (cu *CourseUpdate) SetTutorID(id uuid.UUID) *CourseUpdate {
+	cu.mutation.SetTutorID(id)
+	return cu
+}
+
+// SetTutor sets the "tutor" edge to the Tutor entity.
+func (cu *CourseUpdate) SetTutor(t *Tutor) *CourseUpdate {
+	return cu.SetTutorID(t.ID)
+}
+
 // Mutation returns the CourseMutation object of the builder.
 func (cu *CourseUpdate) Mutation() *CourseMutation {
 	return cu.mutation
+}
+
+// ClearReviewCourse clears all "review_course" edges to the ReviewCourse entity.
+func (cu *CourseUpdate) ClearReviewCourse() *CourseUpdate {
+	cu.mutation.ClearReviewCourse()
+	return cu
+}
+
+// RemoveReviewCourseIDs removes the "review_course" edge to ReviewCourse entities by IDs.
+func (cu *CourseUpdate) RemoveReviewCourseIDs(ids ...int) *CourseUpdate {
+	cu.mutation.RemoveReviewCourseIDs(ids...)
+	return cu
+}
+
+// RemoveReviewCourse removes "review_course" edges to ReviewCourse entities.
+func (cu *CourseUpdate) RemoveReviewCourse(r ...*ReviewCourse) *CourseUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return cu.RemoveReviewCourseIDs(ids...)
+}
+
+// ClearClass clears the "class" edge to the Class entity.
+func (cu *CourseUpdate) ClearClass() *CourseUpdate {
+	cu.mutation.ClearClass()
+	return cu
+}
+
+// ClearStudent clears the "student" edge to the Student entity.
+func (cu *CourseUpdate) ClearStudent() *CourseUpdate {
+	cu.mutation.ClearStudent()
+	return cu
+}
+
+// ClearTutor clears the "tutor" edge to the Tutor entity.
+func (cu *CourseUpdate) ClearTutor() *CourseUpdate {
+	cu.mutation.ClearTutor()
+	return cu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -129,11 +238,6 @@ func (cu *CourseUpdate) check() error {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Course.title": %w`, err)}
 		}
 	}
-	if v, ok := cu.mutation.EstimatedTime(); ok {
-		if err := course.EstimatedTimeValidator(v); err != nil {
-			return &ValidationError{Name: "estimated_time", err: fmt.Errorf(`ent: validator failed for field "Course.estimated_time": %w`, err)}
-		}
-	}
 	if v, ok := cu.mutation.Description(); ok {
 		if err := course.DescriptionValidator(v); err != nil {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Course.description": %w`, err)}
@@ -154,6 +258,9 @@ func (cu *CourseUpdate) check() error {
 			return &ValidationError{Name: "level_id", err: fmt.Errorf(`ent: validator failed for field "Course.level_id": %w`, err)}
 		}
 	}
+	if _, ok := cu.mutation.TutorID(); cu.mutation.TutorCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Course.tutor"`)
+	}
 	return nil
 }
 
@@ -173,7 +280,7 @@ func (cu *CourseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(course.FieldTitle, field.TypeString, value)
 	}
 	if value, ok := cu.mutation.EstimatedTime(); ok {
-		_spec.SetField(course.FieldEstimatedTime, field.TypeString, value)
+		_spec.SetField(course.FieldEstimatedTime, field.TypeTime, value)
 	}
 	if value, ok := cu.mutation.Description(); ok {
 		_spec.SetField(course.FieldDescription, field.TypeString, value)
@@ -195,6 +302,165 @@ func (cu *CourseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if cu.mutation.CoursePictureURLCleared() {
 		_spec.ClearField(course.FieldCoursePictureURL, field.TypeString)
+	}
+	if cu.mutation.ReviewCourseCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   course.ReviewCourseTable,
+			Columns: []string{course.ReviewCourseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: reviewcourse.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.RemovedReviewCourseIDs(); len(nodes) > 0 && !cu.mutation.ReviewCourseCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   course.ReviewCourseTable,
+			Columns: []string{course.ReviewCourseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: reviewcourse.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.ReviewCourseIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   course.ReviewCourseTable,
+			Columns: []string{course.ReviewCourseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: reviewcourse.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cu.mutation.ClassCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   course.ClassTable,
+			Columns: []string{course.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: class.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   course.ClassTable,
+			Columns: []string{course.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: class.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cu.mutation.StudentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   course.StudentTable,
+			Columns: []string{course.StudentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: student.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.StudentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   course.StudentTable,
+			Columns: []string{course.StudentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: student.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cu.mutation.TutorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   course.TutorTable,
+			Columns: []string{course.TutorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tutor.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.TutorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   course.TutorTable,
+			Columns: []string{course.TutorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tutor.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -223,8 +489,8 @@ func (cuo *CourseUpdateOne) SetTitle(s string) *CourseUpdateOne {
 }
 
 // SetEstimatedTime sets the "estimated_time" field.
-func (cuo *CourseUpdateOne) SetEstimatedTime(s string) *CourseUpdateOne {
-	cuo.mutation.SetEstimatedTime(s)
+func (cuo *CourseUpdateOne) SetEstimatedTime(t time.Time) *CourseUpdateOne {
+	cuo.mutation.SetEstimatedTime(t)
 	return cuo
 }
 
@@ -279,9 +545,112 @@ func (cuo *CourseUpdateOne) ClearCoursePictureURL() *CourseUpdateOne {
 	return cuo
 }
 
+// AddReviewCourseIDs adds the "review_course" edge to the ReviewCourse entity by IDs.
+func (cuo *CourseUpdateOne) AddReviewCourseIDs(ids ...int) *CourseUpdateOne {
+	cuo.mutation.AddReviewCourseIDs(ids...)
+	return cuo
+}
+
+// AddReviewCourse adds the "review_course" edges to the ReviewCourse entity.
+func (cuo *CourseUpdateOne) AddReviewCourse(r ...*ReviewCourse) *CourseUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return cuo.AddReviewCourseIDs(ids...)
+}
+
+// SetClassID sets the "class" edge to the Class entity by ID.
+func (cuo *CourseUpdateOne) SetClassID(id uuid.UUID) *CourseUpdateOne {
+	cuo.mutation.SetClassID(id)
+	return cuo
+}
+
+// SetNillableClassID sets the "class" edge to the Class entity by ID if the given value is not nil.
+func (cuo *CourseUpdateOne) SetNillableClassID(id *uuid.UUID) *CourseUpdateOne {
+	if id != nil {
+		cuo = cuo.SetClassID(*id)
+	}
+	return cuo
+}
+
+// SetClass sets the "class" edge to the Class entity.
+func (cuo *CourseUpdateOne) SetClass(c *Class) *CourseUpdateOne {
+	return cuo.SetClassID(c.ID)
+}
+
+// SetStudentID sets the "student" edge to the Student entity by ID.
+func (cuo *CourseUpdateOne) SetStudentID(id uuid.UUID) *CourseUpdateOne {
+	cuo.mutation.SetStudentID(id)
+	return cuo
+}
+
+// SetNillableStudentID sets the "student" edge to the Student entity by ID if the given value is not nil.
+func (cuo *CourseUpdateOne) SetNillableStudentID(id *uuid.UUID) *CourseUpdateOne {
+	if id != nil {
+		cuo = cuo.SetStudentID(*id)
+	}
+	return cuo
+}
+
+// SetStudent sets the "student" edge to the Student entity.
+func (cuo *CourseUpdateOne) SetStudent(s *Student) *CourseUpdateOne {
+	return cuo.SetStudentID(s.ID)
+}
+
+// SetTutorID sets the "tutor" edge to the Tutor entity by ID.
+func (cuo *CourseUpdateOne) SetTutorID(id uuid.UUID) *CourseUpdateOne {
+	cuo.mutation.SetTutorID(id)
+	return cuo
+}
+
+// SetTutor sets the "tutor" edge to the Tutor entity.
+func (cuo *CourseUpdateOne) SetTutor(t *Tutor) *CourseUpdateOne {
+	return cuo.SetTutorID(t.ID)
+}
+
 // Mutation returns the CourseMutation object of the builder.
 func (cuo *CourseUpdateOne) Mutation() *CourseMutation {
 	return cuo.mutation
+}
+
+// ClearReviewCourse clears all "review_course" edges to the ReviewCourse entity.
+func (cuo *CourseUpdateOne) ClearReviewCourse() *CourseUpdateOne {
+	cuo.mutation.ClearReviewCourse()
+	return cuo
+}
+
+// RemoveReviewCourseIDs removes the "review_course" edge to ReviewCourse entities by IDs.
+func (cuo *CourseUpdateOne) RemoveReviewCourseIDs(ids ...int) *CourseUpdateOne {
+	cuo.mutation.RemoveReviewCourseIDs(ids...)
+	return cuo
+}
+
+// RemoveReviewCourse removes "review_course" edges to ReviewCourse entities.
+func (cuo *CourseUpdateOne) RemoveReviewCourse(r ...*ReviewCourse) *CourseUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return cuo.RemoveReviewCourseIDs(ids...)
+}
+
+// ClearClass clears the "class" edge to the Class entity.
+func (cuo *CourseUpdateOne) ClearClass() *CourseUpdateOne {
+	cuo.mutation.ClearClass()
+	return cuo
+}
+
+// ClearStudent clears the "student" edge to the Student entity.
+func (cuo *CourseUpdateOne) ClearStudent() *CourseUpdateOne {
+	cuo.mutation.ClearStudent()
+	return cuo
+}
+
+// ClearTutor clears the "tutor" edge to the Tutor entity.
+func (cuo *CourseUpdateOne) ClearTutor() *CourseUpdateOne {
+	cuo.mutation.ClearTutor()
+	return cuo
 }
 
 // Where appends a list predicates to the CourseUpdate builder.
@@ -331,11 +700,6 @@ func (cuo *CourseUpdateOne) check() error {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Course.title": %w`, err)}
 		}
 	}
-	if v, ok := cuo.mutation.EstimatedTime(); ok {
-		if err := course.EstimatedTimeValidator(v); err != nil {
-			return &ValidationError{Name: "estimated_time", err: fmt.Errorf(`ent: validator failed for field "Course.estimated_time": %w`, err)}
-		}
-	}
 	if v, ok := cuo.mutation.Description(); ok {
 		if err := course.DescriptionValidator(v); err != nil {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Course.description": %w`, err)}
@@ -355,6 +719,9 @@ func (cuo *CourseUpdateOne) check() error {
 		if err := course.LevelIDValidator(v); err != nil {
 			return &ValidationError{Name: "level_id", err: fmt.Errorf(`ent: validator failed for field "Course.level_id": %w`, err)}
 		}
+	}
+	if _, ok := cuo.mutation.TutorID(); cuo.mutation.TutorCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Course.tutor"`)
 	}
 	return nil
 }
@@ -392,7 +759,7 @@ func (cuo *CourseUpdateOne) sqlSave(ctx context.Context) (_node *Course, err err
 		_spec.SetField(course.FieldTitle, field.TypeString, value)
 	}
 	if value, ok := cuo.mutation.EstimatedTime(); ok {
-		_spec.SetField(course.FieldEstimatedTime, field.TypeString, value)
+		_spec.SetField(course.FieldEstimatedTime, field.TypeTime, value)
 	}
 	if value, ok := cuo.mutation.Description(); ok {
 		_spec.SetField(course.FieldDescription, field.TypeString, value)
@@ -414,6 +781,165 @@ func (cuo *CourseUpdateOne) sqlSave(ctx context.Context) (_node *Course, err err
 	}
 	if cuo.mutation.CoursePictureURLCleared() {
 		_spec.ClearField(course.FieldCoursePictureURL, field.TypeString)
+	}
+	if cuo.mutation.ReviewCourseCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   course.ReviewCourseTable,
+			Columns: []string{course.ReviewCourseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: reviewcourse.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.RemovedReviewCourseIDs(); len(nodes) > 0 && !cuo.mutation.ReviewCourseCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   course.ReviewCourseTable,
+			Columns: []string{course.ReviewCourseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: reviewcourse.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.ReviewCourseIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   course.ReviewCourseTable,
+			Columns: []string{course.ReviewCourseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: reviewcourse.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.ClassCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   course.ClassTable,
+			Columns: []string{course.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: class.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   course.ClassTable,
+			Columns: []string{course.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: class.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.StudentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   course.StudentTable,
+			Columns: []string{course.StudentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: student.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.StudentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   course.StudentTable,
+			Columns: []string{course.StudentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: student.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.TutorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   course.TutorTable,
+			Columns: []string{course.TutorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tutor.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.TutorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   course.TutorTable,
+			Columns: []string{course.TutorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tutor.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Course{config: cuo.config}
 	_spec.Assign = _node.assignValues

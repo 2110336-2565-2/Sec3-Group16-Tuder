@@ -25,8 +25,44 @@ const (
 	FieldLevelID = "level_id"
 	// FieldCoursePictureURL holds the string denoting the course_picture_url field in the database.
 	FieldCoursePictureURL = "course_picture_url"
+	// EdgeReviewCourse holds the string denoting the review_course edge name in mutations.
+	EdgeReviewCourse = "review_course"
+	// EdgeClass holds the string denoting the class edge name in mutations.
+	EdgeClass = "class"
+	// EdgeStudent holds the string denoting the student edge name in mutations.
+	EdgeStudent = "student"
+	// EdgeTutor holds the string denoting the tutor edge name in mutations.
+	EdgeTutor = "tutor"
 	// Table holds the table name of the course in the database.
 	Table = "courses"
+	// ReviewCourseTable is the table that holds the review_course relation/edge.
+	ReviewCourseTable = "review_courses"
+	// ReviewCourseInverseTable is the table name for the ReviewCourse entity.
+	// It exists in this package in order to avoid circular dependency with the "reviewcourse" package.
+	ReviewCourseInverseTable = "review_courses"
+	// ReviewCourseColumn is the table column denoting the review_course relation/edge.
+	ReviewCourseColumn = "course_review_course"
+	// ClassTable is the table that holds the class relation/edge.
+	ClassTable = "classes"
+	// ClassInverseTable is the table name for the Class entity.
+	// It exists in this package in order to avoid circular dependency with the "class" package.
+	ClassInverseTable = "classes"
+	// ClassColumn is the table column denoting the class relation/edge.
+	ClassColumn = "course_class"
+	// StudentTable is the table that holds the student relation/edge.
+	StudentTable = "courses"
+	// StudentInverseTable is the table name for the Student entity.
+	// It exists in this package in order to avoid circular dependency with the "student" package.
+	StudentInverseTable = "students"
+	// StudentColumn is the table column denoting the student relation/edge.
+	StudentColumn = "student_course"
+	// TutorTable is the table that holds the tutor relation/edge.
+	TutorTable = "courses"
+	// TutorInverseTable is the table name for the Tutor entity.
+	// It exists in this package in order to avoid circular dependency with the "tutor" package.
+	TutorInverseTable = "tutors"
+	// TutorColumn is the table column denoting the tutor relation/edge.
+	TutorColumn = "tutor_course"
 )
 
 // Columns holds all SQL columns for course fields.
@@ -41,10 +77,22 @@ var Columns = []string{
 	FieldCoursePictureURL,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the "courses"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"student_course",
+	"tutor_course",
+}
+
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -54,8 +102,6 @@ func ValidColumn(column string) bool {
 var (
 	// TitleValidator is a validator for the "title" field. It is called by the builders before save.
 	TitleValidator func(string) error
-	// EstimatedTimeValidator is a validator for the "estimated_time" field. It is called by the builders before save.
-	EstimatedTimeValidator func(string) error
 	// DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	DescriptionValidator func(string) error
 	// CourseStatusValidator is a validator for the "course_status" field. It is called by the builders before save.
