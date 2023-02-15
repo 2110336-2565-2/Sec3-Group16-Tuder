@@ -9,7 +9,7 @@ import (
 )
 
 type ServiceTutorRegister interface {
-	RegisterTutorService(r *schemas.SchemaRegister) (err error)
+	RegisterTutorService(r *schemas.SchemaRegister) (*schemas.SchemaRegisterResponse, error)
 }
 
 type serviceTutorRegister struct {
@@ -20,12 +20,27 @@ func NewServiceTutorRegister(r repository.RepositoryTutorRegister) *serviceTutor
 	return &serviceTutorRegister{repository: r}
 }
 
-func (s serviceTutorRegister) RegisterTutorService(r *schemas.SchemaRegister) error {
+func (s serviceTutorRegister) RegisterTutorService(r *schemas.SchemaRegister) (*schemas.SchemaRegisterResponse, error) {
 	//TODO connect this function to repo
 	if r.Password != r.ConfirmPassword {
-		return errors.New("the password isn't match")
+		return nil, errors.New("the password isn't match")
 	}
+
 	passwordValidator := utils.PasswordValidator(r.Username, r.Email, r.Firstname, r.Lastname)
-	err := passwordValidator.Validate(r.Password)
-	return err
+	if err := passwordValidator.Validate(r.Password); err != nil {
+		return nil, err
+	}
+
+	_, err := s.repository.RegisterTutorRepository(r)
+	if err != nil {
+		return nil, err
+	}
+
+	token, _ := utils.GenerateToken(r.Username, true)
+	return &schemas.SchemaRegisterResponse{
+		Success: true,
+		Message: "Register Success",
+		Token:   token,
+		Error:   nil,
+	}, nil
 }

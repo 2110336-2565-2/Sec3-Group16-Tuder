@@ -24,49 +24,56 @@ func (cR *controllerRegister) RegisterUser(c echo.Context) (err error) {
 		As string `json:"as,omitempty"`
 	}
 	uRole := &Role{}
-	if err = c.Bind(uRole); err != nil {
+	if err := c.Bind(uRole); err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaRegisterResponse{
 			Success: false,
 			Message: "invalid request payload",
 			Error:   err,
 		})
-		return
+		return err
 	}
 
 	uR := &schema.SchemaRegister{}
-	if err = c.Bind(uR); err != nil {
+	if err := c.Bind(uR); err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaRegisterResponse{
 			Success: false,
 			Message: "invalid request payload",
 			Error:   err,
 		})
-		return
+		return err
 	}
-
+	token := ""
 	if uRole.As == "student" {
-		if err = cR.studentService.RegisterStudentService(uR); err != nil {
+		userLoginInfo, err := cR.studentService.RegisterStudentService(uR)
+		if err != nil {
+
 			c.JSON(http.StatusBadRequest, schema.SchemaRegisterResponse{
 				Success: false,
 				Message: fmt.Sprint(err),
 				Error:   err,
 			})
-			return
+			return err
 		}
+		token = userLoginInfo.Token
 	}
 	if uRole.As == "tutor" {
-		if err = cR.tutorService.RegisterTutorService(uR); err != nil {
+		userLoginInfo, err := cR.tutorService.RegisterTutorService(uR)
+		if err != nil {
+
 			c.JSON(http.StatusBadRequest, schema.SchemaRegisterResponse{
 				Success: false,
 				Message: fmt.Sprint(err),
 				Error:   err,
 			})
-			return
+			return err
 		}
+		token = userLoginInfo.Token
 	}
 
 	c.JSON(http.StatusOK, schema.SchemaRegisterResponse{
 		Success: true,
 		Message: "Register successfully",
+		Token:   token,
 	})
 	return nil
 }

@@ -9,7 +9,7 @@ import (
 )
 
 type ServiceStudentRegister interface {
-	RegisterStudentService(r *schemas.SchemaRegister) (err error)
+	RegisterStudentService(r *schemas.SchemaRegister) (*schemas.SchemaRegisterResponse, error)
 }
 
 type serviceStudentRegister struct {
@@ -20,12 +20,26 @@ func NewServiceStudentRegister(r repository.RepositoryStudentRegister) *serviceS
 	return &serviceStudentRegister{repository: r}
 }
 
-func (s serviceStudentRegister) RegisterStudentService(r *schemas.SchemaRegister) error {
+func (s serviceStudentRegister) RegisterStudentService(r *schemas.SchemaRegister) (*schemas.SchemaRegisterResponse, error) {
 	//TODO connect this function to repo
 	if r.Password != r.ConfirmPassword {
-		return errors.New("the password isn't match")
+		return nil, errors.New("the password isn't match")
 	}
+
 	passwordValidator := utils.PasswordValidator(r.Username, r.Email, r.Firstname, r.Lastname)
-	err := passwordValidator.Validate(r.Password)
-	return err
+	if err := passwordValidator.Validate(r.Password); err != nil {
+		return nil, err
+	}
+
+	_, err := s.repository.RegisterStudentRepository(r)
+	if err != nil {
+		return nil, err
+	}
+	token, _ := utils.GenerateToken(r.Username, true)
+	return &schemas.SchemaRegisterResponse{
+		Success: true,
+		Message: "Register Success",
+		Token:   token,
+		Error:   nil,
+	}, nil
 }
