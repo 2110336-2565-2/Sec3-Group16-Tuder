@@ -1,8 +1,32 @@
 import FormT from './FormStyle.js';
+import { useState } from 'react';
+import axios from 'axios';
+
+const api = axios.create({
+    baseURL: 'http://localhost:8080' // replace with the URL of your locally running server
+  });
 
 export default function FormSignIn(){
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+
+    async function handleSubmit(event) {
+        console.log("asadfsd")
+        event.preventDefault();
+        try {
+            const response = await api.post('/api/v1/login', { username, password });
+            const token = response.data.token;
+            localStorage.setItem('jwtToken', token);
+            console.log(token);
+            // Redirect to the home page
+            //window.location.href = '/';
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    
     return(
-        <form>
+        <form onSubmit={handleSubmit}>
             <FormT.Div FormW='350px'>
                 <FormT.Header>Sign In</FormT.Header>
                 <FormT.Content>Sign in and start managing your candidates!</FormT.Content>
@@ -24,7 +48,7 @@ export default function FormSignIn(){
                     </FormT.ContentSmall>
                 </FormT.ContentInline>
                 <FormT.Content>
-                    <FormT.Button type='submit'>Sign in</FormT.Button>
+                    <FormT.Button onClick= {handleSubmit} type='submit'>Sign in</FormT.Button>
                 </FormT.Content>
                 <FormT.Content>
                     <FormT.ContentSmall>
