@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/mixin"
 
@@ -25,8 +26,15 @@ func (UserMixin) Fields() []ent.Field {
 		field.String("last_name").NotEmpty(),
 		field.String("address").NotEmpty(),
 		field.String("phone").NotEmpty(),
-		field.String("birth_date").NotEmpty(),
+		field.Time("birth_date"),
 		field.String("gender").NotEmpty(),
 		field.String("profile_picture_URL").Optional().Nillable(),
+	}
+}
+
+func (UserMixin) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("issue_report", IssueReport.Type).
+			Unique(),
 	}
 }
