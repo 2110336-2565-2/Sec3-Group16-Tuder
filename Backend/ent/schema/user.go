@@ -2,26 +2,31 @@ package schema
 
 import (
 	"entgo.io/ent"
-	"github.com/google/uuid"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/mixin"
+
+	"github.com/google/uuid"
 )
 
 // Todo holds the schema definition for the Todo entity.
-type User struct {
-	ent.Schema
+type UserMixin struct {
+	mixin.Schema
 }
 
 // Fields of the Todo.
-func (User) Fields() []ent.Field {
+func (UserMixin) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
-            Default(uuid.New).Unique().StorageKey("id"),
+			Default(uuid.New).Unique().StorageKey("id").Immutable(),
 		field.String("username").NotEmpty().Unique(),
-		field.String("password").NotEmpty(),
+		field.String("password").NotEmpty().Sensitive(),
+		field.String("email").NotEmpty(),
+		field.String("first_name").NotEmpty(),
+		field.String("last_name").NotEmpty(),
+		field.String("address").NotEmpty(),
+		field.String("phone").NotEmpty(),
+		field.String("birth_date").NotEmpty(),
+		field.String("gender").NotEmpty(),
+		field.String("profile_picture_URL").Optional().Nillable(),
 	}
 }
-
-func (User) Edges() []ent.Edge {
-	return nil
-}
-
