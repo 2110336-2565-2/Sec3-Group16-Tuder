@@ -7,7 +7,7 @@ export function signIn(signInData){
 
 export default function signInAction(data){
     return (dispatch) => {
-        
+
         signIn(data).then((response) => {
         
             let res = response.data;
@@ -23,7 +23,7 @@ export default function signInAction(data){
                 let role = res.data.role
                 console.log("user role: "+ role)
                 dispatch(
-                    setRole(role)
+                    setRole("hee")
                 )
             }
 

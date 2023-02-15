@@ -9,7 +9,7 @@ export const roleSlice = createSlice({
     initialState,
     reducers:{
         setRole : (state, action) => {
-            state.role = action.payload;
+            return action.payload;
         },
     },
 })
