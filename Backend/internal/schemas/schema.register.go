@@ -1,8 +1,6 @@
 package schemas
 
-import (
-	"time"
-)
+import "time"
 
 type SchemaRegister struct {
 	Username        string    `json:"username,omitempty"`
@@ -13,7 +11,7 @@ type SchemaRegister struct {
 	Lastname        string    `json:"lastname,omitempty"`
 	Address         string    `json:"address,omitempty"`
 	Phone           string    `json:"phone,omitempty"`
-	Birthdate       time.Time `json:"birthdate,omitempty"`
+	Birthdate       time.Time  `json:"birthdate,omitempty"`
 	Gender          string    `json:"gender,omitempty"`
 }
 

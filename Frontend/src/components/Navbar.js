@@ -5,6 +5,7 @@ import {useSelector, connect} from 'react-redux'
 import {signOutAction} from '../handlers/signOutHandler';
 import { useDispatch } from 'react-redux';
 import {useNavigate} from 'react-router-dom';
+import { Fragment } from 'react';
 
 
 function mapStateToProps(state) {
@@ -55,15 +56,15 @@ function Navbar(props){
     });
 
     return (
-        <>
+        <Fragment>
             <NavbarSection>
-                <NavbarHeader>Tudor</NavbarHeader>
+                <NavbarHeader>Tuder</NavbarHeader>
                 <NavbarItems>
                     {contentElement}
                 </NavbarItems>
             </NavbarSection>   
             <Outlet />    
-        </>
+        </Fragment>
     )
 }
 

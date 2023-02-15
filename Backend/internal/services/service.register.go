@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 
 	repository "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -23,10 +24,13 @@ func NewServiceRegister(r repository.RepositoryRegister) *serviceRegister {
 func (s serviceRegister) RegisterService(r *schemas.SchemaRegister) error {
 	//TODO connect this function to repo
 
+	fmt.Print(r)
+
 	if r.Password != r.ConfirmPassword {
 		return errors.New("the password isn't match")
 	}
 	passwordValidator := utils.PasswordValidator(r.Username, r.Email, r.Firstname, r.Lastname)
 	err := passwordValidator.Validate(r.Password)
+
 	return err
 }

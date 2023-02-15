@@ -27,6 +27,8 @@ func (cR *controllerRegister) RegisterUser(c echo.Context) (err error) {
 		return
 	}
 
+	fmt.Println(uR)
+
 	if err = cR.service.RegisterService(uR); err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaRegisterResponse{
 			Success: false,

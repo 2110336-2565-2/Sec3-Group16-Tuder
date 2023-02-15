@@ -49,6 +49,16 @@ const FormT = {
             color:black;
         }
     `,
+    DateInput: styled.input`
+        width: ${(props) => {
+            return props.BoxSize
+        }};
+        padding: 8px 13px;
+        border: 1px solid black;
+        border-radius: 6px;
+        background-color: white;
+        color: black;
+    `,
     Checkbox: styled.input`
         margin-right: 5px;
         accent-color: #EB7B42;
@@ -77,13 +87,28 @@ const FormT = {
     Component: styled.div`
         display: flex;
         flex-direction: column;
+        padding-right: 2.5px;
+        padding-left: 2.5px;
     `,
     Label: styled.div`
         margin-bottom: 0.5em;
+        font-size: 13px;
     `,
-    Space: styled.div`
-        padding-right: 5px;
-        padding-left: 5px;
+    Select: styled.select`
+        -webkit-appearance: none;
+        padding: 7px 40px 7px 12px;
+        width: ${(props) => {
+            return props.BoxSize
+        }};
+        height: 34px;
+        border: 1px solid black;
+        border-radius: 6px;
+        background: white;
+        font-size: 13px;
+    `,
+    Option: styled.option`
+        color: black;
+        background: white;
     `
 }
 

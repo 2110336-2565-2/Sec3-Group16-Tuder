@@ -2,13 +2,14 @@ import styled from "styled-components"
 import FormSignUp from "../components/FormSignUp.js";
 
 export default function SignUp(){
+
     return(
-        <ContainerWithHeight margintop='30px'>
+        <ContainerWithHeight margintop='0px'>
             <SeperateSection>
                 <ItemGrid justify='center' columngrid='1 / 2'>
-                    <ImageTudor width='600px' src="/images/index.png" alt="seprate70" />
+                    <ImageTudor mt='120px' width='600px' src="/images/signin.png" alt="seprate70" />
                 </ItemGrid>
-                <ItemGrid columngrid='2 / 4'>
+                <ItemGrid columngrid='3 / 4'>
                     <FormSignUp />
                 </ItemGrid>
             </SeperateSection>
@@ -21,6 +22,9 @@ export default function SignUp(){
 const ImageTudor = styled.img`
     max-width: ${(props) => {
         return props.maxwidth
+    }};
+    margin-top: ${(props)=>{
+        return props.mt
     }};
 `;
 
