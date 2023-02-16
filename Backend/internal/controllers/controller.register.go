@@ -23,8 +23,11 @@ func (cR *controllerRegister) RegisterUser(c echo.Context) (err error) {
 	type Role struct {
 		As string `json:"as,omitempty"`
 	}
+
 	uRole := &Role{}
-	if err := c.Bind(uRole); err != nil {
+
+	if err := c.Bind(&uRole); err != nil {
+
 		c.JSON(http.StatusBadRequest, schema.SchemaRegisterResponse{
 			Success: false,
 			Message: "invalid request payload",
@@ -33,8 +36,10 @@ func (cR *controllerRegister) RegisterUser(c echo.Context) (err error) {
 		return err
 	}
 
+	fmt.Print("uRole.As	: ", uRole.As, "")
+
 	uR := &schema.SchemaRegister{}
-	if err := c.Bind(uR); err != nil {
+	if err := c.Bind(&uR); err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaRegisterResponse{
 			Success: false,
 			Message: "invalid request payload",

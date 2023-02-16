@@ -9,7 +9,6 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/migrate"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/middlewares"
 	routes "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/routes"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 	godotenv "github.com/joho/godotenv"
 	echo "github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
@@ -47,19 +46,17 @@ func main() {
 	}
 
 	// test
-	ps, _ := utils.HashPassword("brightHee")
+	// ps, _ := utils.HashPassword("bright")
 
-	client.User.Create().
-		SetUsername("hee").
-		SetPassword(ps).
-		SetRole("student").
-		Save(context.Background())
+	// client.User.Create().
+	// 	SetUsername("bright").
+	// 	SetPassword(ps).
+	// 	Save(context.Background())
 
-	client.User.Create().
-		SetUsername("bighee").
-		SetPassword(ps).
-		SetRole("tutor").
-		Save(context.Background())
+	// client.User.Create().
+	// 	SetUsername("big").
+	// 	SetPassword(ps).
+	// 	Save(context.Background())
 
 	routes.InitRoutes(client, e)
 	e.Use(middlewares.CorsMiddleware)

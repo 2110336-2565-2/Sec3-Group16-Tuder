@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -21,7 +20,7 @@ func NewServiceLogin(repository repositorys.RepositoryLogin) *serviceLogin {
 	return &serviceLogin{repository: repository}
 }
 
-func (s *serviceLogin)LoginService(userLogin *schemas.SchemaLogin) (*schemas.SchemaLoginResponses, error) {
+func (s *serviceLogin) LoginService(userLogin *schemas.SchemaLogin) (*schemas.SchemaLoginResponses, error) {
 
 	// check password
 	user, err := s.repository.LoginRepository(userLogin)
@@ -29,17 +28,14 @@ func (s *serviceLogin)LoginService(userLogin *schemas.SchemaLogin) (*schemas.Sch
 		return nil, err
 	}
 
-	if !utils.CheckPasswordHash(userLogin.Password, user.Password){
+	if !utils.CheckPasswordHash(userLogin.Password, user.Password) {
 		return nil, errors.New("the password isn't match")
 	}
 
-	token , _ := utils.GenerateToken(user.Username,fmt.Sprint(user.Role), true)
+	token, _ := utils.GenerateToken(user.Username, true)
 
 	return &schemas.SchemaLoginResponses{
 		Username: user.Username,
-		Role: fmt.Sprint(user.Role),
-		Token: token ,
-
+		Token:    token,
 	}, nil
 }
-
