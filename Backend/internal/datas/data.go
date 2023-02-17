@@ -1,4 +1,4 @@
-package test
+package datas
 import (
 	"context"
 	"fmt"
@@ -19,8 +19,6 @@ func TestData(client *ent.Client){
 	client.Student.Delete().Exec(ctx)
 	client.User.Delete().Exec(ctx)
 	
-	
-	
 	ps, _ := utils.HashPassword("brightHeemen")
 	user1, err := client.User.Create().
 	SetUsername("hee").
@@ -35,37 +33,37 @@ func TestData(client *ent.Client){
 		SetRole(user.RoleStudent).
 		Save(ctx)
 		
-		if err != nil {
-			log.Fatalf("failed creating user: %v", err)
-		}
+	if err != nil {
+		log.Fatalf("failed creating user: %v", err)
+	}
 		
-		user2, err := client.User.Create().
-		SetUsername("bighee").
-		SetPassword(ps).
-		SetAddress("b").
-		SetEmail("b").
-		SetPhone("1").
-		SetFirstName("Bright").
-		SetLastName("Jukjeejid").
-		SetGender("female").
-		SetBirthDate(time.Now()).
-		SetRole(user.RoleTutor).
-		Save(ctx)
-		
-		if err != nil {
-			log.Fatalf("failed creating user: %v", err)
-		}
-		
-		fmt.Println(user1)
-		fmt.Println(user2)
-		
-		client.Student.Create().
-		SetUserID(user1.ID).
-		Save(context.Background())
-		
-		client.Tutor.Create().
-		SetUserID(user2.ID).
-		SetCitizenID("1234567890123").
-		Save(context.Background())
+	user2, err := client.User.Create().
+	SetUsername("bighee").
+	SetPassword(ps).
+	SetAddress("b").
+	SetEmail("b").
+	SetPhone("1").
+	SetFirstName("Bright").
+	SetLastName("Jukjeejid").
+	SetGender("female").
+	SetBirthDate(time.Now()).
+	SetRole(user.RoleTutor).
+	Save(ctx)
+	
+	if err != nil {
+		log.Fatalf("failed creating user: %v", err)
+	}
+	
+	fmt.Println(user1)
+	fmt.Println(user2)
+	
+	client.Student.Create().
+	SetUserID(user1.ID).
+	Save(context.Background())
+	
+	client.Tutor.Create().
+	SetUserID(user2.ID).
+	SetCitizenID("1234567890123").
+	Save(context.Background())
 		
 	}

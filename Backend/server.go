@@ -13,7 +13,7 @@ import (
 	godotenv "github.com/joho/godotenv"
 	echo "github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/test"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/datas"
 )
 
 func init() {
@@ -48,7 +48,7 @@ func main() {
 	}
 
 	// test must reset db as always
-	test.TestData(client)
+	datas.TestData(client)
 	
 	routes.InitRoutes(client, e)
 	e.Use(middlewares.CorsMiddleware)
