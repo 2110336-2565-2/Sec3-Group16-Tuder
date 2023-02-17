@@ -13,8 +13,8 @@ type controllerLogin struct {
 	service service.ServiceLogin
 }
 
-func NewControllerLogin(service service.ServiceLogin) *controllerLogin {
-	return &controllerLogin{service: service}
+func NewControllerLogin(s service.ServiceLogin) *controllerLogin {
+	return &controllerLogin{service: s}
 }
 
 func (cR * controllerLogin) LoginUser(c echo.Context) (err error) {

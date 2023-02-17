@@ -14,6 +14,6 @@ func InitRegisterRoute(c *ent.Client, e *echo.Group) {
 	serviceStudentRegister := services.NewServiceStudentRegister(repoStudentRegister)
 	serviceTutorRegister := services.NewServiceTutorRegister(repoTutorRegister)
 	controllerRegister := controller.NewControllerRegister(serviceStudentRegister, serviceTutorRegister)
-
-	e.POST("/register", controllerRegister.RegisterUser)
+	
+	e.POST("/signUp", controllerRegister.RegisterUser)
 }

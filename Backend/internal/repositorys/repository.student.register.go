@@ -6,6 +6,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 )
@@ -24,7 +25,7 @@ func NewRepositoryStudentRegister(c *ent.Client) *repositoryStudentRegister {
 }
 
 func (r repositoryStudentRegister) RegisterStudentRepository(sr *schema.SchemaRegister) (*ent.Student, error) {
-	// panic("implement me")
+
 	_, err := r.client.Student.
 		Query().Where(sql.FieldEQ("username", sr.Username)).Only(r.ctx)
 
@@ -33,8 +34,7 @@ func (r repositoryStudentRegister) RegisterStudentRepository(sr *schema.SchemaRe
 	}
 	hashedPassword, _ := utils.HashPassword(sr.Password)
 
-	newStudent, err := r.client.Student.
-		Create().
+	newUser, err := r.client.User.Create().
 		SetUsername(sr.Username).
 		SetPassword(hashedPassword).
 		SetEmail(sr.Email).
@@ -44,7 +44,21 @@ func (r repositoryStudentRegister) RegisterStudentRepository(sr *schema.SchemaRe
 		SetPhone(sr.Phone).
 		SetBirthDate(sr.Birthdate).
 		SetGender(sr.Gender).
+		SetRole(user.RoleStudent).
 		Save(r.ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	
+	newStudent, err := r.client.Student.
+		Create().SetUserID( newUser.ID).
+		Save(r.ctx)
+		
+	if err != nil {
+		return nil, err
+	}
 
 	return newStudent, nil
 }

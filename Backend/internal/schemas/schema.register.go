@@ -16,5 +16,5 @@ type SchemaRegister struct {
 	Description     string    `json:"description,omitempty"`
 	OmiseBankToken  string    `json:"omise_bank_token,omitempty"`
 	CitizenID       string    `json:"citizen_id,omitempty"`
-	As              string    `json:"as,omitempty"`
+	Role              string    `json:"role,omitempty"`
 }

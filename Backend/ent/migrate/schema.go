@@ -14,8 +14,8 @@ var (
 		{Name: "review_avaliable", Type: field.TypeBool, Default: true},
 		{Name: "total_hour", Type: field.TypeTime},
 		{Name: "success_hour", Type: field.TypeTime},
-		{Name: "course_class", Type: field.TypeUUID, Unique: true},
-		{Name: "student_class", Type: field.TypeUUID, Unique: true},
+		{Name: "course_class", Type: field.TypeUUID},
+		{Name: "student_class", Type: field.TypeUUID},
 	}
 	// ClassesTable holds the schema information for the "classes" table.
 	ClassesTable = &schema.Table{
@@ -233,45 +233,43 @@ var (
 	// StudentsColumns holds the columns for the "students" table.
 	StudentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
-		{Name: "username", Type: field.TypeString, Unique: true},
-		{Name: "password", Type: field.TypeString},
-		{Name: "email", Type: field.TypeString},
-		{Name: "first_name", Type: field.TypeString},
-		{Name: "last_name", Type: field.TypeString},
-		{Name: "address", Type: field.TypeString},
-		{Name: "phone", Type: field.TypeString},
-		{Name: "birth_date", Type: field.TypeTime},
-		{Name: "gender", Type: field.TypeString},
-		{Name: "profile_picture_url", Type: field.TypeString, Nullable: true},
+		{Name: "user_student", Type: field.TypeUUID, Unique: true},
 	}
 	// StudentsTable holds the schema information for the "students" table.
 	StudentsTable = &schema.Table{
 		Name:       "students",
 		Columns:    StudentsColumns,
 		PrimaryKey: []*schema.Column{StudentsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "students_users_student",
+				Columns:    []*schema.Column{StudentsColumns[1]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
 	}
 	// TutorsColumns holds the columns for the "tutors" table.
 	TutorsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
-		{Name: "username", Type: field.TypeString, Unique: true},
-		{Name: "password", Type: field.TypeString},
-		{Name: "email", Type: field.TypeString},
-		{Name: "first_name", Type: field.TypeString},
-		{Name: "last_name", Type: field.TypeString},
-		{Name: "address", Type: field.TypeString},
-		{Name: "phone", Type: field.TypeString},
-		{Name: "birth_date", Type: field.TypeTime},
-		{Name: "gender", Type: field.TypeString},
-		{Name: "profile_picture_url", Type: field.TypeString, Nullable: true},
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "omise_bank_token", Type: field.TypeString, Nullable: true},
 		{Name: "citizen_id", Type: field.TypeString, Unique: true},
+		{Name: "user_tutor", Type: field.TypeUUID, Unique: true},
 	}
 	// TutorsTable holds the schema information for the "tutors" table.
 	TutorsTable = &schema.Table{
 		Name:       "tutors",
 		Columns:    TutorsColumns,
 		PrimaryKey: []*schema.Column{TutorsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "tutors_users_tutor",
+				Columns:    []*schema.Column{TutorsColumns[4]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
 	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
@@ -286,6 +284,7 @@ var (
 		{Name: "birth_date", Type: field.TypeTime},
 		{Name: "gender", Type: field.TypeString},
 		{Name: "profile_picture_url", Type: field.TypeString, Nullable: true},
+		{Name: "role", Type: field.TypeEnum, Enums: []string{"student", "tutor"}},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
@@ -324,4 +323,6 @@ func init() {
 	ReviewTutorsTable.ForeignKeys[0].RefTable = TutorsTable
 	SchedulesTable.ForeignKeys[0].RefTable = ClassesTable
 	SchedulesTable.ForeignKeys[1].RefTable = TutorsTable
+	StudentsTable.ForeignKeys[0].RefTable = UsersTable
+	TutorsTable.ForeignKeys[0].RefTable = UsersTable
 }

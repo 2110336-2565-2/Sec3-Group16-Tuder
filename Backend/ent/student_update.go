@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -16,6 +15,7 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
 )
 
@@ -29,80 +29,6 @@ type StudentUpdate struct {
 // Where appends a list predicates to the StudentUpdate builder.
 func (su *StudentUpdate) Where(ps ...predicate.Student) *StudentUpdate {
 	su.mutation.Where(ps...)
-	return su
-}
-
-// SetUsername sets the "username" field.
-func (su *StudentUpdate) SetUsername(s string) *StudentUpdate {
-	su.mutation.SetUsername(s)
-	return su
-}
-
-// SetPassword sets the "password" field.
-func (su *StudentUpdate) SetPassword(s string) *StudentUpdate {
-	su.mutation.SetPassword(s)
-	return su
-}
-
-// SetEmail sets the "email" field.
-func (su *StudentUpdate) SetEmail(s string) *StudentUpdate {
-	su.mutation.SetEmail(s)
-	return su
-}
-
-// SetFirstName sets the "first_name" field.
-func (su *StudentUpdate) SetFirstName(s string) *StudentUpdate {
-	su.mutation.SetFirstName(s)
-	return su
-}
-
-// SetLastName sets the "last_name" field.
-func (su *StudentUpdate) SetLastName(s string) *StudentUpdate {
-	su.mutation.SetLastName(s)
-	return su
-}
-
-// SetAddress sets the "address" field.
-func (su *StudentUpdate) SetAddress(s string) *StudentUpdate {
-	su.mutation.SetAddress(s)
-	return su
-}
-
-// SetPhone sets the "phone" field.
-func (su *StudentUpdate) SetPhone(s string) *StudentUpdate {
-	su.mutation.SetPhone(s)
-	return su
-}
-
-// SetBirthDate sets the "birth_date" field.
-func (su *StudentUpdate) SetBirthDate(t time.Time) *StudentUpdate {
-	su.mutation.SetBirthDate(t)
-	return su
-}
-
-// SetGender sets the "gender" field.
-func (su *StudentUpdate) SetGender(s string) *StudentUpdate {
-	su.mutation.SetGender(s)
-	return su
-}
-
-// SetProfilePictureURL sets the "profile_picture_URL" field.
-func (su *StudentUpdate) SetProfilePictureURL(s string) *StudentUpdate {
-	su.mutation.SetProfilePictureURL(s)
-	return su
-}
-
-// SetNillableProfilePictureURL sets the "profile_picture_URL" field if the given value is not nil.
-func (su *StudentUpdate) SetNillableProfilePictureURL(s *string) *StudentUpdate {
-	if s != nil {
-		su.SetProfilePictureURL(*s)
-	}
-	return su
-}
-
-// ClearProfilePictureURL clears the value of the "profile_picture_URL" field.
-func (su *StudentUpdate) ClearProfilePictureURL() *StudentUpdate {
-	su.mutation.ClearProfilePictureURL()
 	return su
 }
 
@@ -140,23 +66,30 @@ func (su *StudentUpdate) SetCourse(c *Course) *StudentUpdate {
 	return su.SetCourseID(c.ID)
 }
 
-// SetClassID sets the "class" edge to the Class entity by ID.
-func (su *StudentUpdate) SetClassID(id uuid.UUID) *StudentUpdate {
-	su.mutation.SetClassID(id)
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (su *StudentUpdate) AddClasIDs(ids ...uuid.UUID) *StudentUpdate {
+	su.mutation.AddClasIDs(ids...)
 	return su
 }
 
-// SetNillableClassID sets the "class" edge to the Class entity by ID if the given value is not nil.
-func (su *StudentUpdate) SetNillableClassID(id *uuid.UUID) *StudentUpdate {
-	if id != nil {
-		su = su.SetClassID(*id)
+// AddClass adds the "class" edges to the Class entity.
+func (su *StudentUpdate) AddClass(c ...*Class) *StudentUpdate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
+	return su.AddClasIDs(ids...)
+}
+
+// SetUserID sets the "user" edge to the User entity by ID.
+func (su *StudentUpdate) SetUserID(id uuid.UUID) *StudentUpdate {
+	su.mutation.SetUserID(id)
 	return su
 }
 
-// SetClass sets the "class" edge to the Class entity.
-func (su *StudentUpdate) SetClass(c *Class) *StudentUpdate {
-	return su.SetClassID(c.ID)
+// SetUser sets the "user" edge to the User entity.
+func (su *StudentUpdate) SetUser(u *User) *StudentUpdate {
+	return su.SetUserID(u.ID)
 }
 
 // Mutation returns the StudentMutation object of the builder.
@@ -191,9 +124,30 @@ func (su *StudentUpdate) ClearCourse() *StudentUpdate {
 	return su
 }
 
-// ClearClass clears the "class" edge to the Class entity.
+// ClearClass clears all "class" edges to the Class entity.
 func (su *StudentUpdate) ClearClass() *StudentUpdate {
 	su.mutation.ClearClass()
+	return su
+}
+
+// RemoveClasIDs removes the "class" edge to Class entities by IDs.
+func (su *StudentUpdate) RemoveClasIDs(ids ...uuid.UUID) *StudentUpdate {
+	su.mutation.RemoveClasIDs(ids...)
+	return su
+}
+
+// RemoveClass removes "class" edges to Class entities.
+func (su *StudentUpdate) RemoveClass(c ...*Class) *StudentUpdate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return su.RemoveClasIDs(ids...)
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (su *StudentUpdate) ClearUser() *StudentUpdate {
+	su.mutation.ClearUser()
 	return su
 }
 
@@ -226,45 +180,8 @@ func (su *StudentUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (su *StudentUpdate) check() error {
-	if v, ok := su.mutation.Username(); ok {
-		if err := student.UsernameValidator(v); err != nil {
-			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "Student.username": %w`, err)}
-		}
-	}
-	if v, ok := su.mutation.Password(); ok {
-		if err := student.PasswordValidator(v); err != nil {
-			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Student.password": %w`, err)}
-		}
-	}
-	if v, ok := su.mutation.Email(); ok {
-		if err := student.EmailValidator(v); err != nil {
-			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Student.email": %w`, err)}
-		}
-	}
-	if v, ok := su.mutation.FirstName(); ok {
-		if err := student.FirstNameValidator(v); err != nil {
-			return &ValidationError{Name: "first_name", err: fmt.Errorf(`ent: validator failed for field "Student.first_name": %w`, err)}
-		}
-	}
-	if v, ok := su.mutation.LastName(); ok {
-		if err := student.LastNameValidator(v); err != nil {
-			return &ValidationError{Name: "last_name", err: fmt.Errorf(`ent: validator failed for field "Student.last_name": %w`, err)}
-		}
-	}
-	if v, ok := su.mutation.Address(); ok {
-		if err := student.AddressValidator(v); err != nil {
-			return &ValidationError{Name: "address", err: fmt.Errorf(`ent: validator failed for field "Student.address": %w`, err)}
-		}
-	}
-	if v, ok := su.mutation.Phone(); ok {
-		if err := student.PhoneValidator(v); err != nil {
-			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "Student.phone": %w`, err)}
-		}
-	}
-	if v, ok := su.mutation.Gender(); ok {
-		if err := student.GenderValidator(v); err != nil {
-			return &ValidationError{Name: "gender", err: fmt.Errorf(`ent: validator failed for field "Student.gender": %w`, err)}
-		}
+	if _, ok := su.mutation.UserID(); su.mutation.UserCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Student.user"`)
 	}
 	return nil
 }
@@ -280,39 +197,6 @@ func (su *StudentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := su.mutation.Username(); ok {
-		_spec.SetField(student.FieldUsername, field.TypeString, value)
-	}
-	if value, ok := su.mutation.Password(); ok {
-		_spec.SetField(student.FieldPassword, field.TypeString, value)
-	}
-	if value, ok := su.mutation.Email(); ok {
-		_spec.SetField(student.FieldEmail, field.TypeString, value)
-	}
-	if value, ok := su.mutation.FirstName(); ok {
-		_spec.SetField(student.FieldFirstName, field.TypeString, value)
-	}
-	if value, ok := su.mutation.LastName(); ok {
-		_spec.SetField(student.FieldLastName, field.TypeString, value)
-	}
-	if value, ok := su.mutation.Address(); ok {
-		_spec.SetField(student.FieldAddress, field.TypeString, value)
-	}
-	if value, ok := su.mutation.Phone(); ok {
-		_spec.SetField(student.FieldPhone, field.TypeString, value)
-	}
-	if value, ok := su.mutation.BirthDate(); ok {
-		_spec.SetField(student.FieldBirthDate, field.TypeTime, value)
-	}
-	if value, ok := su.mutation.Gender(); ok {
-		_spec.SetField(student.FieldGender, field.TypeString, value)
-	}
-	if value, ok := su.mutation.ProfilePictureURL(); ok {
-		_spec.SetField(student.FieldProfilePictureURL, field.TypeString, value)
-	}
-	if su.mutation.ProfilePictureURLCleared() {
-		_spec.ClearField(student.FieldProfilePictureURL, field.TypeString)
 	}
 	if su.mutation.IssueReportCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -405,7 +289,7 @@ func (su *StudentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if su.mutation.ClassCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   student.ClassTable,
 			Columns: []string{student.ClassColumn},
@@ -419,9 +303,9 @@ func (su *StudentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := su.mutation.ClassIDs(); len(nodes) > 0 {
+	if nodes := su.mutation.RemovedClassIDs(); len(nodes) > 0 && !su.mutation.ClassCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   student.ClassTable,
 			Columns: []string{student.ClassColumn},
@@ -430,6 +314,60 @@ func (su *StudentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: class.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   student.ClassTable,
+			Columns: []string{student.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: class.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if su.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   student.UserTable,
+			Columns: []string{student.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: user.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   student.UserTable,
+			Columns: []string{student.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: user.FieldID,
 				},
 			},
 		}
@@ -456,80 +394,6 @@ type StudentUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *StudentMutation
-}
-
-// SetUsername sets the "username" field.
-func (suo *StudentUpdateOne) SetUsername(s string) *StudentUpdateOne {
-	suo.mutation.SetUsername(s)
-	return suo
-}
-
-// SetPassword sets the "password" field.
-func (suo *StudentUpdateOne) SetPassword(s string) *StudentUpdateOne {
-	suo.mutation.SetPassword(s)
-	return suo
-}
-
-// SetEmail sets the "email" field.
-func (suo *StudentUpdateOne) SetEmail(s string) *StudentUpdateOne {
-	suo.mutation.SetEmail(s)
-	return suo
-}
-
-// SetFirstName sets the "first_name" field.
-func (suo *StudentUpdateOne) SetFirstName(s string) *StudentUpdateOne {
-	suo.mutation.SetFirstName(s)
-	return suo
-}
-
-// SetLastName sets the "last_name" field.
-func (suo *StudentUpdateOne) SetLastName(s string) *StudentUpdateOne {
-	suo.mutation.SetLastName(s)
-	return suo
-}
-
-// SetAddress sets the "address" field.
-func (suo *StudentUpdateOne) SetAddress(s string) *StudentUpdateOne {
-	suo.mutation.SetAddress(s)
-	return suo
-}
-
-// SetPhone sets the "phone" field.
-func (suo *StudentUpdateOne) SetPhone(s string) *StudentUpdateOne {
-	suo.mutation.SetPhone(s)
-	return suo
-}
-
-// SetBirthDate sets the "birth_date" field.
-func (suo *StudentUpdateOne) SetBirthDate(t time.Time) *StudentUpdateOne {
-	suo.mutation.SetBirthDate(t)
-	return suo
-}
-
-// SetGender sets the "gender" field.
-func (suo *StudentUpdateOne) SetGender(s string) *StudentUpdateOne {
-	suo.mutation.SetGender(s)
-	return suo
-}
-
-// SetProfilePictureURL sets the "profile_picture_URL" field.
-func (suo *StudentUpdateOne) SetProfilePictureURL(s string) *StudentUpdateOne {
-	suo.mutation.SetProfilePictureURL(s)
-	return suo
-}
-
-// SetNillableProfilePictureURL sets the "profile_picture_URL" field if the given value is not nil.
-func (suo *StudentUpdateOne) SetNillableProfilePictureURL(s *string) *StudentUpdateOne {
-	if s != nil {
-		suo.SetProfilePictureURL(*s)
-	}
-	return suo
-}
-
-// ClearProfilePictureURL clears the value of the "profile_picture_URL" field.
-func (suo *StudentUpdateOne) ClearProfilePictureURL() *StudentUpdateOne {
-	suo.mutation.ClearProfilePictureURL()
-	return suo
 }
 
 // AddIssueReportIDs adds the "issue_report" edge to the IssueReport entity by IDs.
@@ -566,23 +430,30 @@ func (suo *StudentUpdateOne) SetCourse(c *Course) *StudentUpdateOne {
 	return suo.SetCourseID(c.ID)
 }
 
-// SetClassID sets the "class" edge to the Class entity by ID.
-func (suo *StudentUpdateOne) SetClassID(id uuid.UUID) *StudentUpdateOne {
-	suo.mutation.SetClassID(id)
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (suo *StudentUpdateOne) AddClasIDs(ids ...uuid.UUID) *StudentUpdateOne {
+	suo.mutation.AddClasIDs(ids...)
 	return suo
 }
 
-// SetNillableClassID sets the "class" edge to the Class entity by ID if the given value is not nil.
-func (suo *StudentUpdateOne) SetNillableClassID(id *uuid.UUID) *StudentUpdateOne {
-	if id != nil {
-		suo = suo.SetClassID(*id)
+// AddClass adds the "class" edges to the Class entity.
+func (suo *StudentUpdateOne) AddClass(c ...*Class) *StudentUpdateOne {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
+	return suo.AddClasIDs(ids...)
+}
+
+// SetUserID sets the "user" edge to the User entity by ID.
+func (suo *StudentUpdateOne) SetUserID(id uuid.UUID) *StudentUpdateOne {
+	suo.mutation.SetUserID(id)
 	return suo
 }
 
-// SetClass sets the "class" edge to the Class entity.
-func (suo *StudentUpdateOne) SetClass(c *Class) *StudentUpdateOne {
-	return suo.SetClassID(c.ID)
+// SetUser sets the "user" edge to the User entity.
+func (suo *StudentUpdateOne) SetUser(u *User) *StudentUpdateOne {
+	return suo.SetUserID(u.ID)
 }
 
 // Mutation returns the StudentMutation object of the builder.
@@ -617,9 +488,30 @@ func (suo *StudentUpdateOne) ClearCourse() *StudentUpdateOne {
 	return suo
 }
 
-// ClearClass clears the "class" edge to the Class entity.
+// ClearClass clears all "class" edges to the Class entity.
 func (suo *StudentUpdateOne) ClearClass() *StudentUpdateOne {
 	suo.mutation.ClearClass()
+	return suo
+}
+
+// RemoveClasIDs removes the "class" edge to Class entities by IDs.
+func (suo *StudentUpdateOne) RemoveClasIDs(ids ...uuid.UUID) *StudentUpdateOne {
+	suo.mutation.RemoveClasIDs(ids...)
+	return suo
+}
+
+// RemoveClass removes "class" edges to Class entities.
+func (suo *StudentUpdateOne) RemoveClass(c ...*Class) *StudentUpdateOne {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return suo.RemoveClasIDs(ids...)
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (suo *StudentUpdateOne) ClearUser() *StudentUpdateOne {
+	suo.mutation.ClearUser()
 	return suo
 }
 
@@ -665,45 +557,8 @@ func (suo *StudentUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (suo *StudentUpdateOne) check() error {
-	if v, ok := suo.mutation.Username(); ok {
-		if err := student.UsernameValidator(v); err != nil {
-			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "Student.username": %w`, err)}
-		}
-	}
-	if v, ok := suo.mutation.Password(); ok {
-		if err := student.PasswordValidator(v); err != nil {
-			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Student.password": %w`, err)}
-		}
-	}
-	if v, ok := suo.mutation.Email(); ok {
-		if err := student.EmailValidator(v); err != nil {
-			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Student.email": %w`, err)}
-		}
-	}
-	if v, ok := suo.mutation.FirstName(); ok {
-		if err := student.FirstNameValidator(v); err != nil {
-			return &ValidationError{Name: "first_name", err: fmt.Errorf(`ent: validator failed for field "Student.first_name": %w`, err)}
-		}
-	}
-	if v, ok := suo.mutation.LastName(); ok {
-		if err := student.LastNameValidator(v); err != nil {
-			return &ValidationError{Name: "last_name", err: fmt.Errorf(`ent: validator failed for field "Student.last_name": %w`, err)}
-		}
-	}
-	if v, ok := suo.mutation.Address(); ok {
-		if err := student.AddressValidator(v); err != nil {
-			return &ValidationError{Name: "address", err: fmt.Errorf(`ent: validator failed for field "Student.address": %w`, err)}
-		}
-	}
-	if v, ok := suo.mutation.Phone(); ok {
-		if err := student.PhoneValidator(v); err != nil {
-			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "Student.phone": %w`, err)}
-		}
-	}
-	if v, ok := suo.mutation.Gender(); ok {
-		if err := student.GenderValidator(v); err != nil {
-			return &ValidationError{Name: "gender", err: fmt.Errorf(`ent: validator failed for field "Student.gender": %w`, err)}
-		}
+	if _, ok := suo.mutation.UserID(); suo.mutation.UserCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Student.user"`)
 	}
 	return nil
 }
@@ -736,39 +591,6 @@ func (suo *StudentUpdateOne) sqlSave(ctx context.Context) (_node *Student, err e
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := suo.mutation.Username(); ok {
-		_spec.SetField(student.FieldUsername, field.TypeString, value)
-	}
-	if value, ok := suo.mutation.Password(); ok {
-		_spec.SetField(student.FieldPassword, field.TypeString, value)
-	}
-	if value, ok := suo.mutation.Email(); ok {
-		_spec.SetField(student.FieldEmail, field.TypeString, value)
-	}
-	if value, ok := suo.mutation.FirstName(); ok {
-		_spec.SetField(student.FieldFirstName, field.TypeString, value)
-	}
-	if value, ok := suo.mutation.LastName(); ok {
-		_spec.SetField(student.FieldLastName, field.TypeString, value)
-	}
-	if value, ok := suo.mutation.Address(); ok {
-		_spec.SetField(student.FieldAddress, field.TypeString, value)
-	}
-	if value, ok := suo.mutation.Phone(); ok {
-		_spec.SetField(student.FieldPhone, field.TypeString, value)
-	}
-	if value, ok := suo.mutation.BirthDate(); ok {
-		_spec.SetField(student.FieldBirthDate, field.TypeTime, value)
-	}
-	if value, ok := suo.mutation.Gender(); ok {
-		_spec.SetField(student.FieldGender, field.TypeString, value)
-	}
-	if value, ok := suo.mutation.ProfilePictureURL(); ok {
-		_spec.SetField(student.FieldProfilePictureURL, field.TypeString, value)
-	}
-	if suo.mutation.ProfilePictureURLCleared() {
-		_spec.ClearField(student.FieldProfilePictureURL, field.TypeString)
 	}
 	if suo.mutation.IssueReportCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -861,7 +683,7 @@ func (suo *StudentUpdateOne) sqlSave(ctx context.Context) (_node *Student, err e
 	}
 	if suo.mutation.ClassCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   student.ClassTable,
 			Columns: []string{student.ClassColumn},
@@ -875,9 +697,9 @@ func (suo *StudentUpdateOne) sqlSave(ctx context.Context) (_node *Student, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := suo.mutation.ClassIDs(); len(nodes) > 0 {
+	if nodes := suo.mutation.RemovedClassIDs(); len(nodes) > 0 && !suo.mutation.ClassCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   student.ClassTable,
 			Columns: []string{student.ClassColumn},
@@ -886,6 +708,60 @@ func (suo *StudentUpdateOne) sqlSave(ctx context.Context) (_node *Student, err e
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: class.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   student.ClassTable,
+			Columns: []string{student.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: class.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   student.UserTable,
+			Columns: []string{student.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: user.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   student.UserTable,
+			Columns: []string{student.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: user.FieldID,
 				},
 			},
 		}

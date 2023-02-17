@@ -1,8 +1,6 @@
 import FormT from './FormStyle.js';
 import { useState } from 'react';
-import signInAction from '../handlers/signInHandler.js';
-import { useDispatch } from 'react-redux';
-import { useSelector } from 'react-redux';
+import signInHandler from '../handlers/signInHandler.js';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -10,8 +8,8 @@ import { useNavigate } from 'react-router-dom';
 export default function FormSignIn(){
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [status, setStatus] = useState('waiting');
     
-    const dispatch = useDispatch();
     const navigate = useNavigate();
 
 
@@ -21,7 +19,18 @@ export default function FormSignIn(){
             username,
             password,
         }
-        dispatch( (await signInAction(signInData, navigate)));
+        setStatus('submitting')
+        try{
+            await signInHandler(signInData, navigate);
+            setStatus('success')
+        } catch (error){
+
+            // Handle by do sth
+
+
+            console.log(error);
+            setStatus('error');
+        }
     }
 
     return(

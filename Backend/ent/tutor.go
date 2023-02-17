@@ -5,10 +5,10 @@ package ent
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
 )
 
@@ -17,26 +17,6 @@ type Tutor struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
-	// Username holds the value of the "username" field.
-	Username string `json:"username,omitempty"`
-	// Password holds the value of the "password" field.
-	Password string `json:"-"`
-	// Email holds the value of the "email" field.
-	Email string `json:"email,omitempty"`
-	// FirstName holds the value of the "first_name" field.
-	FirstName string `json:"first_name,omitempty"`
-	// LastName holds the value of the "last_name" field.
-	LastName string `json:"last_name,omitempty"`
-	// Address holds the value of the "address" field.
-	Address string `json:"address,omitempty"`
-	// Phone holds the value of the "phone" field.
-	Phone string `json:"phone,omitempty"`
-	// BirthDate holds the value of the "birth_date" field.
-	BirthDate time.Time `json:"birth_date,omitempty"`
-	// Gender holds the value of the "gender" field.
-	Gender string `json:"gender,omitempty"`
-	// ProfilePictureURL holds the value of the "profile_picture_URL" field.
-	ProfilePictureURL *string `json:"profile_picture_URL,omitempty"`
 	// Description holds the value of the "description" field.
 	Description *string `json:"description,omitempty"`
 	// OmiseBankToken holds the value of the "omise_bank_token" field.
@@ -45,7 +25,8 @@ type Tutor struct {
 	CitizenID string `json:"citizen_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TutorQuery when eager-loading is set.
-	Edges TutorEdges `json:"edges"`
+	Edges      TutorEdges `json:"edges"`
+	user_tutor *uuid.UUID
 }
 
 // TutorEdges holds the relations/edges for other nodes in the graph.
@@ -58,9 +39,11 @@ type TutorEdges struct {
 	ReviewTutor []*ReviewTutor `json:"review_tutor,omitempty"`
 	// Schedule holds the value of the schedule edge.
 	Schedule []*Schedule `json:"schedule,omitempty"`
+	// User holds the value of the user edge.
+	User *User `json:"user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [5]bool
 }
 
 // IssueReportOrErr returns the IssueReport value or an error if the edge
@@ -99,17 +82,30 @@ func (e TutorEdges) ScheduleOrErr() ([]*Schedule, error) {
 	return nil, &NotLoadedError{edge: "schedule"}
 }
 
+// UserOrErr returns the User value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e TutorEdges) UserOrErr() (*User, error) {
+	if e.loadedTypes[4] {
+		if e.User == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: user.Label}
+		}
+		return e.User, nil
+	}
+	return nil, &NotLoadedError{edge: "user"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Tutor) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case tutor.FieldUsername, tutor.FieldPassword, tutor.FieldEmail, tutor.FieldFirstName, tutor.FieldLastName, tutor.FieldAddress, tutor.FieldPhone, tutor.FieldGender, tutor.FieldProfilePictureURL, tutor.FieldDescription, tutor.FieldOmiseBankToken, tutor.FieldCitizenID:
+		case tutor.FieldDescription, tutor.FieldOmiseBankToken, tutor.FieldCitizenID:
 			values[i] = new(sql.NullString)
-		case tutor.FieldBirthDate:
-			values[i] = new(sql.NullTime)
 		case tutor.FieldID:
 			values[i] = new(uuid.UUID)
+		case tutor.ForeignKeys[0]: // user_tutor
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Tutor", columns[i])
 		}
@@ -131,67 +127,6 @@ func (t *Tutor) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				t.ID = *value
 			}
-		case tutor.FieldUsername:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field username", values[i])
-			} else if value.Valid {
-				t.Username = value.String
-			}
-		case tutor.FieldPassword:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field password", values[i])
-			} else if value.Valid {
-				t.Password = value.String
-			}
-		case tutor.FieldEmail:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field email", values[i])
-			} else if value.Valid {
-				t.Email = value.String
-			}
-		case tutor.FieldFirstName:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field first_name", values[i])
-			} else if value.Valid {
-				t.FirstName = value.String
-			}
-		case tutor.FieldLastName:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field last_name", values[i])
-			} else if value.Valid {
-				t.LastName = value.String
-			}
-		case tutor.FieldAddress:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field address", values[i])
-			} else if value.Valid {
-				t.Address = value.String
-			}
-		case tutor.FieldPhone:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field phone", values[i])
-			} else if value.Valid {
-				t.Phone = value.String
-			}
-		case tutor.FieldBirthDate:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field birth_date", values[i])
-			} else if value.Valid {
-				t.BirthDate = value.Time
-			}
-		case tutor.FieldGender:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field gender", values[i])
-			} else if value.Valid {
-				t.Gender = value.String
-			}
-		case tutor.FieldProfilePictureURL:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field profile_picture_URL", values[i])
-			} else if value.Valid {
-				t.ProfilePictureURL = new(string)
-				*t.ProfilePictureURL = value.String
-			}
 		case tutor.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
@@ -211,6 +146,13 @@ func (t *Tutor) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field citizen_id", values[i])
 			} else if value.Valid {
 				t.CitizenID = value.String
+			}
+		case tutor.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field user_tutor", values[i])
+			} else if value.Valid {
+				t.user_tutor = new(uuid.UUID)
+				*t.user_tutor = *value.S.(*uuid.UUID)
 			}
 		}
 	}
@@ -237,6 +179,11 @@ func (t *Tutor) QuerySchedule() *ScheduleQuery {
 	return NewTutorClient(t.config).QuerySchedule(t)
 }
 
+// QueryUser queries the "user" edge of the Tutor entity.
+func (t *Tutor) QueryUser() *UserQuery {
+	return NewTutorClient(t.config).QueryUser(t)
+}
+
 // Update returns a builder for updating this Tutor.
 // Note that you need to call Tutor.Unwrap() before calling this method if this Tutor
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -260,37 +207,6 @@ func (t *Tutor) String() string {
 	var builder strings.Builder
 	builder.WriteString("Tutor(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", t.ID))
-	builder.WriteString("username=")
-	builder.WriteString(t.Username)
-	builder.WriteString(", ")
-	builder.WriteString("password=<sensitive>")
-	builder.WriteString(", ")
-	builder.WriteString("email=")
-	builder.WriteString(t.Email)
-	builder.WriteString(", ")
-	builder.WriteString("first_name=")
-	builder.WriteString(t.FirstName)
-	builder.WriteString(", ")
-	builder.WriteString("last_name=")
-	builder.WriteString(t.LastName)
-	builder.WriteString(", ")
-	builder.WriteString("address=")
-	builder.WriteString(t.Address)
-	builder.WriteString(", ")
-	builder.WriteString("phone=")
-	builder.WriteString(t.Phone)
-	builder.WriteString(", ")
-	builder.WriteString("birth_date=")
-	builder.WriteString(t.BirthDate.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("gender=")
-	builder.WriteString(t.Gender)
-	builder.WriteString(", ")
-	if v := t.ProfilePictureURL; v != nil {
-		builder.WriteString("profile_picture_URL=")
-		builder.WriteString(*v)
-	}
-	builder.WriteString(", ")
 	if v := t.Description; v != nil {
 		builder.WriteString("description=")
 		builder.WriteString(*v)

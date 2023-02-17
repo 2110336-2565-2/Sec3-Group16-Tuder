@@ -193,7 +193,7 @@ func HasStudent() predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, StudentTable, StudentColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, StudentTable, StudentColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -205,7 +205,7 @@ func HasStudentWith(preds ...predicate.Student) predicate.Class {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(StudentInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, StudentTable, StudentColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, StudentTable, StudentColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
@@ -220,7 +220,7 @@ func HasCourse() predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, CourseTable, CourseColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, CourseTable, CourseColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -232,7 +232,7 @@ func HasCourseWith(preds ...predicate.Course) predicate.Class {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(CourseInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, CourseTable, CourseColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, CourseTable, CourseColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

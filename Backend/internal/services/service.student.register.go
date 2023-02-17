@@ -35,6 +35,7 @@ func (s serviceStudentRegister) RegisterStudentService(r *schemas.SchemaRegister
 	if err != nil {
 		return nil, err
 	}
+	
 	token, _ := utils.GenerateToken(r.Username, true)
 	return &schemas.SchemaRegisterResponse{
 		Success: true,

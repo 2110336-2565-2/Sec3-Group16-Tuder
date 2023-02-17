@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -14,6 +13,7 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
 )
 
@@ -22,74 +22,6 @@ type StudentCreate struct {
 	config
 	mutation *StudentMutation
 	hooks    []Hook
-}
-
-// SetUsername sets the "username" field.
-func (sc *StudentCreate) SetUsername(s string) *StudentCreate {
-	sc.mutation.SetUsername(s)
-	return sc
-}
-
-// SetPassword sets the "password" field.
-func (sc *StudentCreate) SetPassword(s string) *StudentCreate {
-	sc.mutation.SetPassword(s)
-	return sc
-}
-
-// SetEmail sets the "email" field.
-func (sc *StudentCreate) SetEmail(s string) *StudentCreate {
-	sc.mutation.SetEmail(s)
-	return sc
-}
-
-// SetFirstName sets the "first_name" field.
-func (sc *StudentCreate) SetFirstName(s string) *StudentCreate {
-	sc.mutation.SetFirstName(s)
-	return sc
-}
-
-// SetLastName sets the "last_name" field.
-func (sc *StudentCreate) SetLastName(s string) *StudentCreate {
-	sc.mutation.SetLastName(s)
-	return sc
-}
-
-// SetAddress sets the "address" field.
-func (sc *StudentCreate) SetAddress(s string) *StudentCreate {
-	sc.mutation.SetAddress(s)
-	return sc
-}
-
-// SetPhone sets the "phone" field.
-func (sc *StudentCreate) SetPhone(s string) *StudentCreate {
-	sc.mutation.SetPhone(s)
-	return sc
-}
-
-// SetBirthDate sets the "birth_date" field.
-func (sc *StudentCreate) SetBirthDate(t time.Time) *StudentCreate {
-	sc.mutation.SetBirthDate(t)
-	return sc
-}
-
-// SetGender sets the "gender" field.
-func (sc *StudentCreate) SetGender(s string) *StudentCreate {
-	sc.mutation.SetGender(s)
-	return sc
-}
-
-// SetProfilePictureURL sets the "profile_picture_URL" field.
-func (sc *StudentCreate) SetProfilePictureURL(s string) *StudentCreate {
-	sc.mutation.SetProfilePictureURL(s)
-	return sc
-}
-
-// SetNillableProfilePictureURL sets the "profile_picture_URL" field if the given value is not nil.
-func (sc *StudentCreate) SetNillableProfilePictureURL(s *string) *StudentCreate {
-	if s != nil {
-		sc.SetProfilePictureURL(*s)
-	}
-	return sc
 }
 
 // SetID sets the "id" field.
@@ -140,23 +72,30 @@ func (sc *StudentCreate) SetCourse(c *Course) *StudentCreate {
 	return sc.SetCourseID(c.ID)
 }
 
-// SetClassID sets the "class" edge to the Class entity by ID.
-func (sc *StudentCreate) SetClassID(id uuid.UUID) *StudentCreate {
-	sc.mutation.SetClassID(id)
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (sc *StudentCreate) AddClasIDs(ids ...uuid.UUID) *StudentCreate {
+	sc.mutation.AddClasIDs(ids...)
 	return sc
 }
 
-// SetNillableClassID sets the "class" edge to the Class entity by ID if the given value is not nil.
-func (sc *StudentCreate) SetNillableClassID(id *uuid.UUID) *StudentCreate {
-	if id != nil {
-		sc = sc.SetClassID(*id)
+// AddClass adds the "class" edges to the Class entity.
+func (sc *StudentCreate) AddClass(c ...*Class) *StudentCreate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
+	return sc.AddClasIDs(ids...)
+}
+
+// SetUserID sets the "user" edge to the User entity by ID.
+func (sc *StudentCreate) SetUserID(id uuid.UUID) *StudentCreate {
+	sc.mutation.SetUserID(id)
 	return sc
 }
 
-// SetClass sets the "class" edge to the Class entity.
-func (sc *StudentCreate) SetClass(c *Class) *StudentCreate {
-	return sc.SetClassID(c.ID)
+// SetUser sets the "user" edge to the User entity.
+func (sc *StudentCreate) SetUser(u *User) *StudentCreate {
+	return sc.SetUserID(u.ID)
 }
 
 // Mutation returns the StudentMutation object of the builder.
@@ -202,72 +141,8 @@ func (sc *StudentCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (sc *StudentCreate) check() error {
-	if _, ok := sc.mutation.Username(); !ok {
-		return &ValidationError{Name: "username", err: errors.New(`ent: missing required field "Student.username"`)}
-	}
-	if v, ok := sc.mutation.Username(); ok {
-		if err := student.UsernameValidator(v); err != nil {
-			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "Student.username": %w`, err)}
-		}
-	}
-	if _, ok := sc.mutation.Password(); !ok {
-		return &ValidationError{Name: "password", err: errors.New(`ent: missing required field "Student.password"`)}
-	}
-	if v, ok := sc.mutation.Password(); ok {
-		if err := student.PasswordValidator(v); err != nil {
-			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Student.password": %w`, err)}
-		}
-	}
-	if _, ok := sc.mutation.Email(); !ok {
-		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "Student.email"`)}
-	}
-	if v, ok := sc.mutation.Email(); ok {
-		if err := student.EmailValidator(v); err != nil {
-			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Student.email": %w`, err)}
-		}
-	}
-	if _, ok := sc.mutation.FirstName(); !ok {
-		return &ValidationError{Name: "first_name", err: errors.New(`ent: missing required field "Student.first_name"`)}
-	}
-	if v, ok := sc.mutation.FirstName(); ok {
-		if err := student.FirstNameValidator(v); err != nil {
-			return &ValidationError{Name: "first_name", err: fmt.Errorf(`ent: validator failed for field "Student.first_name": %w`, err)}
-		}
-	}
-	if _, ok := sc.mutation.LastName(); !ok {
-		return &ValidationError{Name: "last_name", err: errors.New(`ent: missing required field "Student.last_name"`)}
-	}
-	if v, ok := sc.mutation.LastName(); ok {
-		if err := student.LastNameValidator(v); err != nil {
-			return &ValidationError{Name: "last_name", err: fmt.Errorf(`ent: validator failed for field "Student.last_name": %w`, err)}
-		}
-	}
-	if _, ok := sc.mutation.Address(); !ok {
-		return &ValidationError{Name: "address", err: errors.New(`ent: missing required field "Student.address"`)}
-	}
-	if v, ok := sc.mutation.Address(); ok {
-		if err := student.AddressValidator(v); err != nil {
-			return &ValidationError{Name: "address", err: fmt.Errorf(`ent: validator failed for field "Student.address": %w`, err)}
-		}
-	}
-	if _, ok := sc.mutation.Phone(); !ok {
-		return &ValidationError{Name: "phone", err: errors.New(`ent: missing required field "Student.phone"`)}
-	}
-	if v, ok := sc.mutation.Phone(); ok {
-		if err := student.PhoneValidator(v); err != nil {
-			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "Student.phone": %w`, err)}
-		}
-	}
-	if _, ok := sc.mutation.BirthDate(); !ok {
-		return &ValidationError{Name: "birth_date", err: errors.New(`ent: missing required field "Student.birth_date"`)}
-	}
-	if _, ok := sc.mutation.Gender(); !ok {
-		return &ValidationError{Name: "gender", err: errors.New(`ent: missing required field "Student.gender"`)}
-	}
-	if v, ok := sc.mutation.Gender(); ok {
-		if err := student.GenderValidator(v); err != nil {
-			return &ValidationError{Name: "gender", err: fmt.Errorf(`ent: validator failed for field "Student.gender": %w`, err)}
-		}
+	if _, ok := sc.mutation.UserID(); !ok {
+		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "Student.user"`)}
 	}
 	return nil
 }
@@ -303,46 +178,6 @@ func (sc *StudentCreate) createSpec() (*Student, *sqlgraph.CreateSpec) {
 	if id, ok := sc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
-	}
-	if value, ok := sc.mutation.Username(); ok {
-		_spec.SetField(student.FieldUsername, field.TypeString, value)
-		_node.Username = value
-	}
-	if value, ok := sc.mutation.Password(); ok {
-		_spec.SetField(student.FieldPassword, field.TypeString, value)
-		_node.Password = value
-	}
-	if value, ok := sc.mutation.Email(); ok {
-		_spec.SetField(student.FieldEmail, field.TypeString, value)
-		_node.Email = value
-	}
-	if value, ok := sc.mutation.FirstName(); ok {
-		_spec.SetField(student.FieldFirstName, field.TypeString, value)
-		_node.FirstName = value
-	}
-	if value, ok := sc.mutation.LastName(); ok {
-		_spec.SetField(student.FieldLastName, field.TypeString, value)
-		_node.LastName = value
-	}
-	if value, ok := sc.mutation.Address(); ok {
-		_spec.SetField(student.FieldAddress, field.TypeString, value)
-		_node.Address = value
-	}
-	if value, ok := sc.mutation.Phone(); ok {
-		_spec.SetField(student.FieldPhone, field.TypeString, value)
-		_node.Phone = value
-	}
-	if value, ok := sc.mutation.BirthDate(); ok {
-		_spec.SetField(student.FieldBirthDate, field.TypeTime, value)
-		_node.BirthDate = value
-	}
-	if value, ok := sc.mutation.Gender(); ok {
-		_spec.SetField(student.FieldGender, field.TypeString, value)
-		_node.Gender = value
-	}
-	if value, ok := sc.mutation.ProfilePictureURL(); ok {
-		_spec.SetField(student.FieldProfilePictureURL, field.TypeString, value)
-		_node.ProfilePictureURL = &value
 	}
 	if nodes := sc.mutation.IssueReportIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -384,7 +219,7 @@ func (sc *StudentCreate) createSpec() (*Student, *sqlgraph.CreateSpec) {
 	}
 	if nodes := sc.mutation.ClassIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   student.ClassTable,
 			Columns: []string{student.ClassColumn},
@@ -399,6 +234,26 @@ func (sc *StudentCreate) createSpec() (*Student, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   student.UserTable,
+			Columns: []string{student.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.user_student = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

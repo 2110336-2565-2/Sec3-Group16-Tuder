@@ -13,15 +13,15 @@ import SignUp from './pages/SignUp.js';
 import Courses from './pages/Courses';
 import Report from './pages/Report';
 
-import { useSelector } from 'react-redux';
+import { useState } from 'react';
 
 
 function App() {
-
+  const [role, SetRole] = useState('guest');
 
   return (
     <Fragment>
-      <Navbar />
+      <Navbar role={role} />
     </Fragment>
   );
 }

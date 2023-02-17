@@ -1,9 +1,9 @@
 import FormT from './FormStyle.js';
 import { useState } from 'react';
-import signUpAction from '../handlers/signUpHandler.js';
+import signUpHandler from '../handlers/signUpHandler.js';
 import signupContent from "../datas/SignUp.role.js";
 import styled from 'styled-components';
-import { useDispatch } from 'react-redux';
+
 import { useNavigate } from 'react-router-dom';
 import { Fragment } from 'react';
 
@@ -20,15 +20,18 @@ export default function FormSignUp(){
     const [contactnumber, setContactNumber] = useState('');
     const [gender, setGender] = useState('');
     const [birthdate, setBirthDate] = useState('');
+    const [role, setRole] = useState('');
 
-    const dispatch = useDispatch();
+
+    const [status, setStatus] = useState('waiting');
+ 
     const navigate = useNavigate()
+
 
 
     async function submitHandler(e){
         e.preventDefault();
         let birthdateISO = (new Date(birthdate)).toISOString(); 
-        console.log(gender);
         const signUpData = {
             username : username,
             password: password,
@@ -39,8 +42,20 @@ export default function FormSignUp(){
             address: address,
             phone:  contactnumber,
             birthdate: birthdateISO,
-            gender: gender }
-        dispatch( (await signUpAction(signUpData, navigate)));
+            gender: gender,
+            role: role
+         }
+         setStatus('submitting')
+         try{
+            await signUpHandler(signUpData, navigate);
+            setStatus('success')
+        } catch (error){
+
+            // Handle by do sth
+
+            console.log(error);
+            setStatus('error');
+        }
     }
 
     
@@ -117,7 +132,7 @@ export default function FormSignUp(){
                             <FormT.Component key={elementindex}>
                                 <FormT.Label>{element} :</FormT.Label>
                                 <FormT.Select BoxSize='170px' name={name} value={value} onChange={onChange}  required >
-                                    <FormT.Option value="" selected disabled hidden>Please select</FormT.Option>
+                                    <FormT.Option value="" disabled hidden>Please select</FormT.Option>
                                     <FormT.Option value='male'>male</FormT.Option>
                                     <FormT.Option value='female'>female</FormT.Option>
                                     <FormT.Option value='-'>I don't like hee</FormT.Option>
@@ -145,7 +160,8 @@ export default function FormSignUp(){
                 <FormT.Content>
                     <FormT.Component>
                         <FormT.Label>As :</FormT.Label>
-                        <FormT.Select BoxSize='343px' name='as'>
+                        <FormT.Select BoxSize='343px' name='role' value={role} onChange={(e) => setRole(e.target.value)}  required >
+                            <FormT.Option value="" disabled hidden>Please select</FormT.Option>
                             <FormT.Option value='student'>Student</FormT.Option>
                             <FormT.Option value='tutor'>Tutor</FormT.Option>
                         </FormT.Select>

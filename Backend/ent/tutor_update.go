@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -17,6 +16,7 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewtutor"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
 )
 
@@ -30,80 +30,6 @@ type TutorUpdate struct {
 // Where appends a list predicates to the TutorUpdate builder.
 func (tu *TutorUpdate) Where(ps ...predicate.Tutor) *TutorUpdate {
 	tu.mutation.Where(ps...)
-	return tu
-}
-
-// SetUsername sets the "username" field.
-func (tu *TutorUpdate) SetUsername(s string) *TutorUpdate {
-	tu.mutation.SetUsername(s)
-	return tu
-}
-
-// SetPassword sets the "password" field.
-func (tu *TutorUpdate) SetPassword(s string) *TutorUpdate {
-	tu.mutation.SetPassword(s)
-	return tu
-}
-
-// SetEmail sets the "email" field.
-func (tu *TutorUpdate) SetEmail(s string) *TutorUpdate {
-	tu.mutation.SetEmail(s)
-	return tu
-}
-
-// SetFirstName sets the "first_name" field.
-func (tu *TutorUpdate) SetFirstName(s string) *TutorUpdate {
-	tu.mutation.SetFirstName(s)
-	return tu
-}
-
-// SetLastName sets the "last_name" field.
-func (tu *TutorUpdate) SetLastName(s string) *TutorUpdate {
-	tu.mutation.SetLastName(s)
-	return tu
-}
-
-// SetAddress sets the "address" field.
-func (tu *TutorUpdate) SetAddress(s string) *TutorUpdate {
-	tu.mutation.SetAddress(s)
-	return tu
-}
-
-// SetPhone sets the "phone" field.
-func (tu *TutorUpdate) SetPhone(s string) *TutorUpdate {
-	tu.mutation.SetPhone(s)
-	return tu
-}
-
-// SetBirthDate sets the "birth_date" field.
-func (tu *TutorUpdate) SetBirthDate(t time.Time) *TutorUpdate {
-	tu.mutation.SetBirthDate(t)
-	return tu
-}
-
-// SetGender sets the "gender" field.
-func (tu *TutorUpdate) SetGender(s string) *TutorUpdate {
-	tu.mutation.SetGender(s)
-	return tu
-}
-
-// SetProfilePictureURL sets the "profile_picture_URL" field.
-func (tu *TutorUpdate) SetProfilePictureURL(s string) *TutorUpdate {
-	tu.mutation.SetProfilePictureURL(s)
-	return tu
-}
-
-// SetNillableProfilePictureURL sets the "profile_picture_URL" field if the given value is not nil.
-func (tu *TutorUpdate) SetNillableProfilePictureURL(s *string) *TutorUpdate {
-	if s != nil {
-		tu.SetProfilePictureURL(*s)
-	}
-	return tu
-}
-
-// ClearProfilePictureURL clears the value of the "profile_picture_URL" field.
-func (tu *TutorUpdate) ClearProfilePictureURL() *TutorUpdate {
-	tu.mutation.ClearProfilePictureURL()
 	return tu
 }
 
@@ -213,6 +139,17 @@ func (tu *TutorUpdate) AddSchedule(s ...*Schedule) *TutorUpdate {
 	return tu.AddScheduleIDs(ids...)
 }
 
+// SetUserID sets the "user" edge to the User entity by ID.
+func (tu *TutorUpdate) SetUserID(id uuid.UUID) *TutorUpdate {
+	tu.mutation.SetUserID(id)
+	return tu
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (tu *TutorUpdate) SetUser(u *User) *TutorUpdate {
+	return tu.SetUserID(u.ID)
+}
+
 // Mutation returns the TutorMutation object of the builder.
 func (tu *TutorUpdate) Mutation() *TutorMutation {
 	return tu.mutation
@@ -302,6 +239,12 @@ func (tu *TutorUpdate) RemoveSchedule(s ...*Schedule) *TutorUpdate {
 	return tu.RemoveScheduleIDs(ids...)
 }
 
+// ClearUser clears the "user" edge to the User entity.
+func (tu *TutorUpdate) ClearUser() *TutorUpdate {
+	tu.mutation.ClearUser()
+	return tu
+}
+
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (tu *TutorUpdate) Save(ctx context.Context) (int, error) {
 	return withHooks[int, TutorMutation](ctx, tu.sqlSave, tu.mutation, tu.hooks)
@@ -331,50 +274,13 @@ func (tu *TutorUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (tu *TutorUpdate) check() error {
-	if v, ok := tu.mutation.Username(); ok {
-		if err := tutor.UsernameValidator(v); err != nil {
-			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "Tutor.username": %w`, err)}
-		}
-	}
-	if v, ok := tu.mutation.Password(); ok {
-		if err := tutor.PasswordValidator(v); err != nil {
-			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Tutor.password": %w`, err)}
-		}
-	}
-	if v, ok := tu.mutation.Email(); ok {
-		if err := tutor.EmailValidator(v); err != nil {
-			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Tutor.email": %w`, err)}
-		}
-	}
-	if v, ok := tu.mutation.FirstName(); ok {
-		if err := tutor.FirstNameValidator(v); err != nil {
-			return &ValidationError{Name: "first_name", err: fmt.Errorf(`ent: validator failed for field "Tutor.first_name": %w`, err)}
-		}
-	}
-	if v, ok := tu.mutation.LastName(); ok {
-		if err := tutor.LastNameValidator(v); err != nil {
-			return &ValidationError{Name: "last_name", err: fmt.Errorf(`ent: validator failed for field "Tutor.last_name": %w`, err)}
-		}
-	}
-	if v, ok := tu.mutation.Address(); ok {
-		if err := tutor.AddressValidator(v); err != nil {
-			return &ValidationError{Name: "address", err: fmt.Errorf(`ent: validator failed for field "Tutor.address": %w`, err)}
-		}
-	}
-	if v, ok := tu.mutation.Phone(); ok {
-		if err := tutor.PhoneValidator(v); err != nil {
-			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "Tutor.phone": %w`, err)}
-		}
-	}
-	if v, ok := tu.mutation.Gender(); ok {
-		if err := tutor.GenderValidator(v); err != nil {
-			return &ValidationError{Name: "gender", err: fmt.Errorf(`ent: validator failed for field "Tutor.gender": %w`, err)}
-		}
-	}
 	if v, ok := tu.mutation.CitizenID(); ok {
 		if err := tutor.CitizenIDValidator(v); err != nil {
 			return &ValidationError{Name: "citizen_id", err: fmt.Errorf(`ent: validator failed for field "Tutor.citizen_id": %w`, err)}
 		}
+	}
+	if _, ok := tu.mutation.UserID(); tu.mutation.UserCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Tutor.user"`)
 	}
 	return nil
 }
@@ -390,39 +296,6 @@ func (tu *TutorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := tu.mutation.Username(); ok {
-		_spec.SetField(tutor.FieldUsername, field.TypeString, value)
-	}
-	if value, ok := tu.mutation.Password(); ok {
-		_spec.SetField(tutor.FieldPassword, field.TypeString, value)
-	}
-	if value, ok := tu.mutation.Email(); ok {
-		_spec.SetField(tutor.FieldEmail, field.TypeString, value)
-	}
-	if value, ok := tu.mutation.FirstName(); ok {
-		_spec.SetField(tutor.FieldFirstName, field.TypeString, value)
-	}
-	if value, ok := tu.mutation.LastName(); ok {
-		_spec.SetField(tutor.FieldLastName, field.TypeString, value)
-	}
-	if value, ok := tu.mutation.Address(); ok {
-		_spec.SetField(tutor.FieldAddress, field.TypeString, value)
-	}
-	if value, ok := tu.mutation.Phone(); ok {
-		_spec.SetField(tutor.FieldPhone, field.TypeString, value)
-	}
-	if value, ok := tu.mutation.BirthDate(); ok {
-		_spec.SetField(tutor.FieldBirthDate, field.TypeTime, value)
-	}
-	if value, ok := tu.mutation.Gender(); ok {
-		_spec.SetField(tutor.FieldGender, field.TypeString, value)
-	}
-	if value, ok := tu.mutation.ProfilePictureURL(); ok {
-		_spec.SetField(tutor.FieldProfilePictureURL, field.TypeString, value)
-	}
-	if tu.mutation.ProfilePictureURLCleared() {
-		_spec.ClearField(tutor.FieldProfilePictureURL, field.TypeString)
 	}
 	if value, ok := tu.mutation.Description(); ok {
 		_spec.SetField(tutor.FieldDescription, field.TypeString, value)
@@ -655,6 +528,41 @@ func (tu *TutorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if tu.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   tutor.UserTable,
+			Columns: []string{tutor.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: user.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   tutor.UserTable,
+			Columns: []string{tutor.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, tu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{tutor.Label}
@@ -673,80 +581,6 @@ type TutorUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *TutorMutation
-}
-
-// SetUsername sets the "username" field.
-func (tuo *TutorUpdateOne) SetUsername(s string) *TutorUpdateOne {
-	tuo.mutation.SetUsername(s)
-	return tuo
-}
-
-// SetPassword sets the "password" field.
-func (tuo *TutorUpdateOne) SetPassword(s string) *TutorUpdateOne {
-	tuo.mutation.SetPassword(s)
-	return tuo
-}
-
-// SetEmail sets the "email" field.
-func (tuo *TutorUpdateOne) SetEmail(s string) *TutorUpdateOne {
-	tuo.mutation.SetEmail(s)
-	return tuo
-}
-
-// SetFirstName sets the "first_name" field.
-func (tuo *TutorUpdateOne) SetFirstName(s string) *TutorUpdateOne {
-	tuo.mutation.SetFirstName(s)
-	return tuo
-}
-
-// SetLastName sets the "last_name" field.
-func (tuo *TutorUpdateOne) SetLastName(s string) *TutorUpdateOne {
-	tuo.mutation.SetLastName(s)
-	return tuo
-}
-
-// SetAddress sets the "address" field.
-func (tuo *TutorUpdateOne) SetAddress(s string) *TutorUpdateOne {
-	tuo.mutation.SetAddress(s)
-	return tuo
-}
-
-// SetPhone sets the "phone" field.
-func (tuo *TutorUpdateOne) SetPhone(s string) *TutorUpdateOne {
-	tuo.mutation.SetPhone(s)
-	return tuo
-}
-
-// SetBirthDate sets the "birth_date" field.
-func (tuo *TutorUpdateOne) SetBirthDate(t time.Time) *TutorUpdateOne {
-	tuo.mutation.SetBirthDate(t)
-	return tuo
-}
-
-// SetGender sets the "gender" field.
-func (tuo *TutorUpdateOne) SetGender(s string) *TutorUpdateOne {
-	tuo.mutation.SetGender(s)
-	return tuo
-}
-
-// SetProfilePictureURL sets the "profile_picture_URL" field.
-func (tuo *TutorUpdateOne) SetProfilePictureURL(s string) *TutorUpdateOne {
-	tuo.mutation.SetProfilePictureURL(s)
-	return tuo
-}
-
-// SetNillableProfilePictureURL sets the "profile_picture_URL" field if the given value is not nil.
-func (tuo *TutorUpdateOne) SetNillableProfilePictureURL(s *string) *TutorUpdateOne {
-	if s != nil {
-		tuo.SetProfilePictureURL(*s)
-	}
-	return tuo
-}
-
-// ClearProfilePictureURL clears the value of the "profile_picture_URL" field.
-func (tuo *TutorUpdateOne) ClearProfilePictureURL() *TutorUpdateOne {
-	tuo.mutation.ClearProfilePictureURL()
-	return tuo
 }
 
 // SetDescription sets the "description" field.
@@ -855,6 +689,17 @@ func (tuo *TutorUpdateOne) AddSchedule(s ...*Schedule) *TutorUpdateOne {
 	return tuo.AddScheduleIDs(ids...)
 }
 
+// SetUserID sets the "user" edge to the User entity by ID.
+func (tuo *TutorUpdateOne) SetUserID(id uuid.UUID) *TutorUpdateOne {
+	tuo.mutation.SetUserID(id)
+	return tuo
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (tuo *TutorUpdateOne) SetUser(u *User) *TutorUpdateOne {
+	return tuo.SetUserID(u.ID)
+}
+
 // Mutation returns the TutorMutation object of the builder.
 func (tuo *TutorUpdateOne) Mutation() *TutorMutation {
 	return tuo.mutation
@@ -944,6 +789,12 @@ func (tuo *TutorUpdateOne) RemoveSchedule(s ...*Schedule) *TutorUpdateOne {
 	return tuo.RemoveScheduleIDs(ids...)
 }
 
+// ClearUser clears the "user" edge to the User entity.
+func (tuo *TutorUpdateOne) ClearUser() *TutorUpdateOne {
+	tuo.mutation.ClearUser()
+	return tuo
+}
+
 // Where appends a list predicates to the TutorUpdate builder.
 func (tuo *TutorUpdateOne) Where(ps ...predicate.Tutor) *TutorUpdateOne {
 	tuo.mutation.Where(ps...)
@@ -986,50 +837,13 @@ func (tuo *TutorUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (tuo *TutorUpdateOne) check() error {
-	if v, ok := tuo.mutation.Username(); ok {
-		if err := tutor.UsernameValidator(v); err != nil {
-			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "Tutor.username": %w`, err)}
-		}
-	}
-	if v, ok := tuo.mutation.Password(); ok {
-		if err := tutor.PasswordValidator(v); err != nil {
-			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Tutor.password": %w`, err)}
-		}
-	}
-	if v, ok := tuo.mutation.Email(); ok {
-		if err := tutor.EmailValidator(v); err != nil {
-			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Tutor.email": %w`, err)}
-		}
-	}
-	if v, ok := tuo.mutation.FirstName(); ok {
-		if err := tutor.FirstNameValidator(v); err != nil {
-			return &ValidationError{Name: "first_name", err: fmt.Errorf(`ent: validator failed for field "Tutor.first_name": %w`, err)}
-		}
-	}
-	if v, ok := tuo.mutation.LastName(); ok {
-		if err := tutor.LastNameValidator(v); err != nil {
-			return &ValidationError{Name: "last_name", err: fmt.Errorf(`ent: validator failed for field "Tutor.last_name": %w`, err)}
-		}
-	}
-	if v, ok := tuo.mutation.Address(); ok {
-		if err := tutor.AddressValidator(v); err != nil {
-			return &ValidationError{Name: "address", err: fmt.Errorf(`ent: validator failed for field "Tutor.address": %w`, err)}
-		}
-	}
-	if v, ok := tuo.mutation.Phone(); ok {
-		if err := tutor.PhoneValidator(v); err != nil {
-			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "Tutor.phone": %w`, err)}
-		}
-	}
-	if v, ok := tuo.mutation.Gender(); ok {
-		if err := tutor.GenderValidator(v); err != nil {
-			return &ValidationError{Name: "gender", err: fmt.Errorf(`ent: validator failed for field "Tutor.gender": %w`, err)}
-		}
-	}
 	if v, ok := tuo.mutation.CitizenID(); ok {
 		if err := tutor.CitizenIDValidator(v); err != nil {
 			return &ValidationError{Name: "citizen_id", err: fmt.Errorf(`ent: validator failed for field "Tutor.citizen_id": %w`, err)}
 		}
+	}
+	if _, ok := tuo.mutation.UserID(); tuo.mutation.UserCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Tutor.user"`)
 	}
 	return nil
 }
@@ -1062,39 +876,6 @@ func (tuo *TutorUpdateOne) sqlSave(ctx context.Context) (_node *Tutor, err error
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := tuo.mutation.Username(); ok {
-		_spec.SetField(tutor.FieldUsername, field.TypeString, value)
-	}
-	if value, ok := tuo.mutation.Password(); ok {
-		_spec.SetField(tutor.FieldPassword, field.TypeString, value)
-	}
-	if value, ok := tuo.mutation.Email(); ok {
-		_spec.SetField(tutor.FieldEmail, field.TypeString, value)
-	}
-	if value, ok := tuo.mutation.FirstName(); ok {
-		_spec.SetField(tutor.FieldFirstName, field.TypeString, value)
-	}
-	if value, ok := tuo.mutation.LastName(); ok {
-		_spec.SetField(tutor.FieldLastName, field.TypeString, value)
-	}
-	if value, ok := tuo.mutation.Address(); ok {
-		_spec.SetField(tutor.FieldAddress, field.TypeString, value)
-	}
-	if value, ok := tuo.mutation.Phone(); ok {
-		_spec.SetField(tutor.FieldPhone, field.TypeString, value)
-	}
-	if value, ok := tuo.mutation.BirthDate(); ok {
-		_spec.SetField(tutor.FieldBirthDate, field.TypeTime, value)
-	}
-	if value, ok := tuo.mutation.Gender(); ok {
-		_spec.SetField(tutor.FieldGender, field.TypeString, value)
-	}
-	if value, ok := tuo.mutation.ProfilePictureURL(); ok {
-		_spec.SetField(tutor.FieldProfilePictureURL, field.TypeString, value)
-	}
-	if tuo.mutation.ProfilePictureURLCleared() {
-		_spec.ClearField(tutor.FieldProfilePictureURL, field.TypeString)
 	}
 	if value, ok := tuo.mutation.Description(); ok {
 		_spec.SetField(tutor.FieldDescription, field.TypeString, value)
@@ -1319,6 +1100,41 @@ func (tuo *TutorUpdateOne) sqlSave(ctx context.Context) (_node *Tutor, err error
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: schedule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if tuo.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   tutor.UserTable,
+			Columns: []string{tutor.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: user.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   tutor.UserTable,
+			Columns: []string{tutor.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: user.FieldID,
 				},
 			},
 		}

@@ -1,30 +1,23 @@
 import { Outlet, Link } from 'react-router-dom';
 import navbarContent from '../datas/Navbar.role.js';
 import styled from 'styled-components';
-import {useSelector, connect} from 'react-redux'
 import {signOutAction} from '../handlers/signOutHandler';
-import { useDispatch } from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import { Fragment } from 'react';
+import getRole from '../utils/jwtGet';
 
 
-function mapStateToProps(state) {
-    return {
-        role: state.role
-    }
-}
 
-function Navbar(props){
+export default function Navbar(props){
     // choose Navbar contents array from role 
-    const dispatch = useDispatch();
-    const role = props.role;
+    
+    const role = getRole()
     const navigate = useNavigate();
 
     
     function signOutHandler(e) {
         e.preventDefault();
-        
-        dispatch( signOutAction(navigate));
+        signOutAction(navigate);
     }
 
     let navbarRole = null
@@ -69,7 +62,7 @@ function Navbar(props){
 }
 
 
-export default connect(mapStateToProps)(Navbar);
+
 
 
 

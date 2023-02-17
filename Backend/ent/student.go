@@ -5,43 +5,23 @@ package ent
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
 )
 
 // Student is the model entity for the Student schema.
 type Student struct {
-	config `json:"-"`
+	config
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
-	// Username holds the value of the "username" field.
-	Username string `json:"username,omitempty"`
-	// Password holds the value of the "password" field.
-	Password string `json:"-"`
-	// Email holds the value of the "email" field.
-	Email string `json:"email,omitempty"`
-	// FirstName holds the value of the "first_name" field.
-	FirstName string `json:"first_name,omitempty"`
-	// LastName holds the value of the "last_name" field.
-	LastName string `json:"last_name,omitempty"`
-	// Address holds the value of the "address" field.
-	Address string `json:"address,omitempty"`
-	// Phone holds the value of the "phone" field.
-	Phone string `json:"phone,omitempty"`
-	// BirthDate holds the value of the "birth_date" field.
-	BirthDate time.Time `json:"birth_date,omitempty"`
-	// Gender holds the value of the "gender" field.
-	Gender string `json:"gender,omitempty"`
-	// ProfilePictureURL holds the value of the "profile_picture_URL" field.
-	ProfilePictureURL *string `json:"profile_picture_URL,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the StudentQuery when eager-loading is set.
-	Edges StudentEdges `json:"edges"`
+	Edges        StudentEdges `json:"edges"`
+	user_student *uuid.UUID
 }
 
 // StudentEdges holds the relations/edges for other nodes in the graph.
@@ -51,10 +31,12 @@ type StudentEdges struct {
 	// Course holds the value of the course edge.
 	Course *Course `json:"course,omitempty"`
 	// Class holds the value of the class edge.
-	Class *Class `json:"class,omitempty"`
+	Class []*Class `json:"class,omitempty"`
+	// User holds the value of the user edge.
+	User *User `json:"user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // IssueReportOrErr returns the IssueReport value or an error if the edge
@@ -80,16 +62,25 @@ func (e StudentEdges) CourseOrErr() (*Course, error) {
 }
 
 // ClassOrErr returns the Class value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e StudentEdges) ClassOrErr() (*Class, error) {
+// was not loaded in eager-loading.
+func (e StudentEdges) ClassOrErr() ([]*Class, error) {
 	if e.loadedTypes[2] {
-		if e.Class == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: class.Label}
-		}
 		return e.Class, nil
 	}
 	return nil, &NotLoadedError{edge: "class"}
+}
+
+// UserOrErr returns the User value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e StudentEdges) UserOrErr() (*User, error) {
+	if e.loadedTypes[3] {
+		if e.User == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: user.Label}
+		}
+		return e.User, nil
+	}
+	return nil, &NotLoadedError{edge: "user"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -97,12 +88,10 @@ func (*Student) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case student.FieldUsername, student.FieldPassword, student.FieldEmail, student.FieldFirstName, student.FieldLastName, student.FieldAddress, student.FieldPhone, student.FieldGender, student.FieldProfilePictureURL:
-			values[i] = new(sql.NullString)
-		case student.FieldBirthDate:
-			values[i] = new(sql.NullTime)
 		case student.FieldID:
 			values[i] = new(uuid.UUID)
+		case student.ForeignKeys[0]: // user_student
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Student", columns[i])
 		}
@@ -124,66 +113,12 @@ func (s *Student) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				s.ID = *value
 			}
-		case student.FieldUsername:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field username", values[i])
+		case student.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field user_student", values[i])
 			} else if value.Valid {
-				s.Username = value.String
-			}
-		case student.FieldPassword:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field password", values[i])
-			} else if value.Valid {
-				s.Password = value.String
-			}
-		case student.FieldEmail:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field email", values[i])
-			} else if value.Valid {
-				s.Email = value.String
-			}
-		case student.FieldFirstName:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field first_name", values[i])
-			} else if value.Valid {
-				s.FirstName = value.String
-			}
-		case student.FieldLastName:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field last_name", values[i])
-			} else if value.Valid {
-				s.LastName = value.String
-			}
-		case student.FieldAddress:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field address", values[i])
-			} else if value.Valid {
-				s.Address = value.String
-			}
-		case student.FieldPhone:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field phone", values[i])
-			} else if value.Valid {
-				s.Phone = value.String
-			}
-		case student.FieldBirthDate:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field birth_date", values[i])
-			} else if value.Valid {
-				s.BirthDate = value.Time
-			}
-		case student.FieldGender:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field gender", values[i])
-			} else if value.Valid {
-				s.Gender = value.String
-			}
-		case student.FieldProfilePictureURL:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field profile_picture_URL", values[i])
-			} else if value.Valid {
-				s.ProfilePictureURL = new(string)
-				*s.ProfilePictureURL = value.String
+				s.user_student = new(uuid.UUID)
+				*s.user_student = *value.S.(*uuid.UUID)
 			}
 		}
 	}
@@ -203,6 +138,11 @@ func (s *Student) QueryCourse() *CourseQuery {
 // QueryClass queries the "class" edge of the Student entity.
 func (s *Student) QueryClass() *ClassQuery {
 	return NewStudentClient(s.config).QueryClass(s)
+}
+
+// QueryUser queries the "user" edge of the Student entity.
+func (s *Student) QueryUser() *UserQuery {
+	return NewStudentClient(s.config).QueryUser(s)
 }
 
 // Update returns a builder for updating this Student.
@@ -227,37 +167,7 @@ func (s *Student) Unwrap() *Student {
 func (s *Student) String() string {
 	var builder strings.Builder
 	builder.WriteString("Student(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", s.ID))
-	builder.WriteString("username=")
-	builder.WriteString(s.Username)
-	builder.WriteString(", ")
-	builder.WriteString("password=<sensitive>")
-	builder.WriteString(", ")
-	builder.WriteString("email=")
-	builder.WriteString(s.Email)
-	builder.WriteString(", ")
-	builder.WriteString("first_name=")
-	builder.WriteString(s.FirstName)
-	builder.WriteString(", ")
-	builder.WriteString("last_name=")
-	builder.WriteString(s.LastName)
-	builder.WriteString(", ")
-	builder.WriteString("address=")
-	builder.WriteString(s.Address)
-	builder.WriteString(", ")
-	builder.WriteString("phone=")
-	builder.WriteString(s.Phone)
-	builder.WriteString(", ")
-	builder.WriteString("birth_date=")
-	builder.WriteString(s.BirthDate.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("gender=")
-	builder.WriteString(s.Gender)
-	builder.WriteString(", ")
-	if v := s.ProfilePictureURL; v != nil {
-		builder.WriteString("profile_picture_URL=")
-		builder.WriteString(*v)
-	}
+	builder.WriteString(fmt.Sprintf("id=%v", s.ID))
 	builder.WriteByte(')')
 	return builder.String()
 }

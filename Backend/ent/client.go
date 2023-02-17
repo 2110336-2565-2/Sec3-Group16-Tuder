@@ -357,7 +357,7 @@ func (c *ClassClient) QueryStudent(cl *Class) *StudentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(class.Table, class.FieldID, id),
 			sqlgraph.To(student.Table, student.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, class.StudentTable, class.StudentColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, class.StudentTable, class.StudentColumn),
 		)
 		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
 		return fromV, nil
@@ -373,7 +373,7 @@ func (c *ClassClient) QueryCourse(cl *Class) *CourseQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(class.Table, class.FieldID, id),
 			sqlgraph.To(course.Table, course.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, class.CourseTable, class.CourseColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, class.CourseTable, class.CourseColumn),
 		)
 		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
 		return fromV, nil
@@ -523,7 +523,7 @@ func (c *CourseClient) QueryClass(co *Course) *ClassQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(course.Table, course.FieldID, id),
 			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, course.ClassTable, course.ClassColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, course.ClassTable, course.ClassColumn),
 		)
 		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
 		return fromV, nil
@@ -1589,7 +1589,23 @@ func (c *StudentClient) QueryClass(s *Student) *ClassQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(student.Table, student.FieldID, id),
 			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, student.ClassTable, student.ClassColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, student.ClassTable, student.ClassColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUser queries the user edge of a Student.
+func (c *StudentClient) QueryUser(s *Student) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(student.Table, student.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, student.UserTable, student.UserColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil
@@ -1779,6 +1795,22 @@ func (c *TutorClient) QuerySchedule(t *Tutor) *ScheduleQuery {
 	return query
 }
 
+// QueryUser queries the user edge of a Tutor.
+func (c *TutorClient) QueryUser(t *Tutor) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(tutor.Table, tutor.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, tutor.UserTable, tutor.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *TutorClient) Hooks() []Hook {
 	return c.hooks.Tutor
@@ -1938,6 +1970,38 @@ func (c *UserClient) QueryPaymentHistory(u *User) *PaymentHistoryQuery {
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(paymenthistory.Table, paymenthistory.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.PaymentHistoryTable, user.PaymentHistoryColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryStudent queries the student edge of a User.
+func (c *UserClient) QueryStudent(u *User) *StudentQuery {
+	query := (&StudentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(student.Table, student.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, user.StudentTable, user.StudentColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTutor queries the tutor edge of a User.
+func (c *UserClient) QueryTutor(u *User) *TutorQuery {
+	query := (&TutorClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(tutor.Table, tutor.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, user.TutorTable, user.TutorColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil

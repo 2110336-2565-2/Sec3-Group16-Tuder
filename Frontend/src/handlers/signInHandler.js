@@ -1,42 +1,28 @@
 import api from './apiHandler';
-import {setRole} from '../features/role/roleSlice'
 
-export async function signIn(signInData){
-    return  await api.post('/api/v1/login', signInData)
-}
-
-export default async function signInAction(data, navigate){
-    return async (dispatch) => {
-
-        await signIn(data).then((response) => {
+export default async function signInHandler(signInData, navigate){
+    await api.post('/api/v1/login', signInData).then((response) => {
         
-            let res = response.data;
+        let res = response.data;
+        // if login success, MOO will set token
+        if (res.success === true) {
             
-            // if login success, MOO will set token
-            if (res.success === true) {
+            // change state and put jwt token on a local storage
+            let token = res.data.token;
+            localStorage.setItem('jwtToken', token); 
+            
+            console.log(res); 
+            navigate('/')
+            
+        }
 
-                let token = res.data.token;
-                localStorage.setItem('jwtToken', token); 
-                console.log(res);
+    }).catch(function(error){
+        // if internal error occurs, MOO will return error message
+        if (error.response) {
+            let res = error.response.data;
+            // console.log(res.message);
+            throw new Error(res.message);
+        }
+    });
 
-                // redux state
-                let role = res.data.role
-              
-                dispatch(
-                    setRole(role)
-                )
-
-                navigate('/')
-                
-            }
-
-        }).catch(function(error){
-            // if internal error occurs, MOO will return error message
-            if (error.response) {
-                let res = error.response.data;
-                console.log(res.message);
-            }
-        });
-
-    }
 }

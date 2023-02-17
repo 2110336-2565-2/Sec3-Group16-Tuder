@@ -31,8 +31,7 @@ func (Course) Fields() []ent.Field {
 func (Course) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("review_course", ReviewCourse.Type),
-		edge.To("class", Class.Type).
-			Unique(),
+		edge.To("class", Class.Type),
 		edge.From("student", Student.Type).
 			Ref("course").
 			Unique(),

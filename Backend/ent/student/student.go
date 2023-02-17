@@ -11,32 +11,14 @@ const (
 	Label = "student"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldUsername holds the string denoting the username field in the database.
-	FieldUsername = "username"
-	// FieldPassword holds the string denoting the password field in the database.
-	FieldPassword = "password"
-	// FieldEmail holds the string denoting the email field in the database.
-	FieldEmail = "email"
-	// FieldFirstName holds the string denoting the first_name field in the database.
-	FieldFirstName = "first_name"
-	// FieldLastName holds the string denoting the last_name field in the database.
-	FieldLastName = "last_name"
-	// FieldAddress holds the string denoting the address field in the database.
-	FieldAddress = "address"
-	// FieldPhone holds the string denoting the phone field in the database.
-	FieldPhone = "phone"
-	// FieldBirthDate holds the string denoting the birth_date field in the database.
-	FieldBirthDate = "birth_date"
-	// FieldGender holds the string denoting the gender field in the database.
-	FieldGender = "gender"
-	// FieldProfilePictureURL holds the string denoting the profile_picture_url field in the database.
-	FieldProfilePictureURL = "profile_picture_url"
 	// EdgeIssueReport holds the string denoting the issue_report edge name in mutations.
 	EdgeIssueReport = "issue_report"
 	// EdgeCourse holds the string denoting the course edge name in mutations.
 	EdgeCourse = "course"
 	// EdgeClass holds the string denoting the class edge name in mutations.
 	EdgeClass = "class"
+	// EdgeUser holds the string denoting the user edge name in mutations.
+	EdgeUser = "user"
 	// Table holds the table name of the student in the database.
 	Table = "students"
 	// IssueReportTable is the table that holds the issue_report relation/edge.
@@ -60,21 +42,24 @@ const (
 	ClassInverseTable = "classes"
 	// ClassColumn is the table column denoting the class relation/edge.
 	ClassColumn = "student_class"
+	// UserTable is the table that holds the user relation/edge.
+	UserTable = "students"
+	// UserInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	UserInverseTable = "users"
+	// UserColumn is the table column denoting the user relation/edge.
+	UserColumn = "user_student"
 )
 
 // Columns holds all SQL columns for student fields.
 var Columns = []string{
 	FieldID,
-	FieldUsername,
-	FieldPassword,
-	FieldEmail,
-	FieldFirstName,
-	FieldLastName,
-	FieldAddress,
-	FieldPhone,
-	FieldBirthDate,
-	FieldGender,
-	FieldProfilePictureURL,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the "students"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"user_student",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -84,26 +69,15 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
+			return true
+		}
+	}
 	return false
 }
 
 var (
-	// UsernameValidator is a validator for the "username" field. It is called by the builders before save.
-	UsernameValidator func(string) error
-	// PasswordValidator is a validator for the "password" field. It is called by the builders before save.
-	PasswordValidator func(string) error
-	// EmailValidator is a validator for the "email" field. It is called by the builders before save.
-	EmailValidator func(string) error
-	// FirstNameValidator is a validator for the "first_name" field. It is called by the builders before save.
-	FirstNameValidator func(string) error
-	// LastNameValidator is a validator for the "last_name" field. It is called by the builders before save.
-	LastNameValidator func(string) error
-	// AddressValidator is a validator for the "address" field. It is called by the builders before save.
-	AddressValidator func(string) error
-	// PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
-	PhoneValidator func(string) error
-	// GenderValidator is a validator for the "gender" field. It is called by the builders before save.
-	GenderValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
