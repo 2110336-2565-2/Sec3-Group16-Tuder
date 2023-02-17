@@ -9,9 +9,11 @@ import (
 )
 
 func InitRegisterRoute(c *ent.Client, e *echo.Group) {
-	repoRegister := repository.NewRepositoryRegister(c)
-	serviceRegister := services.NewServiceRegister(repoRegister)
-	controllerRegister := controller.NewControllerRegister(serviceRegister)
+	repoStudentRegister := repository.NewRepositoryStudentRegister(c)
+	repoTutorRegister := repository.NewRepositoryTutorRegister(c)
+	serviceStudentRegister := services.NewServiceStudentRegister(repoStudentRegister)
+	serviceTutorRegister := services.NewServiceTutorRegister(repoTutorRegister)
+	controllerRegister := controller.NewControllerRegister(serviceStudentRegister, serviceTutorRegister)
 
 	e.POST("/register", controllerRegister.RegisterUser)
 }

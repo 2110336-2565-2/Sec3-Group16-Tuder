@@ -1,5 +1,6 @@
 package schemas
 
+
 type SchemaResponses struct {
 	Success bool        `json:"success"`
 	Message string      `json:"message"`
@@ -9,12 +10,13 @@ type SchemaResponses struct {
 type SchemaRegisterResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
+	Token   string `json:"token"`
 	Error   error  `json:"error"`
 }
 
 type SchemaLoginResponses struct {
-	Username string `json:"username"`
-	Token    string `json:"token"`
+	Username string `json:"username"`   
+	Token    string `json:"token"` 
 }
 
 type SchemaErrorResponse struct {
