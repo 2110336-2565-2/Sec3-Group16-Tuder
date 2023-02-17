@@ -2,7 +2,7 @@ package repositorys
 
 import (
 	"context"
-
+	"fmt"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	entTutor "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	entUser "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
@@ -49,7 +49,16 @@ func (r *repositoryTutor) GetTutorsRepository() ([]*ent.Tutor, error) {
 
 func (r *repositoryTutor) CreateTutorRepository(sr *schema.SchemaCreateTutor) (*ent.Tutor, error) {
 
-	newUser, err := r.client.User.Create().
+	// create a transaction
+	tx, err := r.client.Tx(r.ctx)
+	if err != nil {
+		return nil, fmt.Errorf("starting a transaction: %w", err)
+	}
+	// wrap the client with the transaction
+	txc := tx.Client()
+
+
+	newUser, err := txc.User.Create().
 		SetUsername(sr.Username).
 		SetPassword(sr.Password).
 		SetFirstName(sr.Firstname).
@@ -60,10 +69,13 @@ func (r *repositoryTutor) CreateTutorRepository(sr *schema.SchemaCreateTutor) (*
 		Save(r.ctx)
 
 	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
 		return nil, err
 	}
 
-	tutor, err := r.client.Tutor.
+	tutor, err := txc.Tutor.
 		Create().
 		SetUserID(newUser.ID).
 		SetDescription(sr.Description).
@@ -72,42 +84,74 @@ func (r *repositoryTutor) CreateTutorRepository(sr *schema.SchemaCreateTutor) (*
 		Save(r.ctx)
 
 	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
 		return nil, err
 	}
-	return tutor, nil
+
+	return tutor, tx.Commit()	
 }
 
 func (r *repositoryTutor) UpdateTutorRepository(sr *schema.SchemaUpdateTutor) (*ent.Tutor, error) {
 
-	newUser, err := r.client.User.Create().
+	// create a transaction
+	tx, err := r.client.Tx(r.ctx)
+	if err != nil {
+		return nil, fmt.Errorf("starting a transaction: %w", err)
+	}
+	// wrap the client with the transaction
+	txc := tx.Client()
+
+
+	newUser, err := txc.User.Create().
 		SetFirstName(sr.Firstname).
 		SetLastName(sr.Lastname).
 		SetPhone(sr.Phone).
 		SetAddress(sr.Address).
 		SetProfilePictureURL(sr.ProfilePictureURL).
 		Save(r.ctx)
+
 	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
 		return nil, err
 	}
 
-	tutor, err := r.client.Tutor.
+	tutor, err := txc.Tutor.
 		UpdateOneID(sr.ID).
 		SetUserID(newUser.ID).
 		SetDescription(sr.Description).
 		SetOmiseBankToken(sr.OmiseBankToken).
 		Save(r.ctx)
+
 	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
 		return nil, err
 	}
-	return tutor, nil
+	return tutor, tx.Commit()
 }
 
 func (r *repositoryTutor) DeleteTutorRepository(sr *schema.SchemaDeleteTutor) error {
-	err := r.client.Tutor.
+	// create a transaction
+	tx, err := r.client.Tx(r.ctx)
+	if err != nil {
+		return fmt.Errorf("starting a transaction: %w", err)
+	}
+	// wrap the client with the transaction
+	txc := tx.Client()
+
+	err = txc.Tutor.
 		DeleteOneID(sr.ID).
 		Exec(r.ctx)
 
 	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
 		return err
 	}
 	return nil

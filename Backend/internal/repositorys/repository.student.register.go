@@ -3,10 +3,9 @@ package repositorys
 import (
 	"context"
 	"errors"
-
-	"entgo.io/ent/dialect/sql"
+	"fmt"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
+	entUser"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 )
@@ -26,15 +25,27 @@ func NewRepositoryStudentRegister(c *ent.Client) *repositoryStudentRegister {
 
 func (r repositoryStudentRegister) RegisterStudentRepository(sr *schema.SchemaRegister) (*ent.Student, error) {
 
-	_, err := r.client.Student.
-		Query().Where(sql.FieldEQ("username", sr.Username)).Only(r.ctx)
+	// create a transaction
+	tx, err := r.client.Tx(r.ctx)
+	if err != nil {
+		return nil, fmt.Errorf("starting a transaction: %w", err)
+	}
+	// wrap the client with the transaction
+	txc := tx.Client()
+
+
+	_, err = txc.User.
+		Query().
+		Where(entUser.UsernameEQ(sr.Username)).
+		Only(r.ctx)
+
 
 	if err == nil {
 		return nil, errors.New("the username has been used")
 	}
 	hashedPassword, _ := utils.HashPassword(sr.Password)
 
-	newUser, err := r.client.User.Create().
+	newUser, err := txc.User.Create().
 		SetUsername(sr.Username).
 		SetPassword(hashedPassword).
 		SetEmail(sr.Email).
@@ -44,21 +55,27 @@ func (r repositoryStudentRegister) RegisterStudentRepository(sr *schema.SchemaRe
 		SetPhone(sr.Phone).
 		SetBirthDate(sr.Birthdate).
 		SetGender(sr.Gender).
-		SetRole(user.RoleStudent).
+		SetRole(entUser.RoleStudent).
 		Save(r.ctx)
 
 	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
 		return nil, err
 	}
 
 	
-	newStudent, err := r.client.Student.
+	newStudent, err := txc.Student.
 		Create().SetUserID( newUser.ID).
 		Save(r.ctx)
 		
 	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
 		return nil, err
 	}
 
-	return newStudent, nil
+	return newStudent, tx.Commit()
 }

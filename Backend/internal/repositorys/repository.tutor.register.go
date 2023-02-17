@@ -3,10 +3,10 @@ package repositorys
 import (
 	"context"
 	"errors"
+	"fmt"
 
-	"entgo.io/ent/dialect/sql"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
+	entUser "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 )
@@ -25,33 +25,50 @@ func NewRepositoryTutorRegister(c *ent.Client) *repositoryTutorRegister {
 }
 
 func (r repositoryTutorRegister) RegisterTutorRepository(sr *schema.SchemaRegister) (*ent.Tutor, error) {
-	_, err := r.client.Tutor.
-		Query().Where(sql.FieldEQ("username", sr.Username)).Only(r.ctx)
 
+	// create a transaction
+	tx, err := r.client.Tx(r.ctx)
+	if err != nil {
+		return nil, fmt.Errorf("starting a transaction: %w", err)
+	}
+	// wrap the client with the transaction
+	txc := tx.Client()
+
+	_, err = txc.User.
+	Query().
+	Where(entUser.UsernameEQ(sr.Username)).
+	Only(r.ctx)
+	
 	if err == nil {
 		return nil, errors.New("the username has been used")
 	}
-	hashedPassword, _ := utils.HashPassword(sr.Password)
-
-	newUser, err := r.client.User.Create().
-			SetUsername(sr.Username).
-			SetPassword(hashedPassword).
-			SetEmail(sr.Email).
-			SetFirstName(sr.Firstname).
-			SetLastName(sr.Lastname).
-			SetAddress(sr.Address).
-			SetPhone(sr.Phone).
-			SetBirthDate(sr.Birthdate).
-			SetGender(sr.Gender).
-			SetRole(user.RoleTutor).
-			Save(r.ctx)
 	
+	hashedPassword, _ := utils.HashPassword(sr.Password)
+	
+
+
+
+	newUser, err := txc.User.Create().
+		SetUsername(sr.Username).
+		SetPassword(hashedPassword).
+		SetEmail(sr.Email).
+		SetFirstName(sr.Firstname).
+		SetLastName(sr.Lastname).
+		SetAddress(sr.Address).
+		SetPhone(sr.Phone).
+		SetBirthDate(sr.Birthdate).
+		SetGender(sr.Gender).
+		SetRole(entUser.RoleTutor).
+		Save(r.ctx)
+
 	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
 		return nil, err
 	}
-		
-			
-	newTutor, err := r.client.Tutor.
+
+	newTutor, err := txc.Tutor.
 		Create().
 		SetUser(newUser).
 		SetDescription(sr.Description).
@@ -60,9 +77,11 @@ func (r repositoryTutorRegister) RegisterTutorRepository(sr *schema.SchemaRegist
 		Save(r.ctx)
 
 	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
 		return nil, err
 	}
-	
 
-	return newTutor, nil
+	return newTutor, tx.Commit()	
 }
