@@ -16,7 +16,7 @@ import ErrorPage from './pages/ErrorPage';
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <App/>,
     errorElement: <ErrorPage />,
     children: [
       {index: true, element: <Home /> },
@@ -30,7 +30,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/SignIn",
-        element: <SignIn />,
+        element: <SignIn/>,
       },
       {
         path: "/SignUp",
@@ -46,7 +46,7 @@ const router = createBrowserRouter([
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <RouterProvider router={router} role='student'/>
   </React.StrictMode>
 );
 

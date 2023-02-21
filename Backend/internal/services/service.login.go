@@ -37,5 +37,6 @@ func (s *serviceLogin) LoginService(l *schemas.SchemaLogin) (*schemas.SchemaLogi
 	return &schemas.SchemaLoginResponses{
 		Username: luser.Username,
 		Token:    token,
+		Role:     luser.Role.String(),
 		}, nil
 }

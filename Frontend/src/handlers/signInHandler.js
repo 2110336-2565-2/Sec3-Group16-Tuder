@@ -7,6 +7,8 @@ export default async function signInHandler(signInData, navigate){
         // if login success, MOO will set token
         if (res.success === true) {
             
+            
+            
             // change state and put jwt token on a local storage
             let token = res.data.token;
             localStorage.setItem('jwtToken', token); 

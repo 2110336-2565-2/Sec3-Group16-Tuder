@@ -12,17 +12,19 @@ import SignIn from './pages/SignIn.js';
 import SignUp from './pages/SignUp.js';
 import Courses from './pages/Courses';
 import Report from './pages/Report';
-
+import useRole from './hooks/useRole';
 import { useState } from 'react';
+import { Outlet } from 'react-router-dom';
 
 
 function App() {
-  const [role, SetRole] = useState('guest');
-
+  
   return (
     <Fragment>
-      <Navbar role={role} />
+      <Navbar />
+      
     </Fragment>
+    
   );
 }
 export default App;

@@ -1,14 +1,15 @@
 import FormT from './FormStyle.js';
 import { useState } from 'react';
 import signInHandler from '../handlers/signInHandler.js';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
+import useRole from '../hooks/useRole.js';
 
 
-
-export default function FormSignIn(){
+export default function FormSignIn(props){
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [status, setStatus] = useState('waiting');
+    const [role, handleRole] = useOutletContext();
     
     const navigate = useNavigate();
 
@@ -22,6 +23,8 @@ export default function FormSignIn(){
         setStatus('submitting')
         try{
             await signInHandler(signInData, navigate);
+            // update role in state
+            handleRole.handleRole();
             setStatus('success')
         } catch (error){
 
@@ -34,7 +37,7 @@ export default function FormSignIn(){
     }
 
     return(
-        <form onSubmit={submitHandler}>
+        <form onSubmit={submitHandler} >
             <FormT.Div FormW='350px'>
                 <FormT.Header>Sign In</FormT.Header>
                 <FormT.Content>Sign In and start managing your candidates!</FormT.Content>

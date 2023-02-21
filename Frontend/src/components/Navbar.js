@@ -4,20 +4,23 @@ import styled from 'styled-components';
 import {signOutAction} from '../handlers/signOutHandler';
 import {useNavigate} from 'react-router-dom';
 import { Fragment } from 'react';
-import getRole from '../utils/jwtGet';
+import { useEffect } from 'react';
+import useRole from '../hooks/useRole';
 
 
 
 export default function Navbar(props){
     // choose Navbar contents array from role 
     
-    const role = getRole()
+    const [role, handleRole] = useRole();
     const navigate = useNavigate();
 
+    
     
     function signOutHandler(e) {
         e.preventDefault();
         signOutAction(navigate);
+        handleRole();
     }
 
     let navbarRole = null
@@ -56,7 +59,7 @@ export default function Navbar(props){
                     {contentElement}
                 </NavbarItems>
             </NavbarSection>   
-            <Outlet />    
+            <Outlet context={[{role},{handleRole}]} />   
         </Fragment>
     )
 }
