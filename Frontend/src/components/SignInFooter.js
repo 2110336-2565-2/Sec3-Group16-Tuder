@@ -1,17 +1,15 @@
-import React, { Fragment } from "react";
+import React from "react";
 import styled from "styled-components";
 
 export default function Footer(){
 
 
     return (
-        <Fragment>
             <FooterSection>
                 <FooterContent>
                 <ImageFooter width='600px' src="/images/SignInFooter.png" alt="seprate70" />
                 </FooterContent>
             </FooterSection>
-        </Fragment>
     )
 }
 
