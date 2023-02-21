@@ -2,7 +2,6 @@ import FormT from './FormStyle.js';
 import { useState } from 'react';
 import signInHandler from '../handlers/signInHandler.js';
 import { useNavigate, useOutletContext } from 'react-router-dom';
-import useRole from '../hooks/useRole.js';
 
 
 export default function FormSignIn(props){
@@ -23,13 +22,13 @@ export default function FormSignIn(props){
         setStatus('submitting')
         try{
             await signInHandler(signInData, navigate);
+
             // update role in state
             handleRole.handleRole();
             setStatus('success')
         } catch (error){
 
             // Handle by do sth
-
 
             console.log(error);
             setStatus('error');

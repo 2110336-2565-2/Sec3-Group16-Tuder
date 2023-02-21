@@ -4,12 +4,11 @@ import styled from 'styled-components';
 import {signOutAction} from '../handlers/signOutHandler';
 import {useNavigate} from 'react-router-dom';
 import { Fragment } from 'react';
-import { useEffect } from 'react';
 import useRole from '../hooks/useRole';
 
 
 
-export default function Navbar(props){
+export default function Navbar(){
     // choose Navbar contents array from role 
     
     const [role, handleRole] = useRole();
@@ -38,16 +37,16 @@ export default function Navbar(props){
     // change to component for use in JSX  --> Generate NavItem for each content
     const contentElement = contents.map((content, index) => {
         if(content === 'Home'){
-            return <NavbarItem><TuderLinkNav to='/' key={index}>{content}</TuderLinkNav></NavbarItem>
+            return <NavbarItem key="home"><TuderLinkNav to='/' key={index}>{content}</TuderLinkNav></NavbarItem>
         }else if(content === 'Sign Up'){
-            return <NavbarItem><TuderButton type='tudor-button' to="/SignUp" key={index}>{content}</TuderButton></NavbarItem>
+            return <NavbarItem key="signUp"><TuderButton type='tudor-button' to="/SignUp" key={index}>{content}</TuderButton></NavbarItem>
         }else if(content === 'Sign In'){
-            return <NavbarItem><TuderLinkNav to='/SignIn' key={index}>{content}</TuderLinkNav></NavbarItem>
+            return <NavbarItem key="signIn"><TuderLinkNav to='/SignIn' key={index}>{content}</TuderLinkNav></NavbarItem>
         }else if(content === 'Sign Out'){
-            return <NavbarItem><TuderButton type='red-button' onClick={signOutHandler} key={index}>{content}</TuderButton></NavbarItem>
+            return <NavbarItem key="signOut"><TuderButton type='red-button' onClick={signOutHandler} key={index}>{content}</TuderButton></NavbarItem>
         }else{
             let urlLink = "/" + content
-            return <NavbarItem><TuderLinkNav to= {urlLink} key={index}>{content}</TuderLinkNav></NavbarItem>
+            return <NavbarItem key={content}><TuderLinkNav to= {urlLink} key={index}>{content}</TuderLinkNav></NavbarItem>
         }
     });
 

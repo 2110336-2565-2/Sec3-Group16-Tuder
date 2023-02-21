@@ -6,15 +6,16 @@ import { Fragment } from 'react';
 
 // import components
 import Navbar from './components/Navbar.js';
+import Footer from './components/SignUpFooter';
 import Home from './pages/Home.js'
 // import Card from './pages/components/Card';
 import SignIn from './pages/SignIn.js';
 import SignUp from './pages/SignUp.js';
 import Courses from './pages/Courses';
 import Report from './pages/Report';
-import useRole from './hooks/useRole';
-import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+
+import styled from 'styled-components';
+
 
 
 function App() {
@@ -22,9 +23,10 @@ function App() {
   return (
     <Fragment>
       <Navbar />
-      
     </Fragment>
     
   );
 }
+
+
 export default App;
