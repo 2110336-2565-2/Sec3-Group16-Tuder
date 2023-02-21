@@ -36,17 +36,17 @@ export default function Navbar(){
     const contents = navbarRole.content;
     // change to component for use in JSX  --> Generate NavItem for each content
     const contentElement = contents.map((content, index) => {
-        if(content === 'Home'){
-            return <NavbarItem key="home"><TuderLinkNav to='/' key={index}>{content}</TuderLinkNav></NavbarItem>
-        }else if(content === 'Sign Up'){
-            return <NavbarItem key="signUp"><TuderButton type='tudor-button' to="/SignUp" key={index}>{content}</TuderButton></NavbarItem>
-        }else if(content === 'Sign In'){
-            return <NavbarItem key="signIn"><TuderLinkNav to='/SignIn' key={index}>{content}</TuderLinkNav></NavbarItem>
-        }else if(content === 'Sign Out'){
-            return <NavbarItem key="signOut"><TuderButton type='red-button' onClick={signOutHandler} key={index}>{content}</TuderButton></NavbarItem>
+        if(content.title === 'Home'){
+            return <NavbarItem key="home"><TuderLinkNav to={content.link} key={index}>{content.title}</TuderLinkNav></NavbarItem>
+        }else if(content.title === 'Sign Up'){
+            return <NavbarItem key="signUp"><TuderButton type='tudor-button' to={content.link} key={index}>{content.title}</TuderButton></NavbarItem>
+        }else if(content.title === 'Sign In'){
+            return <NavbarItem key="signIn"><TuderLinkNav to={content.link} key={index}>{content.title}</TuderLinkNav></NavbarItem>
+        }else if(content.title === 'Sign Out'){
+            return <NavbarItem key="signOut"><TuderButton type='red-button' onClick={signOutHandler} key={index}>{content.title}</TuderButton></NavbarItem>
         }else{
-            let urlLink = "/" + content
-            return <NavbarItem key={content}><TuderLinkNav to= {urlLink} key={index}>{content}</TuderLinkNav></NavbarItem>
+            let urlLink = "/" + content.title
+            return <NavbarItem key={content.title}><TuderLinkNav to= {urlLink} key={index}>{content.title}</TuderLinkNav></NavbarItem>
         }
     });
 
