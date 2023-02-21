@@ -1,5 +1,5 @@
 import FormT from './FormStyle.js';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import signUpHandler from '../handlers/signUpHandler.js';
 import signupContent from "../datas/SignUp.role.js";
 import styled from 'styled-components';
