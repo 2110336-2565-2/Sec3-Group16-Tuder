@@ -19,6 +19,7 @@ export default function Footer(){
 // styled-components for Navbar components
 const FooterSection = styled.nav`
     margin-top: -50%;
+    pointer-events: none;
 `;
 
 const FooterContent = styled.div`
