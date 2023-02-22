@@ -88,8 +88,8 @@ const FormT = {
     Component: styled.div`
         display: flex;
         flex-direction: column;
-        padding-right: 2.5px;
-        padding-left: 2.5px;
+        padding-right: 7.5px;
+        padding-left: 7.5px;
     `,
     Label: styled.div`
         margin-bottom: 0.5em;

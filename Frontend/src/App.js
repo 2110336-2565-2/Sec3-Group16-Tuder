@@ -13,6 +13,7 @@ import SignIn from './pages/SignIn.js';
 import SignUp from './pages/SignUp.js';
 import Courses from './pages/Courses';
 import Report from './pages/Report';
+import Profile from './pages/Profile.js';
 
 import styled from 'styled-components';
 
