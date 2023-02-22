@@ -4,7 +4,7 @@ export default function Course(props){
     return (
         <>
             <CardHeader>
-                <CardContent>
+                <CardContent >
                     {props.coursename}
                 </CardContent>
                 <CardContent>    
