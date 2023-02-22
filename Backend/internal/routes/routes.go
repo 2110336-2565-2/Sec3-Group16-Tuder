@@ -10,4 +10,5 @@ func InitRoutes(c *ent.Client, e *echo.Echo) {
 	InitLoginRoutes(c, v1)
 	InitRegisterRoute(c, v1)
 	InitTutorRoutes(c, v1)
+	InitSearchRoutes(c, v1)
 }
