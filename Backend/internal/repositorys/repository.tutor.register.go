@@ -12,7 +12,7 @@ import (
 )
 
 type RepositoryTutorRegister interface {
-	RegisterTutorRepository(sr *schema.SchemaRegister) (*ent.Tutor, error)
+	RegisterTutor(sr *schema.SchemaRegister) (*ent.Tutor, error)
 }
 
 type repositoryTutorRegister struct {
@@ -24,7 +24,7 @@ func NewRepositoryTutorRegister(c *ent.Client) *repositoryTutorRegister {
 	return &repositoryTutorRegister{client: c, ctx: context.Background()}
 }
 
-func (r repositoryTutorRegister) RegisterTutorRepository(sr *schema.SchemaRegister) (*ent.Tutor, error) {
+func (r repositoryTutorRegister) RegisterTutor(sr *schema.SchemaRegister) (*ent.Tutor, error) {
 
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)

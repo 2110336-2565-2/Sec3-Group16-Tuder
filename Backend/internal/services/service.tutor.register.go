@@ -31,7 +31,7 @@ func (s serviceTutorRegister) RegisterTutorService(r *schemas.SchemaRegister) (*
 		return nil, err
 	}
 
-	_, err := s.repository.RegisterTutorRepository(r)
+	_, err := s.repository.RegisterTutor(r)
 	if err != nil {
 		return nil, err
 	}

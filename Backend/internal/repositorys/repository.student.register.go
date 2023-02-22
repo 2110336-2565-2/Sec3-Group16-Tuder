@@ -11,7 +11,7 @@ import (
 )
 
 type RepositoryStudentRegister interface {
-	RegisterStudentRepository(sr *schema.SchemaRegister) (*ent.Student, error)
+	RegisterStudent(sr *schema.SchemaRegister) (*ent.Student, error)
 }
 
 type repositoryStudentRegister struct {
@@ -23,7 +23,7 @@ func NewRepositoryStudentRegister(c *ent.Client) *repositoryStudentRegister {
 	return &repositoryStudentRegister{client: c, ctx: context.Background()}
 }
 
-func (r repositoryStudentRegister) RegisterStudentRepository(sr *schema.SchemaRegister) (*ent.Student, error) {
+func (r repositoryStudentRegister) RegisterStudent(sr *schema.SchemaRegister) (*ent.Student, error) {
 
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)

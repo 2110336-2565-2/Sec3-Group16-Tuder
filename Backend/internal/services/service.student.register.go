@@ -31,7 +31,7 @@ func (s serviceStudentRegister) RegisterStudentService(r *schemas.SchemaRegister
 		return nil, err
 	}
 
-	_, err := s.repository.RegisterStudentRepository(r)
+	_, err := s.repository.RegisterStudent(r)
 	if err != nil {
 		return nil, err
 	}
