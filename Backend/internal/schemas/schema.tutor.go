@@ -43,16 +43,18 @@ type SchemaCreateTutor struct {
 }
 
 type SchemaUpdateTutor struct {
-	ID                uuid.UUID `json:"id"`
-	Firstname         string    `json:"firstname"`
-	Lastname          string    `json:"lastname"`
-	Phone             string    `json:"phone"`
-	Address           string    `json:"address"`
-	ProfilePictureURL string    `json:"profile_picture_URL"`
-	Birthdate         time.Time `json:"birthdate"`
-	Gender            string    `json:"gender"`
-	Description       string    `json:"description"`
-	OmiseBankToken    string    `json:"omise_bank_token"`
+	ID        uuid.UUID `json:"id"`
+	Firstname string    `json:"firstname"`
+	Lastname  string    `json:"lastname"`
+	Phone     string    `json:"phone"`
+	Address   string    `json:"address"`
+	//ProfilePictureURL string    `json:"profile_picture_URL"`
+	Birthdate      time.Time `json:"birthdate"`
+	Gender         string    `json:"gender"`
+	Description    string    `json:"description"`
+	OmiseBankToken string    `json:"omise_bank_token"`
+	Email          string    `json:"email"`
+	// missing email,
 }
 
 type SchemaDeleteTutor struct {
