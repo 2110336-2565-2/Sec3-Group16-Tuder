@@ -33,7 +33,7 @@ export const dummyTutor = {
     'gender': 'female',
     'birthdate': '10/10/2010',
     'citizenID': '1234567890123',
-    'description': 'I am a good tutor',
+    'description':"Experienced tutor with a passion for education and helping students succeed. With a Master's degree in Education and 5 years of teaching experience, I have a proven track record of improving student performance and confidence in subjects such as Math, English, and Science. I customize my lessons to meet each student's individual needs and learning style, creating a supportive and engaging environment for maximum success. Outside of the classroom, I enjoy reading, hiking, and trying new recipes. Let's work together to reach your educational goals!",
     'bankName': 'Kasikorn',  
     'accountNumber': '1234567890',
     'accountName': 'Mehrab Jaidee',

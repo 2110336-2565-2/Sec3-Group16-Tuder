@@ -12,14 +12,16 @@ export const InfoWrapper = styled.div`
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    width: ${(props) => (props.isSpan ? "100%" : "")};
+    gap: 10px;
 `;
 
 export const InfoTitle = styled.h2`
-    font-size: 20px;
+    font-size: 16px;
     font-weight: bold;
 `;
 
 export const InfoContent = styled.span`
-    font-size: 20px;
+    font-size: 16px;
     font-weight: regular;
 `;

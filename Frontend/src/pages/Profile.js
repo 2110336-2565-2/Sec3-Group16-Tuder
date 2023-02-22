@@ -4,6 +4,9 @@ import StudentInfo from "../components/profile/StudentInfo.js";
 import TutorInfo from "../components/profile/TutorInfo.js";
 import { dummyStudent, dummyTutor } from "../datas/Profile.role.js";
 
+// icons
+import { EditOutlined } from "@ant-design/icons";
+
 export default function Profile() {
     function capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
@@ -21,7 +24,10 @@ export default function Profile() {
             <Email>{user.email}</Email>
         </TopSection>
         <MiddleSection>
-            <Title>Information</Title>
+            <TitleWrapper>
+                <Title>Information</Title>
+                <EditIcon />
+            </TitleWrapper>
             {user.role === "student" ? (
             <StudentInfo user={user} />
             ) : (
@@ -88,9 +94,20 @@ const MiddleSection = styled.div`
     margin-top: 20px;
 `;
 
+const TitleWrapper = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 10px;
+`;
+
 const Title = styled.h1`
     font-size: 36px;
     font-weight: bold;
+`;
+
+const EditIcon = styled(EditOutlined)`
+    font-size: 30px;
+    cursor: pointer;
 `;
 
 const InfoContainter = styled.div``;
