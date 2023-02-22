@@ -335,7 +335,7 @@ func (sq *ScheduleQuery) WithClass(opts ...func(*ClassQuery)) *ScheduleQuery {
 // Example:
 //
 //	var v []struct {
-//		Day0 bool `json:"day_0,omitempty"`
+//		Day0 [24]bool `json:"day_0,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -358,7 +358,7 @@ func (sq *ScheduleQuery) GroupBy(field string, fields ...string) *ScheduleGroupB
 // Example:
 //
 //	var v []struct {
-//		Day0 bool `json:"day_0,omitempty"`
+//		Day0 [24]bool `json:"day_0,omitempty"`
 //	}
 //
 //	client.Schedule.Query().

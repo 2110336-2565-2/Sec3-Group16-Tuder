@@ -82,20 +82,6 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultDay0 holds the default value on creation for the "day_0" field.
-	DefaultDay0 bool
-	// DefaultDay1 holds the default value on creation for the "day_1" field.
-	DefaultDay1 bool
-	// DefaultDay2 holds the default value on creation for the "day_2" field.
-	DefaultDay2 bool
-	// DefaultDay3 holds the default value on creation for the "day_3" field.
-	DefaultDay3 bool
-	// DefaultDay4 holds the default value on creation for the "day_4" field.
-	DefaultDay4 bool
-	// DefaultDay5 holds the default value on creation for the "day_5" field.
-	DefaultDay5 bool
-	// DefaultDay6 holds the default value on creation for the "day_6" field.
-	DefaultDay6 bool
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )

@@ -41,11 +41,13 @@ var (
 	CoursesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "title", Type: field.TypeString},
+		{Name: "subject", Type: field.TypeString},
+		{Name: "topic", Type: field.TypeString},
 		{Name: "estimated_time", Type: field.TypeTime},
 		{Name: "description", Type: field.TypeString},
 		{Name: "course_status", Type: field.TypeString},
 		{Name: "price_per_hour", Type: field.TypeInt},
-		{Name: "level_id", Type: field.TypeString},
+		{Name: "level", Type: field.TypeEnum, Nullable: true, Enums: []string{"Grade1", "Grade2", "Grade3", "Grade4", "Grade5", "Grade6", "Grade7", "Grade8", "Grade9", "Grade10", "Grade11", "Grade12"}},
 		{Name: "course_picture_url", Type: field.TypeString, Nullable: true},
 		{Name: "student_course", Type: field.TypeUUID, Unique: true, Nullable: true},
 		{Name: "tutor_course", Type: field.TypeUUID},
@@ -58,13 +60,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "courses_students_course",
-				Columns:    []*schema.Column{CoursesColumns[8]},
+				Columns:    []*schema.Column{CoursesColumns[10]},
 				RefColumns: []*schema.Column{StudentsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "courses_tutors_course",
-				Columns:    []*schema.Column{CoursesColumns[9]},
+				Columns:    []*schema.Column{CoursesColumns[11]},
 				RefColumns: []*schema.Column{TutorsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -200,13 +202,13 @@ var (
 	// SchedulesColumns holds the columns for the "schedules" table.
 	SchedulesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
-		{Name: "day_0", Type: field.TypeBool, Nullable: true, Default: false},
-		{Name: "day_1", Type: field.TypeBool, Nullable: true, Default: false},
-		{Name: "day_2", Type: field.TypeBool, Nullable: true, Default: false},
-		{Name: "day_3", Type: field.TypeBool, Nullable: true, Default: false},
-		{Name: "day_4", Type: field.TypeBool, Nullable: true, Default: false},
-		{Name: "day_5", Type: field.TypeBool, Nullable: true, Default: false},
-		{Name: "day_6", Type: field.TypeBool, Nullable: true, Default: false},
+		{Name: "day_0", Type: field.TypeJSON},
+		{Name: "day_1", Type: field.TypeJSON},
+		{Name: "day_2", Type: field.TypeJSON},
+		{Name: "day_3", Type: field.TypeJSON},
+		{Name: "day_4", Type: field.TypeJSON},
+		{Name: "day_5", Type: field.TypeJSON},
+		{Name: "day_6", Type: field.TypeJSON},
 		{Name: "class_schedule", Type: field.TypeUUID, Unique: true},
 		{Name: "tutor_schedule", Type: field.TypeUUID},
 	}

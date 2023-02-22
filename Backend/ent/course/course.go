@@ -3,6 +3,8 @@
 package course
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 )
 
@@ -13,6 +15,10 @@ const (
 	FieldID = "id"
 	// FieldTitle holds the string denoting the title field in the database.
 	FieldTitle = "title"
+	// FieldSubject holds the string denoting the subject field in the database.
+	FieldSubject = "subject"
+	// FieldTopic holds the string denoting the topic field in the database.
+	FieldTopic = "topic"
 	// FieldEstimatedTime holds the string denoting the estimated_time field in the database.
 	FieldEstimatedTime = "estimated_time"
 	// FieldDescription holds the string denoting the description field in the database.
@@ -21,8 +27,8 @@ const (
 	FieldCourseStatus = "course_status"
 	// FieldPricePerHour holds the string denoting the price_per_hour field in the database.
 	FieldPricePerHour = "price_per_hour"
-	// FieldLevelID holds the string denoting the level_id field in the database.
-	FieldLevelID = "level_id"
+	// FieldLevel holds the string denoting the level field in the database.
+	FieldLevel = "level"
 	// FieldCoursePictureURL holds the string denoting the course_picture_url field in the database.
 	FieldCoursePictureURL = "course_picture_url"
 	// EdgeReviewCourse holds the string denoting the review_course edge name in mutations.
@@ -69,11 +75,13 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldTitle,
+	FieldSubject,
+	FieldTopic,
 	FieldEstimatedTime,
 	FieldDescription,
 	FieldCourseStatus,
 	FieldPricePerHour,
-	FieldLevelID,
+	FieldLevel,
 	FieldCoursePictureURL,
 }
 
@@ -102,14 +110,49 @@ func ValidColumn(column string) bool {
 var (
 	// TitleValidator is a validator for the "title" field. It is called by the builders before save.
 	TitleValidator func(string) error
+	// SubjectValidator is a validator for the "subject" field. It is called by the builders before save.
+	SubjectValidator func(string) error
+	// TopicValidator is a validator for the "topic" field. It is called by the builders before save.
+	TopicValidator func(string) error
 	// DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	DescriptionValidator func(string) error
 	// CourseStatusValidator is a validator for the "course_status" field. It is called by the builders before save.
 	CourseStatusValidator func(string) error
 	// PricePerHourValidator is a validator for the "price_per_hour" field. It is called by the builders before save.
 	PricePerHourValidator func(int) error
-	// LevelIDValidator is a validator for the "level_id" field. It is called by the builders before save.
-	LevelIDValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
+
+// Level defines the type for the "level" enum field.
+type Level string
+
+// Level values.
+const (
+	LevelGrade1  Level = "Grade1"
+	LevelGrade2  Level = "Grade2"
+	LevelGrade3  Level = "Grade3"
+	LevelGrade4  Level = "Grade4"
+	LevelGrade5  Level = "Grade5"
+	LevelGrade6  Level = "Grade6"
+	LevelGrade7  Level = "Grade7"
+	LevelGrade8  Level = "Grade8"
+	LevelGrade9  Level = "Grade9"
+	LevelGrade10 Level = "Grade10"
+	LevelGrade11 Level = "Grade11"
+	LevelGrade12 Level = "Grade12"
+)
+
+func (l Level) String() string {
+	return string(l)
+}
+
+// LevelValidator is a validator for the "level" field enum values. It is called by the builders before save.
+func LevelValidator(l Level) error {
+	switch l {
+	case LevelGrade1, LevelGrade2, LevelGrade3, LevelGrade4, LevelGrade5, LevelGrade6, LevelGrade7, LevelGrade8, LevelGrade9, LevelGrade10, LevelGrade11, LevelGrade12:
+		return nil
+	default:
+		return fmt.Errorf("course: invalid enum value for level field: %q", l)
+	}
+}

@@ -61,6 +61,16 @@ func Title(v string) predicate.Course {
 	return predicate.Course(sql.FieldEQ(FieldTitle, v))
 }
 
+// Subject applies equality check predicate on the "subject" field. It's identical to SubjectEQ.
+func Subject(v string) predicate.Course {
+	return predicate.Course(sql.FieldEQ(FieldSubject, v))
+}
+
+// Topic applies equality check predicate on the "topic" field. It's identical to TopicEQ.
+func Topic(v string) predicate.Course {
+	return predicate.Course(sql.FieldEQ(FieldTopic, v))
+}
+
 // EstimatedTime applies equality check predicate on the "estimated_time" field. It's identical to EstimatedTimeEQ.
 func EstimatedTime(v time.Time) predicate.Course {
 	return predicate.Course(sql.FieldEQ(FieldEstimatedTime, v))
@@ -79,11 +89,6 @@ func CourseStatus(v string) predicate.Course {
 // PricePerHour applies equality check predicate on the "price_per_hour" field. It's identical to PricePerHourEQ.
 func PricePerHour(v int) predicate.Course {
 	return predicate.Course(sql.FieldEQ(FieldPricePerHour, v))
-}
-
-// LevelID applies equality check predicate on the "level_id" field. It's identical to LevelIDEQ.
-func LevelID(v string) predicate.Course {
-	return predicate.Course(sql.FieldEQ(FieldLevelID, v))
 }
 
 // CoursePictureURL applies equality check predicate on the "course_picture_url" field. It's identical to CoursePictureURLEQ.
@@ -154,6 +159,136 @@ func TitleEqualFold(v string) predicate.Course {
 // TitleContainsFold applies the ContainsFold predicate on the "title" field.
 func TitleContainsFold(v string) predicate.Course {
 	return predicate.Course(sql.FieldContainsFold(FieldTitle, v))
+}
+
+// SubjectEQ applies the EQ predicate on the "subject" field.
+func SubjectEQ(v string) predicate.Course {
+	return predicate.Course(sql.FieldEQ(FieldSubject, v))
+}
+
+// SubjectNEQ applies the NEQ predicate on the "subject" field.
+func SubjectNEQ(v string) predicate.Course {
+	return predicate.Course(sql.FieldNEQ(FieldSubject, v))
+}
+
+// SubjectIn applies the In predicate on the "subject" field.
+func SubjectIn(vs ...string) predicate.Course {
+	return predicate.Course(sql.FieldIn(FieldSubject, vs...))
+}
+
+// SubjectNotIn applies the NotIn predicate on the "subject" field.
+func SubjectNotIn(vs ...string) predicate.Course {
+	return predicate.Course(sql.FieldNotIn(FieldSubject, vs...))
+}
+
+// SubjectGT applies the GT predicate on the "subject" field.
+func SubjectGT(v string) predicate.Course {
+	return predicate.Course(sql.FieldGT(FieldSubject, v))
+}
+
+// SubjectGTE applies the GTE predicate on the "subject" field.
+func SubjectGTE(v string) predicate.Course {
+	return predicate.Course(sql.FieldGTE(FieldSubject, v))
+}
+
+// SubjectLT applies the LT predicate on the "subject" field.
+func SubjectLT(v string) predicate.Course {
+	return predicate.Course(sql.FieldLT(FieldSubject, v))
+}
+
+// SubjectLTE applies the LTE predicate on the "subject" field.
+func SubjectLTE(v string) predicate.Course {
+	return predicate.Course(sql.FieldLTE(FieldSubject, v))
+}
+
+// SubjectContains applies the Contains predicate on the "subject" field.
+func SubjectContains(v string) predicate.Course {
+	return predicate.Course(sql.FieldContains(FieldSubject, v))
+}
+
+// SubjectHasPrefix applies the HasPrefix predicate on the "subject" field.
+func SubjectHasPrefix(v string) predicate.Course {
+	return predicate.Course(sql.FieldHasPrefix(FieldSubject, v))
+}
+
+// SubjectHasSuffix applies the HasSuffix predicate on the "subject" field.
+func SubjectHasSuffix(v string) predicate.Course {
+	return predicate.Course(sql.FieldHasSuffix(FieldSubject, v))
+}
+
+// SubjectEqualFold applies the EqualFold predicate on the "subject" field.
+func SubjectEqualFold(v string) predicate.Course {
+	return predicate.Course(sql.FieldEqualFold(FieldSubject, v))
+}
+
+// SubjectContainsFold applies the ContainsFold predicate on the "subject" field.
+func SubjectContainsFold(v string) predicate.Course {
+	return predicate.Course(sql.FieldContainsFold(FieldSubject, v))
+}
+
+// TopicEQ applies the EQ predicate on the "topic" field.
+func TopicEQ(v string) predicate.Course {
+	return predicate.Course(sql.FieldEQ(FieldTopic, v))
+}
+
+// TopicNEQ applies the NEQ predicate on the "topic" field.
+func TopicNEQ(v string) predicate.Course {
+	return predicate.Course(sql.FieldNEQ(FieldTopic, v))
+}
+
+// TopicIn applies the In predicate on the "topic" field.
+func TopicIn(vs ...string) predicate.Course {
+	return predicate.Course(sql.FieldIn(FieldTopic, vs...))
+}
+
+// TopicNotIn applies the NotIn predicate on the "topic" field.
+func TopicNotIn(vs ...string) predicate.Course {
+	return predicate.Course(sql.FieldNotIn(FieldTopic, vs...))
+}
+
+// TopicGT applies the GT predicate on the "topic" field.
+func TopicGT(v string) predicate.Course {
+	return predicate.Course(sql.FieldGT(FieldTopic, v))
+}
+
+// TopicGTE applies the GTE predicate on the "topic" field.
+func TopicGTE(v string) predicate.Course {
+	return predicate.Course(sql.FieldGTE(FieldTopic, v))
+}
+
+// TopicLT applies the LT predicate on the "topic" field.
+func TopicLT(v string) predicate.Course {
+	return predicate.Course(sql.FieldLT(FieldTopic, v))
+}
+
+// TopicLTE applies the LTE predicate on the "topic" field.
+func TopicLTE(v string) predicate.Course {
+	return predicate.Course(sql.FieldLTE(FieldTopic, v))
+}
+
+// TopicContains applies the Contains predicate on the "topic" field.
+func TopicContains(v string) predicate.Course {
+	return predicate.Course(sql.FieldContains(FieldTopic, v))
+}
+
+// TopicHasPrefix applies the HasPrefix predicate on the "topic" field.
+func TopicHasPrefix(v string) predicate.Course {
+	return predicate.Course(sql.FieldHasPrefix(FieldTopic, v))
+}
+
+// TopicHasSuffix applies the HasSuffix predicate on the "topic" field.
+func TopicHasSuffix(v string) predicate.Course {
+	return predicate.Course(sql.FieldHasSuffix(FieldTopic, v))
+}
+
+// TopicEqualFold applies the EqualFold predicate on the "topic" field.
+func TopicEqualFold(v string) predicate.Course {
+	return predicate.Course(sql.FieldEqualFold(FieldTopic, v))
+}
+
+// TopicContainsFold applies the ContainsFold predicate on the "topic" field.
+func TopicContainsFold(v string) predicate.Course {
+	return predicate.Course(sql.FieldContainsFold(FieldTopic, v))
 }
 
 // EstimatedTimeEQ applies the EQ predicate on the "estimated_time" field.
@@ -366,69 +501,34 @@ func PricePerHourLTE(v int) predicate.Course {
 	return predicate.Course(sql.FieldLTE(FieldPricePerHour, v))
 }
 
-// LevelIDEQ applies the EQ predicate on the "level_id" field.
-func LevelIDEQ(v string) predicate.Course {
-	return predicate.Course(sql.FieldEQ(FieldLevelID, v))
+// LevelEQ applies the EQ predicate on the "level" field.
+func LevelEQ(v Level) predicate.Course {
+	return predicate.Course(sql.FieldEQ(FieldLevel, v))
 }
 
-// LevelIDNEQ applies the NEQ predicate on the "level_id" field.
-func LevelIDNEQ(v string) predicate.Course {
-	return predicate.Course(sql.FieldNEQ(FieldLevelID, v))
+// LevelNEQ applies the NEQ predicate on the "level" field.
+func LevelNEQ(v Level) predicate.Course {
+	return predicate.Course(sql.FieldNEQ(FieldLevel, v))
 }
 
-// LevelIDIn applies the In predicate on the "level_id" field.
-func LevelIDIn(vs ...string) predicate.Course {
-	return predicate.Course(sql.FieldIn(FieldLevelID, vs...))
+// LevelIn applies the In predicate on the "level" field.
+func LevelIn(vs ...Level) predicate.Course {
+	return predicate.Course(sql.FieldIn(FieldLevel, vs...))
 }
 
-// LevelIDNotIn applies the NotIn predicate on the "level_id" field.
-func LevelIDNotIn(vs ...string) predicate.Course {
-	return predicate.Course(sql.FieldNotIn(FieldLevelID, vs...))
+// LevelNotIn applies the NotIn predicate on the "level" field.
+func LevelNotIn(vs ...Level) predicate.Course {
+	return predicate.Course(sql.FieldNotIn(FieldLevel, vs...))
 }
 
-// LevelIDGT applies the GT predicate on the "level_id" field.
-func LevelIDGT(v string) predicate.Course {
-	return predicate.Course(sql.FieldGT(FieldLevelID, v))
+// LevelIsNil applies the IsNil predicate on the "level" field.
+func LevelIsNil() predicate.Course {
+	return predicate.Course(sql.FieldIsNull(FieldLevel))
 }
 
-// LevelIDGTE applies the GTE predicate on the "level_id" field.
-func LevelIDGTE(v string) predicate.Course {
-	return predicate.Course(sql.FieldGTE(FieldLevelID, v))
-}
-
-// LevelIDLT applies the LT predicate on the "level_id" field.
-func LevelIDLT(v string) predicate.Course {
-	return predicate.Course(sql.FieldLT(FieldLevelID, v))
-}
-
-// LevelIDLTE applies the LTE predicate on the "level_id" field.
-func LevelIDLTE(v string) predicate.Course {
-	return predicate.Course(sql.FieldLTE(FieldLevelID, v))
-}
-
-// LevelIDContains applies the Contains predicate on the "level_id" field.
-func LevelIDContains(v string) predicate.Course {
-	return predicate.Course(sql.FieldContains(FieldLevelID, v))
-}
-
-// LevelIDHasPrefix applies the HasPrefix predicate on the "level_id" field.
-func LevelIDHasPrefix(v string) predicate.Course {
-	return predicate.Course(sql.FieldHasPrefix(FieldLevelID, v))
-}
-
-// LevelIDHasSuffix applies the HasSuffix predicate on the "level_id" field.
-func LevelIDHasSuffix(v string) predicate.Course {
-	return predicate.Course(sql.FieldHasSuffix(FieldLevelID, v))
-}
-
-// LevelIDEqualFold applies the EqualFold predicate on the "level_id" field.
-func LevelIDEqualFold(v string) predicate.Course {
-	return predicate.Course(sql.FieldEqualFold(FieldLevelID, v))
-}
-
-// LevelIDContainsFold applies the ContainsFold predicate on the "level_id" field.
-func LevelIDContainsFold(v string) predicate.Course {
-	return predicate.Course(sql.FieldContainsFold(FieldLevelID, v))
+// LevelNotNil applies the NotNil predicate on the "level" field.
+func LevelNotNil() predicate.Course {
+	return predicate.Course(sql.FieldNotNull(FieldLevel))
 }
 
 // CoursePictureURLEQ applies the EQ predicate on the "course_picture_url" field.

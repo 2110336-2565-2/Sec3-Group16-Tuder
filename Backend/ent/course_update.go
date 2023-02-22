@@ -39,6 +39,18 @@ func (cu *CourseUpdate) SetTitle(s string) *CourseUpdate {
 	return cu
 }
 
+// SetSubject sets the "subject" field.
+func (cu *CourseUpdate) SetSubject(s string) *CourseUpdate {
+	cu.mutation.SetSubject(s)
+	return cu
+}
+
+// SetTopic sets the "topic" field.
+func (cu *CourseUpdate) SetTopic(s string) *CourseUpdate {
+	cu.mutation.SetTopic(s)
+	return cu
+}
+
 // SetEstimatedTime sets the "estimated_time" field.
 func (cu *CourseUpdate) SetEstimatedTime(t time.Time) *CourseUpdate {
 	cu.mutation.SetEstimatedTime(t)
@@ -70,9 +82,23 @@ func (cu *CourseUpdate) AddPricePerHour(i int) *CourseUpdate {
 	return cu
 }
 
-// SetLevelID sets the "level_id" field.
-func (cu *CourseUpdate) SetLevelID(s string) *CourseUpdate {
-	cu.mutation.SetLevelID(s)
+// SetLevel sets the "level" field.
+func (cu *CourseUpdate) SetLevel(c course.Level) *CourseUpdate {
+	cu.mutation.SetLevel(c)
+	return cu
+}
+
+// SetNillableLevel sets the "level" field if the given value is not nil.
+func (cu *CourseUpdate) SetNillableLevel(c *course.Level) *CourseUpdate {
+	if c != nil {
+		cu.SetLevel(*c)
+	}
+	return cu
+}
+
+// ClearLevel clears the value of the "level" field.
+func (cu *CourseUpdate) ClearLevel() *CourseUpdate {
+	cu.mutation.ClearLevel()
 	return cu
 }
 
@@ -249,6 +275,16 @@ func (cu *CourseUpdate) check() error {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Course.title": %w`, err)}
 		}
 	}
+	if v, ok := cu.mutation.Subject(); ok {
+		if err := course.SubjectValidator(v); err != nil {
+			return &ValidationError{Name: "subject", err: fmt.Errorf(`ent: validator failed for field "Course.subject": %w`, err)}
+		}
+	}
+	if v, ok := cu.mutation.Topic(); ok {
+		if err := course.TopicValidator(v); err != nil {
+			return &ValidationError{Name: "topic", err: fmt.Errorf(`ent: validator failed for field "Course.topic": %w`, err)}
+		}
+	}
 	if v, ok := cu.mutation.Description(); ok {
 		if err := course.DescriptionValidator(v); err != nil {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Course.description": %w`, err)}
@@ -264,9 +300,9 @@ func (cu *CourseUpdate) check() error {
 			return &ValidationError{Name: "price_per_hour", err: fmt.Errorf(`ent: validator failed for field "Course.price_per_hour": %w`, err)}
 		}
 	}
-	if v, ok := cu.mutation.LevelID(); ok {
-		if err := course.LevelIDValidator(v); err != nil {
-			return &ValidationError{Name: "level_id", err: fmt.Errorf(`ent: validator failed for field "Course.level_id": %w`, err)}
+	if v, ok := cu.mutation.Level(); ok {
+		if err := course.LevelValidator(v); err != nil {
+			return &ValidationError{Name: "level", err: fmt.Errorf(`ent: validator failed for field "Course.level": %w`, err)}
 		}
 	}
 	if _, ok := cu.mutation.TutorID(); cu.mutation.TutorCleared() && !ok {
@@ -290,6 +326,12 @@ func (cu *CourseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.Title(); ok {
 		_spec.SetField(course.FieldTitle, field.TypeString, value)
 	}
+	if value, ok := cu.mutation.Subject(); ok {
+		_spec.SetField(course.FieldSubject, field.TypeString, value)
+	}
+	if value, ok := cu.mutation.Topic(); ok {
+		_spec.SetField(course.FieldTopic, field.TypeString, value)
+	}
 	if value, ok := cu.mutation.EstimatedTime(); ok {
 		_spec.SetField(course.FieldEstimatedTime, field.TypeTime, value)
 	}
@@ -305,8 +347,11 @@ func (cu *CourseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.AddedPricePerHour(); ok {
 		_spec.AddField(course.FieldPricePerHour, field.TypeInt, value)
 	}
-	if value, ok := cu.mutation.LevelID(); ok {
-		_spec.SetField(course.FieldLevelID, field.TypeString, value)
+	if value, ok := cu.mutation.Level(); ok {
+		_spec.SetField(course.FieldLevel, field.TypeEnum, value)
+	}
+	if cu.mutation.LevelCleared() {
+		_spec.ClearField(course.FieldLevel, field.TypeEnum)
 	}
 	if value, ok := cu.mutation.CoursePictureURL(); ok {
 		_spec.SetField(course.FieldCoursePictureURL, field.TypeString, value)
@@ -518,6 +563,18 @@ func (cuo *CourseUpdateOne) SetTitle(s string) *CourseUpdateOne {
 	return cuo
 }
 
+// SetSubject sets the "subject" field.
+func (cuo *CourseUpdateOne) SetSubject(s string) *CourseUpdateOne {
+	cuo.mutation.SetSubject(s)
+	return cuo
+}
+
+// SetTopic sets the "topic" field.
+func (cuo *CourseUpdateOne) SetTopic(s string) *CourseUpdateOne {
+	cuo.mutation.SetTopic(s)
+	return cuo
+}
+
 // SetEstimatedTime sets the "estimated_time" field.
 func (cuo *CourseUpdateOne) SetEstimatedTime(t time.Time) *CourseUpdateOne {
 	cuo.mutation.SetEstimatedTime(t)
@@ -549,9 +606,23 @@ func (cuo *CourseUpdateOne) AddPricePerHour(i int) *CourseUpdateOne {
 	return cuo
 }
 
-// SetLevelID sets the "level_id" field.
-func (cuo *CourseUpdateOne) SetLevelID(s string) *CourseUpdateOne {
-	cuo.mutation.SetLevelID(s)
+// SetLevel sets the "level" field.
+func (cuo *CourseUpdateOne) SetLevel(c course.Level) *CourseUpdateOne {
+	cuo.mutation.SetLevel(c)
+	return cuo
+}
+
+// SetNillableLevel sets the "level" field if the given value is not nil.
+func (cuo *CourseUpdateOne) SetNillableLevel(c *course.Level) *CourseUpdateOne {
+	if c != nil {
+		cuo.SetLevel(*c)
+	}
+	return cuo
+}
+
+// ClearLevel clears the value of the "level" field.
+func (cuo *CourseUpdateOne) ClearLevel() *CourseUpdateOne {
+	cuo.mutation.ClearLevel()
 	return cuo
 }
 
@@ -741,6 +812,16 @@ func (cuo *CourseUpdateOne) check() error {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Course.title": %w`, err)}
 		}
 	}
+	if v, ok := cuo.mutation.Subject(); ok {
+		if err := course.SubjectValidator(v); err != nil {
+			return &ValidationError{Name: "subject", err: fmt.Errorf(`ent: validator failed for field "Course.subject": %w`, err)}
+		}
+	}
+	if v, ok := cuo.mutation.Topic(); ok {
+		if err := course.TopicValidator(v); err != nil {
+			return &ValidationError{Name: "topic", err: fmt.Errorf(`ent: validator failed for field "Course.topic": %w`, err)}
+		}
+	}
 	if v, ok := cuo.mutation.Description(); ok {
 		if err := course.DescriptionValidator(v); err != nil {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Course.description": %w`, err)}
@@ -756,9 +837,9 @@ func (cuo *CourseUpdateOne) check() error {
 			return &ValidationError{Name: "price_per_hour", err: fmt.Errorf(`ent: validator failed for field "Course.price_per_hour": %w`, err)}
 		}
 	}
-	if v, ok := cuo.mutation.LevelID(); ok {
-		if err := course.LevelIDValidator(v); err != nil {
-			return &ValidationError{Name: "level_id", err: fmt.Errorf(`ent: validator failed for field "Course.level_id": %w`, err)}
+	if v, ok := cuo.mutation.Level(); ok {
+		if err := course.LevelValidator(v); err != nil {
+			return &ValidationError{Name: "level", err: fmt.Errorf(`ent: validator failed for field "Course.level": %w`, err)}
 		}
 	}
 	if _, ok := cuo.mutation.TutorID(); cuo.mutation.TutorCleared() && !ok {
@@ -799,6 +880,12 @@ func (cuo *CourseUpdateOne) sqlSave(ctx context.Context) (_node *Course, err err
 	if value, ok := cuo.mutation.Title(); ok {
 		_spec.SetField(course.FieldTitle, field.TypeString, value)
 	}
+	if value, ok := cuo.mutation.Subject(); ok {
+		_spec.SetField(course.FieldSubject, field.TypeString, value)
+	}
+	if value, ok := cuo.mutation.Topic(); ok {
+		_spec.SetField(course.FieldTopic, field.TypeString, value)
+	}
 	if value, ok := cuo.mutation.EstimatedTime(); ok {
 		_spec.SetField(course.FieldEstimatedTime, field.TypeTime, value)
 	}
@@ -814,8 +901,11 @@ func (cuo *CourseUpdateOne) sqlSave(ctx context.Context) (_node *Course, err err
 	if value, ok := cuo.mutation.AddedPricePerHour(); ok {
 		_spec.AddField(course.FieldPricePerHour, field.TypeInt, value)
 	}
-	if value, ok := cuo.mutation.LevelID(); ok {
-		_spec.SetField(course.FieldLevelID, field.TypeString, value)
+	if value, ok := cuo.mutation.Level(); ok {
+		_spec.SetField(course.FieldLevel, field.TypeEnum, value)
+	}
+	if cuo.mutation.LevelCleared() {
+		_spec.ClearField(course.FieldLevel, field.TypeEnum)
 	}
 	if value, ok := cuo.mutation.CoursePictureURL(); ok {
 		_spec.SetField(course.FieldCoursePictureURL, field.TypeString, value)
