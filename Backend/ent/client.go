@@ -531,22 +531,6 @@ func (c *CourseClient) QueryClass(co *Course) *ClassQuery {
 	return query
 }
 
-// QueryStudent queries the student edge of a Course.
-func (c *CourseClient) QueryStudent(co *Course) *StudentQuery {
-	query := (&StudentClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := co.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(course.Table, course.FieldID, id),
-			sqlgraph.To(student.Table, student.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, course.StudentTable, course.StudentColumn),
-		)
-		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryTutor queries the tutor edge of a Course.
 func (c *CourseClient) QueryTutor(co *Course) *TutorQuery {
 	query := (&TutorClient{config: c.config}).Query()
@@ -1558,22 +1542,6 @@ func (c *StudentClient) QueryIssueReport(s *Student) *IssueReportQuery {
 			sqlgraph.From(student.Table, student.FieldID, id),
 			sqlgraph.To(issuereport.Table, issuereport.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, student.IssueReportTable, student.IssueReportColumn),
-		)
-		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryCourse queries the course edge of a Student.
-func (c *StudentClient) QueryCourse(s *Student) *CourseQuery {
-	query := (&CourseClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := s.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(student.Table, student.FieldID, id),
-			sqlgraph.To(course.Table, course.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, student.CourseTable, student.CourseColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil

@@ -3,8 +3,6 @@
 package course
 
 import (
-	"time"
-
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
@@ -72,18 +70,13 @@ func Topic(v string) predicate.Course {
 }
 
 // EstimatedTime applies equality check predicate on the "estimated_time" field. It's identical to EstimatedTimeEQ.
-func EstimatedTime(v time.Time) predicate.Course {
+func EstimatedTime(v int) predicate.Course {
 	return predicate.Course(sql.FieldEQ(FieldEstimatedTime, v))
 }
 
 // Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
 func Description(v string) predicate.Course {
 	return predicate.Course(sql.FieldEQ(FieldDescription, v))
-}
-
-// CourseStatus applies equality check predicate on the "course_status" field. It's identical to CourseStatusEQ.
-func CourseStatus(v string) predicate.Course {
-	return predicate.Course(sql.FieldEQ(FieldCourseStatus, v))
 }
 
 // PricePerHour applies equality check predicate on the "price_per_hour" field. It's identical to PricePerHourEQ.
@@ -292,42 +285,42 @@ func TopicContainsFold(v string) predicate.Course {
 }
 
 // EstimatedTimeEQ applies the EQ predicate on the "estimated_time" field.
-func EstimatedTimeEQ(v time.Time) predicate.Course {
+func EstimatedTimeEQ(v int) predicate.Course {
 	return predicate.Course(sql.FieldEQ(FieldEstimatedTime, v))
 }
 
 // EstimatedTimeNEQ applies the NEQ predicate on the "estimated_time" field.
-func EstimatedTimeNEQ(v time.Time) predicate.Course {
+func EstimatedTimeNEQ(v int) predicate.Course {
 	return predicate.Course(sql.FieldNEQ(FieldEstimatedTime, v))
 }
 
 // EstimatedTimeIn applies the In predicate on the "estimated_time" field.
-func EstimatedTimeIn(vs ...time.Time) predicate.Course {
+func EstimatedTimeIn(vs ...int) predicate.Course {
 	return predicate.Course(sql.FieldIn(FieldEstimatedTime, vs...))
 }
 
 // EstimatedTimeNotIn applies the NotIn predicate on the "estimated_time" field.
-func EstimatedTimeNotIn(vs ...time.Time) predicate.Course {
+func EstimatedTimeNotIn(vs ...int) predicate.Course {
 	return predicate.Course(sql.FieldNotIn(FieldEstimatedTime, vs...))
 }
 
 // EstimatedTimeGT applies the GT predicate on the "estimated_time" field.
-func EstimatedTimeGT(v time.Time) predicate.Course {
+func EstimatedTimeGT(v int) predicate.Course {
 	return predicate.Course(sql.FieldGT(FieldEstimatedTime, v))
 }
 
 // EstimatedTimeGTE applies the GTE predicate on the "estimated_time" field.
-func EstimatedTimeGTE(v time.Time) predicate.Course {
+func EstimatedTimeGTE(v int) predicate.Course {
 	return predicate.Course(sql.FieldGTE(FieldEstimatedTime, v))
 }
 
 // EstimatedTimeLT applies the LT predicate on the "estimated_time" field.
-func EstimatedTimeLT(v time.Time) predicate.Course {
+func EstimatedTimeLT(v int) predicate.Course {
 	return predicate.Course(sql.FieldLT(FieldEstimatedTime, v))
 }
 
 // EstimatedTimeLTE applies the LTE predicate on the "estimated_time" field.
-func EstimatedTimeLTE(v time.Time) predicate.Course {
+func EstimatedTimeLTE(v int) predicate.Course {
 	return predicate.Course(sql.FieldLTE(FieldEstimatedTime, v))
 }
 
@@ -394,71 +387,6 @@ func DescriptionEqualFold(v string) predicate.Course {
 // DescriptionContainsFold applies the ContainsFold predicate on the "description" field.
 func DescriptionContainsFold(v string) predicate.Course {
 	return predicate.Course(sql.FieldContainsFold(FieldDescription, v))
-}
-
-// CourseStatusEQ applies the EQ predicate on the "course_status" field.
-func CourseStatusEQ(v string) predicate.Course {
-	return predicate.Course(sql.FieldEQ(FieldCourseStatus, v))
-}
-
-// CourseStatusNEQ applies the NEQ predicate on the "course_status" field.
-func CourseStatusNEQ(v string) predicate.Course {
-	return predicate.Course(sql.FieldNEQ(FieldCourseStatus, v))
-}
-
-// CourseStatusIn applies the In predicate on the "course_status" field.
-func CourseStatusIn(vs ...string) predicate.Course {
-	return predicate.Course(sql.FieldIn(FieldCourseStatus, vs...))
-}
-
-// CourseStatusNotIn applies the NotIn predicate on the "course_status" field.
-func CourseStatusNotIn(vs ...string) predicate.Course {
-	return predicate.Course(sql.FieldNotIn(FieldCourseStatus, vs...))
-}
-
-// CourseStatusGT applies the GT predicate on the "course_status" field.
-func CourseStatusGT(v string) predicate.Course {
-	return predicate.Course(sql.FieldGT(FieldCourseStatus, v))
-}
-
-// CourseStatusGTE applies the GTE predicate on the "course_status" field.
-func CourseStatusGTE(v string) predicate.Course {
-	return predicate.Course(sql.FieldGTE(FieldCourseStatus, v))
-}
-
-// CourseStatusLT applies the LT predicate on the "course_status" field.
-func CourseStatusLT(v string) predicate.Course {
-	return predicate.Course(sql.FieldLT(FieldCourseStatus, v))
-}
-
-// CourseStatusLTE applies the LTE predicate on the "course_status" field.
-func CourseStatusLTE(v string) predicate.Course {
-	return predicate.Course(sql.FieldLTE(FieldCourseStatus, v))
-}
-
-// CourseStatusContains applies the Contains predicate on the "course_status" field.
-func CourseStatusContains(v string) predicate.Course {
-	return predicate.Course(sql.FieldContains(FieldCourseStatus, v))
-}
-
-// CourseStatusHasPrefix applies the HasPrefix predicate on the "course_status" field.
-func CourseStatusHasPrefix(v string) predicate.Course {
-	return predicate.Course(sql.FieldHasPrefix(FieldCourseStatus, v))
-}
-
-// CourseStatusHasSuffix applies the HasSuffix predicate on the "course_status" field.
-func CourseStatusHasSuffix(v string) predicate.Course {
-	return predicate.Course(sql.FieldHasSuffix(FieldCourseStatus, v))
-}
-
-// CourseStatusEqualFold applies the EqualFold predicate on the "course_status" field.
-func CourseStatusEqualFold(v string) predicate.Course {
-	return predicate.Course(sql.FieldEqualFold(FieldCourseStatus, v))
-}
-
-// CourseStatusContainsFold applies the ContainsFold predicate on the "course_status" field.
-func CourseStatusContainsFold(v string) predicate.Course {
-	return predicate.Course(sql.FieldContainsFold(FieldCourseStatus, v))
 }
 
 // PricePerHourEQ applies the EQ predicate on the "price_per_hour" field.
@@ -651,33 +579,6 @@ func HasClassWith(preds ...predicate.Class) predicate.Course {
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ClassInverseTable, FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, ClassTable, ClassColumn),
-		)
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasStudent applies the HasEdge predicate on the "student" edge.
-func HasStudent() predicate.Course {
-	return predicate.Course(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, StudentTable, StudentColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasStudentWith applies the HasEdge predicate on the "student" edge with a given conditions (other predicates).
-func HasStudentWith(preds ...predicate.Student) predicate.Course {
-	return predicate.Course(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(StudentInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, StudentTable, StudentColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

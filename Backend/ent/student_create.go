@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
@@ -51,25 +50,6 @@ func (sc *StudentCreate) AddIssueReport(i ...*IssueReport) *StudentCreate {
 		ids[j] = i[j].ID
 	}
 	return sc.AddIssueReportIDs(ids...)
-}
-
-// SetCourseID sets the "course" edge to the Course entity by ID.
-func (sc *StudentCreate) SetCourseID(id uuid.UUID) *StudentCreate {
-	sc.mutation.SetCourseID(id)
-	return sc
-}
-
-// SetNillableCourseID sets the "course" edge to the Course entity by ID if the given value is not nil.
-func (sc *StudentCreate) SetNillableCourseID(id *uuid.UUID) *StudentCreate {
-	if id != nil {
-		sc = sc.SetCourseID(*id)
-	}
-	return sc
-}
-
-// SetCourse sets the "course" edge to the Course entity.
-func (sc *StudentCreate) SetCourse(c *Course) *StudentCreate {
-	return sc.SetCourseID(c.ID)
 }
 
 // AddClasIDs adds the "class" edge to the Class entity by IDs.
@@ -190,25 +170,6 @@ func (sc *StudentCreate) createSpec() (*Student, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: issuereport.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := sc.mutation.CourseIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   student.CourseTable,
-			Columns: []string{student.CourseColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
 				},
 			},
 		}

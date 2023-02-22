@@ -2,6 +2,7 @@ package repositorys
 
 import (
 	"context"
+	"errors"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -9,6 +10,7 @@ import (
 
 type RepositoryCourseSearch interface {
 	CourseSearchRepository(sr *schema.CourseSearch) ([]*ent.Course, error)
+	SearchAll() ([]*ent.Course, error)
 }
 
 type repositoryCourseSearch struct {
@@ -35,4 +37,16 @@ func (r repositoryCourseSearch) SearchByTutorNameRepository(sr *schema.CourseSea
 	// }
 
 	return nil, nil
+}
+
+func (r repositoryCourseSearch) SearchAll() ([]*ent.Course, error) {
+	courses, err := r.client.Course.
+		Query().
+		All(r.ctx)
+
+	if err != nil {
+		return nil, errors.New("Course not found")
+	}
+
+	return courses, nil
 }

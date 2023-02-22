@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -13,6 +15,7 @@ type ServiceCourseSearch interface {
 	// CourseSearchByTime(CourseInfoByTime *schemas.SchemaUpdateTutor) ([]*ent.Course, error)
 	// CourseSearchByDay(CourseInfoByDay *schemas.SchemaUpdateTutor) ([]*ent.Course, error)
 	// CourseSearchByContent(CourseInfoByContent *schemas.SchemaUpdateTutor) ([]*ent.Course, error)
+	SearchAllCourse() ([]*schemas.CourseSearchResult, error)
 }
 
 type serviceCourseSearch struct {
@@ -74,4 +77,32 @@ func (s *serviceCourseSearch) CourseSearchByContent(CourseInfoByContent *schemas
 	// 	return nil, err
 	// }
 	return nil, nil
+}
+
+func (s *serviceCourseSearch) SearchAllCourse() ([]*schemas.CourseSearchResult, error) {
+	courses, err := s.repository.SearchAll()
+	// fmt.Println(courses)
+	// fmt.Println(err)
+	if err != nil {
+		return nil, err
+	}
+	var courseResponses []*schemas.CourseSearchResult
+	for _, course := range courses {
+		fmt.Println("here")
+		fmt.Println(course.Edges.Tutor)
+		fmt.Println("here")
+		courseResponses = append(courseResponses, &schemas.CourseSearchResult{
+			Course_id:          course.ID,
+			Tutor_name:         course.Edges.Tutor.Edges.User.Username,
+			Tittle:             course.Title,
+			Subject:            course.Subject,
+			Topic:              course.Topic,
+			Estimate_time:      course.EstimatedTime,
+			Price_per_hour:     course.PricePerHour,
+			Course_picture_url: *course.CoursePictureURL,
+		})
+	}
+	fmt.Println(courseResponses)
+	fmt.Println(err)
+	return courseResponses, nil
 }

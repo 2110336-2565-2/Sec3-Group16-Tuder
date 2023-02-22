@@ -50,12 +50,8 @@ func init() {
 	courseDescDescription := courseFields[5].Descriptor()
 	// course.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	course.DescriptionValidator = courseDescDescription.Validators[0].(func(string) error)
-	// courseDescCourseStatus is the schema descriptor for course_status field.
-	courseDescCourseStatus := courseFields[6].Descriptor()
-	// course.CourseStatusValidator is a validator for the "course_status" field. It is called by the builders before save.
-	course.CourseStatusValidator = courseDescCourseStatus.Validators[0].(func(string) error)
 	// courseDescPricePerHour is the schema descriptor for price_per_hour field.
-	courseDescPricePerHour := courseFields[7].Descriptor()
+	courseDescPricePerHour := courseFields[6].Descriptor()
 	// course.PricePerHourValidator is a validator for the "price_per_hour" field. It is called by the builders before save.
 	course.PricePerHourValidator = courseDescPricePerHour.Validators[0].(func(int) error)
 	// courseDescID is the schema descriptor for id field.

@@ -13,8 +13,6 @@ const (
 	FieldID = "id"
 	// EdgeIssueReport holds the string denoting the issue_report edge name in mutations.
 	EdgeIssueReport = "issue_report"
-	// EdgeCourse holds the string denoting the course edge name in mutations.
-	EdgeCourse = "course"
 	// EdgeClass holds the string denoting the class edge name in mutations.
 	EdgeClass = "class"
 	// EdgeUser holds the string denoting the user edge name in mutations.
@@ -28,13 +26,6 @@ const (
 	IssueReportInverseTable = "issue_reports"
 	// IssueReportColumn is the table column denoting the issue_report relation/edge.
 	IssueReportColumn = "student_issue_report"
-	// CourseTable is the table that holds the course relation/edge.
-	CourseTable = "courses"
-	// CourseInverseTable is the table name for the Course entity.
-	// It exists in this package in order to avoid circular dependency with the "course" package.
-	CourseInverseTable = "courses"
-	// CourseColumn is the table column denoting the course relation/edge.
-	CourseColumn = "student_course"
 	// ClassTable is the table that holds the class relation/edge.
 	ClassTable = "classes"
 	// ClassInverseTable is the table name for the Class entity.

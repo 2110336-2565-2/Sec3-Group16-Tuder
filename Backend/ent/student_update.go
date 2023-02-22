@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
@@ -45,25 +44,6 @@ func (su *StudentUpdate) AddIssueReport(i ...*IssueReport) *StudentUpdate {
 		ids[j] = i[j].ID
 	}
 	return su.AddIssueReportIDs(ids...)
-}
-
-// SetCourseID sets the "course" edge to the Course entity by ID.
-func (su *StudentUpdate) SetCourseID(id uuid.UUID) *StudentUpdate {
-	su.mutation.SetCourseID(id)
-	return su
-}
-
-// SetNillableCourseID sets the "course" edge to the Course entity by ID if the given value is not nil.
-func (su *StudentUpdate) SetNillableCourseID(id *uuid.UUID) *StudentUpdate {
-	if id != nil {
-		su = su.SetCourseID(*id)
-	}
-	return su
-}
-
-// SetCourse sets the "course" edge to the Course entity.
-func (su *StudentUpdate) SetCourse(c *Course) *StudentUpdate {
-	return su.SetCourseID(c.ID)
 }
 
 // AddClasIDs adds the "class" edge to the Class entity by IDs.
@@ -116,12 +96,6 @@ func (su *StudentUpdate) RemoveIssueReport(i ...*IssueReport) *StudentUpdate {
 		ids[j] = i[j].ID
 	}
 	return su.RemoveIssueReportIDs(ids...)
-}
-
-// ClearCourse clears the "course" edge to the Course entity.
-func (su *StudentUpdate) ClearCourse() *StudentUpdate {
-	su.mutation.ClearCourse()
-	return su
 }
 
 // ClearClass clears all "class" edges to the Class entity.
@@ -244,41 +218,6 @@ func (su *StudentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: issuereport.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if su.mutation.CourseCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   student.CourseTable,
-			Columns: []string{student.CourseColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := su.mutation.CourseIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   student.CourseTable,
-			Columns: []string{student.CourseColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
 				},
 			},
 		}
@@ -411,25 +350,6 @@ func (suo *StudentUpdateOne) AddIssueReport(i ...*IssueReport) *StudentUpdateOne
 	return suo.AddIssueReportIDs(ids...)
 }
 
-// SetCourseID sets the "course" edge to the Course entity by ID.
-func (suo *StudentUpdateOne) SetCourseID(id uuid.UUID) *StudentUpdateOne {
-	suo.mutation.SetCourseID(id)
-	return suo
-}
-
-// SetNillableCourseID sets the "course" edge to the Course entity by ID if the given value is not nil.
-func (suo *StudentUpdateOne) SetNillableCourseID(id *uuid.UUID) *StudentUpdateOne {
-	if id != nil {
-		suo = suo.SetCourseID(*id)
-	}
-	return suo
-}
-
-// SetCourse sets the "course" edge to the Course entity.
-func (suo *StudentUpdateOne) SetCourse(c *Course) *StudentUpdateOne {
-	return suo.SetCourseID(c.ID)
-}
-
 // AddClasIDs adds the "class" edge to the Class entity by IDs.
 func (suo *StudentUpdateOne) AddClasIDs(ids ...uuid.UUID) *StudentUpdateOne {
 	suo.mutation.AddClasIDs(ids...)
@@ -480,12 +400,6 @@ func (suo *StudentUpdateOne) RemoveIssueReport(i ...*IssueReport) *StudentUpdate
 		ids[j] = i[j].ID
 	}
 	return suo.RemoveIssueReportIDs(ids...)
-}
-
-// ClearCourse clears the "course" edge to the Course entity.
-func (suo *StudentUpdateOne) ClearCourse() *StudentUpdateOne {
-	suo.mutation.ClearCourse()
-	return suo
 }
 
 // ClearClass clears all "class" edges to the Class entity.
@@ -638,41 +552,6 @@ func (suo *StudentUpdateOne) sqlSave(ctx context.Context) (_node *Student, err e
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: issuereport.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if suo.mutation.CourseCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   student.CourseTable,
-			Columns: []string{student.CourseColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := suo.mutation.CourseIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   student.CourseTable,
-			Columns: []string{student.CourseColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
 				},
 			},
 		}

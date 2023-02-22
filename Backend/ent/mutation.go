@@ -683,9 +683,9 @@ type CourseMutation struct {
 	title                *string
 	subject              *string
 	topic                *string
-	estimated_time       *time.Time
+	estimated_time       *int
+	addestimated_time    *int
 	description          *string
-	course_status        *string
 	price_per_hour       *int
 	addprice_per_hour    *int
 	level                *course.Level
@@ -697,8 +697,6 @@ type CourseMutation struct {
 	class                map[uuid.UUID]struct{}
 	removedclass         map[uuid.UUID]struct{}
 	clearedclass         bool
-	student              *uuid.UUID
-	clearedstudent       bool
 	tutor                *uuid.UUID
 	clearedtutor         bool
 	done                 bool
@@ -919,12 +917,13 @@ func (m *CourseMutation) ResetTopic() {
 }
 
 // SetEstimatedTime sets the "estimated_time" field.
-func (m *CourseMutation) SetEstimatedTime(t time.Time) {
-	m.estimated_time = &t
+func (m *CourseMutation) SetEstimatedTime(i int) {
+	m.estimated_time = &i
+	m.addestimated_time = nil
 }
 
 // EstimatedTime returns the value of the "estimated_time" field in the mutation.
-func (m *CourseMutation) EstimatedTime() (r time.Time, exists bool) {
+func (m *CourseMutation) EstimatedTime() (r int, exists bool) {
 	v := m.estimated_time
 	if v == nil {
 		return
@@ -935,7 +934,7 @@ func (m *CourseMutation) EstimatedTime() (r time.Time, exists bool) {
 // OldEstimatedTime returns the old "estimated_time" field's value of the Course entity.
 // If the Course object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CourseMutation) OldEstimatedTime(ctx context.Context) (v time.Time, err error) {
+func (m *CourseMutation) OldEstimatedTime(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldEstimatedTime is only allowed on UpdateOne operations")
 	}
@@ -949,9 +948,28 @@ func (m *CourseMutation) OldEstimatedTime(ctx context.Context) (v time.Time, err
 	return oldValue.EstimatedTime, nil
 }
 
+// AddEstimatedTime adds i to the "estimated_time" field.
+func (m *CourseMutation) AddEstimatedTime(i int) {
+	if m.addestimated_time != nil {
+		*m.addestimated_time += i
+	} else {
+		m.addestimated_time = &i
+	}
+}
+
+// AddedEstimatedTime returns the value that was added to the "estimated_time" field in this mutation.
+func (m *CourseMutation) AddedEstimatedTime() (r int, exists bool) {
+	v := m.addestimated_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
 // ResetEstimatedTime resets all changes to the "estimated_time" field.
 func (m *CourseMutation) ResetEstimatedTime() {
 	m.estimated_time = nil
+	m.addestimated_time = nil
 }
 
 // SetDescription sets the "description" field.
@@ -988,42 +1006,6 @@ func (m *CourseMutation) OldDescription(ctx context.Context) (v string, err erro
 // ResetDescription resets all changes to the "description" field.
 func (m *CourseMutation) ResetDescription() {
 	m.description = nil
-}
-
-// SetCourseStatus sets the "course_status" field.
-func (m *CourseMutation) SetCourseStatus(s string) {
-	m.course_status = &s
-}
-
-// CourseStatus returns the value of the "course_status" field in the mutation.
-func (m *CourseMutation) CourseStatus() (r string, exists bool) {
-	v := m.course_status
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCourseStatus returns the old "course_status" field's value of the Course entity.
-// If the Course object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CourseMutation) OldCourseStatus(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCourseStatus is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCourseStatus requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCourseStatus: %w", err)
-	}
-	return oldValue.CourseStatus, nil
-}
-
-// ResetCourseStatus resets all changes to the "course_status" field.
-func (m *CourseMutation) ResetCourseStatus() {
-	m.course_status = nil
 }
 
 // SetPricePerHour sets the "price_per_hour" field.
@@ -1288,45 +1270,6 @@ func (m *CourseMutation) ResetClass() {
 	m.removedclass = nil
 }
 
-// SetStudentID sets the "student" edge to the Student entity by id.
-func (m *CourseMutation) SetStudentID(id uuid.UUID) {
-	m.student = &id
-}
-
-// ClearStudent clears the "student" edge to the Student entity.
-func (m *CourseMutation) ClearStudent() {
-	m.clearedstudent = true
-}
-
-// StudentCleared reports if the "student" edge to the Student entity was cleared.
-func (m *CourseMutation) StudentCleared() bool {
-	return m.clearedstudent
-}
-
-// StudentID returns the "student" edge ID in the mutation.
-func (m *CourseMutation) StudentID() (id uuid.UUID, exists bool) {
-	if m.student != nil {
-		return *m.student, true
-	}
-	return
-}
-
-// StudentIDs returns the "student" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// StudentID instead. It exists only for internal usage by the builders.
-func (m *CourseMutation) StudentIDs() (ids []uuid.UUID) {
-	if id := m.student; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetStudent resets all changes to the "student" edge.
-func (m *CourseMutation) ResetStudent() {
-	m.student = nil
-	m.clearedstudent = false
-}
-
 // SetTutorID sets the "tutor" edge to the Tutor entity by id.
 func (m *CourseMutation) SetTutorID(id uuid.UUID) {
 	m.tutor = &id
@@ -1400,7 +1343,7 @@ func (m *CourseMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CourseMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 8)
 	if m.title != nil {
 		fields = append(fields, course.FieldTitle)
 	}
@@ -1415,9 +1358,6 @@ func (m *CourseMutation) Fields() []string {
 	}
 	if m.description != nil {
 		fields = append(fields, course.FieldDescription)
-	}
-	if m.course_status != nil {
-		fields = append(fields, course.FieldCourseStatus)
 	}
 	if m.price_per_hour != nil {
 		fields = append(fields, course.FieldPricePerHour)
@@ -1446,8 +1386,6 @@ func (m *CourseMutation) Field(name string) (ent.Value, bool) {
 		return m.EstimatedTime()
 	case course.FieldDescription:
 		return m.Description()
-	case course.FieldCourseStatus:
-		return m.CourseStatus()
 	case course.FieldPricePerHour:
 		return m.PricePerHour()
 	case course.FieldLevel:
@@ -1473,8 +1411,6 @@ func (m *CourseMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldEstimatedTime(ctx)
 	case course.FieldDescription:
 		return m.OldDescription(ctx)
-	case course.FieldCourseStatus:
-		return m.OldCourseStatus(ctx)
 	case course.FieldPricePerHour:
 		return m.OldPricePerHour(ctx)
 	case course.FieldLevel:
@@ -1512,7 +1448,7 @@ func (m *CourseMutation) SetField(name string, value ent.Value) error {
 		m.SetTopic(v)
 		return nil
 	case course.FieldEstimatedTime:
-		v, ok := value.(time.Time)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1524,13 +1460,6 @@ func (m *CourseMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDescription(v)
-		return nil
-	case course.FieldCourseStatus:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCourseStatus(v)
 		return nil
 	case course.FieldPricePerHour:
 		v, ok := value.(int)
@@ -1561,6 +1490,9 @@ func (m *CourseMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *CourseMutation) AddedFields() []string {
 	var fields []string
+	if m.addestimated_time != nil {
+		fields = append(fields, course.FieldEstimatedTime)
+	}
 	if m.addprice_per_hour != nil {
 		fields = append(fields, course.FieldPricePerHour)
 	}
@@ -1572,6 +1504,8 @@ func (m *CourseMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *CourseMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
+	case course.FieldEstimatedTime:
+		return m.AddedEstimatedTime()
 	case course.FieldPricePerHour:
 		return m.AddedPricePerHour()
 	}
@@ -1583,6 +1517,13 @@ func (m *CourseMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *CourseMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case course.FieldEstimatedTime:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddEstimatedTime(v)
+		return nil
 	case course.FieldPricePerHour:
 		v, ok := value.(int)
 		if !ok {
@@ -1647,9 +1588,6 @@ func (m *CourseMutation) ResetField(name string) error {
 	case course.FieldDescription:
 		m.ResetDescription()
 		return nil
-	case course.FieldCourseStatus:
-		m.ResetCourseStatus()
-		return nil
 	case course.FieldPricePerHour:
 		m.ResetPricePerHour()
 		return nil
@@ -1665,15 +1603,12 @@ func (m *CourseMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CourseMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 3)
 	if m.review_course != nil {
 		edges = append(edges, course.EdgeReviewCourse)
 	}
 	if m.class != nil {
 		edges = append(edges, course.EdgeClass)
-	}
-	if m.student != nil {
-		edges = append(edges, course.EdgeStudent)
 	}
 	if m.tutor != nil {
 		edges = append(edges, course.EdgeTutor)
@@ -1697,10 +1632,6 @@ func (m *CourseMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case course.EdgeStudent:
-		if id := m.student; id != nil {
-			return []ent.Value{*id}
-		}
 	case course.EdgeTutor:
 		if id := m.tutor; id != nil {
 			return []ent.Value{*id}
@@ -1711,7 +1642,7 @@ func (m *CourseMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CourseMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 3)
 	if m.removedreview_course != nil {
 		edges = append(edges, course.EdgeReviewCourse)
 	}
@@ -1743,15 +1674,12 @@ func (m *CourseMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CourseMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 3)
 	if m.clearedreview_course {
 		edges = append(edges, course.EdgeReviewCourse)
 	}
 	if m.clearedclass {
 		edges = append(edges, course.EdgeClass)
-	}
-	if m.clearedstudent {
-		edges = append(edges, course.EdgeStudent)
 	}
 	if m.clearedtutor {
 		edges = append(edges, course.EdgeTutor)
@@ -1767,8 +1695,6 @@ func (m *CourseMutation) EdgeCleared(name string) bool {
 		return m.clearedreview_course
 	case course.EdgeClass:
 		return m.clearedclass
-	case course.EdgeStudent:
-		return m.clearedstudent
 	case course.EdgeTutor:
 		return m.clearedtutor
 	}
@@ -1779,9 +1705,6 @@ func (m *CourseMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *CourseMutation) ClearEdge(name string) error {
 	switch name {
-	case course.EdgeStudent:
-		m.ClearStudent()
-		return nil
 	case course.EdgeTutor:
 		m.ClearTutor()
 		return nil
@@ -1798,9 +1721,6 @@ func (m *CourseMutation) ResetEdge(name string) error {
 		return nil
 	case course.EdgeClass:
 		m.ResetClass()
-		return nil
-	case course.EdgeStudent:
-		m.ResetStudent()
 		return nil
 	case course.EdgeTutor:
 		m.ResetTutor()
@@ -5348,8 +5268,6 @@ type StudentMutation struct {
 	issue_report        map[uuid.UUID]struct{}
 	removedissue_report map[uuid.UUID]struct{}
 	clearedissue_report bool
-	course              *uuid.UUID
-	clearedcourse       bool
 	class               map[uuid.UUID]struct{}
 	removedclass        map[uuid.UUID]struct{}
 	clearedclass        bool
@@ -5516,45 +5434,6 @@ func (m *StudentMutation) ResetIssueReport() {
 	m.issue_report = nil
 	m.clearedissue_report = false
 	m.removedissue_report = nil
-}
-
-// SetCourseID sets the "course" edge to the Course entity by id.
-func (m *StudentMutation) SetCourseID(id uuid.UUID) {
-	m.course = &id
-}
-
-// ClearCourse clears the "course" edge to the Course entity.
-func (m *StudentMutation) ClearCourse() {
-	m.clearedcourse = true
-}
-
-// CourseCleared reports if the "course" edge to the Course entity was cleared.
-func (m *StudentMutation) CourseCleared() bool {
-	return m.clearedcourse
-}
-
-// CourseID returns the "course" edge ID in the mutation.
-func (m *StudentMutation) CourseID() (id uuid.UUID, exists bool) {
-	if m.course != nil {
-		return *m.course, true
-	}
-	return
-}
-
-// CourseIDs returns the "course" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// CourseID instead. It exists only for internal usage by the builders.
-func (m *StudentMutation) CourseIDs() (ids []uuid.UUID) {
-	if id := m.course; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetCourse resets all changes to the "course" edge.
-func (m *StudentMutation) ResetCourse() {
-	m.course = nil
-	m.clearedcourse = false
 }
 
 // AddClasIDs adds the "class" edge to the Class entity by ids.
@@ -5758,12 +5637,9 @@ func (m *StudentMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *StudentMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 3)
 	if m.issue_report != nil {
 		edges = append(edges, student.EdgeIssueReport)
-	}
-	if m.course != nil {
-		edges = append(edges, student.EdgeCourse)
 	}
 	if m.class != nil {
 		edges = append(edges, student.EdgeClass)
@@ -5784,10 +5660,6 @@ func (m *StudentMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case student.EdgeCourse:
-		if id := m.course; id != nil {
-			return []ent.Value{*id}
-		}
 	case student.EdgeClass:
 		ids := make([]ent.Value, 0, len(m.class))
 		for id := range m.class {
@@ -5804,7 +5676,7 @@ func (m *StudentMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *StudentMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 3)
 	if m.removedissue_report != nil {
 		edges = append(edges, student.EdgeIssueReport)
 	}
@@ -5836,12 +5708,9 @@ func (m *StudentMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *StudentMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 3)
 	if m.clearedissue_report {
 		edges = append(edges, student.EdgeIssueReport)
-	}
-	if m.clearedcourse {
-		edges = append(edges, student.EdgeCourse)
 	}
 	if m.clearedclass {
 		edges = append(edges, student.EdgeClass)
@@ -5858,8 +5727,6 @@ func (m *StudentMutation) EdgeCleared(name string) bool {
 	switch name {
 	case student.EdgeIssueReport:
 		return m.clearedissue_report
-	case student.EdgeCourse:
-		return m.clearedcourse
 	case student.EdgeClass:
 		return m.clearedclass
 	case student.EdgeUser:
@@ -5872,9 +5739,6 @@ func (m *StudentMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *StudentMutation) ClearEdge(name string) error {
 	switch name {
-	case student.EdgeCourse:
-		m.ClearCourse()
-		return nil
 	case student.EdgeUser:
 		m.ClearUser()
 		return nil
@@ -5888,9 +5752,6 @@ func (m *StudentMutation) ResetEdge(name string) error {
 	switch name {
 	case student.EdgeIssueReport:
 		m.ResetIssueReport()
-		return nil
-	case student.EdgeCourse:
-		m.ResetCourse()
 		return nil
 	case student.EdgeClass:
 		m.ResetClass()

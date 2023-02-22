@@ -6,14 +6,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/google/uuid"
 )
@@ -44,20 +42,14 @@ func (cc *CourseCreate) SetTopic(s string) *CourseCreate {
 }
 
 // SetEstimatedTime sets the "estimated_time" field.
-func (cc *CourseCreate) SetEstimatedTime(t time.Time) *CourseCreate {
-	cc.mutation.SetEstimatedTime(t)
+func (cc *CourseCreate) SetEstimatedTime(i int) *CourseCreate {
+	cc.mutation.SetEstimatedTime(i)
 	return cc
 }
 
 // SetDescription sets the "description" field.
 func (cc *CourseCreate) SetDescription(s string) *CourseCreate {
 	cc.mutation.SetDescription(s)
-	return cc
-}
-
-// SetCourseStatus sets the "course_status" field.
-func (cc *CourseCreate) SetCourseStatus(s string) *CourseCreate {
-	cc.mutation.SetCourseStatus(s)
 	return cc
 }
 
@@ -137,25 +129,6 @@ func (cc *CourseCreate) AddClass(c ...*Class) *CourseCreate {
 		ids[i] = c[i].ID
 	}
 	return cc.AddClasIDs(ids...)
-}
-
-// SetStudentID sets the "student" edge to the Student entity by ID.
-func (cc *CourseCreate) SetStudentID(id uuid.UUID) *CourseCreate {
-	cc.mutation.SetStudentID(id)
-	return cc
-}
-
-// SetNillableStudentID sets the "student" edge to the Student entity by ID if the given value is not nil.
-func (cc *CourseCreate) SetNillableStudentID(id *uuid.UUID) *CourseCreate {
-	if id != nil {
-		cc = cc.SetStudentID(*id)
-	}
-	return cc
-}
-
-// SetStudent sets the "student" edge to the Student entity.
-func (cc *CourseCreate) SetStudent(s *Student) *CourseCreate {
-	return cc.SetStudentID(s.ID)
 }
 
 // SetTutorID sets the "tutor" edge to the Tutor entity by ID.
@@ -247,14 +220,6 @@ func (cc *CourseCreate) check() error {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Course.description": %w`, err)}
 		}
 	}
-	if _, ok := cc.mutation.CourseStatus(); !ok {
-		return &ValidationError{Name: "course_status", err: errors.New(`ent: missing required field "Course.course_status"`)}
-	}
-	if v, ok := cc.mutation.CourseStatus(); ok {
-		if err := course.CourseStatusValidator(v); err != nil {
-			return &ValidationError{Name: "course_status", err: fmt.Errorf(`ent: validator failed for field "Course.course_status": %w`, err)}
-		}
-	}
 	if _, ok := cc.mutation.PricePerHour(); !ok {
 		return &ValidationError{Name: "price_per_hour", err: errors.New(`ent: missing required field "Course.price_per_hour"`)}
 	}
@@ -319,16 +284,12 @@ func (cc *CourseCreate) createSpec() (*Course, *sqlgraph.CreateSpec) {
 		_node.Topic = value
 	}
 	if value, ok := cc.mutation.EstimatedTime(); ok {
-		_spec.SetField(course.FieldEstimatedTime, field.TypeTime, value)
+		_spec.SetField(course.FieldEstimatedTime, field.TypeInt, value)
 		_node.EstimatedTime = value
 	}
 	if value, ok := cc.mutation.Description(); ok {
 		_spec.SetField(course.FieldDescription, field.TypeString, value)
 		_node.Description = value
-	}
-	if value, ok := cc.mutation.CourseStatus(); ok {
-		_spec.SetField(course.FieldCourseStatus, field.TypeString, value)
-		_node.CourseStatus = value
 	}
 	if value, ok := cc.mutation.PricePerHour(); ok {
 		_spec.SetField(course.FieldPricePerHour, field.TypeInt, value)
@@ -378,26 +339,6 @@ func (cc *CourseCreate) createSpec() (*Course, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := cc.mutation.StudentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
-			Table:   course.StudentTable,
-			Columns: []string{course.StudentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: student.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.student_course = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := cc.mutation.TutorIDs(); len(nodes) > 0 {

@@ -26,7 +26,7 @@ type SchemaErrorResponse struct {
 }
 
 type CourseSearchResponse struct {
-	Success              bool                 `json:"success"`
-	Message              string               `json:"message"`
-	Course_search_result []CourseSearchResult `json:"Course_serach_result"`
+	Success bool                  `json:"success"`
+	Message string                `json:"message"`
+	Data    []*CourseSearchResult `json:"Course_serach_result"`
 }

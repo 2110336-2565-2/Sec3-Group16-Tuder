@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -15,7 +14,6 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/google/uuid"
 )
@@ -52,20 +50,21 @@ func (cu *CourseUpdate) SetTopic(s string) *CourseUpdate {
 }
 
 // SetEstimatedTime sets the "estimated_time" field.
-func (cu *CourseUpdate) SetEstimatedTime(t time.Time) *CourseUpdate {
-	cu.mutation.SetEstimatedTime(t)
+func (cu *CourseUpdate) SetEstimatedTime(i int) *CourseUpdate {
+	cu.mutation.ResetEstimatedTime()
+	cu.mutation.SetEstimatedTime(i)
+	return cu
+}
+
+// AddEstimatedTime adds i to the "estimated_time" field.
+func (cu *CourseUpdate) AddEstimatedTime(i int) *CourseUpdate {
+	cu.mutation.AddEstimatedTime(i)
 	return cu
 }
 
 // SetDescription sets the "description" field.
 func (cu *CourseUpdate) SetDescription(s string) *CourseUpdate {
 	cu.mutation.SetDescription(s)
-	return cu
-}
-
-// SetCourseStatus sets the "course_status" field.
-func (cu *CourseUpdate) SetCourseStatus(s string) *CourseUpdate {
-	cu.mutation.SetCourseStatus(s)
 	return cu
 }
 
@@ -152,25 +151,6 @@ func (cu *CourseUpdate) AddClass(c ...*Class) *CourseUpdate {
 	return cu.AddClasIDs(ids...)
 }
 
-// SetStudentID sets the "student" edge to the Student entity by ID.
-func (cu *CourseUpdate) SetStudentID(id uuid.UUID) *CourseUpdate {
-	cu.mutation.SetStudentID(id)
-	return cu
-}
-
-// SetNillableStudentID sets the "student" edge to the Student entity by ID if the given value is not nil.
-func (cu *CourseUpdate) SetNillableStudentID(id *uuid.UUID) *CourseUpdate {
-	if id != nil {
-		cu = cu.SetStudentID(*id)
-	}
-	return cu
-}
-
-// SetStudent sets the "student" edge to the Student entity.
-func (cu *CourseUpdate) SetStudent(s *Student) *CourseUpdate {
-	return cu.SetStudentID(s.ID)
-}
-
 // SetTutorID sets the "tutor" edge to the Tutor entity by ID.
 func (cu *CourseUpdate) SetTutorID(id uuid.UUID) *CourseUpdate {
 	cu.mutation.SetTutorID(id)
@@ -229,12 +209,6 @@ func (cu *CourseUpdate) RemoveClass(c ...*Class) *CourseUpdate {
 	return cu.RemoveClasIDs(ids...)
 }
 
-// ClearStudent clears the "student" edge to the Student entity.
-func (cu *CourseUpdate) ClearStudent() *CourseUpdate {
-	cu.mutation.ClearStudent()
-	return cu
-}
-
 // ClearTutor clears the "tutor" edge to the Tutor entity.
 func (cu *CourseUpdate) ClearTutor() *CourseUpdate {
 	cu.mutation.ClearTutor()
@@ -290,11 +264,6 @@ func (cu *CourseUpdate) check() error {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Course.description": %w`, err)}
 		}
 	}
-	if v, ok := cu.mutation.CourseStatus(); ok {
-		if err := course.CourseStatusValidator(v); err != nil {
-			return &ValidationError{Name: "course_status", err: fmt.Errorf(`ent: validator failed for field "Course.course_status": %w`, err)}
-		}
-	}
 	if v, ok := cu.mutation.PricePerHour(); ok {
 		if err := course.PricePerHourValidator(v); err != nil {
 			return &ValidationError{Name: "price_per_hour", err: fmt.Errorf(`ent: validator failed for field "Course.price_per_hour": %w`, err)}
@@ -333,13 +302,13 @@ func (cu *CourseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(course.FieldTopic, field.TypeString, value)
 	}
 	if value, ok := cu.mutation.EstimatedTime(); ok {
-		_spec.SetField(course.FieldEstimatedTime, field.TypeTime, value)
+		_spec.SetField(course.FieldEstimatedTime, field.TypeInt, value)
+	}
+	if value, ok := cu.mutation.AddedEstimatedTime(); ok {
+		_spec.AddField(course.FieldEstimatedTime, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.Description(); ok {
 		_spec.SetField(course.FieldDescription, field.TypeString, value)
-	}
-	if value, ok := cu.mutation.CourseStatus(); ok {
-		_spec.SetField(course.FieldCourseStatus, field.TypeString, value)
 	}
 	if value, ok := cu.mutation.PricePerHour(); ok {
 		_spec.SetField(course.FieldPricePerHour, field.TypeInt, value)
@@ -467,41 +436,6 @@ func (cu *CourseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cu.mutation.StudentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
-			Table:   course.StudentTable,
-			Columns: []string{course.StudentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: student.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.StudentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
-			Table:   course.StudentTable,
-			Columns: []string{course.StudentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: student.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if cu.mutation.TutorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -576,20 +510,21 @@ func (cuo *CourseUpdateOne) SetTopic(s string) *CourseUpdateOne {
 }
 
 // SetEstimatedTime sets the "estimated_time" field.
-func (cuo *CourseUpdateOne) SetEstimatedTime(t time.Time) *CourseUpdateOne {
-	cuo.mutation.SetEstimatedTime(t)
+func (cuo *CourseUpdateOne) SetEstimatedTime(i int) *CourseUpdateOne {
+	cuo.mutation.ResetEstimatedTime()
+	cuo.mutation.SetEstimatedTime(i)
+	return cuo
+}
+
+// AddEstimatedTime adds i to the "estimated_time" field.
+func (cuo *CourseUpdateOne) AddEstimatedTime(i int) *CourseUpdateOne {
+	cuo.mutation.AddEstimatedTime(i)
 	return cuo
 }
 
 // SetDescription sets the "description" field.
 func (cuo *CourseUpdateOne) SetDescription(s string) *CourseUpdateOne {
 	cuo.mutation.SetDescription(s)
-	return cuo
-}
-
-// SetCourseStatus sets the "course_status" field.
-func (cuo *CourseUpdateOne) SetCourseStatus(s string) *CourseUpdateOne {
-	cuo.mutation.SetCourseStatus(s)
 	return cuo
 }
 
@@ -676,25 +611,6 @@ func (cuo *CourseUpdateOne) AddClass(c ...*Class) *CourseUpdateOne {
 	return cuo.AddClasIDs(ids...)
 }
 
-// SetStudentID sets the "student" edge to the Student entity by ID.
-func (cuo *CourseUpdateOne) SetStudentID(id uuid.UUID) *CourseUpdateOne {
-	cuo.mutation.SetStudentID(id)
-	return cuo
-}
-
-// SetNillableStudentID sets the "student" edge to the Student entity by ID if the given value is not nil.
-func (cuo *CourseUpdateOne) SetNillableStudentID(id *uuid.UUID) *CourseUpdateOne {
-	if id != nil {
-		cuo = cuo.SetStudentID(*id)
-	}
-	return cuo
-}
-
-// SetStudent sets the "student" edge to the Student entity.
-func (cuo *CourseUpdateOne) SetStudent(s *Student) *CourseUpdateOne {
-	return cuo.SetStudentID(s.ID)
-}
-
 // SetTutorID sets the "tutor" edge to the Tutor entity by ID.
 func (cuo *CourseUpdateOne) SetTutorID(id uuid.UUID) *CourseUpdateOne {
 	cuo.mutation.SetTutorID(id)
@@ -751,12 +667,6 @@ func (cuo *CourseUpdateOne) RemoveClass(c ...*Class) *CourseUpdateOne {
 		ids[i] = c[i].ID
 	}
 	return cuo.RemoveClasIDs(ids...)
-}
-
-// ClearStudent clears the "student" edge to the Student entity.
-func (cuo *CourseUpdateOne) ClearStudent() *CourseUpdateOne {
-	cuo.mutation.ClearStudent()
-	return cuo
 }
 
 // ClearTutor clears the "tutor" edge to the Tutor entity.
@@ -827,11 +737,6 @@ func (cuo *CourseUpdateOne) check() error {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Course.description": %w`, err)}
 		}
 	}
-	if v, ok := cuo.mutation.CourseStatus(); ok {
-		if err := course.CourseStatusValidator(v); err != nil {
-			return &ValidationError{Name: "course_status", err: fmt.Errorf(`ent: validator failed for field "Course.course_status": %w`, err)}
-		}
-	}
 	if v, ok := cuo.mutation.PricePerHour(); ok {
 		if err := course.PricePerHourValidator(v); err != nil {
 			return &ValidationError{Name: "price_per_hour", err: fmt.Errorf(`ent: validator failed for field "Course.price_per_hour": %w`, err)}
@@ -887,13 +792,13 @@ func (cuo *CourseUpdateOne) sqlSave(ctx context.Context) (_node *Course, err err
 		_spec.SetField(course.FieldTopic, field.TypeString, value)
 	}
 	if value, ok := cuo.mutation.EstimatedTime(); ok {
-		_spec.SetField(course.FieldEstimatedTime, field.TypeTime, value)
+		_spec.SetField(course.FieldEstimatedTime, field.TypeInt, value)
+	}
+	if value, ok := cuo.mutation.AddedEstimatedTime(); ok {
+		_spec.AddField(course.FieldEstimatedTime, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.Description(); ok {
 		_spec.SetField(course.FieldDescription, field.TypeString, value)
-	}
-	if value, ok := cuo.mutation.CourseStatus(); ok {
-		_spec.SetField(course.FieldCourseStatus, field.TypeString, value)
 	}
 	if value, ok := cuo.mutation.PricePerHour(); ok {
 		_spec.SetField(course.FieldPricePerHour, field.TypeInt, value)
@@ -1013,41 +918,6 @@ func (cuo *CourseUpdateOne) sqlSave(ctx context.Context) (_node *Course, err err
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: class.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if cuo.mutation.StudentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
-			Table:   course.StudentTable,
-			Columns: []string{course.StudentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: student.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.StudentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
-			Table:   course.StudentTable,
-			Columns: []string{course.StudentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: student.FieldID,
 				},
 			},
 		}

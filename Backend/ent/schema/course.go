@@ -21,9 +21,8 @@ func (Course) Fields() []ent.Field {
 		field.String("title").NotEmpty(),
 		field.String("subject").NotEmpty(), //new attribute
 		field.String("topic").NotEmpty(),   //new attribute
-		field.Time("estimated_time"),
+		field.Int("estimated_time"),
 		field.String("description").NotEmpty(),
-		field.String("course_status").NotEmpty(),
 		field.Int("price_per_hour").Positive(),
 		field.Enum("level").
 			Values("Grade1", "Grade2", "Grade3", "Grade4", "Grade5", "Grade6", "Grade7", "Grade8", "Grade9", "Grade10", "Grade11", "Grade12").
@@ -36,9 +35,6 @@ func (Course) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("review_course", ReviewCourse.Type),
 		edge.To("class", Class.Type),
-		edge.From("student", Student.Type).
-			Ref("course").
-			Unique(),
 		edge.From("tutor", Tutor.Type).
 			Ref("course").
 			Unique().

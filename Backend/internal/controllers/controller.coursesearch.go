@@ -47,3 +47,24 @@ func (cR *controllerCourseSearch) SearchContent(c echo.Context) (err error) {
 	})
 	return nil
 }
+
+func (cR *controllerCourseSearch) GetAllCourse(c echo.Context) (err error) {
+
+	Course_search_result, err := cR.service.SearchAllCourse()
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaResponses{
+			Success: false,
+			Message: err.Error(),
+			Data:    nil,
+		})
+		return err
+	}
+
+	c.JSON(http.StatusOK, schema.CourseSearchResponse{
+		Success: true,
+		Message: "Search successfully",
+		Data:    Course_search_result,
+	})
+	return
+}

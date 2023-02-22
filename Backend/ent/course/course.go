@@ -23,8 +23,6 @@ const (
 	FieldEstimatedTime = "estimated_time"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
-	// FieldCourseStatus holds the string denoting the course_status field in the database.
-	FieldCourseStatus = "course_status"
 	// FieldPricePerHour holds the string denoting the price_per_hour field in the database.
 	FieldPricePerHour = "price_per_hour"
 	// FieldLevel holds the string denoting the level field in the database.
@@ -35,8 +33,6 @@ const (
 	EdgeReviewCourse = "review_course"
 	// EdgeClass holds the string denoting the class edge name in mutations.
 	EdgeClass = "class"
-	// EdgeStudent holds the string denoting the student edge name in mutations.
-	EdgeStudent = "student"
 	// EdgeTutor holds the string denoting the tutor edge name in mutations.
 	EdgeTutor = "tutor"
 	// Table holds the table name of the course in the database.
@@ -55,13 +51,6 @@ const (
 	ClassInverseTable = "classes"
 	// ClassColumn is the table column denoting the class relation/edge.
 	ClassColumn = "course_class"
-	// StudentTable is the table that holds the student relation/edge.
-	StudentTable = "courses"
-	// StudentInverseTable is the table name for the Student entity.
-	// It exists in this package in order to avoid circular dependency with the "student" package.
-	StudentInverseTable = "students"
-	// StudentColumn is the table column denoting the student relation/edge.
-	StudentColumn = "student_course"
 	// TutorTable is the table that holds the tutor relation/edge.
 	TutorTable = "courses"
 	// TutorInverseTable is the table name for the Tutor entity.
@@ -79,7 +68,6 @@ var Columns = []string{
 	FieldTopic,
 	FieldEstimatedTime,
 	FieldDescription,
-	FieldCourseStatus,
 	FieldPricePerHour,
 	FieldLevel,
 	FieldCoursePictureURL,
@@ -88,7 +76,6 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "courses"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"student_course",
 	"tutor_course",
 }
 
@@ -116,8 +103,6 @@ var (
 	TopicValidator func(string) error
 	// DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	DescriptionValidator func(string) error
-	// CourseStatusValidator is a validator for the "course_status" field. It is called by the builders before save.
-	CourseStatusValidator func(string) error
 	// PricePerHourValidator is a validator for the "price_per_hour" field. It is called by the builders before save.
 	PricePerHourValidator func(int) error
 	// DefaultID holds the default value on creation for the "id" field.
