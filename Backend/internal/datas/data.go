@@ -16,10 +16,10 @@ func TestData(client *ent.Client) {
 
 	ctx := context.Background()
 
-	client.Course.Delete().Exec(ctx)
 	client.Tutor.Delete().Exec(ctx)
 	client.Student.Delete().Exec(ctx)
 	client.User.Delete().Exec(ctx)
+	client.Course.Delete().Exec(ctx)
 
 	ps, _ := utils.HashPassword("brightHeemen")
 	user1, err := client.User.Create().
@@ -32,6 +32,7 @@ func TestData(client *ent.Client) {
 		SetLastName("Jukjeejid").
 		SetGender("male").
 		SetBirthDate(time.Now()).
+		SetProfilePictureURL("profile url").
 		SetRole(user.RoleStudent).
 		Save(ctx)
 
@@ -48,6 +49,7 @@ func TestData(client *ent.Client) {
 		SetFirstName("Bright").
 		SetLastName("Jukjeejid").
 		SetGender("female").
+		SetProfilePictureURL("profile url").
 		SetBirthDate(time.Now()).
 		SetRole(user.RoleTutor).
 		Save(ctx)
@@ -61,14 +63,16 @@ func TestData(client *ent.Client) {
 
 	client.Student.Create().
 		SetUserID(user1.ID).
-		Save(context.Background())
+		Save(ctx)
 
-	tutor1, err := client.Tutor.Create().
+	tutor1, _ := client.Tutor.Create().
 		SetUserID(user2.ID).
 		SetCitizenID("1234567890123").
-		Save(context.Background())
+		SetOmiseBankToken("bank token").
+		SetDescription("test description").
+		Save(ctx)
 
-	course1, err := client.Course.Create().
+	client.Course.Create().
 		SetTutorID(tutor1.ID).
 		SetTitle("sexeducation").
 		SetSubject("test").
@@ -79,10 +83,5 @@ func TestData(client *ent.Client) {
 		SetLevel(course.LevelGrade1).
 		SetCoursePictureURL("picture url").
 		Save(ctx)
-	// tutor1.Update().AddCourseIDs(course1.ID).Save(ctx)
-	fmt.Println("--data--")
-	fmt.Println(user1.Edges.Tutor)
-	fmt.Println(course1)
-	fmt.Println("--data--")
 
 }

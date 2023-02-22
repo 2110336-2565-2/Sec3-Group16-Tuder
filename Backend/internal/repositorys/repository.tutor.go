@@ -30,6 +30,7 @@ func (r *repositoryTutor) GetTutorByUsernameRepository(sr *schema.SchemaGetTutor
 	tutor, err := r.client.Tutor.
 		Query().
 		Where(entTutor.HasUserWith(entUser.UsernameEQ(sr.Username))).
+		WithUser().
 		Only(r.ctx)
 	if err != nil {
 		return nil, err
@@ -39,7 +40,8 @@ func (r *repositoryTutor) GetTutorByUsernameRepository(sr *schema.SchemaGetTutor
 
 func (r *repositoryTutor) GetTutorsRepository() ([]*ent.Tutor, error) {
 	tutor, err := r.client.Tutor.
-		Query().	
+		Query().
+		WithUser().
 		All(r.ctx)
 	if err != nil {
 		return nil, err
