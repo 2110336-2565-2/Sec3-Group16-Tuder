@@ -1,8 +1,6 @@
 package services
 
 import (
-	"fmt"
-
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -81,15 +79,13 @@ func (s *serviceCourseSearch) CourseSearchByContent(CourseInfoByContent *schemas
 
 func (s *serviceCourseSearch) SearchAllCourse() ([]*schemas.CourseSearchResult, error) {
 	courses, err := s.repository.SearchAll()
-	// fmt.Println(courses)
-	// fmt.Println(err)
 	if err != nil {
 		return nil, err
 	}
 	var courseResponses []*schemas.CourseSearchResult
 	for _, course := range courses {
 		
-		
+
 		courseResponses = append(courseResponses, &schemas.CourseSearchResult{
 			Course_id:          course.ID,
 			Tutor_name:         course.Edges.Tutor.Edges.User.Username,
@@ -101,7 +97,6 @@ func (s *serviceCourseSearch) SearchAllCourse() ([]*schemas.CourseSearchResult, 
 			Course_picture_url: *course.CoursePictureURL,
 		})
 	}
-	fmt.Println(courseResponses)
-	fmt.Println(err)
+
 	return courseResponses, nil
 }
