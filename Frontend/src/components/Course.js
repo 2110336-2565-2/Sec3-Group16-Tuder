@@ -4,6 +4,7 @@ export default function Course(props){
     return (
         <>
             <CardHeader>
+                <CardImg src={props.img}/>
                 <CardContent >
                     {props.coursename}
                 </CardContent>
@@ -11,14 +12,27 @@ export default function Course(props){
                     {props.tutor}
                 </CardContent>
                 <CardContent>
-                    {props.content}
+                    {props.topic}
+                </CardContent>  
+                <CardContent>
+                    {props.subject}
+                </CardContent>  
+                <CardContent>
+                    Time: {props.time} hr
+                </CardContent>  
+                <CardContent>
+                    Price/hr: {props.price}
                 </CardContent>    
             </CardHeader>
         </>
     )
 }
 
-
+const CardImg = styled.img`
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+`
 
 const CardHeader = styled.div`
     display: flex;
