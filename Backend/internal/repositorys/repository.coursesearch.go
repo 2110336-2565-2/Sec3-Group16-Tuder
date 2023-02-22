@@ -21,7 +21,7 @@ type repositorySearch  struct {
 	ctx    context.Context
 }
 
-func NewRepositorySearch (c *ent.Client) *repositorySearch  {
+func NewRepositoryCourseSearch (c *ent.Client) *repositorySearch  {
 	return &repositorySearch {client: c, ctx: context.Background()}
 }
 
