@@ -4,7 +4,7 @@ import StudentInfo from "../components/profile/StudentInfo.js";
 import TutorInfo from "../components/profile/TutorInfo.js";
 import { dummyStudent, dummyTutor } from "../datas/Profile.role.js";
 
-export default function EditProfile() {
+export default function Profile() {
     function capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
     }

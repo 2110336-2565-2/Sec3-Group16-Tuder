@@ -1,5 +1,5 @@
 import React from 'react'
-import { InfoContainter, InfoTitle, InfoContent, InfoWrapper } from './profileStyle.js'
+import { InfoContainter, InfoTitle, InfoContent, InfoWrapper } from './ProfileStyle.js'
 
 export default function StudentInfo({user}) {
   return (
