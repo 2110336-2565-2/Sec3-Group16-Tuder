@@ -57,7 +57,6 @@ func (r *repositoryTutor) CreateTutor(sr *schema.SchemaCreateTutor) (*ent.Tutor,
 	// wrap the client with the transaction
 	txc := tx.Client()
 
-
 	newUser, err := txc.User.Create().
 		SetUsername(sr.Username).
 		SetPassword(sr.Password).
@@ -90,7 +89,7 @@ func (r *repositoryTutor) CreateTutor(sr *schema.SchemaCreateTutor) (*ent.Tutor,
 		return nil, err
 	}
 
-	return tutor, tx.Commit()	
+	return tutor, tx.Commit()
 }
 
 func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor, error) {
@@ -102,7 +101,6 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 	}
 	// wrap the client with the transaction
 	txc := tx.Client()
-
 
 	tutor, err := txc.Tutor.
 		UpdateOneID(sr.ID).
@@ -146,7 +144,7 @@ func (r *repositoryTutor) DeleteTutor(sr *schema.SchemaDeleteTutor) error {
 			err = fmt.Errorf("%w: %v", err, rerr)
 		}
 		return err
-	}	
+	}
 
 	return nil
 }
