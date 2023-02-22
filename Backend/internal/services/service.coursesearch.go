@@ -88,9 +88,8 @@ func (s *serviceCourseSearch) SearchAllCourse() ([]*schemas.CourseSearchResult, 
 	}
 	var courseResponses []*schemas.CourseSearchResult
 	for _, course := range courses {
-		fmt.Println("here")
-		fmt.Println(course.Edges.Tutor)
-		fmt.Println("here")
+		
+		
 		courseResponses = append(courseResponses, &schemas.CourseSearchResult{
 			Course_id:          course.ID,
 			Tutor_name:         course.Edges.Tutor.Edges.User.Username,

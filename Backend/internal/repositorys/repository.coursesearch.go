@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 )
@@ -42,6 +43,9 @@ func (r repositoryCourseSearch) SearchByTutorNameRepository(sr *schema.CourseSea
 func (r repositoryCourseSearch) SearchAll() ([]*ent.Course, error) {
 	courses, err := r.client.Course.
 		Query().
+		WithTutor(func(q *ent.TutorQuery) {
+			q.WithUser()        
+		}).
 		All(r.ctx)
 
 	if err != nil {

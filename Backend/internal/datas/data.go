@@ -16,10 +16,10 @@ func TestData(client *ent.Client) {
 
 	ctx := context.Background()
 
+	client.Course.Delete().Exec(ctx)
 	client.Tutor.Delete().Exec(ctx)
 	client.Student.Delete().Exec(ctx)
 	client.User.Delete().Exec(ctx)
-	client.Course.Delete().Exec(ctx)
 
 	ps, _ := utils.HashPassword("brightHeemen")
 	user1, err := client.User.Create().
@@ -69,7 +69,7 @@ func TestData(client *ent.Client) {
 		Save(context.Background())
 
 	course1, err := client.Course.Create().
-		SetTutor(tutor1).
+		SetTutorID(tutor1.ID).
 		SetTitle("sexeducation").
 		SetSubject("test").
 		SetTopic("topichee").
@@ -79,11 +79,10 @@ func TestData(client *ent.Client) {
 		SetLevel(course.LevelGrade1).
 		SetCoursePictureURL("picture url").
 		Save(ctx)
-	tutor1.Update().AddCourseIDs(course1.ID).Save(ctx)
+	// tutor1.Update().AddCourseIDs(course1.ID).Save(ctx)
 	fmt.Println("--data--")
-	fmt.Println(tutor1.Edges.User)
-	fmt.Println(user2)
+	fmt.Println(user1.Edges.Tutor)
+	fmt.Println(course1)
 	fmt.Println("--data--")
-	// fmt.Println(course1)
-	// fmt.Println(err)
+
 }
