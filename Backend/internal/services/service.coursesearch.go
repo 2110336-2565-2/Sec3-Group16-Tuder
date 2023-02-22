@@ -1,21 +1,21 @@
 package services
 
 import (
-	"fmt"
-
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 )
 
 type ServiceCourseSearch interface {
-	CourseSearchService(l *schemas.CourseSearch) (*schemas.CourseSearchResponse, error)
-	// CourseSearchByTutorName(CourseInfoByTutorName *schemas.SchemaUpdateTutor) ([]*ent.Course, error)
-	// CourseSearchByCourseName(CourseInfoByCourseName *schemas.SchemaUpdateTutor) ([]*ent.Course, error)
-	// CourseSearchByTime(CourseInfoByTime *schemas.SchemaUpdateTutor) ([]*ent.Course, error)
-	// CourseSearchByDay(CourseInfoByDay *schemas.SchemaUpdateTutor) ([]*ent.Course, error)
-	// CourseSearchByContent(CourseInfoByContent *schemas.SchemaUpdateTutor) ([]*ent.Course, error)
+	CourseSearchService(l *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error)
+	CourseSearchByTitle(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error)
+	CourseSearchBySubject(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error)
+	CourseSearchByTopic(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error)
+	CourseSearchByTutor(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error)
+	CourseSearchByDay(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error)
 	SearchAllCourse() ([]*schemas.CourseSearchResult, error)
+	Interception(l1 []*schemas.CourseSearchResult, l2 []*schemas.CourseSearchResult) []*schemas.CourseSearchResult
+	PackToSchema(course []*ent.Course) []*schemas.CourseSearchResult
 }
 
 type serviceCourseSearch struct {
@@ -26,70 +26,27 @@ func NewServiceCourseSearch(l repositorys.RepositoryCourseSearch) *serviceCourse
 	return &serviceCourseSearch{repository: l}
 }
 
-func (s *serviceCourseSearch) CourseSearchService(l *schemas.CourseSearch) (*schemas.CourseSearchResponse, error) {
-
-	// check password
-	// luser, err := s.repository.LoginRepository(l)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// if !utils.CheckPasswordHash(l.Password, luser.Password) {
-	// 	return nil, errors.New("the password isn't match")
-	// }
-
-	// token, _ := utils.GenerateLoginToken(luser.Username,luser.Role.String(), true)
-
-	// return &schemas.SchemaLoginResponses{
-	// 	Username: luser.Username,
-	// 	Token:    token,
-	// 	Role:     luser.Role.String(),
-	// 	}, nil
-	return nil, nil
-}
-
-func (s *serviceCourseSearch) CourseSearchByTutorName(CourseInfoByTutorName *schemas.SchemaUpdateTutor) ([]*ent.Course, error) {
-	// CourseInfo, err := s.repository.SearchByTutorNameRepository(CourseInfoByTutorName)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	return nil, nil
-}
-
-func (s *serviceCourseSearch) CourseSearchByCourseName(CourseInfoByCourseName *schemas.SchemaUpdateTutor) ([]*ent.Course, error) {
-	// CourseInfo, err := s.repository.SearchByCourseNameRepository(CourseInfoByCourseName)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	return nil, nil
-}
-
-func (s *serviceCourseSearch) CourseSearchByDayAvailable(CourseInfoByDayAvailable *schemas.SchemaUpdateTutor) ([]*ent.Course, error) {
-	// CourseInfo, err := s.repository.SearchByDayAvailableRepository(CourseInfoByDayAvailable)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	return nil, nil
-}
-func (s *serviceCourseSearch) CourseSearchByContent(CourseInfoByContent *schemas.SchemaUpdateTutor) ([]*ent.Course, error) {
-	// CourseInfo, err := s.repository.SearchByContentRepository(CourseInfoByContent)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	return nil, nil
-}
-
-func (s *serviceCourseSearch) SearchAllCourse() ([]*schemas.CourseSearchResult, error) {
-	courses, err := s.repository.SearchAll()
-	// fmt.Println(courses)
-	// fmt.Println(err)
-	if err != nil {
-		return nil, err
+func (s *serviceCourseSearch) Interception(l1 []*schemas.CourseSearchResult, l2 []*schemas.CourseSearchResult) []*schemas.CourseSearchResult {
+	for _, course_ref := range l2 {
+		ref := course_ref.Course_id
+		stattus := true
+		for _, course_check := range l1 {
+			if ref == course_check.Course_id {
+				stattus = false
+				break
+			}
+		}
+		if stattus == true {
+			l2 = append(l2, course_ref)
+		}
 	}
+	return l2
+}
+
+func (s *serviceCourseSearch) PackToSchema(courses []*ent.Course) []*schemas.CourseSearchResult {
 	var courseResponses []*schemas.CourseSearchResult
 	for _, course := range courses {
-		
-		
+
 		courseResponses = append(courseResponses, &schemas.CourseSearchResult{
 			Course_id:          course.ID,
 			Tutor_name:         course.Edges.Tutor.Edges.User.Username,
@@ -101,7 +58,90 @@ func (s *serviceCourseSearch) SearchAllCourse() ([]*schemas.CourseSearchResult, 
 			Course_picture_url: *course.CoursePictureURL,
 		})
 	}
-	fmt.Println(courseResponses)
-	fmt.Println(err)
+	return courseResponses
+}
+
+func (s *serviceCourseSearch) CourseSearchService(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error) {
+	if ((((searchContent.Title == "") && (searchContent.Subject == "")) && (searchContent.Topic == "")) && (searchContent.Tutor_name == "")) && (searchContent.Days == [7]bool{false, false, false, false, false, false, false}) {
+		return s.SearchAllCourse()
+	}
+	searchResult, _ := s.CourseSearchByTitle(searchContent)
+	subjectSearch, _ := s.CourseSearchBySubject(searchContent)
+	searchResult = s.Interception(subjectSearch, searchResult)
+	topicSearch, _ := s.CourseSearchByTopic(searchContent)
+	searchResult = s.Interception(topicSearch, searchResult)
+	tutorSearch, _ := s.CourseSearchByTutor(searchContent)
+	searchResult = s.Interception(tutorSearch, searchResult)
+	daySearch, _ := s.CourseSearchByDay(searchContent)
+	searchResult = s.Interception(daySearch, searchResult)
+
+	return nil, nil
+}
+
+func (s *serviceCourseSearch) CourseSearchByTutor(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error) {
+	if searchContent.Tutor_name == "" {
+		return []*schemas.CourseSearchResult{}, nil
+	}
+	courses, err := s.repository.SearchByTutorRepository(searchContent)
+	if err != nil {
+		return nil, err
+	}
+	courseResponses := s.PackToSchema(courses)
+	return courseResponses, nil
+}
+
+func (s *serviceCourseSearch) CourseSearchByTitle(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error) {
+	if searchContent.Title == "" {
+		return []*schemas.CourseSearchResult{}, nil
+	}
+	courses, err := s.repository.SearchByTitleRepository(searchContent)
+	if err != nil {
+		return nil, err
+	}
+	courseResponses := s.PackToSchema(courses)
+	return courseResponses, nil
+}
+
+func (s *serviceCourseSearch) CourseSearchByDay(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error) {
+	if searchContent.Days == [7]bool{false, false, false, false, false, false, false} {
+		return []*schemas.CourseSearchResult{}, nil
+	}
+	courses, err := s.repository.SearchByDayRepository(searchContent)
+	if err != nil {
+		return nil, err
+	}
+	courseResponses := s.PackToSchema(courses)
+	return courseResponses, nil
+}
+func (s *serviceCourseSearch) CourseSearchByTopic(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error) {
+	if searchContent.Topic == "" {
+		return []*schemas.CourseSearchResult{}, nil
+	}
+	courses, err := s.repository.SearchByTopicRepository(searchContent)
+	if err != nil {
+		return nil, err
+	}
+	courseResponses := s.PackToSchema(courses)
+	return courseResponses, nil
+}
+
+func (s *serviceCourseSearch) CourseSearchBySubject(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error) {
+	if searchContent.Subject == "" {
+		return []*schemas.CourseSearchResult{}, nil
+	}
+	courses, err := s.repository.SearchBySucjectRepository(searchContent)
+	if err != nil {
+		return nil, err
+	}
+	courseResponses := s.PackToSchema(courses)
+	return courseResponses, nil
+}
+
+func (s *serviceCourseSearch) SearchAllCourse() ([]*schemas.CourseSearchResult, error) {
+	courses, err := s.repository.SearchAll()
+	if err != nil {
+		return nil, err
+	}
+	courseResponses := s.PackToSchema(courses)
 	return courseResponses, nil
 }

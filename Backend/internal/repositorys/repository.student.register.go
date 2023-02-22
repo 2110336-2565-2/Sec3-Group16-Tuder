@@ -30,6 +30,7 @@ func (r repositoryStudentRegister) RegisterStudentRepository(sr *schema.SchemaRe
 	if err != nil {
 		return nil, fmt.Errorf("starting a transaction: %w", err)
 	}
+	
 	// wrap the client with the transaction
 	txc := tx.Client()
 
