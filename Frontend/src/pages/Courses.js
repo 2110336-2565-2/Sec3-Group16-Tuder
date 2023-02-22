@@ -1,15 +1,16 @@
 import CourseList from "../components/CourseList";
-import CourseSearchBar from "../components/CourseSearchBar";
+import CourseSearchForm from "../components/FormCourseSearch";
 import styled from "styled-components";
 
 export default function Courses(){
 
+
+
     return (
         <CourseListPage>
             <h1>Courses</h1>
-            <CourseSearchBar />
+            <CourseSearchForm />
             <CourseList>
-
             </CourseList>
         </CourseListPage>
     )

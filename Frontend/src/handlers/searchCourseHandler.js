@@ -1,12 +1,8 @@
-import api from './apiHandler';
-
-export const fetchCourseHandler = () => {
-    return api.get('/courses')
-}
+import api from '../api';
 
 
-export const fetchCoursebyJSONHandler = (searchData) => {
-    return api.post('/course', searchData).then((response) => {
+export default async function searchCourseHandler(searchData, navigate){
+    await api.post('/api/v1/course', searchData).then((response) => {
         
         let res = response.data;
 
@@ -15,6 +11,8 @@ export const fetchCoursebyJSONHandler = (searchData) => {
         if (res.success === true) {
             
             // change state and put jwt token on a local storage
+            
+            navigate('/')
             
         }
 
@@ -26,4 +24,5 @@ export const fetchCoursebyJSONHandler = (searchData) => {
             throw new Error(res.message);
         }
     });
-}   
+
+}

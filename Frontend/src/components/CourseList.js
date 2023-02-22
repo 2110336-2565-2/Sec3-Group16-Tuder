@@ -12,7 +12,6 @@ export default function CourseList(){
         fetchCourseHandler
         );
 
-
     if (isLoading) {
         return <div>Loading...</div>
     }
@@ -23,7 +22,6 @@ export default function CourseList(){
 
     return (
         <>
-
             <CourseListPage>
                 { data.data.map(item => (  
                     <CourseListcontent key={item.courseid}>
