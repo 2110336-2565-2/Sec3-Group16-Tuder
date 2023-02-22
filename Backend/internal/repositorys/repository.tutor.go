@@ -106,7 +106,6 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 
 	tutor, err := txc.Tutor.
 		UpdateOneID(sr.ID).
-		SetUserID(newUser.ID).
 		SetDescription(sr.Description).
 		SetOmiseBankToken(sr.OmiseBankToken).
 		Save(r.ctx)
@@ -140,9 +139,9 @@ func (r *repositoryTutor) DeleteTutor(sr *schema.SchemaDeleteTutor) error {
 		return err
 	}
 
-	uerr = txc.User.DeleteOneID(sr.UserID).Exec(r.ctx)
+	err = txc.User.DeleteOneID(sr.ID).Exec(r.ctx)
 
-	if uerr != nil {
+	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
 			err = fmt.Errorf("%w: %v", err, rerr)
 		}
