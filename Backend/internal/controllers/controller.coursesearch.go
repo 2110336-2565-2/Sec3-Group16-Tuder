@@ -29,7 +29,7 @@ func (cR *controllerCourseSearch) SearchContent(c echo.Context) (err error) {
 		return err
 	}
 
-	searchContentInfo, err := cR.service.CourseSearchService(searchContent)
+	Course_search_result, err := cR.service.CourseSearchService(searchContent)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaResponses{
@@ -40,12 +40,12 @@ func (cR *controllerCourseSearch) SearchContent(c echo.Context) (err error) {
 		return err
 	}
 
-	c.JSON(http.StatusOK, schema.SchemaResponses{
+	c.JSON(http.StatusOK, schema.CourseSearchResponse{
 		Success: true,
 		Message: "Search successfully",
-		Data:    searchContentInfo,
+		Data:    Course_search_result,
 	})
-	return nil
+	return
 }
 
 func (cR *controllerCourseSearch) GetAllCourse(c echo.Context) (err error) {

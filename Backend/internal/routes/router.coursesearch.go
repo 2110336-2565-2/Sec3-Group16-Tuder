@@ -14,6 +14,6 @@ func InitCourseSearchRoutes(c *ent.Client, e *echo.Group) {
 	serviceCourseSearch := service.NewServiceCourseSearch(repoCourseSearch)
 	controllerCourseSearch := controller.NewControllerCourseSearch(serviceCourseSearch)
 
-	e.POST("/coursesearch", controllerCourseSearch.SearchContent)
+	e.GET("/coursesearch", controllerCourseSearch.SearchContent)
 	e.GET("/courses", controllerCourseSearch.GetAllCourse)
 }
