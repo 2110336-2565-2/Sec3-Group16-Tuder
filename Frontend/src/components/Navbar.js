@@ -1,10 +1,27 @@
 import { Outlet, Link } from 'react-router-dom';
 import navbarContent from '../datas/Navbar.role.js';
 import styled from 'styled-components';
+import {signOutAction} from '../handlers/signOutHandler';
+import {useNavigate} from 'react-router-dom';
+import React, { Fragment } from 'react';
+import useRole from '../hooks/useRole';
 
-export default function Navbar(props){
+
+
+export default function Navbar(){
     // choose Navbar contents array from role 
-    const {role} = props;
+    
+    const [role, handleRole] = useRole();
+    const navigate = useNavigate();
+
+    
+    
+    function signOutHandler(e) {
+        e.preventDefault();
+        signOutAction(navigate);
+        handleRole();
+    }
+
     let navbarRole = null
     if(role === 'guest'){
         navbarRole = navbarContent[0]
@@ -19,37 +36,41 @@ export default function Navbar(props){
     const contents = navbarRole.content;
     // change to component for use in JSX  --> Generate NavItem for each content
     const contentElement = contents.map((content, index) => {
-        if(content === 'Home'){
-            return <NavbarItem><TuderLinkNav to='/' key={index}>{content}</TuderLinkNav></NavbarItem>
-        }else if(content === 'Sign Up'){
-            return <NavbarItem><TuderButton type='tudor-button' to="/SignUp" key={index}>{content}</TuderButton></NavbarItem>
-        }else if(content === 'Sign In'){
-            return <NavbarItem><TuderLinkNav to='/SignIn' key={index}>{content}</TuderLinkNav></NavbarItem>
-        }else if(content === 'Logout'){
-            return <NavbarItem><TuderButton type='red-button' to="/Logout" key={index}>{content}</TuderButton></NavbarItem>
+        if(content.title === 'Home'){
+            return <NavbarItem key="home"><TuderLinkNav to={content.link} key={index}>{content.title}</TuderLinkNav></NavbarItem>
+        }else if(content.title === 'Sign Up'){
+            return <NavbarItem key="signUp"><TuderButton type='tudor-button' to={content.link} key={index}>{content.title}</TuderButton></NavbarItem>
+        }else if(content.title === 'Sign In'){
+            return <NavbarItem key="signIn"><TuderLinkNav to={content.link} key={index}>{content.title}</TuderLinkNav></NavbarItem>
+        }else if(content.title === 'Sign Out'){
+            return <NavbarItem key="signOut"><TuderButton type='red-button' onClick={signOutHandler} key={index}>{content.title}</TuderButton></NavbarItem>
         }else{
-            let urlLink = "/" + content
-            return <NavbarItem><TuderLinkNav to= {urlLink} key={index}>{content}</TuderLinkNav></NavbarItem>
+            let urlLink = "/" + content.title
+            return <NavbarItem key={content.title}><TuderLinkNav to= {urlLink} key={index}>{content.title}</TuderLinkNav></NavbarItem>
         }
     });
 
     return (
-        <>
+        <Fragment>
             <NavbarSection>
-                <NavbarHeader>Tudor</NavbarHeader>
+                <NavbarHeader>Tuder</NavbarHeader>
                 <NavbarItems>
                     {contentElement}
                 </NavbarItems>
             </NavbarSection>   
-            <Outlet />    
-        </>
+            <Outlet context={[{role},{handleRole}]} />   
+        </Fragment>
     )
 }
 
 
+
+
+
+
 // styled-components for Navbar components
 const NavbarSection = styled.nav`
-    height: 50px;
+    height: 70px;
     display: flex;
     padding: 10px 30px;
     box-shadow: 0px 2.98px 7.45px rgba(0, 0, 0, 0.1);

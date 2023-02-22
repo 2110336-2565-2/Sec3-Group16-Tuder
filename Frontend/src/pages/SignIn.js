@@ -1,18 +1,25 @@
+import React, { Fragment } from "react";
 import styled from "styled-components"
 import FormSignIn from "../components/FormSignIn.js";
+import Footer from "../components/SignInFooter.js";
 
 export default function SignIn(){
+    
+
     return(
-        <ContainerWithHeight margintop='100px'>
-            <SeperateSection>
-                <ItemGrid justify='center' columngrid='1 / 3'>
-                    <ImageTudor width='600px' src="/images/index.png" alt="seprate70" />
-                </ItemGrid>
-                <ItemGrid columngrid='4'>
-                    <FormSignIn />
-                </ItemGrid>
-            </SeperateSection>
-        </ContainerWithHeight>
+        <Fragment>
+            <ContainerWithHeight margintop='100px'>
+                <SeperateSection>
+                    <ItemGrid justify='center' columngrid='1 / 3'>
+                        <ImageTudor width='600px' src="/images/signin.png" alt="seprate70" />
+                    </ItemGrid>
+                    <ItemGrid columngrid='4'>
+                        <FormSignIn />
+                    </ItemGrid>
+                </SeperateSection>
+            </ContainerWithHeight>
+            <Footer/>
+        </Fragment>
     )
 }
 

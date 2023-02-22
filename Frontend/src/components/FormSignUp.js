@@ -1,76 +1,174 @@
 import FormT from './FormStyle.js';
+import React, { useState } from 'react';
+import signUpHandler from '../handlers/signUpHandler.js';
+import signupContent from "../datas/SignUp.role.js";
+import styled from 'styled-components';
+
+import { useNavigate } from 'react-router-dom';
+import { Fragment } from 'react';
+
 
 export default function FormSignUp(){
+    // Input State
+    const [firstname, setFirstName] = useState('');
+    const [lastname, setLastName] = useState('');
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const  [confirmpassword, setConfirmPassword] = useState('');
+    const [address, setAddress] = useState('');
+    const [contactnumber, setContactNumber] = useState('');
+    const [gender, setGender] = useState('');
+    const [birthdate, setBirthDate] = useState('');
+    const [role, setRole] = useState('');
+
+
+    const [status, setStatus] = useState('waiting');
+ 
+    const navigate = useNavigate()
+
+
+
+    async function submitHandler(e){
+        e.preventDefault();
+        let birthdateISO = (new Date(birthdate)).toISOString(); 
+        const signUpData = {
+            username : username,
+            password: password,
+            email: email,
+            confirmpassword: confirmpassword,
+            firstname: firstname,
+            lastname: lastname,
+            address: address,
+            phone:  contactnumber,
+            birthdate: birthdateISO,
+            gender: gender,
+            role: role
+         }
+         setStatus('submitting')
+         try{
+            await signUpHandler(signUpData, navigate);
+            setStatus('success')
+        } catch (error){
+
+            // Handle by do sth
+
+            console.log(error);
+            setStatus('error');
+        }
+    }
+
+    
+
+    const signupContents = signupContent.contents;
+    const signupContentElement = signupContents.map((content, index) => {
+        return (
+        
+            <FormT.Content key={index}>
+                { 
+                content.map((element, elementindex) => {
+                    const pholder = 'Enter your ' + element;
+                    const name = element.replace(' ', '').toLowerCase()
+                    let type = ''
+                    let boxsize = ''
+                    let value = ''
+                    let onChange = eval("{(e) => set" + element.replace(/\s/g, '') + "(e.target.value)}");
+                    
+                    if(element === 'Username'){
+                        type = 'text'
+                        boxsize = '315px'
+                        value = username
+                    } else if(element === 'Email'){
+                        type = 'email'
+                        boxsize = '315px'
+                        value = email
+                    }else if(element === 'Password') {
+                        type = 'password'
+                        boxsize = '150px'
+                        value = password
+                    }
+                    else if (element === 'Confirm Password'){
+                        type = 'password'
+                        boxsize = '150px'
+                        value = confirmpassword
+                    }else if(element === 'Birth Date'){
+                        type = 'date'
+                        boxsize = '150px'
+                        value = birthdate
+                    }else if(element === 'Contact Number'){
+                        type = 'number'
+                        boxsize = '315px'
+                        value = contactnumber
+                    }else if(element === 'First Name'){
+                        type = 'text'
+                        boxsize = '150px'
+                        value = firstname
+                        
+                    }else if (element === 'Last Name'){
+                        type = 'text'
+                        boxsize = '150px'
+                        value = lastname
+                        
+                    }else if(element === 'Gender'){
+                        type = 'text'
+                        boxsize = '150px'
+                        value = gender
+                    }
+                    else if (element === 'Address'){
+                        type = 'text'
+                        boxsize = '315px'
+                        value = address
+                    }
+                    
+                    if(element === 'Birth Date'){
+                        return (
+                            <FormT.Component key={elementindex}>
+                                <FormT.Label>{element} :</FormT.Label>
+                                <FormT.DateInput BoxSize={boxsize} name={name} type={type} placeholder={pholder} value={value} onChange={onChange} required/>
+                            </FormT.Component>
+                        )
+                    }else if(element === 'Gender'){
+                        return(
+                            <FormT.Component key={elementindex}>
+                                <FormT.Label>{element} :</FormT.Label>
+                                <FormT.Select BoxSize='150px' name={name} value={value} onChange={onChange}  required >
+                                    <FormT.Option value="" disabled hidden>Please select</FormT.Option>
+                                    <FormT.Option value='male'>male</FormT.Option>
+                                    <FormT.Option value='female'>female</FormT.Option>
+                                    <FormT.Option value='-'>I don't like hee</FormT.Option>
+                                </FormT.Select>
+                            </FormT.Component>
+                        )
+                    }else{
+                        return (
+                            <FormT.Component key={elementindex}>
+                                <FormT.Label>{element} :</FormT.Label>
+                                <FormT.TextInput BoxSize={boxsize} name={name} type={type} placeholder={pholder} value={value} onChange={onChange} required/>
+                            </FormT.Component>
+                        )
+                    }
+                })}
+            </FormT.Content>
+        )
+    });
     return(
-        <form>
+        <SignUpForm onSubmit={submitHandler}>
             <FormT.Div FormW='500px'>
                 <FormT.Header>create account</FormT.Header>
                 <FormT.Content>Sign in and start managing your candidates!</FormT.Content>
+                {signupContentElement}
                 <FormT.Content>
                     <FormT.Component>
-                        <FormT.Label>First Name :</FormT.Label>
-                        <FormT.TextInput BoxSize='140x' name='firstname' type='text' placeholder='Enter your first name'/>
-                    </FormT.Component>
-                    <FormT.Space></FormT.Space>
-                    <FormT.Component>
-                        <FormT.Label>Last Name :</FormT.Label>
-                        <FormT.TextInput BoxSize='140px' name='lastname' type='text' placeholder='Enter your last name'/>
+                        <FormT.Label>As :</FormT.Label>
+                        <FormT.Select BoxSize='315px' name='role' value={role} onChange={(e) => setRole(e.target.value)}  required >
+                            <FormT.Option value="" disabled hidden>Please select</FormT.Option>
+                            <FormT.Option value='student'>Student</FormT.Option>
+                            <FormT.Option value='tutor'>Tutor</FormT.Option>
+                        </FormT.Select>
                     </FormT.Component>
                 </FormT.Content>
                 <FormT.Content>
-                    <FormT.Component>
-                        <FormT.Label>Username :</FormT.Label>
-                        <FormT.TextInput BoxSize='315px' name='username' type='text' placeholder='Enter your username'/>
-                    </FormT.Component>
-                </FormT.Content>
-                <FormT.Content>
-                    <FormT.Component>
-                        <FormT.Label>Email :</FormT.Label>
-                        <FormT.TextInput BoxSize='315px' name='email' type='email' placeholder='Enter your email'/>
-                    </FormT.Component>
-                </FormT.Content>
-                <FormT.Content>
-                    <FormT.Component>
-                        <FormT.Label>Password :</FormT.Label>
-                        <FormT.TextInput BoxSize='140x' name='password' type='password' placeholder='Enter your password'/>
-                    </FormT.Component>
-                    <FormT.Space></FormT.Space>
-                    <FormT.Component>
-                        <FormT.Label>Confirm Password :</FormT.Label>
-                        <FormT.TextInput BoxSize='140px' name='confirmpassword' type='password' placeholder='Enter your password again'/>
-                    </FormT.Component>
-                </FormT.Content>
-                <FormT.Content>
-                    <FormT.Component>
-                        <FormT.Label>Address :</FormT.Label>
-                        <FormT.TextInput BoxSize='315px' name='address' type='text' placeholder='Enter your address'/>
-                    </FormT.Component>
-                </FormT.Content>
-                <FormT.Content>
-                <FormT.Component>
-                        <FormT.Label>Contact Number :</FormT.Label>
-                        <FormT.TextInput BoxSize='315px' name='contactnumber' type='number' placeholder='Enter your contact number'/>
-                    </FormT.Component>
-                </FormT.Content>
-                <FormT.Content>
-                    <FormT.Component>
-                        <FormT.Label>Gender :</FormT.Label>
-                        <FormT.TextInput BoxSize='140x' name='password' type='password' placeholder='Enter your password'/>
-                    </FormT.Component>
-                    <FormT.Space></FormT.Space>
-                    <FormT.Component>
-                        <FormT.Label>Birth Date :</FormT.Label>
-                        <FormT.TextInput BoxSize='140px' name='confirmpassword' type='password' placeholder='Enter your password again'/>
-                    </FormT.Component>
-                </FormT.Content>
-                <FormT.Content>
-                    <FormT.Component>
-                        <FormT.Label>School :</FormT.Label>
-                        <FormT.TextInput BoxSize='315px' name='contactnumber' type='number' placeholder='Enter your contact number'/>
-                    </FormT.Component>
-                </FormT.Content>
-                <FormT.Content>
-                    <FormT.Button type='submit'>Sign in</FormT.Button>
+                    <FormT.Button type='submit'>Sign Up</FormT.Button>
                 </FormT.Content>
                 <FormT.Content>
                     <FormT.ContentSmall>
@@ -79,7 +177,14 @@ export default function FormSignUp(){
                     <FormT.Link to='/Signin' underline='none'>Sign In</FormT.Link>
                 </FormT.Content>
             </FormT.Div>
-        </form>
+        </SignUpForm>
         
     )
+              
 }
+
+const SignUpForm = styled.form`
+    display: flex;
+    justify-content: center;
+`;
+
