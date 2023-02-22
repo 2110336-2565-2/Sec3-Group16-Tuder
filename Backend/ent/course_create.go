@@ -104,23 +104,19 @@ func (cc *CourseCreate) AddReviewCourse(r ...*ReviewCourse) *CourseCreate {
 	return cc.AddReviewCourseIDs(ids...)
 }
 
-// SetClassID sets the "class" edge to the Class entity by ID.
-func (cc *CourseCreate) SetClassID(id uuid.UUID) *CourseCreate {
-	cc.mutation.SetClassID(id)
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (cc *CourseCreate) AddClasIDs(ids ...uuid.UUID) *CourseCreate {
+	cc.mutation.AddClasIDs(ids...)
 	return cc
 }
 
-// SetNillableClassID sets the "class" edge to the Class entity by ID if the given value is not nil.
-func (cc *CourseCreate) SetNillableClassID(id *uuid.UUID) *CourseCreate {
-	if id != nil {
-		cc = cc.SetClassID(*id)
+// AddClass adds the "class" edges to the Class entity.
+func (cc *CourseCreate) AddClass(c ...*Class) *CourseCreate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
-	return cc
-}
-
-// SetClass sets the "class" edge to the Class entity.
-func (cc *CourseCreate) SetClass(c *Class) *CourseCreate {
-	return cc.SetClassID(c.ID)
+	return cc.AddClasIDs(ids...)
 }
 
 // SetStudentID sets the "student" edge to the Student entity by ID.
@@ -326,7 +322,7 @@ func (cc *CourseCreate) createSpec() (*Course, *sqlgraph.CreateSpec) {
 	}
 	if nodes := cc.mutation.ClassIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   course.ClassTable,
 			Columns: []string{course.ClassColumn},

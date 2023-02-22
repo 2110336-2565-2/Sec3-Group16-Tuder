@@ -218,7 +218,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if cu.mutation.StudentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   class.StudentTable,
 			Columns: []string{class.StudentColumn},
@@ -234,7 +234,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := cu.mutation.StudentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   class.StudentTable,
 			Columns: []string{class.StudentColumn},
@@ -253,7 +253,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if cu.mutation.CourseCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   class.CourseTable,
 			Columns: []string{class.CourseColumn},
@@ -269,7 +269,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := cu.mutation.CourseIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   class.CourseTable,
 			Columns: []string{class.CourseColumn},
@@ -522,7 +522,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 	}
 	if cuo.mutation.StudentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   class.StudentTable,
 			Columns: []string{class.StudentColumn},
@@ -538,7 +538,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 	}
 	if nodes := cuo.mutation.StudentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   class.StudentTable,
 			Columns: []string{class.StudentColumn},
@@ -557,7 +557,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 	}
 	if cuo.mutation.CourseCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   class.CourseTable,
 			Columns: []string{class.CourseColumn},
@@ -573,7 +573,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 	}
 	if nodes := cuo.mutation.CourseIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   class.CourseTable,
 			Columns: []string{class.CourseColumn},

@@ -15,6 +15,8 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
 )
@@ -106,6 +108,12 @@ func (uu *UserUpdate) ClearProfilePictureURL() *UserUpdate {
 	return uu
 }
 
+// SetRole sets the "role" field.
+func (uu *UserUpdate) SetRole(u user.Role) *UserUpdate {
+	uu.mutation.SetRole(u)
+	return uu
+}
+
 // AddIssueReportIDs adds the "issue_report" edge to the IssueReport entity by IDs.
 func (uu *UserUpdate) AddIssueReportIDs(ids ...uuid.UUID) *UserUpdate {
 	uu.mutation.AddIssueReportIDs(ids...)
@@ -149,6 +157,44 @@ func (uu *UserUpdate) AddPaymentHistory(p ...*PaymentHistory) *UserUpdate {
 		ids[i] = p[i].ID
 	}
 	return uu.AddPaymentHistoryIDs(ids...)
+}
+
+// SetStudentID sets the "student" edge to the Student entity by ID.
+func (uu *UserUpdate) SetStudentID(id uuid.UUID) *UserUpdate {
+	uu.mutation.SetStudentID(id)
+	return uu
+}
+
+// SetNillableStudentID sets the "student" edge to the Student entity by ID if the given value is not nil.
+func (uu *UserUpdate) SetNillableStudentID(id *uuid.UUID) *UserUpdate {
+	if id != nil {
+		uu = uu.SetStudentID(*id)
+	}
+	return uu
+}
+
+// SetStudent sets the "student" edge to the Student entity.
+func (uu *UserUpdate) SetStudent(s *Student) *UserUpdate {
+	return uu.SetStudentID(s.ID)
+}
+
+// SetTutorID sets the "tutor" edge to the Tutor entity by ID.
+func (uu *UserUpdate) SetTutorID(id uuid.UUID) *UserUpdate {
+	uu.mutation.SetTutorID(id)
+	return uu
+}
+
+// SetNillableTutorID sets the "tutor" edge to the Tutor entity by ID if the given value is not nil.
+func (uu *UserUpdate) SetNillableTutorID(id *uuid.UUID) *UserUpdate {
+	if id != nil {
+		uu = uu.SetTutorID(*id)
+	}
+	return uu
+}
+
+// SetTutor sets the "tutor" edge to the Tutor entity.
+func (uu *UserUpdate) SetTutor(t *Tutor) *UserUpdate {
+	return uu.SetTutorID(t.ID)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -217,6 +263,18 @@ func (uu *UserUpdate) RemovePaymentHistory(p ...*PaymentHistory) *UserUpdate {
 		ids[i] = p[i].ID
 	}
 	return uu.RemovePaymentHistoryIDs(ids...)
+}
+
+// ClearStudent clears the "student" edge to the Student entity.
+func (uu *UserUpdate) ClearStudent() *UserUpdate {
+	uu.mutation.ClearStudent()
+	return uu
+}
+
+// ClearTutor clears the "tutor" edge to the Tutor entity.
+func (uu *UserUpdate) ClearTutor() *UserUpdate {
+	uu.mutation.ClearTutor()
+	return uu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -288,6 +346,11 @@ func (uu *UserUpdate) check() error {
 			return &ValidationError{Name: "gender", err: fmt.Errorf(`ent: validator failed for field "User.gender": %w`, err)}
 		}
 	}
+	if v, ok := uu.mutation.Role(); ok {
+		if err := user.RoleValidator(v); err != nil {
+			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "User.role": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -335,6 +398,9 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if uu.mutation.ProfilePictureURLCleared() {
 		_spec.ClearField(user.FieldProfilePictureURL, field.TypeString)
+	}
+	if value, ok := uu.mutation.Role(); ok {
+		_spec.SetField(user.FieldRole, field.TypeEnum, value)
 	}
 	if uu.mutation.IssueReportCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -498,6 +564,76 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if uu.mutation.StudentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   user.StudentTable,
+			Columns: []string{user.StudentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: student.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.StudentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   user.StudentTable,
+			Columns: []string{user.StudentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: student.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.TutorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   user.TutorTable,
+			Columns: []string{user.TutorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tutor.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.TutorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   user.TutorTable,
+			Columns: []string{user.TutorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tutor.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -592,6 +728,12 @@ func (uuo *UserUpdateOne) ClearProfilePictureURL() *UserUpdateOne {
 	return uuo
 }
 
+// SetRole sets the "role" field.
+func (uuo *UserUpdateOne) SetRole(u user.Role) *UserUpdateOne {
+	uuo.mutation.SetRole(u)
+	return uuo
+}
+
 // AddIssueReportIDs adds the "issue_report" edge to the IssueReport entity by IDs.
 func (uuo *UserUpdateOne) AddIssueReportIDs(ids ...uuid.UUID) *UserUpdateOne {
 	uuo.mutation.AddIssueReportIDs(ids...)
@@ -635,6 +777,44 @@ func (uuo *UserUpdateOne) AddPaymentHistory(p ...*PaymentHistory) *UserUpdateOne
 		ids[i] = p[i].ID
 	}
 	return uuo.AddPaymentHistoryIDs(ids...)
+}
+
+// SetStudentID sets the "student" edge to the Student entity by ID.
+func (uuo *UserUpdateOne) SetStudentID(id uuid.UUID) *UserUpdateOne {
+	uuo.mutation.SetStudentID(id)
+	return uuo
+}
+
+// SetNillableStudentID sets the "student" edge to the Student entity by ID if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableStudentID(id *uuid.UUID) *UserUpdateOne {
+	if id != nil {
+		uuo = uuo.SetStudentID(*id)
+	}
+	return uuo
+}
+
+// SetStudent sets the "student" edge to the Student entity.
+func (uuo *UserUpdateOne) SetStudent(s *Student) *UserUpdateOne {
+	return uuo.SetStudentID(s.ID)
+}
+
+// SetTutorID sets the "tutor" edge to the Tutor entity by ID.
+func (uuo *UserUpdateOne) SetTutorID(id uuid.UUID) *UserUpdateOne {
+	uuo.mutation.SetTutorID(id)
+	return uuo
+}
+
+// SetNillableTutorID sets the "tutor" edge to the Tutor entity by ID if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableTutorID(id *uuid.UUID) *UserUpdateOne {
+	if id != nil {
+		uuo = uuo.SetTutorID(*id)
+	}
+	return uuo
+}
+
+// SetTutor sets the "tutor" edge to the Tutor entity.
+func (uuo *UserUpdateOne) SetTutor(t *Tutor) *UserUpdateOne {
+	return uuo.SetTutorID(t.ID)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -703,6 +883,18 @@ func (uuo *UserUpdateOne) RemovePaymentHistory(p ...*PaymentHistory) *UserUpdate
 		ids[i] = p[i].ID
 	}
 	return uuo.RemovePaymentHistoryIDs(ids...)
+}
+
+// ClearStudent clears the "student" edge to the Student entity.
+func (uuo *UserUpdateOne) ClearStudent() *UserUpdateOne {
+	uuo.mutation.ClearStudent()
+	return uuo
+}
+
+// ClearTutor clears the "tutor" edge to the Tutor entity.
+func (uuo *UserUpdateOne) ClearTutor() *UserUpdateOne {
+	uuo.mutation.ClearTutor()
+	return uuo
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -787,6 +979,11 @@ func (uuo *UserUpdateOne) check() error {
 			return &ValidationError{Name: "gender", err: fmt.Errorf(`ent: validator failed for field "User.gender": %w`, err)}
 		}
 	}
+	if v, ok := uuo.mutation.Role(); ok {
+		if err := user.RoleValidator(v); err != nil {
+			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "User.role": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -851,6 +1048,9 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if uuo.mutation.ProfilePictureURLCleared() {
 		_spec.ClearField(user.FieldProfilePictureURL, field.TypeString)
+	}
+	if value, ok := uuo.mutation.Role(); ok {
+		_spec.SetField(user.FieldRole, field.TypeEnum, value)
 	}
 	if uuo.mutation.IssueReportCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -1006,6 +1206,76 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: paymenthistory.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.StudentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   user.StudentTable,
+			Columns: []string{user.StudentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: student.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.StudentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   user.StudentTable,
+			Columns: []string{user.StudentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: student.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.TutorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   user.TutorTable,
+			Columns: []string{user.TutorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tutor.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.TutorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   user.TutorTable,
+			Columns: []string{user.TutorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tutor.FieldID,
 				},
 			},
 		}

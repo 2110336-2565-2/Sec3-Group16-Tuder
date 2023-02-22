@@ -9,11 +9,13 @@ import (
 )
 
 func InitRegisterRoute(c *ent.Client, e *echo.Group) {
-	repoStudentRegister := repository.NewRepositoryStudentRegister(c)
-	repoTutorRegister := repository.NewRepositoryTutorRegister(c)
-	serviceStudentRegister := services.NewServiceStudentRegister(repoStudentRegister)
-	serviceTutorRegister := services.NewServiceTutorRegister(repoTutorRegister)
-	controllerRegister := controller.NewControllerRegister(serviceStudentRegister, serviceTutorRegister)
+	//repoStudentRegister := repository.NewRepositoryStudentRegister(c) // deprecated
+	//repoTutorRegister := repository.NewRepositoryTutorRegister(c)     // deprecated
+	repoRegister := repository.NewRepositoryRegister(c)
+	//serviceStudentRegister := services.NewServiceStudentRegister(repoStudentRegister) // deprecated
+	//serviceTutorRegister := services.NewServiceTutorRegister(repoTutorRegister)       // deprecated
+	serviceRegister := services.NewServiceRegister(repoRegister)
+	controllerRegister := controller.NewControllerRegister(serviceRegister)
 
-	e.POST("/register", controllerRegister.RegisterUser)
+	e.POST("/signUp", controllerRegister.RegisterUser)
 }

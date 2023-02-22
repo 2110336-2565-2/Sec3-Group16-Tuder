@@ -104,7 +104,7 @@ func (cq *CourseQuery) QueryClass() *ClassQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(course.Table, course.FieldID, selector),
 			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, course.ClassTable, course.ClassColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, course.ClassTable, course.ClassColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -520,8 +520,9 @@ func (cq *CourseQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cours
 		}
 	}
 	if query := cq.withClass; query != nil {
-		if err := cq.loadClass(ctx, query, nodes, nil,
-			func(n *Course, e *Class) { n.Edges.Class = e }); err != nil {
+		if err := cq.loadClass(ctx, query, nodes,
+			func(n *Course) { n.Edges.Class = []*Class{} },
+			func(n *Course, e *Class) { n.Edges.Class = append(n.Edges.Class, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -577,6 +578,9 @@ func (cq *CourseQuery) loadClass(ctx context.Context, query *ClassQuery, nodes [
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
 	}
 	query.withFKs = true
 	query.Where(predicate.Class(func(s *sql.Selector) {

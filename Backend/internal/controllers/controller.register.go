@@ -10,33 +10,14 @@ import (
 )
 
 type controllerRegister struct {
-	studentService service.ServiceStudentRegister
-	tutorService   service.ServiceTutorRegister
+	registerService service.ServiceRegister
 }
 
-func NewControllerRegister(sS service.ServiceStudentRegister, sT service.ServiceTutorRegister) *controllerRegister {
-	return &controllerRegister{tutorService: sT, studentService: sS}
+func NewControllerRegister(s service.ServiceRegister) *controllerRegister {
+	return &controllerRegister{registerService: s}
 }
 
 func (cR *controllerRegister) RegisterUser(c echo.Context) (err error) {
-
-	type Role struct {
-		As string `json:"as,omitempty"`
-	}
-
-	uRole := &Role{}
-
-	if err := c.Bind(&uRole); err != nil {
-
-		c.JSON(http.StatusBadRequest, schema.SchemaRegisterResponse{
-			Success: false,
-			Message: "invalid request payload",
-			Error:   err,
-		})
-		return err
-	}
-
-	fmt.Print("uRole.As	: ", uRole.As, "")
 
 	uR := &schema.SchemaRegister{}
 	if err := c.Bind(&uR); err != nil {
@@ -47,33 +28,18 @@ func (cR *controllerRegister) RegisterUser(c echo.Context) (err error) {
 		})
 		return err
 	}
-	token := ""
-	if uRole.As == "student" {
-		userLoginInfo, err := cR.studentService.RegisterStudentService(uR)
-		if err != nil {
 
-			c.JSON(http.StatusBadRequest, schema.SchemaRegisterResponse{
-				Success: false,
-				Message: fmt.Sprint(err),
-				Error:   err,
-			})
-			return err
-		}
-		token = userLoginInfo.Token
-	}
-	if uRole.As == "tutor" {
-		userLoginInfo, err := cR.tutorService.RegisterTutorService(uR)
-		if err != nil {
+	userLoginInfo, err := cR.registerService.RegisterService(uR)
+	if err != nil {
 
-			c.JSON(http.StatusBadRequest, schema.SchemaRegisterResponse{
-				Success: false,
-				Message: fmt.Sprint(err),
-				Error:   err,
-			})
-			return err
-		}
-		token = userLoginInfo.Token
+		c.JSON(http.StatusBadRequest, schema.SchemaRegisterResponse{
+			Success: false,
+			Message: fmt.Sprint(err),
+			Error:   err,
+		})
+		return err
 	}
+	token := userLoginInfo.Token
 
 	c.JSON(http.StatusOK, schema.SchemaRegisterResponse{
 		Success: true,

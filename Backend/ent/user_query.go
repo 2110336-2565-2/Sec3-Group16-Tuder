@@ -15,6 +15,8 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
 )
@@ -29,6 +31,8 @@ type UserQuery struct {
 	withIssueReport    *IssueReportQuery
 	withPayment        *PaymentQuery
 	withPaymentHistory *PaymentHistoryQuery
+	withStudent        *StudentQuery
+	withTutor          *TutorQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -124,6 +128,50 @@ func (uq *UserQuery) QueryPaymentHistory() *PaymentHistoryQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(paymenthistory.Table, paymenthistory.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.PaymentHistoryTable, user.PaymentHistoryColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryStudent chains the current query on the "student" edge.
+func (uq *UserQuery) QueryStudent() *StudentQuery {
+	query := (&StudentClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(student.Table, student.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, user.StudentTable, user.StudentColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryTutor chains the current query on the "tutor" edge.
+func (uq *UserQuery) QueryTutor() *TutorQuery {
+	query := (&TutorClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(tutor.Table, tutor.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, user.TutorTable, user.TutorColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -326,6 +374,8 @@ func (uq *UserQuery) Clone() *UserQuery {
 		withIssueReport:    uq.withIssueReport.Clone(),
 		withPayment:        uq.withPayment.Clone(),
 		withPaymentHistory: uq.withPaymentHistory.Clone(),
+		withStudent:        uq.withStudent.Clone(),
+		withTutor:          uq.withTutor.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
@@ -362,6 +412,28 @@ func (uq *UserQuery) WithPaymentHistory(opts ...func(*PaymentHistoryQuery)) *Use
 		opt(query)
 	}
 	uq.withPaymentHistory = query
+	return uq
+}
+
+// WithStudent tells the query-builder to eager-load the nodes that are connected to
+// the "student" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithStudent(opts ...func(*StudentQuery)) *UserQuery {
+	query := (&StudentClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withStudent = query
+	return uq
+}
+
+// WithTutor tells the query-builder to eager-load the nodes that are connected to
+// the "tutor" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithTutor(opts ...func(*TutorQuery)) *UserQuery {
+	query := (&TutorClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withTutor = query
 	return uq
 }
 
@@ -443,10 +515,12 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	var (
 		nodes       = []*User{}
 		_spec       = uq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [5]bool{
 			uq.withIssueReport != nil,
 			uq.withPayment != nil,
 			uq.withPaymentHistory != nil,
+			uq.withStudent != nil,
+			uq.withTutor != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -485,6 +559,18 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		if err := uq.loadPaymentHistory(ctx, query, nodes,
 			func(n *User) { n.Edges.PaymentHistory = []*PaymentHistory{} },
 			func(n *User, e *PaymentHistory) { n.Edges.PaymentHistory = append(n.Edges.PaymentHistory, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withStudent; query != nil {
+		if err := uq.loadStudent(ctx, query, nodes, nil,
+			func(n *User, e *Student) { n.Edges.Student = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withTutor; query != nil {
+		if err := uq.loadTutor(ctx, query, nodes, nil,
+			func(n *User, e *Tutor) { n.Edges.Tutor = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -579,6 +665,62 @@ func (uq *UserQuery) loadPaymentHistory(ctx context.Context, query *PaymentHisto
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "user_payment_history" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (uq *UserQuery) loadStudent(ctx context.Context, query *StudentQuery, nodes []*User, init func(*User), assign func(*User, *Student)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+	}
+	query.withFKs = true
+	query.Where(predicate.Student(func(s *sql.Selector) {
+		s.Where(sql.InValues(user.StudentColumn, fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.user_student
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "user_student" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "user_student" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (uq *UserQuery) loadTutor(ctx context.Context, query *TutorQuery, nodes []*User, init func(*User), assign func(*User, *Tutor)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+	}
+	query.withFKs = true
+	query.Where(predicate.Tutor(func(s *sql.Selector) {
+		s.Where(sql.InValues(user.TutorColumn, fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.user_tutor
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "user_tutor" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "user_tutor" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

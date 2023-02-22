@@ -2,26 +2,24 @@ package services
 
 import (
 	"errors"
-
 	repository "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 )
 
-type ServiceTutorRegister interface {
-	RegisterTutorService(r *schemas.SchemaRegister) (*schemas.SchemaRegisterResponse, error)
+type ServiceRegister interface {
+	RegisterService(r *schemas.SchemaRegister) (*schemas.SchemaRegisterResponse, error)
 }
 
-type serviceTutorRegister struct {
-	repository repository.RepositoryTutorRegister
+type serviceRegister struct {
+	repository repository.RepositoryRegister
 }
 
-func NewServiceTutorRegister(r repository.RepositoryTutorRegister) *serviceTutorRegister {
-	return &serviceTutorRegister{repository: r}
+func NewServiceRegister(r repository.RepositoryRegister) *serviceRegister {
+	return &serviceRegister{repository: r}
 }
 
-func (s serviceTutorRegister) RegisterTutorService(r *schemas.SchemaRegister) (*schemas.SchemaRegisterResponse, error) {
-	//TODO connect this function to repo
+func (s serviceRegister) RegisterService(r *schemas.SchemaRegister) (*schemas.SchemaRegisterResponse, error) {
 	if r.Password != r.ConfirmPassword {
 		return nil, errors.New("the password isn't match")
 	}
@@ -31,7 +29,7 @@ func (s serviceTutorRegister) RegisterTutorService(r *schemas.SchemaRegister) (*
 		return nil, err
 	}
 
-	_, err := s.repository.RegisterTutorRepository(r)
+	_, err := s.repository.RegisterUser(r)
 	if err != nil {
 		return nil, err
 	}

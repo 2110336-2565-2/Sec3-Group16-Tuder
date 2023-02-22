@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -15,6 +14,7 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewtutor"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
 )
 
@@ -23,74 +23,6 @@ type TutorCreate struct {
 	config
 	mutation *TutorMutation
 	hooks    []Hook
-}
-
-// SetUsername sets the "username" field.
-func (tc *TutorCreate) SetUsername(s string) *TutorCreate {
-	tc.mutation.SetUsername(s)
-	return tc
-}
-
-// SetPassword sets the "password" field.
-func (tc *TutorCreate) SetPassword(s string) *TutorCreate {
-	tc.mutation.SetPassword(s)
-	return tc
-}
-
-// SetEmail sets the "email" field.
-func (tc *TutorCreate) SetEmail(s string) *TutorCreate {
-	tc.mutation.SetEmail(s)
-	return tc
-}
-
-// SetFirstName sets the "first_name" field.
-func (tc *TutorCreate) SetFirstName(s string) *TutorCreate {
-	tc.mutation.SetFirstName(s)
-	return tc
-}
-
-// SetLastName sets the "last_name" field.
-func (tc *TutorCreate) SetLastName(s string) *TutorCreate {
-	tc.mutation.SetLastName(s)
-	return tc
-}
-
-// SetAddress sets the "address" field.
-func (tc *TutorCreate) SetAddress(s string) *TutorCreate {
-	tc.mutation.SetAddress(s)
-	return tc
-}
-
-// SetPhone sets the "phone" field.
-func (tc *TutorCreate) SetPhone(s string) *TutorCreate {
-	tc.mutation.SetPhone(s)
-	return tc
-}
-
-// SetBirthDate sets the "birth_date" field.
-func (tc *TutorCreate) SetBirthDate(t time.Time) *TutorCreate {
-	tc.mutation.SetBirthDate(t)
-	return tc
-}
-
-// SetGender sets the "gender" field.
-func (tc *TutorCreate) SetGender(s string) *TutorCreate {
-	tc.mutation.SetGender(s)
-	return tc
-}
-
-// SetProfilePictureURL sets the "profile_picture_URL" field.
-func (tc *TutorCreate) SetProfilePictureURL(s string) *TutorCreate {
-	tc.mutation.SetProfilePictureURL(s)
-	return tc
-}
-
-// SetNillableProfilePictureURL sets the "profile_picture_URL" field if the given value is not nil.
-func (tc *TutorCreate) SetNillableProfilePictureURL(s *string) *TutorCreate {
-	if s != nil {
-		tc.SetProfilePictureURL(*s)
-	}
-	return tc
 }
 
 // SetDescription sets the "description" field.
@@ -201,6 +133,17 @@ func (tc *TutorCreate) AddSchedule(s ...*Schedule) *TutorCreate {
 	return tc.AddScheduleIDs(ids...)
 }
 
+// SetUserID sets the "user" edge to the User entity by ID.
+func (tc *TutorCreate) SetUserID(id uuid.UUID) *TutorCreate {
+	tc.mutation.SetUserID(id)
+	return tc
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (tc *TutorCreate) SetUser(u *User) *TutorCreate {
+	return tc.SetUserID(u.ID)
+}
+
 // Mutation returns the TutorMutation object of the builder.
 func (tc *TutorCreate) Mutation() *TutorMutation {
 	return tc.mutation
@@ -244,73 +187,6 @@ func (tc *TutorCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (tc *TutorCreate) check() error {
-	if _, ok := tc.mutation.Username(); !ok {
-		return &ValidationError{Name: "username", err: errors.New(`ent: missing required field "Tutor.username"`)}
-	}
-	if v, ok := tc.mutation.Username(); ok {
-		if err := tutor.UsernameValidator(v); err != nil {
-			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "Tutor.username": %w`, err)}
-		}
-	}
-	if _, ok := tc.mutation.Password(); !ok {
-		return &ValidationError{Name: "password", err: errors.New(`ent: missing required field "Tutor.password"`)}
-	}
-	if v, ok := tc.mutation.Password(); ok {
-		if err := tutor.PasswordValidator(v); err != nil {
-			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Tutor.password": %w`, err)}
-		}
-	}
-	if _, ok := tc.mutation.Email(); !ok {
-		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "Tutor.email"`)}
-	}
-	if v, ok := tc.mutation.Email(); ok {
-		if err := tutor.EmailValidator(v); err != nil {
-			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Tutor.email": %w`, err)}
-		}
-	}
-	if _, ok := tc.mutation.FirstName(); !ok {
-		return &ValidationError{Name: "first_name", err: errors.New(`ent: missing required field "Tutor.first_name"`)}
-	}
-	if v, ok := tc.mutation.FirstName(); ok {
-		if err := tutor.FirstNameValidator(v); err != nil {
-			return &ValidationError{Name: "first_name", err: fmt.Errorf(`ent: validator failed for field "Tutor.first_name": %w`, err)}
-		}
-	}
-	if _, ok := tc.mutation.LastName(); !ok {
-		return &ValidationError{Name: "last_name", err: errors.New(`ent: missing required field "Tutor.last_name"`)}
-	}
-	if v, ok := tc.mutation.LastName(); ok {
-		if err := tutor.LastNameValidator(v); err != nil {
-			return &ValidationError{Name: "last_name", err: fmt.Errorf(`ent: validator failed for field "Tutor.last_name": %w`, err)}
-		}
-	}
-	if _, ok := tc.mutation.Address(); !ok {
-		return &ValidationError{Name: "address", err: errors.New(`ent: missing required field "Tutor.address"`)}
-	}
-	if v, ok := tc.mutation.Address(); ok {
-		if err := tutor.AddressValidator(v); err != nil {
-			return &ValidationError{Name: "address", err: fmt.Errorf(`ent: validator failed for field "Tutor.address": %w`, err)}
-		}
-	}
-	if _, ok := tc.mutation.Phone(); !ok {
-		return &ValidationError{Name: "phone", err: errors.New(`ent: missing required field "Tutor.phone"`)}
-	}
-	if v, ok := tc.mutation.Phone(); ok {
-		if err := tutor.PhoneValidator(v); err != nil {
-			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "Tutor.phone": %w`, err)}
-		}
-	}
-	if _, ok := tc.mutation.BirthDate(); !ok {
-		return &ValidationError{Name: "birth_date", err: errors.New(`ent: missing required field "Tutor.birth_date"`)}
-	}
-	if _, ok := tc.mutation.Gender(); !ok {
-		return &ValidationError{Name: "gender", err: errors.New(`ent: missing required field "Tutor.gender"`)}
-	}
-	if v, ok := tc.mutation.Gender(); ok {
-		if err := tutor.GenderValidator(v); err != nil {
-			return &ValidationError{Name: "gender", err: fmt.Errorf(`ent: validator failed for field "Tutor.gender": %w`, err)}
-		}
-	}
 	if _, ok := tc.mutation.CitizenID(); !ok {
 		return &ValidationError{Name: "citizen_id", err: errors.New(`ent: missing required field "Tutor.citizen_id"`)}
 	}
@@ -318,6 +194,9 @@ func (tc *TutorCreate) check() error {
 		if err := tutor.CitizenIDValidator(v); err != nil {
 			return &ValidationError{Name: "citizen_id", err: fmt.Errorf(`ent: validator failed for field "Tutor.citizen_id": %w`, err)}
 		}
+	}
+	if _, ok := tc.mutation.UserID(); !ok {
+		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "Tutor.user"`)}
 	}
 	return nil
 }
@@ -353,46 +232,6 @@ func (tc *TutorCreate) createSpec() (*Tutor, *sqlgraph.CreateSpec) {
 	if id, ok := tc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
-	}
-	if value, ok := tc.mutation.Username(); ok {
-		_spec.SetField(tutor.FieldUsername, field.TypeString, value)
-		_node.Username = value
-	}
-	if value, ok := tc.mutation.Password(); ok {
-		_spec.SetField(tutor.FieldPassword, field.TypeString, value)
-		_node.Password = value
-	}
-	if value, ok := tc.mutation.Email(); ok {
-		_spec.SetField(tutor.FieldEmail, field.TypeString, value)
-		_node.Email = value
-	}
-	if value, ok := tc.mutation.FirstName(); ok {
-		_spec.SetField(tutor.FieldFirstName, field.TypeString, value)
-		_node.FirstName = value
-	}
-	if value, ok := tc.mutation.LastName(); ok {
-		_spec.SetField(tutor.FieldLastName, field.TypeString, value)
-		_node.LastName = value
-	}
-	if value, ok := tc.mutation.Address(); ok {
-		_spec.SetField(tutor.FieldAddress, field.TypeString, value)
-		_node.Address = value
-	}
-	if value, ok := tc.mutation.Phone(); ok {
-		_spec.SetField(tutor.FieldPhone, field.TypeString, value)
-		_node.Phone = value
-	}
-	if value, ok := tc.mutation.BirthDate(); ok {
-		_spec.SetField(tutor.FieldBirthDate, field.TypeTime, value)
-		_node.BirthDate = value
-	}
-	if value, ok := tc.mutation.Gender(); ok {
-		_spec.SetField(tutor.FieldGender, field.TypeString, value)
-		_node.Gender = value
-	}
-	if value, ok := tc.mutation.ProfilePictureURL(); ok {
-		_spec.SetField(tutor.FieldProfilePictureURL, field.TypeString, value)
-		_node.ProfilePictureURL = &value
 	}
 	if value, ok := tc.mutation.Description(); ok {
 		_spec.SetField(tutor.FieldDescription, field.TypeString, value)
@@ -480,6 +319,26 @@ func (tc *TutorCreate) createSpec() (*Tutor, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := tc.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   tutor.UserTable,
+			Columns: []string{tutor.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.user_tutor = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

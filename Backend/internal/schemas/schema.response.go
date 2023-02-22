@@ -16,7 +16,8 @@ type SchemaRegisterResponse struct {
 
 type SchemaLoginResponses struct {
 	Username string `json:"username"`   
-	Token    string `json:"token"` 
+	Token    string `json:"token"`
+	Role	 string `json:"role"` 
 }
 
 type SchemaErrorResponse struct {

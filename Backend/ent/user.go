@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
 )
@@ -37,6 +39,8 @@ type User struct {
 	Gender string `json:"gender,omitempty"`
 	// ProfilePictureURL holds the value of the "profile_picture_URL" field.
 	ProfilePictureURL *string `json:"profile_picture_URL,omitempty"`
+	// Role holds the value of the "role" field.
+	Role *user.Role `json:"role,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges UserEdges `json:"edges"`
@@ -50,9 +54,13 @@ type UserEdges struct {
 	Payment []*Payment `json:"payment,omitempty"`
 	// PaymentHistory holds the value of the payment_history edge.
 	PaymentHistory []*PaymentHistory `json:"payment_history,omitempty"`
+	// Student holds the value of the student edge.
+	Student *Student `json:"student,omitempty"`
+	// Tutor holds the value of the tutor edge.
+	Tutor *Tutor `json:"tutor,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [5]bool
 }
 
 // IssueReportOrErr returns the IssueReport value or an error if the edge
@@ -82,12 +90,38 @@ func (e UserEdges) PaymentHistoryOrErr() ([]*PaymentHistory, error) {
 	return nil, &NotLoadedError{edge: "payment_history"}
 }
 
+// StudentOrErr returns the Student value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e UserEdges) StudentOrErr() (*Student, error) {
+	if e.loadedTypes[3] {
+		if e.Student == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: student.Label}
+		}
+		return e.Student, nil
+	}
+	return nil, &NotLoadedError{edge: "student"}
+}
+
+// TutorOrErr returns the Tutor value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e UserEdges) TutorOrErr() (*Tutor, error) {
+	if e.loadedTypes[4] {
+		if e.Tutor == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: tutor.Label}
+		}
+		return e.Tutor, nil
+	}
+	return nil, &NotLoadedError{edge: "tutor"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldUsername, user.FieldPassword, user.FieldEmail, user.FieldFirstName, user.FieldLastName, user.FieldAddress, user.FieldPhone, user.FieldGender, user.FieldProfilePictureURL:
+		case user.FieldUsername, user.FieldPassword, user.FieldEmail, user.FieldFirstName, user.FieldLastName, user.FieldAddress, user.FieldPhone, user.FieldGender, user.FieldProfilePictureURL, user.FieldRole:
 			values[i] = new(sql.NullString)
 		case user.FieldBirthDate:
 			values[i] = new(sql.NullTime)
@@ -175,6 +209,13 @@ func (u *User) assignValues(columns []string, values []any) error {
 				u.ProfilePictureURL = new(string)
 				*u.ProfilePictureURL = value.String
 			}
+		case user.FieldRole:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field role", values[i])
+			} else if value.Valid {
+				u.Role = new(user.Role)
+				*u.Role = user.Role(value.String)
+			}
 		}
 	}
 	return nil
@@ -193,6 +234,16 @@ func (u *User) QueryPayment() *PaymentQuery {
 // QueryPaymentHistory queries the "payment_history" edge of the User entity.
 func (u *User) QueryPaymentHistory() *PaymentHistoryQuery {
 	return NewUserClient(u.config).QueryPaymentHistory(u)
+}
+
+// QueryStudent queries the "student" edge of the User entity.
+func (u *User) QueryStudent() *StudentQuery {
+	return NewUserClient(u.config).QueryStudent(u)
+}
+
+// QueryTutor queries the "tutor" edge of the User entity.
+func (u *User) QueryTutor() *TutorQuery {
+	return NewUserClient(u.config).QueryTutor(u)
 }
 
 // Update returns a builder for updating this User.
@@ -247,6 +298,11 @@ func (u *User) String() string {
 	if v := u.ProfilePictureURL; v != nil {
 		builder.WriteString("profile_picture_URL=")
 		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := u.Role; v != nil {
+		builder.WriteString("role=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteByte(')')
 	return builder.String()

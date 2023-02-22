@@ -1,30 +1,25 @@
 import { Outlet, Link } from 'react-router-dom';
 import navbarContent from '../datas/Navbar.role.js';
 import styled from 'styled-components';
-import {useSelector, connect} from 'react-redux'
 import {signOutAction} from '../handlers/signOutHandler';
-import { useDispatch } from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import { Fragment } from 'react';
+import useRole from '../hooks/useRole';
 
 
-function mapStateToProps(state) {
-    return {
-        role: state.role
-    }
-}
 
-function Navbar(props){
+export default function Navbar(){
     // choose Navbar contents array from role 
-    const dispatch = useDispatch();
-    const role = props.role;
+    
+    const [role, handleRole] = useRole();
     const navigate = useNavigate();
 
     
+    
     function signOutHandler(e) {
         e.preventDefault();
-        
-        dispatch( signOutAction(navigate));
+        signOutAction(navigate);
+        handleRole();
     }
 
     let navbarRole = null
@@ -42,16 +37,16 @@ function Navbar(props){
     // change to component for use in JSX  --> Generate NavItem for each content
     const contentElement = contents.map((content, index) => {
         if(content === 'Home'){
-            return <NavbarItem><TuderLinkNav to='/' key={index}>{content}</TuderLinkNav></NavbarItem>
+            return <NavbarItem key="home"><TuderLinkNav to='/' key={index}>{content}</TuderLinkNav></NavbarItem>
         }else if(content === 'Sign Up'){
-            return <NavbarItem><TuderButton type='tudor-button' to="/SignUp" key={index}>{content}</TuderButton></NavbarItem>
+            return <NavbarItem key="signUp"><TuderButton type='tudor-button' to="/SignUp" key={index}>{content}</TuderButton></NavbarItem>
         }else if(content === 'Sign In'){
-            return <NavbarItem><TuderLinkNav to='/SignIn' key={index}>{content}</TuderLinkNav></NavbarItem>
+            return <NavbarItem key="signIn"><TuderLinkNav to='/SignIn' key={index}>{content}</TuderLinkNav></NavbarItem>
         }else if(content === 'Sign Out'){
-            return <NavbarItem><TuderButton type='red-button' onClick={signOutHandler} key={index}>{content}</TuderButton></NavbarItem>
+            return <NavbarItem key="signOut"><TuderButton type='red-button' onClick={signOutHandler} key={index}>{content}</TuderButton></NavbarItem>
         }else{
             let urlLink = "/" + content
-            return <NavbarItem><TuderLinkNav to= {urlLink} key={index}>{content}</TuderLinkNav></NavbarItem>
+            return <NavbarItem key={content}><TuderLinkNav to= {urlLink} key={index}>{content}</TuderLinkNav></NavbarItem>
         }
     });
 
@@ -63,13 +58,13 @@ function Navbar(props){
                     {contentElement}
                 </NavbarItems>
             </NavbarSection>   
-            <Outlet />    
+            <Outlet context={[{role},{handleRole}]} />   
         </Fragment>
     )
 }
 
 
-export default connect(mapStateToProps)(Navbar);
+
 
 
 

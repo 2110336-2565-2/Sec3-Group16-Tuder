@@ -538,7 +538,7 @@ func HasClass() predicate.Course {
 	return predicate.Course(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, ClassTable, ClassColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, ClassTable, ClassColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -550,7 +550,7 @@ func HasClassWith(preds ...predicate.Class) predicate.Course {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ClassInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, ClassTable, ClassColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, ClassTable, ClassColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

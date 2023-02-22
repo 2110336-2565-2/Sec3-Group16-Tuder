@@ -17,6 +17,7 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewtutor"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
 )
 
@@ -31,6 +32,8 @@ type TutorQuery struct {
 	withCourse      *CourseQuery
 	withReviewTutor *ReviewTutorQuery
 	withSchedule    *ScheduleQuery
+	withUser        *UserQuery
+	withFKs         bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -148,6 +151,28 @@ func (tq *TutorQuery) QuerySchedule() *ScheduleQuery {
 			sqlgraph.From(tutor.Table, tutor.FieldID, selector),
 			sqlgraph.To(schedule.Table, schedule.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, tutor.ScheduleTable, tutor.ScheduleColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryUser chains the current query on the "user" edge.
+func (tq *TutorQuery) QueryUser() *UserQuery {
+	query := (&UserClient{config: tq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := tq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := tq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(tutor.Table, tutor.FieldID, selector),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, tutor.UserTable, tutor.UserColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
 		return fromU, nil
@@ -351,6 +376,7 @@ func (tq *TutorQuery) Clone() *TutorQuery {
 		withCourse:      tq.withCourse.Clone(),
 		withReviewTutor: tq.withReviewTutor.Clone(),
 		withSchedule:    tq.withSchedule.Clone(),
+		withUser:        tq.withUser.Clone(),
 		// clone intermediate query.
 		sql:  tq.sql.Clone(),
 		path: tq.path,
@@ -401,18 +427,29 @@ func (tq *TutorQuery) WithSchedule(opts ...func(*ScheduleQuery)) *TutorQuery {
 	return tq
 }
 
+// WithUser tells the query-builder to eager-load the nodes that are connected to
+// the "user" edge. The optional arguments are used to configure the query builder of the edge.
+func (tq *TutorQuery) WithUser(opts ...func(*UserQuery)) *TutorQuery {
+	query := (&UserClient{config: tq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	tq.withUser = query
+	return tq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
 // Example:
 //
 //	var v []struct {
-//		Username string `json:"username,omitempty"`
+//		Description string `json:"description,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Tutor.Query().
-//		GroupBy(tutor.FieldUsername).
+//		GroupBy(tutor.FieldDescription).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (tq *TutorQuery) GroupBy(field string, fields ...string) *TutorGroupBy {
@@ -430,11 +467,11 @@ func (tq *TutorQuery) GroupBy(field string, fields ...string) *TutorGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Username string `json:"username,omitempty"`
+//		Description string `json:"description,omitempty"`
 //	}
 //
 //	client.Tutor.Query().
-//		Select(tutor.FieldUsername).
+//		Select(tutor.FieldDescription).
 //		Scan(ctx, &v)
 func (tq *TutorQuery) Select(fields ...string) *TutorSelect {
 	tq.ctx.Fields = append(tq.ctx.Fields, fields...)
@@ -478,14 +515,22 @@ func (tq *TutorQuery) prepareQuery(ctx context.Context) error {
 func (tq *TutorQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tutor, error) {
 	var (
 		nodes       = []*Tutor{}
+		withFKs     = tq.withFKs
 		_spec       = tq.querySpec()
-		loadedTypes = [4]bool{
+		loadedTypes = [5]bool{
 			tq.withIssueReport != nil,
 			tq.withCourse != nil,
 			tq.withReviewTutor != nil,
 			tq.withSchedule != nil,
+			tq.withUser != nil,
 		}
 	)
+	if tq.withUser != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, tutor.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Tutor).scanValues(nil, columns)
 	}
@@ -529,6 +574,12 @@ func (tq *TutorQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tutor,
 		if err := tq.loadSchedule(ctx, query, nodes,
 			func(n *Tutor) { n.Edges.Schedule = []*Schedule{} },
 			func(n *Tutor, e *Schedule) { n.Edges.Schedule = append(n.Edges.Schedule, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := tq.withUser; query != nil {
+		if err := tq.loadUser(ctx, query, nodes, nil,
+			func(n *Tutor, e *User) { n.Edges.User = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -656,6 +707,38 @@ func (tq *TutorQuery) loadSchedule(ctx context.Context, query *ScheduleQuery, no
 			return fmt.Errorf(`unexpected foreign-key "tutor_schedule" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
+	}
+	return nil
+}
+func (tq *TutorQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Tutor, init func(*Tutor), assign func(*Tutor, *User)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Tutor)
+	for i := range nodes {
+		if nodes[i].user_tutor == nil {
+			continue
+		}
+		fk := *nodes[i].user_tutor
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(user.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "user_tutor" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }

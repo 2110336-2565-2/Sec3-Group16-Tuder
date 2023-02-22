@@ -1,24 +1,8 @@
 import api from './apiHandler';
 
-export async function signUp(signUpData){
-    return  await api.post('/api/v1/signUp', signUpData)
-}
-
-
-async function signUpAction(data, navigate) {
-
-    
-    
-    // Input validation
-    //************************ */
-    //
-
-    
-    // Post to api
-    return async (dispatch) => {
-
-        await api.post('/api/v1/register', data)
-        .then(function(response){
+export default async function signUpHandler(signUpData , navigate){
+    await api.post('/api/v1/signUp', signUpData)
+    .then(function(response){
             
             let res = response.data;
             
@@ -34,11 +18,10 @@ async function signUpAction(data, navigate) {
             // if internal error occurs, MOO will return error message
             if (error.response) {
                 let res = error.response.data;
-                console.log(res.message);
-                console.error(res.error)
+                throw Error( res.message)
             }
         });
-    }
-};
+    };
 
-export default signUpAction;
+
+

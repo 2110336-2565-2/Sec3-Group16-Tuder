@@ -22,21 +22,24 @@ func NewServiceTutor(repository repository.RepositoryTutor) *serviceTutor {
 }
 
 func (s *serviceTutor) GetTutorByUsername(tutorGet *schemas.SchemaGetTutor) (*schemas.SchemaTutor, error) {
-	tutor, err := s.repository.GetTutorByUsernameRepository(tutorGet)
+	tutor, err := s.repository.GetTutorByUsername(tutorGet)
 	if err != nil {
 		return nil, err
 	}
+
+	
+
 	return &schemas.SchemaTutor{
 		ID:                tutor.ID,
-		Username:          tutor.Username,
-		Firstname:         tutor.FirstName,
-		Lastname:          tutor.LastName,
-		Email:             tutor.Email,
-		Phone:             tutor.Phone,
-		Address:           tutor.Address,
-		Birthdate:         tutor.BirthDate,
-		Gender:            tutor.Gender,
-		ProfilePictureURL: *tutor.ProfilePictureURL,
+		Username:          tutor.Edges.User.Username,
+		Firstname:         tutor.Edges.User.FirstName,
+		Lastname:          tutor.Edges.User.LastName,
+		Email:             tutor.Edges.User.Email,
+		Phone:             tutor.Edges.User.Phone,
+		Address:           tutor.Edges.User.Address,
+		Birthdate:         tutor.Edges.User.BirthDate,
+		Gender:            tutor.Edges.User.Gender,
+		ProfilePictureURL: *tutor.Edges.User.ProfilePictureURL,
 		Description:       *tutor.Description,
 		OmiseBankToken:    *tutor.OmiseBankToken,
 		CitizenId:         tutor.CitizenID,
@@ -44,7 +47,7 @@ func (s *serviceTutor) GetTutorByUsername(tutorGet *schemas.SchemaGetTutor) (*sc
 }
 
 func (s *serviceTutor) GetTutors() ([]*schemas.SchemaTutor, error) {
-	tutors, err := s.repository.GetTutorsRepository()
+	tutors, err := s.repository.GetTutors()
 	if err != nil {
 		return nil, err
 	}
@@ -52,15 +55,15 @@ func (s *serviceTutor) GetTutors() ([]*schemas.SchemaTutor, error) {
 	for _, tutor := range tutors {
 		tutorResponses = append(tutorResponses, &schemas.SchemaTutor{
 			ID:                tutor.ID,
-			Username:          tutor.Username,
-			Firstname:         tutor.FirstName,
-			Lastname:          tutor.LastName,
-			Email:             tutor.Email,
-			Phone:             tutor.Phone,
-			Address:           tutor.Address,
-			Birthdate:         tutor.BirthDate,
-			Gender:            tutor.Gender,
-			ProfilePictureURL: *tutor.ProfilePictureURL,
+			Username:          tutor.Edges.User.Username,
+			Firstname:         tutor.Edges.User.FirstName,
+			Lastname:          tutor.Edges.User.LastName,
+			Email:             tutor.Edges.User.Email,
+			Phone:             tutor.Edges.User.Phone,
+			Address:           tutor.Edges.User.Address,
+			Birthdate:         tutor.Edges.User.BirthDate,
+			Gender:            tutor.Edges.User.Gender,
+			ProfilePictureURL: *tutor.Edges.User.ProfilePictureURL,
 			Description:       *tutor.Description,
 			OmiseBankToken:    *tutor.OmiseBankToken,
 			CitizenId:         tutor.CitizenID,
@@ -70,22 +73,22 @@ func (s *serviceTutor) GetTutors() ([]*schemas.SchemaTutor, error) {
 }
 
 func (s *serviceTutor) CreateTutor(tutorCreate *schemas.SchemaCreateTutor) (*schemas.SchemaTutor, error) {
-	tutor, err := s.repository.CreateTutorRepository(tutorCreate)
+	tutor, err := s.repository.CreateTutor(tutorCreate)
 	if err != nil {
 		return nil, err
 	}
 
 	return &schemas.SchemaTutor{
 		ID:                tutor.ID,
-		Username:          tutor.Username,
-		Firstname:         tutor.FirstName,
-		Lastname:          tutor.LastName,
-		Email:             tutor.Email,
-		Phone:             tutor.Phone,
-		Address:           tutor.Address,
-		Birthdate:         tutor.BirthDate,
-		Gender:            tutor.Gender,
-		ProfilePictureURL: *tutor.ProfilePictureURL,
+		Username:          tutor.Edges.User.Username,
+		Firstname:         tutor.Edges.User.FirstName,
+		Lastname:          tutor.Edges.User.LastName,
+		Email:             tutor.Edges.User.Email,
+		Phone:             tutor.Edges.User.Phone,
+		Address:           tutor.Edges.User.Address,
+		Birthdate:         tutor.Edges.User.BirthDate,
+		Gender:            tutor.Edges.User.Gender,
+		ProfilePictureURL: *tutor.Edges.User.ProfilePictureURL,
 		Description:       *tutor.Description,
 		OmiseBankToken:    *tutor.OmiseBankToken,
 		CitizenId:         tutor.CitizenID,
@@ -93,21 +96,21 @@ func (s *serviceTutor) CreateTutor(tutorCreate *schemas.SchemaCreateTutor) (*sch
 }
 
 func (s *serviceTutor) UpdateTutor(tutorUpdate *schemas.SchemaUpdateTutor) (*schemas.SchemaTutor, error) {
-	tutor, err := s.repository.UpdateTutorRepository(tutorUpdate)
+	tutor, err := s.repository.UpdateTutor(tutorUpdate)
 	if err != nil {
 		return nil, err
 	}
 	return &schemas.SchemaTutor{
 		ID:                tutor.ID,
-		Username:          tutor.Username,
-		Firstname:         tutor.FirstName,
-		Lastname:          tutor.LastName,
-		Email:             tutor.Email,
-		Phone:             tutor.Phone,
-		Address:           tutor.Address,
-		Birthdate:         tutor.BirthDate,
-		Gender:            tutor.Gender,
-		ProfilePictureURL: *tutor.ProfilePictureURL,
+		Username:          tutor.Edges.User.Username,
+		Firstname:         tutor.Edges.User.FirstName,
+		Lastname:          tutor.Edges.User.LastName,
+		Email:             tutor.Edges.User.Email,
+		Phone:             tutor.Edges.User.Phone,
+		Address:           tutor.Edges.User.Address,
+		Birthdate:         tutor.Edges.User.BirthDate,
+		Gender:            tutor.Edges.User.Gender,
+		ProfilePictureURL: *tutor.Edges.User.ProfilePictureURL,
 		Description:       *tutor.Description,
 		OmiseBankToken:    *tutor.OmiseBankToken,
 		CitizenId:         tutor.CitizenID,
@@ -115,7 +118,7 @@ func (s *serviceTutor) UpdateTutor(tutorUpdate *schemas.SchemaUpdateTutor) (*sch
 }
 
 func (s *serviceTutor) DeleteTutor(tutorDelete *schemas.SchemaDeleteTutor) error {
-	err := s.repository.DeleteTutorRepository(tutorDelete)
+	err := s.repository.DeleteTutor(tutorDelete)
 	if err != nil {
 		return err
 	}

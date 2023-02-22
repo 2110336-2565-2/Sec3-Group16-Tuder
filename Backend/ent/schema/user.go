@@ -1,21 +1,24 @@
 package schema
 
 import (
+	
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"entgo.io/ent/schema/mixin"
-
 	"github.com/google/uuid"
+	
 )
 
-// Todo holds the schema definition for the Todo entity.
-type UserMixin struct {
-	mixin.Schema
+type User struct {
+	ent.Schema
 }
+// Todo holds the schema definition for the Todo entity.
+// type UserMixin struct {
+// 	mixin.Schema
+// }
 
 // Fields of the Todo.
-func (UserMixin) Fields() []ent.Field {
+func (User) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).Unique().StorageKey("id").Immutable(),
@@ -29,6 +32,7 @@ func (UserMixin) Fields() []ent.Field {
 		field.Time("birth_date"),
 		field.String("gender").NotEmpty(),
 		field.String("profile_picture_URL").Optional().Nillable(),
+		field.Enum("role").Values("student", "tutor").Nillable(),
 	}
 }
 
@@ -38,20 +42,19 @@ func (UserMixin) Fields() []ent.Field {
 // 	}
 // }
 
-type User struct {
-	ent.Schema
-}
 
-func (User) Mixin() []ent.Mixin {
-	return []ent.Mixin{
-		UserMixin{},
-	}
-}
+// func (User) Mixin() []ent.Mixin {
+// 	return []ent.Mixin{
+// 		UserMixin{},
+// 	}
+// }
 
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("issue_report", IssueReport.Type),
 		edge.To("payment", Payment.Type),
 		edge.To("payment_history", PaymentHistory.Type),
+		edge.To("student", Student.Type).Unique(),
+		edge.To("tutor", Tutor.Type).Unique(),
 	}
 }

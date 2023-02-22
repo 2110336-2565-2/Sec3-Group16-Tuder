@@ -2,40 +2,41 @@ package services
 
 import (
 	"errors"
-
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
+
 )
 
 type ServiceLogin interface {
-	LoginService(input *schemas.SchemaLogin) (*schemas.SchemaLoginResponses, error)
+	LoginService(l *schemas.SchemaLogin) (*schemas.SchemaLoginResponses, error)
 }
 
 type serviceLogin struct {
 	repository repositorys.RepositoryLogin
 }
 
-func NewServiceLogin(repository repositorys.RepositoryLogin) *serviceLogin {
-	return &serviceLogin{repository: repository}
+func NewServiceLogin(l repositorys.RepositoryLogin) *serviceLogin {
+	return &serviceLogin{repository: l}
 }
 
-func (s *serviceLogin) LoginService(userLogin *schemas.SchemaLogin) (*schemas.SchemaLoginResponses, error) {
+func (s *serviceLogin) LoginService(l *schemas.SchemaLogin) (*schemas.SchemaLoginResponses, error) {
 
 	// check password
-	user, err := s.repository.LoginRepository(userLogin)
+	luser, err := s.repository.Login(l)
 	if err != nil {
 		return nil, err
 	}
 
-	if !utils.CheckPasswordHash(userLogin.Password, user.Password) {
+	if !utils.CheckPasswordHash(l.Password, luser.Password) {
 		return nil, errors.New("the password isn't match")
 	}
 
-	token, _ := utils.GenerateToken(user.Username, true)
+	token, _ := utils.GenerateLoginToken(luser.Username,luser.Role.String(), true)
 
 	return &schemas.SchemaLoginResponses{
-		Username: user.Username,
+		Username: luser.Username,
 		Token:    token,
-	}, nil
+		Role:     luser.Role.String(),
+		}, nil
 }

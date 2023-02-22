@@ -3,14 +3,13 @@ package repositorys
 import (
 	"context"
 	"errors"
-
-	"entgo.io/ent/dialect/sql"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
+	entUser "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 )
 
 type RepositoryLogin interface {
-	LoginRepository(input *schema.SchemaLogin) (*ent.User, error)
+	Login(l *schema.SchemaLogin) (*ent.User, error)
 }
 
 type repositoryLogin struct {
@@ -18,15 +17,15 @@ type repositoryLogin struct {
 	ctx    context.Context
 }
 
-func NewRepositoryLogin(client *ent.Client) *repositoryLogin {
-	return &repositoryLogin{client: client, ctx: context.Background()}
+func NewRepositoryLogin(c *ent.Client) *repositoryLogin {
+	return &repositoryLogin{client: c, ctx: context.Background()}
 }
 
-func (r *repositoryLogin) LoginRepository(input *schema.SchemaLogin) (*ent.User, error) {
+func (r *repositoryLogin) Login(l *schema.SchemaLogin) (*ent.User, error) {
 
 	user, err := r.client.User.
 		Query().
-		Where(sql.FieldEQ("username", input.Username)).
+		Where(entUser.UsernameEQ(l.Username)).
 		Only(r.ctx)
 
 	if err != nil {

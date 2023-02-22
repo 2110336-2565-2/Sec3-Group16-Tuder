@@ -13,6 +13,8 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
 )
@@ -92,6 +94,12 @@ func (uc *UserCreate) SetNillableProfilePictureURL(s *string) *UserCreate {
 	return uc
 }
 
+// SetRole sets the "role" field.
+func (uc *UserCreate) SetRole(u user.Role) *UserCreate {
+	uc.mutation.SetRole(u)
+	return uc
+}
+
 // SetID sets the "id" field.
 func (uc *UserCreate) SetID(u uuid.UUID) *UserCreate {
 	uc.mutation.SetID(u)
@@ -149,6 +157,44 @@ func (uc *UserCreate) AddPaymentHistory(p ...*PaymentHistory) *UserCreate {
 		ids[i] = p[i].ID
 	}
 	return uc.AddPaymentHistoryIDs(ids...)
+}
+
+// SetStudentID sets the "student" edge to the Student entity by ID.
+func (uc *UserCreate) SetStudentID(id uuid.UUID) *UserCreate {
+	uc.mutation.SetStudentID(id)
+	return uc
+}
+
+// SetNillableStudentID sets the "student" edge to the Student entity by ID if the given value is not nil.
+func (uc *UserCreate) SetNillableStudentID(id *uuid.UUID) *UserCreate {
+	if id != nil {
+		uc = uc.SetStudentID(*id)
+	}
+	return uc
+}
+
+// SetStudent sets the "student" edge to the Student entity.
+func (uc *UserCreate) SetStudent(s *Student) *UserCreate {
+	return uc.SetStudentID(s.ID)
+}
+
+// SetTutorID sets the "tutor" edge to the Tutor entity by ID.
+func (uc *UserCreate) SetTutorID(id uuid.UUID) *UserCreate {
+	uc.mutation.SetTutorID(id)
+	return uc
+}
+
+// SetNillableTutorID sets the "tutor" edge to the Tutor entity by ID if the given value is not nil.
+func (uc *UserCreate) SetNillableTutorID(id *uuid.UUID) *UserCreate {
+	if id != nil {
+		uc = uc.SetTutorID(*id)
+	}
+	return uc
+}
+
+// SetTutor sets the "tutor" edge to the Tutor entity.
+func (uc *UserCreate) SetTutor(t *Tutor) *UserCreate {
+	return uc.SetTutorID(t.ID)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -261,6 +307,14 @@ func (uc *UserCreate) check() error {
 			return &ValidationError{Name: "gender", err: fmt.Errorf(`ent: validator failed for field "User.gender": %w`, err)}
 		}
 	}
+	if _, ok := uc.mutation.Role(); !ok {
+		return &ValidationError{Name: "role", err: errors.New(`ent: missing required field "User.role"`)}
+	}
+	if v, ok := uc.mutation.Role(); ok {
+		if err := user.RoleValidator(v); err != nil {
+			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "User.role": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -336,6 +390,10 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldProfilePictureURL, field.TypeString, value)
 		_node.ProfilePictureURL = &value
 	}
+	if value, ok := uc.mutation.Role(); ok {
+		_spec.SetField(user.FieldRole, field.TypeEnum, value)
+		_node.Role = &value
+	}
 	if nodes := uc.mutation.IssueReportIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -385,6 +443,44 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: paymenthistory.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.StudentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   user.StudentTable,
+			Columns: []string{user.StudentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: student.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.TutorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   user.TutorTable,
+			Columns: []string{user.TutorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tutor.FieldID,
 				},
 			},
 		}

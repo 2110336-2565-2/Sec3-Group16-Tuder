@@ -1,17 +1,15 @@
 import FormT from './FormStyle.js';
 import { useState } from 'react';
-import signInAction from '../handlers/signInHandler.js';
-import { useDispatch } from 'react-redux';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import signInHandler from '../handlers/signInHandler.js';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 
 
-
-export default function FormSignIn(){
+export default function FormSignIn(props){
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [status, setStatus] = useState('waiting');
+    const [role, handleRole] = useOutletContext();
     
-    const dispatch = useDispatch();
     const navigate = useNavigate();
 
 
@@ -21,11 +19,24 @@ export default function FormSignIn(){
             username,
             password,
         }
-        dispatch( (await signInAction(signInData, navigate)));
+        setStatus('submitting')
+        try{
+            await signInHandler(signInData, navigate);
+
+            // update role in state
+            handleRole.handleRole();
+            setStatus('success')
+        } catch (error){
+
+            // Handle by do sth
+
+            console.log(error);
+            setStatus('error');
+        }
     }
 
     return(
-        <form onSubmit={submitHandler}>
+        <form onSubmit={submitHandler} >
             <FormT.Div FormW='350px'>
                 <FormT.Header>Sign In</FormT.Header>
                 <FormT.Content>Sign In and start managing your candidates!</FormT.Content>

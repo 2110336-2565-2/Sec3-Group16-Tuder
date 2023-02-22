@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
@@ -46,7 +45,7 @@ type CourseEdges struct {
 	// ReviewCourse holds the value of the review_course edge.
 	ReviewCourse []*ReviewCourse `json:"review_course,omitempty"`
 	// Class holds the value of the class edge.
-	Class *Class `json:"class,omitempty"`
+	Class []*Class `json:"class,omitempty"`
 	// Student holds the value of the student edge.
 	Student *Student `json:"student,omitempty"`
 	// Tutor holds the value of the tutor edge.
@@ -66,13 +65,9 @@ func (e CourseEdges) ReviewCourseOrErr() ([]*ReviewCourse, error) {
 }
 
 // ClassOrErr returns the Class value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e CourseEdges) ClassOrErr() (*Class, error) {
+// was not loaded in eager-loading.
+func (e CourseEdges) ClassOrErr() ([]*Class, error) {
 	if e.loadedTypes[1] {
-		if e.Class == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: class.Label}
-		}
 		return e.Class, nil
 	}
 	return nil, &NotLoadedError{edge: "class"}

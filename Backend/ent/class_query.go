@@ -102,7 +102,7 @@ func (cq *ClassQuery) QueryStudent() *StudentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(class.Table, class.FieldID, selector),
 			sqlgraph.To(student.Table, student.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, class.StudentTable, class.StudentColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, class.StudentTable, class.StudentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -124,7 +124,7 @@ func (cq *ClassQuery) QueryCourse() *CourseQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(class.Table, class.FieldID, selector),
 			sqlgraph.To(course.Table, course.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, class.CourseTable, class.CourseColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, class.CourseTable, class.CourseColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil

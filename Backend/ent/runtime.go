@@ -148,131 +148,58 @@ func init() {
 	scheduleDescID := scheduleFields[0].Descriptor()
 	// schedule.DefaultID holds the default value on creation for the id field.
 	schedule.DefaultID = scheduleDescID.Default.(func() uuid.UUID)
-	studentMixin := schema.Student{}.Mixin()
-	studentMixinFields0 := studentMixin[0].Fields()
-	_ = studentMixinFields0
 	studentFields := schema.Student{}.Fields()
 	_ = studentFields
-	// studentDescUsername is the schema descriptor for username field.
-	studentDescUsername := studentMixinFields0[1].Descriptor()
-	// student.UsernameValidator is a validator for the "username" field. It is called by the builders before save.
-	student.UsernameValidator = studentDescUsername.Validators[0].(func(string) error)
-	// studentDescPassword is the schema descriptor for password field.
-	studentDescPassword := studentMixinFields0[2].Descriptor()
-	// student.PasswordValidator is a validator for the "password" field. It is called by the builders before save.
-	student.PasswordValidator = studentDescPassword.Validators[0].(func(string) error)
-	// studentDescEmail is the schema descriptor for email field.
-	studentDescEmail := studentMixinFields0[3].Descriptor()
-	// student.EmailValidator is a validator for the "email" field. It is called by the builders before save.
-	student.EmailValidator = studentDescEmail.Validators[0].(func(string) error)
-	// studentDescFirstName is the schema descriptor for first_name field.
-	studentDescFirstName := studentMixinFields0[4].Descriptor()
-	// student.FirstNameValidator is a validator for the "first_name" field. It is called by the builders before save.
-	student.FirstNameValidator = studentDescFirstName.Validators[0].(func(string) error)
-	// studentDescLastName is the schema descriptor for last_name field.
-	studentDescLastName := studentMixinFields0[5].Descriptor()
-	// student.LastNameValidator is a validator for the "last_name" field. It is called by the builders before save.
-	student.LastNameValidator = studentDescLastName.Validators[0].(func(string) error)
-	// studentDescAddress is the schema descriptor for address field.
-	studentDescAddress := studentMixinFields0[6].Descriptor()
-	// student.AddressValidator is a validator for the "address" field. It is called by the builders before save.
-	student.AddressValidator = studentDescAddress.Validators[0].(func(string) error)
-	// studentDescPhone is the schema descriptor for phone field.
-	studentDescPhone := studentMixinFields0[7].Descriptor()
-	// student.PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
-	student.PhoneValidator = studentDescPhone.Validators[0].(func(string) error)
-	// studentDescGender is the schema descriptor for gender field.
-	studentDescGender := studentMixinFields0[9].Descriptor()
-	// student.GenderValidator is a validator for the "gender" field. It is called by the builders before save.
-	student.GenderValidator = studentDescGender.Validators[0].(func(string) error)
 	// studentDescID is the schema descriptor for id field.
-	studentDescID := studentMixinFields0[0].Descriptor()
+	studentDescID := studentFields[0].Descriptor()
 	// student.DefaultID holds the default value on creation for the id field.
 	student.DefaultID = studentDescID.Default.(func() uuid.UUID)
-	tutorMixin := schema.Tutor{}.Mixin()
-	tutorMixinFields0 := tutorMixin[0].Fields()
-	_ = tutorMixinFields0
 	tutorFields := schema.Tutor{}.Fields()
 	_ = tutorFields
-	// tutorDescUsername is the schema descriptor for username field.
-	tutorDescUsername := tutorMixinFields0[1].Descriptor()
-	// tutor.UsernameValidator is a validator for the "username" field. It is called by the builders before save.
-	tutor.UsernameValidator = tutorDescUsername.Validators[0].(func(string) error)
-	// tutorDescPassword is the schema descriptor for password field.
-	tutorDescPassword := tutorMixinFields0[2].Descriptor()
-	// tutor.PasswordValidator is a validator for the "password" field. It is called by the builders before save.
-	tutor.PasswordValidator = tutorDescPassword.Validators[0].(func(string) error)
-	// tutorDescEmail is the schema descriptor for email field.
-	tutorDescEmail := tutorMixinFields0[3].Descriptor()
-	// tutor.EmailValidator is a validator for the "email" field. It is called by the builders before save.
-	tutor.EmailValidator = tutorDescEmail.Validators[0].(func(string) error)
-	// tutorDescFirstName is the schema descriptor for first_name field.
-	tutorDescFirstName := tutorMixinFields0[4].Descriptor()
-	// tutor.FirstNameValidator is a validator for the "first_name" field. It is called by the builders before save.
-	tutor.FirstNameValidator = tutorDescFirstName.Validators[0].(func(string) error)
-	// tutorDescLastName is the schema descriptor for last_name field.
-	tutorDescLastName := tutorMixinFields0[5].Descriptor()
-	// tutor.LastNameValidator is a validator for the "last_name" field. It is called by the builders before save.
-	tutor.LastNameValidator = tutorDescLastName.Validators[0].(func(string) error)
-	// tutorDescAddress is the schema descriptor for address field.
-	tutorDescAddress := tutorMixinFields0[6].Descriptor()
-	// tutor.AddressValidator is a validator for the "address" field. It is called by the builders before save.
-	tutor.AddressValidator = tutorDescAddress.Validators[0].(func(string) error)
-	// tutorDescPhone is the schema descriptor for phone field.
-	tutorDescPhone := tutorMixinFields0[7].Descriptor()
-	// tutor.PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
-	tutor.PhoneValidator = tutorDescPhone.Validators[0].(func(string) error)
-	// tutorDescGender is the schema descriptor for gender field.
-	tutorDescGender := tutorMixinFields0[9].Descriptor()
-	// tutor.GenderValidator is a validator for the "gender" field. It is called by the builders before save.
-	tutor.GenderValidator = tutorDescGender.Validators[0].(func(string) error)
 	// tutorDescCitizenID is the schema descriptor for citizen_id field.
-	tutorDescCitizenID := tutorFields[2].Descriptor()
+	tutorDescCitizenID := tutorFields[3].Descriptor()
 	// tutor.CitizenIDValidator is a validator for the "citizen_id" field. It is called by the builders before save.
 	tutor.CitizenIDValidator = tutorDescCitizenID.Validators[0].(func(string) error)
 	// tutorDescID is the schema descriptor for id field.
-	tutorDescID := tutorMixinFields0[0].Descriptor()
+	tutorDescID := tutorFields[0].Descriptor()
 	// tutor.DefaultID holds the default value on creation for the id field.
 	tutor.DefaultID = tutorDescID.Default.(func() uuid.UUID)
-	userMixin := schema.User{}.Mixin()
-	userMixinFields0 := userMixin[0].Fields()
-	_ = userMixinFields0
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescUsername is the schema descriptor for username field.
-	userDescUsername := userMixinFields0[1].Descriptor()
+	userDescUsername := userFields[1].Descriptor()
 	// user.UsernameValidator is a validator for the "username" field. It is called by the builders before save.
 	user.UsernameValidator = userDescUsername.Validators[0].(func(string) error)
 	// userDescPassword is the schema descriptor for password field.
-	userDescPassword := userMixinFields0[2].Descriptor()
+	userDescPassword := userFields[2].Descriptor()
 	// user.PasswordValidator is a validator for the "password" field. It is called by the builders before save.
 	user.PasswordValidator = userDescPassword.Validators[0].(func(string) error)
 	// userDescEmail is the schema descriptor for email field.
-	userDescEmail := userMixinFields0[3].Descriptor()
+	userDescEmail := userFields[3].Descriptor()
 	// user.EmailValidator is a validator for the "email" field. It is called by the builders before save.
 	user.EmailValidator = userDescEmail.Validators[0].(func(string) error)
 	// userDescFirstName is the schema descriptor for first_name field.
-	userDescFirstName := userMixinFields0[4].Descriptor()
+	userDescFirstName := userFields[4].Descriptor()
 	// user.FirstNameValidator is a validator for the "first_name" field. It is called by the builders before save.
 	user.FirstNameValidator = userDescFirstName.Validators[0].(func(string) error)
 	// userDescLastName is the schema descriptor for last_name field.
-	userDescLastName := userMixinFields0[5].Descriptor()
+	userDescLastName := userFields[5].Descriptor()
 	// user.LastNameValidator is a validator for the "last_name" field. It is called by the builders before save.
 	user.LastNameValidator = userDescLastName.Validators[0].(func(string) error)
 	// userDescAddress is the schema descriptor for address field.
-	userDescAddress := userMixinFields0[6].Descriptor()
+	userDescAddress := userFields[6].Descriptor()
 	// user.AddressValidator is a validator for the "address" field. It is called by the builders before save.
 	user.AddressValidator = userDescAddress.Validators[0].(func(string) error)
 	// userDescPhone is the schema descriptor for phone field.
-	userDescPhone := userMixinFields0[7].Descriptor()
+	userDescPhone := userFields[7].Descriptor()
 	// user.PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
 	user.PhoneValidator = userDescPhone.Validators[0].(func(string) error)
 	// userDescGender is the schema descriptor for gender field.
-	userDescGender := userMixinFields0[9].Descriptor()
+	userDescGender := userFields[9].Descriptor()
 	// user.GenderValidator is a validator for the "gender" field. It is called by the builders before save.
 	user.GenderValidator = userDescGender.Validators[0].(func(string) error)
 	// userDescID is the schema descriptor for id field.
-	userDescID := userMixinFields0[0].Descriptor()
+	userDescID := userFields[0].Descriptor()
 	// user.DefaultID holds the default value on creation for the id field.
 	user.DefaultID = userDescID.Default.(func() uuid.UUID)
 }
