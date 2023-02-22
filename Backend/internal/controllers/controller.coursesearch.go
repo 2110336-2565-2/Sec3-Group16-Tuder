@@ -8,43 +8,42 @@ import (
 	echo "github.com/labstack/echo/v4"
 )
 
-
-type controllerSearch struct {
-	service service.ServiceSearch
+type controllerCourseSearch struct {
+	service service.ServiceCourseSearch
 }
 
-func NewControllerSearch(s service.ServiceSearch) *controllerSearch {
-	return &controllerSearch{service: s}
+func NewControllerCourseSearch(s service.ServiceCourseSearch) *controllerCourseSearch {
+	return &controllerCourseSearch{service: s}
 }
 
-func (cR * controllerSearch) SearchContent(c echo.Context) (err error) {
+func (cR *controllerCourseSearch) SearchContent(c echo.Context) (err error) {
 
-	var searchContent *schema.SchemaSearch
+	var searchContent *schema.CourseSearch
 
 	if err := c.Bind(&searchContent); err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaResponses{
-			Success : false,
-			Message : "invalid request payload",
-			Data : err.Error(),
+			Success: false,
+			Message: "invalid request payload",
+			Data:    err.Error(),
 		})
 		return err
 	}
 
-	searchContentInfo, err := cR.service.SearchService(searchContent)
+	searchContentInfo, err := cR.service.CourseSearchService(searchContent)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaResponses{
-			Success : false,
-			Message : err.Error(),
-			Data : nil,
+			Success: false,
+			Message: err.Error(),
+			Data:    nil,
 		})
 		return err
 	}
 
 	c.JSON(http.StatusOK, schema.SchemaResponses{
-		Success : true,
-		Message : "Search successfully",
-		Data : searchContentInfo,
+		Success: true,
+		Message: "Search successfully",
+		Data:    searchContentInfo,
 	})
 	return nil
 }

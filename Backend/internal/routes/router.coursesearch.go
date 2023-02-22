@@ -8,11 +8,11 @@ import (
 	echo "github.com/labstack/echo/v4"
 )
 
-func InitSearchRoutes(c *ent.Client, e *echo.Group) {
+func InitCourseSearchRoutes(c *ent.Client, e *echo.Group) {
 
-	repoSearch := repository.NewRepositoryLogin(client)
-	serviceSearch := service.NewServiceLogin(repoSearch)
-	controllerSearch := controller.NewControllerLogin(serviceSearch)
+	repoCourseSearch := repository.NewRepositoryCourseSearch(c)
+	serviceCourseSearch := service.NewServiceCourseSearch(repoCourseSearch)
+	controllerSearch := controller.NewControllerCourseSearch(serviceCourseSearch)
 
 	e.POST("/search", controllerSearch.SearchContent)
 

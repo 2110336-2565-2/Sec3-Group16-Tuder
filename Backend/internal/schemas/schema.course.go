@@ -11,7 +11,7 @@ type CourseSearchResult struct {
 	Course_picture_url string `json:"Course_picture_url"`
 }
 
-type CourseSearchParamiter struct {
+type CourseSearch struct {
 	Title      string  `json:"Title"`
 	Subject    string  `json:"Subject"`
 	Topic      string  `json:"Topic"`
