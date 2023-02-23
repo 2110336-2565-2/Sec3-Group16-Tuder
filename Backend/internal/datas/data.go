@@ -5,6 +5,7 @@ import (
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	Course "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
+	util "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 )
 
 func InsertData(client *ent.Client) {
@@ -12,10 +13,7 @@ func InsertData(client *ent.Client) {
 	ctx := context.Background()
 
 	// Delete all data in database
-	client.Tutor.Delete().Exec(ctx)
-	client.Student.Delete().Exec(ctx)
-	client.User.Delete().Exec(ctx)
-	client.Course.Delete().Exec(ctx)
+	util.ClearDB(client, ctx)
 
 	// Insert users
 	user := InsertUser(client)
@@ -30,7 +28,7 @@ func InsertData(client *ent.Client) {
 
 	// Insert courses
 	InsertCourse(client, ctx, tutor1, "Mathematics for Boys lovers", "Mathematics", "Algebra", 60, "Algebra is a branch of mathematics that studies the properties of objects under the action of groups, rings, and other algebraic structures.", 100, Course.LevelGrade10, "https://www.mathsisfun.com/algebra/images/algebra-1.svg")
-	InsertCourse(client, ctx, tutor2, "Boys licking in daily life", "Romantic", "How's Boys smell", 284, "Boys is a kind of thing that we need to know more about it", 2400, Course.LevelGrade12, "Boys")
+	InsertCourse(client, ctx, tutor2, "Boys licking practice in daily life", "Romantic", "How's Boys smell", 284, "Boys is a kind of thing that we need to know more about it", 2400, Course.LevelGrade12, "Boys")
 	InsertCourse(client, ctx, tutor1, "Introduction to Go programming", "Programming", "Golang", 120, "Learn the basics of Go programming language", 150, Course.LevelGrade11, "https://golang.org/doc/gopher/gopher.png")
 
 }
