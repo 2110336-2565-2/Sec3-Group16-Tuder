@@ -4,13 +4,12 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
+
+	//"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
 )
 
@@ -23,66 +22,16 @@ func InsertData(client *ent.Client) {
 	client.User.Delete().Exec(ctx)
 	client.Course.Delete().Exec(ctx)
 
-	ps, _ := utils.HashPassword("brightHeemen")
-	user1Id := uuid.New()
-	user2Id := uuid.New()
-	user3Id := uuid.New()
-	user4Id := uuid.New()
+	var user []*ent.User
 
-	user1, err := client.User.Query().Where(user.Username("bighee")).Only(ctx)
-	if err != nil {
-		user1, err = client.User.Create().
-			SetID(user1Id).
-			SetUsername("bighee").
-			SetPassword(ps).
-			SetAddress("a").
-			SetEmail("a").
-			SetPhone("0").
-			SetFirstName("Bright").
-			SetLastName("Jukjeejid").
-			SetGender("male").
-			SetBirthDate(time.Now()).
-			SetProfilePictureURL("profile url").
-			SetRole(user.RoleStudent).
-			Save(ctx)
-
-		if err != nil {
-			log.Fatalf("failed creating user: %v", err)
-		}
-
-	}
+	user, err := InsertUser(client)
 
 	client.Student.Create().
-		SetUserID(user1.ID).
+		SetUserID(user[0].ID).
 		Save(ctx)
-	fmt.Println(user1)
+	fmt.Println(user[0])
 
-	user2, err := client.User.Query().Where(user.Username("Hee")).Only(ctx)
-
-	if err != nil {
-
-		user2, err = client.User.Create().
-			SetID(user2Id).
-			SetUsername("Hee").
-			SetPassword(ps).
-			SetAddress("b").
-			SetEmail("b").
-			SetPhone("1").
-			SetFirstName("Bright").
-			SetLastName("Jukjeejid").
-			SetGender("female").
-			SetProfilePictureURL("profile url").
-			SetBirthDate(time.Now()).
-			SetRole(user.RoleTutor).
-			Save(ctx)
-
-		if err != nil {
-			log.Fatalf("failed creating user: %v", err)
-		}
-
-	}
-
-	fmt.Println(user2)
+	fmt.Println(user[1])
 
 	tutorId := uuid.New()
 
@@ -91,7 +40,7 @@ func InsertData(client *ent.Client) {
 
 		tutor1, err = client.Tutor.Create().
 			SetID(tutorId).
-			SetUserID(user2.ID).
+			SetUserID(user[1].ID).
 			SetCitizenID("1").
 			SetOmiseBankToken("bank token").
 			SetDescription("test description").
@@ -102,34 +51,10 @@ func InsertData(client *ent.Client) {
 	}
 
 	// update tutor user id
-	client.Tutor.UpdateOne(tutor1).SetUserID(user2.ID).Exec(ctx)
+	client.Tutor.UpdateOne(tutor1).SetUserID(user[1].ID).Exec(ctx)
 	//---------------------------------------------------------------------
-	user3, err := client.User.Query().Where(user.Username("hee")).Only(ctx)
 
-	if err != nil {
-
-		user3, err = client.User.Create().
-			SetID(user3Id).
-			SetUsername("hee").
-			SetPassword(ps).
-			SetAddress("bc").
-			SetEmail("bc").
-			SetPhone("12").
-			SetFirstName("Brightc").
-			SetLastName("Jukjeejidc").
-			SetGender("female").
-			SetProfilePictureURL("profile url").
-			SetBirthDate(time.Now()).
-			SetRole(user.RoleTutor).
-			Save(ctx)
-
-		if err != nil {
-			log.Fatalf("failed creating user: %v", err)
-		}
-
-	}
-
-	fmt.Println(user3)
+	fmt.Println(user[2])
 
 	tutorId2 := uuid.New()
 
@@ -139,7 +64,7 @@ func InsertData(client *ent.Client) {
 
 		tutor2, err = client.Tutor.Create().
 			SetID(tutorId2).
-			SetUserID(user3.ID).
+			SetUserID(user[2].ID).
 			SetCitizenID("2").
 			SetOmiseBankToken("bank token").
 			SetDescription("test description").
@@ -150,35 +75,11 @@ func InsertData(client *ent.Client) {
 	}
 
 	// update tutor user id
-	client.Tutor.UpdateOne(tutor2).SetUserID(user3.ID).Exec(ctx)
+	client.Tutor.UpdateOne(tutor2).SetUserID(user[2].ID).Exec(ctx)
 
 	//-----------------------------------------------------------------------
-	user4, err := client.User.Query().Where(user.Username("pongkul")).Only(ctx)
 
-	if err != nil {
-
-		user4, err = client.User.Create().
-			SetID(user4Id).
-			SetUsername("pongkul").
-			SetPassword(ps).
-			SetAddress("bd").
-			SetEmail("bd").
-			SetPhone("1d").
-			SetFirstName("Brightd").
-			SetLastName("Jukjeejidd").
-			SetGender("female").
-			SetProfilePictureURL("profile url").
-			SetBirthDate(time.Now()).
-			SetRole(user.RoleTutor).
-			Save(ctx)
-
-		if err != nil {
-			log.Fatalf("failed creating user: %v", err)
-		}
-
-	}
-
-	fmt.Println(user3)
+	fmt.Println(user[2])
 
 	tutorId3 := uuid.New()
 
@@ -188,7 +89,7 @@ func InsertData(client *ent.Client) {
 
 		tutor3, err = client.Tutor.Create().
 			SetID(tutorId3).
-			SetUserID(user4.ID).
+			SetUserID(user[3].ID).
 			SetCitizenID("3").
 			SetOmiseBankToken("bank token").
 			SetDescription("test description").
@@ -199,7 +100,7 @@ func InsertData(client *ent.Client) {
 	}
 
 	// update tutor user id
-	client.Tutor.UpdateOne(tutor3).SetUserID(user4.ID).Exec(ctx)
+	client.Tutor.UpdateOne(tutor3).SetUserID(user[3].ID).Exec(ctx)
 
 	//----------------------------------------------------------------
 	course1Id := uuid.New()
