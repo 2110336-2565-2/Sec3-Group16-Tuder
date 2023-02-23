@@ -13,7 +13,7 @@ type ServiceCourseSearch interface {
 	CourseSearchByTopic(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error)
 	CourseSearchByTutor(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error)
 	CourseSearchByDay(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error)
-	SearchAllCourse() ([]*schemas.CourseSearchResult, error)
+	SearchAllCourse(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error)
 	Interception(l1 []*schemas.CourseSearchResult, l2 []*schemas.CourseSearchResult) []*schemas.CourseSearchResult
 	PackToSchema(course []*ent.Course) []*schemas.CourseSearchResult
 }
@@ -46,7 +46,6 @@ func (s *serviceCourseSearch) Interception(l1 []*schemas.CourseSearchResult, l2 
 func (s *serviceCourseSearch) PackToSchema(courses []*ent.Course) []*schemas.CourseSearchResult {
 	var courseResponses []*schemas.CourseSearchResult
 	for _, course := range courses {
-
 		courseResponses = append(courseResponses, &schemas.CourseSearchResult{
 			Course_id:          course.ID,
 			Tutor_name:         course.Edges.Tutor.Edges.User.Username,
@@ -64,7 +63,7 @@ func (s *serviceCourseSearch) PackToSchema(courses []*ent.Course) []*schemas.Cou
 func (s *serviceCourseSearch) CourseSearchService(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error) {
 
 	if ((((searchContent.Title == "") && (searchContent.Subject == "")) && (searchContent.Topic == "")) && (searchContent.Tutor_name == "")) && (searchContent.Days == [7]bool{false, false, false, false, false, false, false}) {
-		return s.SearchAllCourse()
+		return s.SearchAllCourse(searchContent)
 	}
 
 	searchResult, _ := s.CourseSearchByTitle(searchContent)
@@ -92,6 +91,7 @@ func (s *serviceCourseSearch) CourseSearchByTutor(searchContent *schemas.CourseS
 	return courseResponses, nil
 }
 
+// ---------------------------------------------------------------------------------------------
 func (s *serviceCourseSearch) CourseSearchByTitle(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error) {
 	if searchContent.Title == "" {
 		return []*schemas.CourseSearchResult{}, nil
@@ -104,6 +104,7 @@ func (s *serviceCourseSearch) CourseSearchByTitle(searchContent *schemas.CourseS
 	return courseResponses, nil
 }
 
+// ---------------------------------------------------------------------------------------------
 func (s *serviceCourseSearch) CourseSearchByDay(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error) {
 	if searchContent.Days == [7]bool{false, false, false, false, false, false, false} {
 		return []*schemas.CourseSearchResult{}, nil
@@ -115,6 +116,8 @@ func (s *serviceCourseSearch) CourseSearchByDay(searchContent *schemas.CourseSea
 	courseResponses := s.PackToSchema(courses)
 	return courseResponses, nil
 }
+
+// ---------------------------------------------------------------------------------------------
 func (s *serviceCourseSearch) CourseSearchByTopic(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error) {
 	if searchContent.Topic == "" {
 		return []*schemas.CourseSearchResult{}, nil
@@ -127,6 +130,7 @@ func (s *serviceCourseSearch) CourseSearchByTopic(searchContent *schemas.CourseS
 	return courseResponses, nil
 }
 
+// ---------------------------------------------------------------------------------------------
 func (s *serviceCourseSearch) CourseSearchBySubject(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error) {
 	if searchContent.Subject == "" {
 		return []*schemas.CourseSearchResult{}, nil
@@ -139,11 +143,14 @@ func (s *serviceCourseSearch) CourseSearchBySubject(searchContent *schemas.Cours
 	return courseResponses, nil
 }
 
-func (s *serviceCourseSearch) SearchAllCourse() ([]*schemas.CourseSearchResult, error) {
-	courses, err := s.repository.SearchAll()
+// ---------------------------------------------------------------------------------------------
+func (s *serviceCourseSearch) SearchAllCourse(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error) {
+	courses, err := s.repository.SearchByTitleRepository(searchContent)
 	if err != nil {
 		return nil, err
 	}
 	courseResponses := s.PackToSchema(courses)
 	return courseResponses, nil
 }
+
+//---------------------------------------------------------------------------------------------

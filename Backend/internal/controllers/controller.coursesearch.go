@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -20,7 +19,7 @@ func NewControllerCourseSearch(s service.ServiceCourseSearch) *controllerCourseS
 func (cR *controllerCourseSearch) SearchContent(c echo.Context) (err error) {
 
 	var searchContent *schema.CourseSearch
-	
+
 	if err := c.Bind(&searchContent); err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaResponses{
 			Success: false,
@@ -29,7 +28,7 @@ func (cR *controllerCourseSearch) SearchContent(c echo.Context) (err error) {
 		})
 		return err
 	}
-	fmt.Println(searchContent)
+	//fmt.Println(searchContent)
 
 	Course_search_result, err := cR.service.CourseSearchService(searchContent)
 	if err != nil {
@@ -50,8 +49,19 @@ func (cR *controllerCourseSearch) SearchContent(c echo.Context) (err error) {
 }
 
 func (cR *controllerCourseSearch) GetAllCourse(c echo.Context) (err error) {
+	var searchContent *schema.CourseSearch
 
-	Course_search_result, err := cR.service.SearchAllCourse()
+	if err := c.Bind(&searchContent); err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaResponses{
+			Success: false,
+			Message: "invalid request payload",
+			Data:    err.Error(),
+		})
+		return err
+	}
+	//fmt.Println(searchContent)
+
+	Course_search_result, err := cR.service.SearchAllCourse(searchContent)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaResponses{

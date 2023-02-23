@@ -26,6 +26,8 @@ func InsertData(client *ent.Client) {
 	ps, _ := utils.HashPassword("brightHeemen")
 	user1Id := uuid.New()
 	user2Id := uuid.New()
+	user3Id := uuid.New()
+	user4Id := uuid.New()
 
 	user1, err := client.User.Query().Where(user.Username("bighee")).Only(ctx)
 	if err != nil {
@@ -55,13 +57,13 @@ func InsertData(client *ent.Client) {
 		Save(ctx)
 	fmt.Println(user1)
 
-	user2, err := client.User.Query().Where(user.Username("hee")).Only(ctx)
+	user2, err := client.User.Query().Where(user.Username("Hee")).Only(ctx)
 
 	if err != nil {
 
 		user2, err = client.User.Create().
 			SetID(user2Id).
-			SetUsername("hee").
+			SetUsername("Hee").
 			SetPassword(ps).
 			SetAddress("b").
 			SetEmail("b").
@@ -84,14 +86,13 @@ func InsertData(client *ent.Client) {
 
 	tutorId := uuid.New()
 
-	tutor1, err := client.Tutor.Query().Where(tutor.CitizenIDEQ("1234567890123")).Only(ctx)
-
+	tutor1, err := client.Tutor.Query().Where(tutor.CitizenIDEQ("1")).Only(ctx)
 	if err != nil {
 
 		tutor1, err = client.Tutor.Create().
 			SetID(tutorId).
 			SetUserID(user2.ID).
-			SetCitizenID("1234567890123").
+			SetCitizenID("1").
 			SetOmiseBankToken("bank token").
 			SetDescription("test description").
 			Save(ctx)
@@ -102,9 +103,108 @@ func InsertData(client *ent.Client) {
 
 	// update tutor user id
 	client.Tutor.UpdateOne(tutor1).SetUserID(user2.ID).Exec(ctx)
+	//---------------------------------------------------------------------
+	user3, err := client.User.Query().Where(user.Username("hee")).Only(ctx)
 
+	if err != nil {
+
+		user3, err = client.User.Create().
+			SetID(user3Id).
+			SetUsername("hee").
+			SetPassword(ps).
+			SetAddress("bc").
+			SetEmail("bc").
+			SetPhone("12").
+			SetFirstName("Brightc").
+			SetLastName("Jukjeejidc").
+			SetGender("female").
+			SetProfilePictureURL("profile url").
+			SetBirthDate(time.Now()).
+			SetRole(user.RoleTutor).
+			Save(ctx)
+
+		if err != nil {
+			log.Fatalf("failed creating user: %v", err)
+		}
+
+	}
+
+	fmt.Println(user3)
+
+	tutorId2 := uuid.New()
+
+	tutor2, err := client.Tutor.Query().Where(tutor.CitizenIDEQ("2")).Only(ctx)
+
+	if err != nil {
+
+		tutor2, err = client.Tutor.Create().
+			SetID(tutorId2).
+			SetUserID(user3.ID).
+			SetCitizenID("2").
+			SetOmiseBankToken("bank token").
+			SetDescription("test description").
+			Save(ctx)
+		if err != nil {
+			log.Fatalf("failed creating tutor: %v", err)
+		}
+	}
+
+	// update tutor user id
+	client.Tutor.UpdateOne(tutor2).SetUserID(user3.ID).Exec(ctx)
+
+	//-----------------------------------------------------------------------
+	user4, err := client.User.Query().Where(user.Username("pongkul")).Only(ctx)
+
+	if err != nil {
+
+		user4, err = client.User.Create().
+			SetID(user4Id).
+			SetUsername("pongkul").
+			SetPassword(ps).
+			SetAddress("bd").
+			SetEmail("bd").
+			SetPhone("1d").
+			SetFirstName("Brightd").
+			SetLastName("Jukjeejidd").
+			SetGender("female").
+			SetProfilePictureURL("profile url").
+			SetBirthDate(time.Now()).
+			SetRole(user.RoleTutor).
+			Save(ctx)
+
+		if err != nil {
+			log.Fatalf("failed creating user: %v", err)
+		}
+
+	}
+
+	fmt.Println(user3)
+
+	tutorId3 := uuid.New()
+
+	tutor3, err := client.Tutor.Query().Where(tutor.CitizenIDEQ("3")).Only(ctx)
+
+	if err != nil {
+
+		tutor3, err = client.Tutor.Create().
+			SetID(tutorId3).
+			SetUserID(user4.ID).
+			SetCitizenID("3").
+			SetOmiseBankToken("bank token").
+			SetDescription("test description").
+			Save(ctx)
+		if err != nil {
+			log.Fatalf("failed creating tutor: %v", err)
+		}
+	}
+
+	// update tutor user id
+	client.Tutor.UpdateOne(tutor3).SetUserID(user4.ID).Exec(ctx)
+
+	//----------------------------------------------------------------
 	course1Id := uuid.New()
 	course2Id := uuid.New()
+	course3Id := uuid.New()
 
 	// course 1
 	client.Course.Create().
@@ -123,15 +223,29 @@ func InsertData(client *ent.Client) {
 	// course 2
 	client.Course.Create().
 		SetID(course2Id).
-		SetTutorID(tutor1.ID).
-		SetTitle("Ye hee hom hom").
+		SetTutorID(tutor2.ID).
+		SetTitle("Ye hee hom").
 		SetSubject("sex with me").
 		SetTopic("Life of big hee").
-		SetEstimatedTime(10).
+		SetEstimatedTime(106).
 		SetDescription("test description").
-		SetPricePerHour(510).
+		SetPricePerHour(5101).
 		SetLevel(course.LevelGrade3).
-		SetCoursePictureURL("https://media.istockphoto.com/id/475737947/th/%E0%B8%A3%E0%B8%B9%E0%B8%9B%E0%B8%96%E0%B9%88%E0%B8%B2%E0%B8%A2/%E0%B8%9A%E0%B8%B1%E0%B8%93%E0%B8%91%E0%B8%B4%E0%B8%95%E0%B8%A7%E0%B8%B4%E0%B8%97%E0%B8%A2%E0%B8%B2%E0%B8%A5%E0%B8%B1%E0%B8%A2%E0%B8%8A%E0%B8%B2%E0%B8%A2%E0%B9%81%E0%B8%A5%E0%B8%B0%E0%B8%9C%E0%B8%B9%E0%B9%89%E0%B8%9B%E0%B8%81%E0%B8%84%E0%B8%A3%E0%B8%AD%E0%B8%87.jpg?s=1024x1024&w=is&k=20&c=2-vUNDj7147LiiAE_syfPsfWhkY8FGtw7lbGq_S5X3A=").
+		SetCoursePictureURL("https:kuy").
+		Save(ctx)
+
+	// course 2
+	client.Course.Create().
+		SetID(course3Id).
+		SetTutorID(tutor3.ID).
+		SetTitle("Ye hom hom").
+		SetSubject("sex with me").
+		SetTopic("Life of big hee").
+		SetEstimatedTime(102).
+		SetDescription("test description").
+		SetPricePerHour(5108).
+		SetLevel(course.LevelGrade4).
+		SetCoursePictureURL("https://kuy2").
 		Save(ctx)
 
 }
