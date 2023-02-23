@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -26,7 +27,6 @@ type ScheduleQuery struct {
 	predicates []predicate.Schedule
 	withTutor  *TutorQuery
 	withClass  *ClassQuery
-	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -77,7 +77,7 @@ func (sq *ScheduleQuery) QueryTutor() *TutorQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(schedule.Table, schedule.FieldID, selector),
 			sqlgraph.To(tutor.Table, tutor.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, schedule.TutorTable, schedule.TutorColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, schedule.TutorTable, schedule.TutorColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -99,7 +99,7 @@ func (sq *ScheduleQuery) QueryClass() *ClassQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(schedule.Table, schedule.FieldID, selector),
 			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, schedule.ClassTable, schedule.ClassColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, schedule.ClassTable, schedule.ClassColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -406,19 +406,12 @@ func (sq *ScheduleQuery) prepareQuery(ctx context.Context) error {
 func (sq *ScheduleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Schedule, error) {
 	var (
 		nodes       = []*Schedule{}
-		withFKs     = sq.withFKs
 		_spec       = sq.querySpec()
 		loadedTypes = [2]bool{
 			sq.withTutor != nil,
 			sq.withClass != nil,
 		}
 	)
-	if sq.withTutor != nil || sq.withClass != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, schedule.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Schedule).scanValues(nil, columns)
 	}
@@ -438,14 +431,16 @@ func (sq *ScheduleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Sch
 		return nodes, nil
 	}
 	if query := sq.withTutor; query != nil {
-		if err := sq.loadTutor(ctx, query, nodes, nil,
-			func(n *Schedule, e *Tutor) { n.Edges.Tutor = e }); err != nil {
+		if err := sq.loadTutor(ctx, query, nodes,
+			func(n *Schedule) { n.Edges.Tutor = []*Tutor{} },
+			func(n *Schedule, e *Tutor) { n.Edges.Tutor = append(n.Edges.Tutor, e) }); err != nil {
 			return nil, err
 		}
 	}
 	if query := sq.withClass; query != nil {
-		if err := sq.loadClass(ctx, query, nodes, nil,
-			func(n *Schedule, e *Class) { n.Edges.Class = e }); err != nil {
+		if err := sq.loadClass(ctx, query, nodes,
+			func(n *Schedule) { n.Edges.Class = []*Class{} },
+			func(n *Schedule, e *Class) { n.Edges.Class = append(n.Edges.Class, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -453,66 +448,64 @@ func (sq *ScheduleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Sch
 }
 
 func (sq *ScheduleQuery) loadTutor(ctx context.Context, query *TutorQuery, nodes []*Schedule, init func(*Schedule), assign func(*Schedule, *Tutor)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*Schedule)
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Schedule)
 	for i := range nodes {
-		if nodes[i].tutor_schedule == nil {
-			continue
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
 		}
-		fk := *nodes[i].tutor_schedule
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(tutor.IDIn(ids...))
+	query.withFKs = true
+	query.Where(predicate.Tutor(func(s *sql.Selector) {
+		s.Where(sql.InValues(schedule.TutorColumn, fks...))
+	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
+		fk := n.schedule_tutor
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "schedule_tutor" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "tutor_schedule" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "schedule_tutor" returned %v for node %v`, *fk, n.ID)
 		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
+		assign(node, n)
 	}
 	return nil
 }
 func (sq *ScheduleQuery) loadClass(ctx context.Context, query *ClassQuery, nodes []*Schedule, init func(*Schedule), assign func(*Schedule, *Class)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*Schedule)
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Schedule)
 	for i := range nodes {
-		if nodes[i].class_schedule == nil {
-			continue
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
 		}
-		fk := *nodes[i].class_schedule
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(class.IDIn(ids...))
+	query.withFKs = true
+	query.Where(predicate.Class(func(s *sql.Selector) {
+		s.Where(sql.InValues(schedule.ClassColumn, fks...))
+	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
+		fk := n.schedule_class
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "schedule_class" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "class_schedule" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "schedule_class" returned %v for node %v`, *fk, n.ID)
 		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
+		assign(node, n)
 	}
 	return nil
 }

@@ -49,19 +49,8 @@ func (cR *controllerCourseSearch) SearchContent(c echo.Context) (err error) {
 }
 
 func (cR *controllerCourseSearch) GetAllCourse(c echo.Context) (err error) {
-	var searchContent *schema.CourseSearch
 
-	if err := c.Bind(&searchContent); err != nil {
-		c.JSON(http.StatusBadRequest, schema.SchemaResponses{
-			Success: false,
-			Message: "invalid request payload",
-			Data:    err.Error(),
-		})
-		return err
-	}
-	//fmt.Println(searchContent)
-
-	Course_search_result, err := cR.service.SearchAllCourse(searchContent)
+	Course_search_result, err := cR.service.SearchAllCourse()
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaResponses{

@@ -20,7 +20,8 @@ type RepositoryCourseSearch interface {
 	SearchByTopicRepository(sr *schema.CourseSearch) ([]*ent.Course, error)
 	SearchByTutorRepository(sr *schema.CourseSearch) ([]*ent.Course, error)
 	SearchByDayRepository(sr *schema.CourseSearch) ([]*ent.Course, error)
-	SearchAll(sr *schema.CourseSearch) ([]*ent.Course, error)
+	SearchAll() ([]*ent.Course, error)
+	checkTimeAvailable(d [24]bool) bool
 }
 
 type repositoryCourseSearch struct {
@@ -102,13 +103,87 @@ func (r repositoryCourseSearch) SearchByTutorRepository(sr *schema.CourseSearch)
 }
 
 // ---------------------------------------------------------------------------------------------
+
+func (r repositoryCourseSearch) checkTimeAvailable(d [24]bool) bool {
+	for _, b := range d {
+		if b {
+			return true
+		}
+	}
+	return false
+}
+
 func (r repositoryCourseSearch) SearchByDayRepository(sr *schema.CourseSearch) ([]*ent.Course, error) {
 	//implement here
-	return nil, nil
+	days := sr.Days
+	courses, err := r.client.Course.
+		Query().
+		WithTutor(func(q *ent.TutorQuery) {
+			q.WithSchedule().WithUser()
+		}).
+		All(r.ctx)
+
+	if err != nil {
+		return nil, errors.New("Course not found")
+	}
+	var matched_courses []*ent.Course
+	for _, course := range courses {
+		state := true
+		if days[0] {
+			if r.checkTimeAvailable(course.Edges.Tutor.Edges.Schedule.Day0) == false {
+				state = false
+			}
+		}
+		if days[1] {
+			if r.checkTimeAvailable(course.Edges.Tutor.Edges.Schedule.Day1) == false {
+				state = false
+			}
+		}
+		if days[2] {
+			if r.checkTimeAvailable(course.Edges.Tutor.Edges.Schedule.Day2) == false {
+				state = false
+			}
+		}
+		if days[3] {
+			if r.checkTimeAvailable(course.Edges.Tutor.Edges.Schedule.Day3) == false {
+				state = false
+			}
+		}
+		if days[4] {
+			if r.checkTimeAvailable(course.Edges.Tutor.Edges.Schedule.Day4) == false {
+				state = false
+			}
+		}
+		if days[5] {
+			if r.checkTimeAvailable(course.Edges.Tutor.Edges.Schedule.Day5) == false {
+				state = false
+			}
+		}
+		if days[6] {
+			if r.checkTimeAvailable(course.Edges.Tutor.Edges.Schedule.Day6) == false {
+				state = false
+			}
+		}
+		if state {
+			matched_courses = append(matched_courses, course)
+		}
+	}
+	return matched_courses, nil
 }
 
 // ---------------------------------------------------------------------------------------------
-func (r repositoryCourseSearch) SearchAll(sr *schema.CourseSearch) ([]*ent.Course, error) {
+func (r repositoryCourseSearch) SearchAll() ([]*ent.Course, error) {
+	courses, err := r.client.Course.
+		Query().
+		WithTutor(func(q *ent.TutorQuery) {
+			q.WithUser()
+		}).
+		All(r.ctx)
 
-	return nil, nil
+	if err != nil {
+		return nil, errors.New("Course not found")
+	}
+	// fmt.Println(courses[0].Edges.Tutor.Edges.User.Username)
+
+	return courses, nil
 }

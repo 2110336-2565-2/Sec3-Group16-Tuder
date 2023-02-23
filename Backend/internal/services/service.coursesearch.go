@@ -13,8 +13,8 @@ type ServiceCourseSearch interface {
 	CourseSearchByTopic(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error)
 	CourseSearchByTutor(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error)
 	CourseSearchByDay(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error)
-	SearchAllCourse(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error)
-	Interception(l1 []*schemas.CourseSearchResult, l2 []*schemas.CourseSearchResult) []*schemas.CourseSearchResult
+	SearchAllCourse() ([]*schemas.CourseSearchResult, error)
+	Intercept(l [][]*schemas.CourseSearchResult) []*schemas.CourseSearchResult
 	PackToSchema(course []*ent.Course) []*schemas.CourseSearchResult
 }
 
@@ -26,21 +26,52 @@ func NewServiceCourseSearch(l repositorys.RepositoryCourseSearch) *serviceCourse
 	return &serviceCourseSearch{repository: l}
 }
 
-func (s *serviceCourseSearch) Interception(l1 []*schemas.CourseSearchResult, l2 []*schemas.CourseSearchResult) []*schemas.CourseSearchResult {
-	for _, course_ref := range l2 {
-		ref := course_ref.Course_id
-		status := true
-		for _, course_check := range l1 {
-			if ref == course_check.Course_id {
-				status = false
-				break
-			}
-		}
-		if status == true {
-			l2 = append(l2, course_ref)
+func (s *serviceCourseSearch) Intercept(l [][]*schemas.CourseSearchResult) []*schemas.CourseSearchResult {
+	result := []*schemas.CourseSearchResult{}
+	start := 0
+	for idx, r := range l {
+		if len(r) > 0 {
+			result = r
+			start = idx
+			break
 		}
 	}
-	return l2
+	for _, lx := range l[start:] {
+		tmp := []*schemas.CourseSearchResult{}
+		if len(lx) > 0 {
+			for _, course_ref := range lx {
+				id_ref := course_ref.Course_id
+				for _, course_check := range result {
+					if id_ref == course_check.Course_id {
+						tmp = append(tmp, course_ref)
+						break
+					}
+				}
+			}
+			result = tmp
+		}
+	}
+	return result
+}
+
+func (s *serviceCourseSearch) Union(l [][]*schemas.CourseSearchResult) []*schemas.CourseSearchResult {
+	result := []*schemas.CourseSearchResult{}
+	for _, lx := range l {
+		for _, course_ref := range lx {
+			id_ref := course_ref.Course_id
+			status := true
+			for _, course_check := range result {
+				if id_ref == course_check.Course_id {
+					status = false
+					break
+				}
+			}
+			if status == true {
+				result = append(result, course_ref)
+			}
+		}
+	}
+	return result
 }
 
 func (s *serviceCourseSearch) PackToSchema(courses []*ent.Course) []*schemas.CourseSearchResult {
@@ -63,18 +94,21 @@ func (s *serviceCourseSearch) PackToSchema(courses []*ent.Course) []*schemas.Cou
 func (s *serviceCourseSearch) CourseSearchService(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error) {
 
 	if ((((searchContent.Title == "") && (searchContent.Subject == "")) && (searchContent.Topic == "")) && (searchContent.Tutor_name == "")) && (searchContent.Days == [7]bool{false, false, false, false, false, false, false}) {
-		return s.SearchAllCourse(searchContent)
+		return s.SearchAllCourse()
 	}
 
-	searchResult, _ := s.CourseSearchByTitle(searchContent)
+	titleResult, _ := s.CourseSearchByTitle(searchContent)
 	subjectSearch, _ := s.CourseSearchBySubject(searchContent)
-	searchResult = s.Interception(subjectSearch, searchResult)
 	topicSearch, _ := s.CourseSearchByTopic(searchContent)
-	searchResult = s.Interception(topicSearch, searchResult)
 	tutorSearch, _ := s.CourseSearchByTutor(searchContent)
-	searchResult = s.Interception(tutorSearch, searchResult)
 	daySearch, _ := s.CourseSearchByDay(searchContent)
-	searchResult = s.Interception(daySearch, searchResult)
+
+	searchResult := s.Intercept([][]*schemas.CourseSearchResult{titleResult, subjectSearch, topicSearch, tutorSearch, daySearch})
+	if len(searchResult) == 0 {
+		searchResult = s.Union([][]*schemas.CourseSearchResult{titleResult, subjectSearch, topicSearch, tutorSearch, daySearch})
+	}
+
+	// fmt.Println(daySearch)
 
 	return searchResult, nil
 }
@@ -144,8 +178,8 @@ func (s *serviceCourseSearch) CourseSearchBySubject(searchContent *schemas.Cours
 }
 
 // ---------------------------------------------------------------------------------------------
-func (s *serviceCourseSearch) SearchAllCourse(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error) {
-	courses, err := s.repository.SearchByTitleRepository(searchContent)
+func (s *serviceCourseSearch) SearchAllCourse() ([]*schemas.CourseSearchResult, error) {
+	courses, err := s.repository.SearchAll()
 	if err != nil {
 		return nil, err
 	}

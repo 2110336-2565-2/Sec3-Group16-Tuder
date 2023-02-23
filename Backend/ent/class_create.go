@@ -70,14 +70,6 @@ func (cc *ClassCreate) SetScheduleID(id uuid.UUID) *ClassCreate {
 	return cc
 }
 
-// SetNillableScheduleID sets the "schedule" edge to the Schedule entity by ID if the given value is not nil.
-func (cc *ClassCreate) SetNillableScheduleID(id *uuid.UUID) *ClassCreate {
-	if id != nil {
-		cc = cc.SetScheduleID(*id)
-	}
-	return cc
-}
-
 // SetSchedule sets the "schedule" edge to the Schedule entity.
 func (cc *ClassCreate) SetSchedule(s *Schedule) *ClassCreate {
 	return cc.SetScheduleID(s.ID)
@@ -161,6 +153,9 @@ func (cc *ClassCreate) check() error {
 	if _, ok := cc.mutation.SuccessHour(); !ok {
 		return &ValidationError{Name: "success_hour", err: errors.New(`ent: missing required field "Class.success_hour"`)}
 	}
+	if _, ok := cc.mutation.ScheduleID(); !ok {
+		return &ValidationError{Name: "schedule", err: errors.New(`ent: missing required edge "Class.schedule"`)}
+	}
 	if _, ok := cc.mutation.StudentID(); !ok {
 		return &ValidationError{Name: "student", err: errors.New(`ent: missing required edge "Class.student"`)}
 	}
@@ -216,7 +211,7 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 	}
 	if nodes := cc.mutation.ScheduleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   class.ScheduleTable,
 			Columns: []string{class.ScheduleColumn},
@@ -231,6 +226,7 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.class_schedule = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := cc.mutation.StudentIDs(); len(nodes) > 0 {

@@ -14,7 +14,9 @@ var (
 		{Name: "review_avaliable", Type: field.TypeBool, Default: true},
 		{Name: "total_hour", Type: field.TypeTime},
 		{Name: "success_hour", Type: field.TypeTime},
+		{Name: "class_schedule", Type: field.TypeUUID},
 		{Name: "course_class", Type: field.TypeUUID},
+		{Name: "schedule_class", Type: field.TypeUUID, Nullable: true},
 		{Name: "student_class", Type: field.TypeUUID},
 	}
 	// ClassesTable holds the schema information for the "classes" table.
@@ -24,14 +26,26 @@ var (
 		PrimaryKey: []*schema.Column{ClassesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "classes_courses_class",
+				Symbol:     "classes_schedules_schedule",
 				Columns:    []*schema.Column{ClassesColumns[4]},
+				RefColumns: []*schema.Column{SchedulesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "classes_courses_class",
+				Columns:    []*schema.Column{ClassesColumns[5]},
 				RefColumns: []*schema.Column{CoursesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
+				Symbol:     "classes_schedules_class",
+				Columns:    []*schema.Column{ClassesColumns[6]},
+				RefColumns: []*schema.Column{SchedulesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
 				Symbol:     "classes_students_class",
-				Columns:    []*schema.Column{ClassesColumns[5]},
+				Columns:    []*schema.Column{ClassesColumns[7]},
 				RefColumns: []*schema.Column{StudentsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -201,28 +215,12 @@ var (
 		{Name: "day_4", Type: field.TypeJSON},
 		{Name: "day_5", Type: field.TypeJSON},
 		{Name: "day_6", Type: field.TypeJSON},
-		{Name: "class_schedule", Type: field.TypeUUID, Unique: true},
-		{Name: "tutor_schedule", Type: field.TypeUUID},
 	}
 	// SchedulesTable holds the schema information for the "schedules" table.
 	SchedulesTable = &schema.Table{
 		Name:       "schedules",
 		Columns:    SchedulesColumns,
 		PrimaryKey: []*schema.Column{SchedulesColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "schedules_classes_schedule",
-				Columns:    []*schema.Column{SchedulesColumns[8]},
-				RefColumns: []*schema.Column{ClassesColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
-				Symbol:     "schedules_tutors_schedule",
-				Columns:    []*schema.Column{SchedulesColumns[9]},
-				RefColumns: []*schema.Column{TutorsColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-		},
 	}
 	// StudentsColumns holds the columns for the "students" table.
 	StudentsColumns = []*schema.Column{
@@ -249,6 +247,7 @@ var (
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "omise_bank_token", Type: field.TypeString, Nullable: true},
 		{Name: "citizen_id", Type: field.TypeString, Unique: true},
+		{Name: "schedule_tutor", Type: field.TypeUUID},
 		{Name: "user_tutor", Type: field.TypeUUID, Unique: true},
 	}
 	// TutorsTable holds the schema information for the "tutors" table.
@@ -258,8 +257,14 @@ var (
 		PrimaryKey: []*schema.Column{TutorsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "tutors_users_tutor",
+				Symbol:     "tutors_schedules_tutor",
 				Columns:    []*schema.Column{TutorsColumns[4]},
+				RefColumns: []*schema.Column{SchedulesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "tutors_users_tutor",
+				Columns:    []*schema.Column{TutorsColumns[5]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -310,8 +315,10 @@ var (
 )
 
 func init() {
-	ClassesTable.ForeignKeys[0].RefTable = CoursesTable
-	ClassesTable.ForeignKeys[1].RefTable = StudentsTable
+	ClassesTable.ForeignKeys[0].RefTable = SchedulesTable
+	ClassesTable.ForeignKeys[1].RefTable = CoursesTable
+	ClassesTable.ForeignKeys[2].RefTable = SchedulesTable
+	ClassesTable.ForeignKeys[3].RefTable = StudentsTable
 	CoursesTable.ForeignKeys[0].RefTable = TutorsTable
 	IssueReportsTable.ForeignKeys[0].RefTable = StudentsTable
 	IssueReportsTable.ForeignKeys[1].RefTable = TutorsTable
@@ -321,8 +328,7 @@ func init() {
 	PaymentHistoriesTable.ForeignKeys[1].RefTable = UsersTable
 	ReviewCoursesTable.ForeignKeys[0].RefTable = CoursesTable
 	ReviewTutorsTable.ForeignKeys[0].RefTable = TutorsTable
-	SchedulesTable.ForeignKeys[0].RefTable = ClassesTable
-	SchedulesTable.ForeignKeys[1].RefTable = TutorsTable
 	StudentsTable.ForeignKeys[0].RefTable = UsersTable
-	TutorsTable.ForeignKeys[0].RefTable = UsersTable
+	TutorsTable.ForeignKeys[0].RefTable = SchedulesTable
+	TutorsTable.ForeignKeys[1].RefTable = UsersTable
 }

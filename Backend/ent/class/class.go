@@ -26,7 +26,7 @@ const (
 	// Table holds the table name of the class in the database.
 	Table = "classes"
 	// ScheduleTable is the table that holds the schedule relation/edge.
-	ScheduleTable = "schedules"
+	ScheduleTable = "classes"
 	// ScheduleInverseTable is the table name for the Schedule entity.
 	// It exists in this package in order to avoid circular dependency with the "schedule" package.
 	ScheduleInverseTable = "schedules"
@@ -59,7 +59,9 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "classes"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
+	"class_schedule",
 	"course_class",
+	"schedule_class",
 	"student_class",
 }
 

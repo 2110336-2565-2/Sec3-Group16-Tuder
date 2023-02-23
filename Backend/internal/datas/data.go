@@ -22,12 +22,59 @@ func InsertData(client *ent.Client) {
 	client.Student.Delete().Exec(ctx)
 	client.User.Delete().Exec(ctx)
 	client.Course.Delete().Exec(ctx)
+	client.Schedule.Delete().Exec(ctx)
 
 	ps, _ := utils.HashPassword("brightHeemen")
 	user1Id := uuid.New()
 	user2Id := uuid.New()
 	user3Id := uuid.New()
 	user4Id := uuid.New()
+
+	//schedule1
+	free_day := [24]bool{}
+	busy_day := [24]bool{}
+	some_day := [24]bool{}
+	for idx, _ := range free_day {
+		free_day[idx] = true
+		busy_day[idx] = false
+		if idx < 12 {
+			some_day[idx] = true
+		} else {
+			some_day[idx] = false
+		}
+	}
+
+	schedule1, _ := client.Schedule.Create().
+		SetID(uuid.New()).
+		SetDay0(busy_day).
+		SetDay1(busy_day).
+		SetDay2(busy_day).
+		SetDay3(some_day).
+		SetDay4(free_day).
+		SetDay5(free_day).
+		SetDay6(free_day).
+		Save(ctx)
+
+	schedule2, _ := client.Schedule.Create().
+		SetID(uuid.New()).
+		SetDay0(free_day).
+		SetDay1(free_day).
+		SetDay2(free_day).
+		SetDay3(some_day).
+		SetDay4(busy_day).
+		SetDay5(busy_day).
+		SetDay6(busy_day).
+		Save(ctx)
+	schedule3, _ := client.Schedule.Create().
+		SetID(uuid.New()).
+		SetDay0(some_day).
+		SetDay1(some_day).
+		SetDay2(some_day).
+		SetDay3(some_day).
+		SetDay4(some_day).
+		SetDay5(some_day).
+		SetDay6(busy_day).
+		Save(ctx)
 
 	user1, err := client.User.Query().Where(user.Username("bighee")).Only(ctx)
 	if err != nil {
@@ -95,6 +142,7 @@ func InsertData(client *ent.Client) {
 			SetCitizenID("1").
 			SetOmiseBankToken("bank token").
 			SetDescription("test description").
+			SetScheduleID(schedule1.ID).
 			Save(ctx)
 		if err != nil {
 			log.Fatalf("failed creating tutor: %v", err)
@@ -143,6 +191,7 @@ func InsertData(client *ent.Client) {
 			SetCitizenID("2").
 			SetOmiseBankToken("bank token").
 			SetDescription("test description").
+			SetScheduleID(schedule2.ID).
 			Save(ctx)
 		if err != nil {
 			log.Fatalf("failed creating tutor: %v", err)
@@ -192,6 +241,7 @@ func InsertData(client *ent.Client) {
 			SetCitizenID("3").
 			SetOmiseBankToken("bank token").
 			SetDescription("test description").
+			SetScheduleID(schedule3.ID).
 			Save(ctx)
 		if err != nil {
 			log.Fatalf("failed creating tutor: %v", err)

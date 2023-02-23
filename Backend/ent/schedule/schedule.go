@@ -32,19 +32,19 @@ const (
 	// Table holds the table name of the schedule in the database.
 	Table = "schedules"
 	// TutorTable is the table that holds the tutor relation/edge.
-	TutorTable = "schedules"
+	TutorTable = "tutors"
 	// TutorInverseTable is the table name for the Tutor entity.
 	// It exists in this package in order to avoid circular dependency with the "tutor" package.
 	TutorInverseTable = "tutors"
 	// TutorColumn is the table column denoting the tutor relation/edge.
-	TutorColumn = "tutor_schedule"
+	TutorColumn = "schedule_tutor"
 	// ClassTable is the table that holds the class relation/edge.
-	ClassTable = "schedules"
+	ClassTable = "classes"
 	// ClassInverseTable is the table name for the Class entity.
 	// It exists in this package in order to avoid circular dependency with the "class" package.
 	ClassInverseTable = "classes"
 	// ClassColumn is the table column denoting the class relation/edge.
-	ClassColumn = "class_schedule"
+	ClassColumn = "schedule_class"
 )
 
 // Columns holds all SQL columns for schedule fields.
@@ -59,22 +59,10 @@ var Columns = []string{
 	FieldDay6,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "schedules"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"class_schedule",
-	"tutor_schedule",
-}
-
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}

@@ -15,5 +15,5 @@ func InitCourseSearchRoutes(c *ent.Client, e *echo.Group) {
 	controllerCourseSearch := controller.NewControllerCourseSearch(serviceCourseSearch)
 
 	e.POST("/coursesearch", controllerCourseSearch.SearchContent)
-	e.POST("/courses", controllerCourseSearch.GetAllCourse)
+	e.GET("/courses", controllerCourseSearch.GetAllCourse)
 }
