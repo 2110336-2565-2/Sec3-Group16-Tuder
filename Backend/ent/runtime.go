@@ -38,22 +38,22 @@ func init() {
 	courseDescTitle := courseFields[1].Descriptor()
 	// course.TitleValidator is a validator for the "title" field. It is called by the builders before save.
 	course.TitleValidator = courseDescTitle.Validators[0].(func(string) error)
+	// courseDescSubject is the schema descriptor for subject field.
+	courseDescSubject := courseFields[2].Descriptor()
+	// course.SubjectValidator is a validator for the "subject" field. It is called by the builders before save.
+	course.SubjectValidator = courseDescSubject.Validators[0].(func(string) error)
+	// courseDescTopic is the schema descriptor for topic field.
+	courseDescTopic := courseFields[3].Descriptor()
+	// course.TopicValidator is a validator for the "topic" field. It is called by the builders before save.
+	course.TopicValidator = courseDescTopic.Validators[0].(func(string) error)
 	// courseDescDescription is the schema descriptor for description field.
-	courseDescDescription := courseFields[3].Descriptor()
+	courseDescDescription := courseFields[5].Descriptor()
 	// course.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	course.DescriptionValidator = courseDescDescription.Validators[0].(func(string) error)
-	// courseDescCourseStatus is the schema descriptor for course_status field.
-	courseDescCourseStatus := courseFields[4].Descriptor()
-	// course.CourseStatusValidator is a validator for the "course_status" field. It is called by the builders before save.
-	course.CourseStatusValidator = courseDescCourseStatus.Validators[0].(func(string) error)
 	// courseDescPricePerHour is the schema descriptor for price_per_hour field.
-	courseDescPricePerHour := courseFields[5].Descriptor()
+	courseDescPricePerHour := courseFields[6].Descriptor()
 	// course.PricePerHourValidator is a validator for the "price_per_hour" field. It is called by the builders before save.
 	course.PricePerHourValidator = courseDescPricePerHour.Validators[0].(func(int) error)
-	// courseDescLevelID is the schema descriptor for level_id field.
-	courseDescLevelID := courseFields[6].Descriptor()
-	// course.LevelIDValidator is a validator for the "level_id" field. It is called by the builders before save.
-	course.LevelIDValidator = courseDescLevelID.Validators[0].(func(string) error)
 	// courseDescID is the schema descriptor for id field.
 	courseDescID := courseFields[0].Descriptor()
 	// course.DefaultID holds the default value on creation for the id field.
@@ -116,34 +116,6 @@ func init() {
 	reviewtutor.ScoreValidator = reviewtutorDescScore.Validators[0].(func(float32) error)
 	scheduleFields := schema.Schedule{}.Fields()
 	_ = scheduleFields
-	// scheduleDescDay0 is the schema descriptor for day_0 field.
-	scheduleDescDay0 := scheduleFields[1].Descriptor()
-	// schedule.DefaultDay0 holds the default value on creation for the day_0 field.
-	schedule.DefaultDay0 = scheduleDescDay0.Default.(bool)
-	// scheduleDescDay1 is the schema descriptor for day_1 field.
-	scheduleDescDay1 := scheduleFields[2].Descriptor()
-	// schedule.DefaultDay1 holds the default value on creation for the day_1 field.
-	schedule.DefaultDay1 = scheduleDescDay1.Default.(bool)
-	// scheduleDescDay2 is the schema descriptor for day_2 field.
-	scheduleDescDay2 := scheduleFields[3].Descriptor()
-	// schedule.DefaultDay2 holds the default value on creation for the day_2 field.
-	schedule.DefaultDay2 = scheduleDescDay2.Default.(bool)
-	// scheduleDescDay3 is the schema descriptor for day_3 field.
-	scheduleDescDay3 := scheduleFields[4].Descriptor()
-	// schedule.DefaultDay3 holds the default value on creation for the day_3 field.
-	schedule.DefaultDay3 = scheduleDescDay3.Default.(bool)
-	// scheduleDescDay4 is the schema descriptor for day_4 field.
-	scheduleDescDay4 := scheduleFields[5].Descriptor()
-	// schedule.DefaultDay4 holds the default value on creation for the day_4 field.
-	schedule.DefaultDay4 = scheduleDescDay4.Default.(bool)
-	// scheduleDescDay5 is the schema descriptor for day_5 field.
-	scheduleDescDay5 := scheduleFields[6].Descriptor()
-	// schedule.DefaultDay5 holds the default value on creation for the day_5 field.
-	schedule.DefaultDay5 = scheduleDescDay5.Default.(bool)
-	// scheduleDescDay6 is the schema descriptor for day_6 field.
-	scheduleDescDay6 := scheduleFields[7].Descriptor()
-	// schedule.DefaultDay6 holds the default value on creation for the day_6 field.
-	schedule.DefaultDay6 = scheduleDescDay6.Default.(bool)
 	// scheduleDescID is the schema descriptor for id field.
 	scheduleDescID := scheduleFields[0].Descriptor()
 	// schedule.DefaultID holds the default value on creation for the id field.

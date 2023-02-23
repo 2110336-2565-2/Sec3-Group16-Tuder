@@ -41,13 +41,13 @@ var (
 	CoursesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "title", Type: field.TypeString},
-		{Name: "estimated_time", Type: field.TypeTime},
+		{Name: "subject", Type: field.TypeString},
+		{Name: "topic", Type: field.TypeString},
+		{Name: "estimated_time", Type: field.TypeInt},
 		{Name: "description", Type: field.TypeString},
-		{Name: "course_status", Type: field.TypeString},
 		{Name: "price_per_hour", Type: field.TypeInt},
-		{Name: "level_id", Type: field.TypeString},
+		{Name: "level", Type: field.TypeEnum, Nullable: true, Enums: []string{"Grade1", "Grade2", "Grade3", "Grade4", "Grade5", "Grade6", "Grade7", "Grade8", "Grade9", "Grade10", "Grade11", "Grade12"}},
 		{Name: "course_picture_url", Type: field.TypeString, Nullable: true},
-		{Name: "student_course", Type: field.TypeUUID, Unique: true, Nullable: true},
 		{Name: "tutor_course", Type: field.TypeUUID},
 	}
 	// CoursesTable holds the schema information for the "courses" table.
@@ -56,12 +56,6 @@ var (
 		Columns:    CoursesColumns,
 		PrimaryKey: []*schema.Column{CoursesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "courses_students_course",
-				Columns:    []*schema.Column{CoursesColumns[8]},
-				RefColumns: []*schema.Column{StudentsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
 			{
 				Symbol:     "courses_tutors_course",
 				Columns:    []*schema.Column{CoursesColumns[9]},
@@ -200,13 +194,13 @@ var (
 	// SchedulesColumns holds the columns for the "schedules" table.
 	SchedulesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
-		{Name: "day_0", Type: field.TypeBool, Nullable: true, Default: false},
-		{Name: "day_1", Type: field.TypeBool, Nullable: true, Default: false},
-		{Name: "day_2", Type: field.TypeBool, Nullable: true, Default: false},
-		{Name: "day_3", Type: field.TypeBool, Nullable: true, Default: false},
-		{Name: "day_4", Type: field.TypeBool, Nullable: true, Default: false},
-		{Name: "day_5", Type: field.TypeBool, Nullable: true, Default: false},
-		{Name: "day_6", Type: field.TypeBool, Nullable: true, Default: false},
+		{Name: "day_0", Type: field.TypeJSON},
+		{Name: "day_1", Type: field.TypeJSON},
+		{Name: "day_2", Type: field.TypeJSON},
+		{Name: "day_3", Type: field.TypeJSON},
+		{Name: "day_4", Type: field.TypeJSON},
+		{Name: "day_5", Type: field.TypeJSON},
+		{Name: "day_6", Type: field.TypeJSON},
 		{Name: "class_schedule", Type: field.TypeUUID, Unique: true},
 		{Name: "tutor_schedule", Type: field.TypeUUID},
 	}
@@ -291,6 +285,13 @@ var (
 		Name:       "users",
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "user_username_role",
+				Unique:  true,
+				Columns: []*schema.Column{UsersColumns[1], UsersColumns[11]},
+			},
+		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
@@ -311,8 +312,7 @@ var (
 func init() {
 	ClassesTable.ForeignKeys[0].RefTable = CoursesTable
 	ClassesTable.ForeignKeys[1].RefTable = StudentsTable
-	CoursesTable.ForeignKeys[0].RefTable = StudentsTable
-	CoursesTable.ForeignKeys[1].RefTable = TutorsTable
+	CoursesTable.ForeignKeys[0].RefTable = TutorsTable
 	IssueReportsTable.ForeignKeys[0].RefTable = StudentsTable
 	IssueReportsTable.ForeignKeys[1].RefTable = TutorsTable
 	IssueReportsTable.ForeignKeys[2].RefTable = UsersTable

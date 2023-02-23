@@ -31,142 +31,44 @@ func (su *ScheduleUpdate) Where(ps ...predicate.Schedule) *ScheduleUpdate {
 }
 
 // SetDay0 sets the "day_0" field.
-func (su *ScheduleUpdate) SetDay0(b bool) *ScheduleUpdate {
+func (su *ScheduleUpdate) SetDay0(b [24]bool) *ScheduleUpdate {
 	su.mutation.SetDay0(b)
 	return su
 }
 
-// SetNillableDay0 sets the "day_0" field if the given value is not nil.
-func (su *ScheduleUpdate) SetNillableDay0(b *bool) *ScheduleUpdate {
-	if b != nil {
-		su.SetDay0(*b)
-	}
-	return su
-}
-
-// ClearDay0 clears the value of the "day_0" field.
-func (su *ScheduleUpdate) ClearDay0() *ScheduleUpdate {
-	su.mutation.ClearDay0()
-	return su
-}
-
 // SetDay1 sets the "day_1" field.
-func (su *ScheduleUpdate) SetDay1(b bool) *ScheduleUpdate {
+func (su *ScheduleUpdate) SetDay1(b [24]bool) *ScheduleUpdate {
 	su.mutation.SetDay1(b)
 	return su
 }
 
-// SetNillableDay1 sets the "day_1" field if the given value is not nil.
-func (su *ScheduleUpdate) SetNillableDay1(b *bool) *ScheduleUpdate {
-	if b != nil {
-		su.SetDay1(*b)
-	}
-	return su
-}
-
-// ClearDay1 clears the value of the "day_1" field.
-func (su *ScheduleUpdate) ClearDay1() *ScheduleUpdate {
-	su.mutation.ClearDay1()
-	return su
-}
-
 // SetDay2 sets the "day_2" field.
-func (su *ScheduleUpdate) SetDay2(b bool) *ScheduleUpdate {
+func (su *ScheduleUpdate) SetDay2(b [24]bool) *ScheduleUpdate {
 	su.mutation.SetDay2(b)
 	return su
 }
 
-// SetNillableDay2 sets the "day_2" field if the given value is not nil.
-func (su *ScheduleUpdate) SetNillableDay2(b *bool) *ScheduleUpdate {
-	if b != nil {
-		su.SetDay2(*b)
-	}
-	return su
-}
-
-// ClearDay2 clears the value of the "day_2" field.
-func (su *ScheduleUpdate) ClearDay2() *ScheduleUpdate {
-	su.mutation.ClearDay2()
-	return su
-}
-
 // SetDay3 sets the "day_3" field.
-func (su *ScheduleUpdate) SetDay3(b bool) *ScheduleUpdate {
+func (su *ScheduleUpdate) SetDay3(b [24]bool) *ScheduleUpdate {
 	su.mutation.SetDay3(b)
 	return su
 }
 
-// SetNillableDay3 sets the "day_3" field if the given value is not nil.
-func (su *ScheduleUpdate) SetNillableDay3(b *bool) *ScheduleUpdate {
-	if b != nil {
-		su.SetDay3(*b)
-	}
-	return su
-}
-
-// ClearDay3 clears the value of the "day_3" field.
-func (su *ScheduleUpdate) ClearDay3() *ScheduleUpdate {
-	su.mutation.ClearDay3()
-	return su
-}
-
 // SetDay4 sets the "day_4" field.
-func (su *ScheduleUpdate) SetDay4(b bool) *ScheduleUpdate {
+func (su *ScheduleUpdate) SetDay4(b [24]bool) *ScheduleUpdate {
 	su.mutation.SetDay4(b)
 	return su
 }
 
-// SetNillableDay4 sets the "day_4" field if the given value is not nil.
-func (su *ScheduleUpdate) SetNillableDay4(b *bool) *ScheduleUpdate {
-	if b != nil {
-		su.SetDay4(*b)
-	}
-	return su
-}
-
-// ClearDay4 clears the value of the "day_4" field.
-func (su *ScheduleUpdate) ClearDay4() *ScheduleUpdate {
-	su.mutation.ClearDay4()
-	return su
-}
-
 // SetDay5 sets the "day_5" field.
-func (su *ScheduleUpdate) SetDay5(b bool) *ScheduleUpdate {
+func (su *ScheduleUpdate) SetDay5(b [24]bool) *ScheduleUpdate {
 	su.mutation.SetDay5(b)
 	return su
 }
 
-// SetNillableDay5 sets the "day_5" field if the given value is not nil.
-func (su *ScheduleUpdate) SetNillableDay5(b *bool) *ScheduleUpdate {
-	if b != nil {
-		su.SetDay5(*b)
-	}
-	return su
-}
-
-// ClearDay5 clears the value of the "day_5" field.
-func (su *ScheduleUpdate) ClearDay5() *ScheduleUpdate {
-	su.mutation.ClearDay5()
-	return su
-}
-
 // SetDay6 sets the "day_6" field.
-func (su *ScheduleUpdate) SetDay6(b bool) *ScheduleUpdate {
+func (su *ScheduleUpdate) SetDay6(b [24]bool) *ScheduleUpdate {
 	su.mutation.SetDay6(b)
-	return su
-}
-
-// SetNillableDay6 sets the "day_6" field if the given value is not nil.
-func (su *ScheduleUpdate) SetNillableDay6(b *bool) *ScheduleUpdate {
-	if b != nil {
-		su.SetDay6(*b)
-	}
-	return su
-}
-
-// ClearDay6 clears the value of the "day_6" field.
-func (su *ScheduleUpdate) ClearDay6() *ScheduleUpdate {
-	su.mutation.ClearDay6()
 	return su
 }
 
@@ -260,46 +162,25 @@ func (su *ScheduleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if value, ok := su.mutation.Day0(); ok {
-		_spec.SetField(schedule.FieldDay0, field.TypeBool, value)
-	}
-	if su.mutation.Day0Cleared() {
-		_spec.ClearField(schedule.FieldDay0, field.TypeBool)
+		_spec.SetField(schedule.FieldDay0, field.TypeJSON, value)
 	}
 	if value, ok := su.mutation.Day1(); ok {
-		_spec.SetField(schedule.FieldDay1, field.TypeBool, value)
-	}
-	if su.mutation.Day1Cleared() {
-		_spec.ClearField(schedule.FieldDay1, field.TypeBool)
+		_spec.SetField(schedule.FieldDay1, field.TypeJSON, value)
 	}
 	if value, ok := su.mutation.Day2(); ok {
-		_spec.SetField(schedule.FieldDay2, field.TypeBool, value)
-	}
-	if su.mutation.Day2Cleared() {
-		_spec.ClearField(schedule.FieldDay2, field.TypeBool)
+		_spec.SetField(schedule.FieldDay2, field.TypeJSON, value)
 	}
 	if value, ok := su.mutation.Day3(); ok {
-		_spec.SetField(schedule.FieldDay3, field.TypeBool, value)
-	}
-	if su.mutation.Day3Cleared() {
-		_spec.ClearField(schedule.FieldDay3, field.TypeBool)
+		_spec.SetField(schedule.FieldDay3, field.TypeJSON, value)
 	}
 	if value, ok := su.mutation.Day4(); ok {
-		_spec.SetField(schedule.FieldDay4, field.TypeBool, value)
-	}
-	if su.mutation.Day4Cleared() {
-		_spec.ClearField(schedule.FieldDay4, field.TypeBool)
+		_spec.SetField(schedule.FieldDay4, field.TypeJSON, value)
 	}
 	if value, ok := su.mutation.Day5(); ok {
-		_spec.SetField(schedule.FieldDay5, field.TypeBool, value)
-	}
-	if su.mutation.Day5Cleared() {
-		_spec.ClearField(schedule.FieldDay5, field.TypeBool)
+		_spec.SetField(schedule.FieldDay5, field.TypeJSON, value)
 	}
 	if value, ok := su.mutation.Day6(); ok {
-		_spec.SetField(schedule.FieldDay6, field.TypeBool, value)
-	}
-	if su.mutation.Day6Cleared() {
-		_spec.ClearField(schedule.FieldDay6, field.TypeBool)
+		_spec.SetField(schedule.FieldDay6, field.TypeJSON, value)
 	}
 	if su.mutation.TutorCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -392,142 +273,44 @@ type ScheduleUpdateOne struct {
 }
 
 // SetDay0 sets the "day_0" field.
-func (suo *ScheduleUpdateOne) SetDay0(b bool) *ScheduleUpdateOne {
+func (suo *ScheduleUpdateOne) SetDay0(b [24]bool) *ScheduleUpdateOne {
 	suo.mutation.SetDay0(b)
 	return suo
 }
 
-// SetNillableDay0 sets the "day_0" field if the given value is not nil.
-func (suo *ScheduleUpdateOne) SetNillableDay0(b *bool) *ScheduleUpdateOne {
-	if b != nil {
-		suo.SetDay0(*b)
-	}
-	return suo
-}
-
-// ClearDay0 clears the value of the "day_0" field.
-func (suo *ScheduleUpdateOne) ClearDay0() *ScheduleUpdateOne {
-	suo.mutation.ClearDay0()
-	return suo
-}
-
 // SetDay1 sets the "day_1" field.
-func (suo *ScheduleUpdateOne) SetDay1(b bool) *ScheduleUpdateOne {
+func (suo *ScheduleUpdateOne) SetDay1(b [24]bool) *ScheduleUpdateOne {
 	suo.mutation.SetDay1(b)
 	return suo
 }
 
-// SetNillableDay1 sets the "day_1" field if the given value is not nil.
-func (suo *ScheduleUpdateOne) SetNillableDay1(b *bool) *ScheduleUpdateOne {
-	if b != nil {
-		suo.SetDay1(*b)
-	}
-	return suo
-}
-
-// ClearDay1 clears the value of the "day_1" field.
-func (suo *ScheduleUpdateOne) ClearDay1() *ScheduleUpdateOne {
-	suo.mutation.ClearDay1()
-	return suo
-}
-
 // SetDay2 sets the "day_2" field.
-func (suo *ScheduleUpdateOne) SetDay2(b bool) *ScheduleUpdateOne {
+func (suo *ScheduleUpdateOne) SetDay2(b [24]bool) *ScheduleUpdateOne {
 	suo.mutation.SetDay2(b)
 	return suo
 }
 
-// SetNillableDay2 sets the "day_2" field if the given value is not nil.
-func (suo *ScheduleUpdateOne) SetNillableDay2(b *bool) *ScheduleUpdateOne {
-	if b != nil {
-		suo.SetDay2(*b)
-	}
-	return suo
-}
-
-// ClearDay2 clears the value of the "day_2" field.
-func (suo *ScheduleUpdateOne) ClearDay2() *ScheduleUpdateOne {
-	suo.mutation.ClearDay2()
-	return suo
-}
-
 // SetDay3 sets the "day_3" field.
-func (suo *ScheduleUpdateOne) SetDay3(b bool) *ScheduleUpdateOne {
+func (suo *ScheduleUpdateOne) SetDay3(b [24]bool) *ScheduleUpdateOne {
 	suo.mutation.SetDay3(b)
 	return suo
 }
 
-// SetNillableDay3 sets the "day_3" field if the given value is not nil.
-func (suo *ScheduleUpdateOne) SetNillableDay3(b *bool) *ScheduleUpdateOne {
-	if b != nil {
-		suo.SetDay3(*b)
-	}
-	return suo
-}
-
-// ClearDay3 clears the value of the "day_3" field.
-func (suo *ScheduleUpdateOne) ClearDay3() *ScheduleUpdateOne {
-	suo.mutation.ClearDay3()
-	return suo
-}
-
 // SetDay4 sets the "day_4" field.
-func (suo *ScheduleUpdateOne) SetDay4(b bool) *ScheduleUpdateOne {
+func (suo *ScheduleUpdateOne) SetDay4(b [24]bool) *ScheduleUpdateOne {
 	suo.mutation.SetDay4(b)
 	return suo
 }
 
-// SetNillableDay4 sets the "day_4" field if the given value is not nil.
-func (suo *ScheduleUpdateOne) SetNillableDay4(b *bool) *ScheduleUpdateOne {
-	if b != nil {
-		suo.SetDay4(*b)
-	}
-	return suo
-}
-
-// ClearDay4 clears the value of the "day_4" field.
-func (suo *ScheduleUpdateOne) ClearDay4() *ScheduleUpdateOne {
-	suo.mutation.ClearDay4()
-	return suo
-}
-
 // SetDay5 sets the "day_5" field.
-func (suo *ScheduleUpdateOne) SetDay5(b bool) *ScheduleUpdateOne {
+func (suo *ScheduleUpdateOne) SetDay5(b [24]bool) *ScheduleUpdateOne {
 	suo.mutation.SetDay5(b)
 	return suo
 }
 
-// SetNillableDay5 sets the "day_5" field if the given value is not nil.
-func (suo *ScheduleUpdateOne) SetNillableDay5(b *bool) *ScheduleUpdateOne {
-	if b != nil {
-		suo.SetDay5(*b)
-	}
-	return suo
-}
-
-// ClearDay5 clears the value of the "day_5" field.
-func (suo *ScheduleUpdateOne) ClearDay5() *ScheduleUpdateOne {
-	suo.mutation.ClearDay5()
-	return suo
-}
-
 // SetDay6 sets the "day_6" field.
-func (suo *ScheduleUpdateOne) SetDay6(b bool) *ScheduleUpdateOne {
+func (suo *ScheduleUpdateOne) SetDay6(b [24]bool) *ScheduleUpdateOne {
 	suo.mutation.SetDay6(b)
-	return suo
-}
-
-// SetNillableDay6 sets the "day_6" field if the given value is not nil.
-func (suo *ScheduleUpdateOne) SetNillableDay6(b *bool) *ScheduleUpdateOne {
-	if b != nil {
-		suo.SetDay6(*b)
-	}
-	return suo
-}
-
-// ClearDay6 clears the value of the "day_6" field.
-func (suo *ScheduleUpdateOne) ClearDay6() *ScheduleUpdateOne {
-	suo.mutation.ClearDay6()
 	return suo
 }
 
@@ -651,46 +434,25 @@ func (suo *ScheduleUpdateOne) sqlSave(ctx context.Context) (_node *Schedule, err
 		}
 	}
 	if value, ok := suo.mutation.Day0(); ok {
-		_spec.SetField(schedule.FieldDay0, field.TypeBool, value)
-	}
-	if suo.mutation.Day0Cleared() {
-		_spec.ClearField(schedule.FieldDay0, field.TypeBool)
+		_spec.SetField(schedule.FieldDay0, field.TypeJSON, value)
 	}
 	if value, ok := suo.mutation.Day1(); ok {
-		_spec.SetField(schedule.FieldDay1, field.TypeBool, value)
-	}
-	if suo.mutation.Day1Cleared() {
-		_spec.ClearField(schedule.FieldDay1, field.TypeBool)
+		_spec.SetField(schedule.FieldDay1, field.TypeJSON, value)
 	}
 	if value, ok := suo.mutation.Day2(); ok {
-		_spec.SetField(schedule.FieldDay2, field.TypeBool, value)
-	}
-	if suo.mutation.Day2Cleared() {
-		_spec.ClearField(schedule.FieldDay2, field.TypeBool)
+		_spec.SetField(schedule.FieldDay2, field.TypeJSON, value)
 	}
 	if value, ok := suo.mutation.Day3(); ok {
-		_spec.SetField(schedule.FieldDay3, field.TypeBool, value)
-	}
-	if suo.mutation.Day3Cleared() {
-		_spec.ClearField(schedule.FieldDay3, field.TypeBool)
+		_spec.SetField(schedule.FieldDay3, field.TypeJSON, value)
 	}
 	if value, ok := suo.mutation.Day4(); ok {
-		_spec.SetField(schedule.FieldDay4, field.TypeBool, value)
-	}
-	if suo.mutation.Day4Cleared() {
-		_spec.ClearField(schedule.FieldDay4, field.TypeBool)
+		_spec.SetField(schedule.FieldDay4, field.TypeJSON, value)
 	}
 	if value, ok := suo.mutation.Day5(); ok {
-		_spec.SetField(schedule.FieldDay5, field.TypeBool, value)
-	}
-	if suo.mutation.Day5Cleared() {
-		_spec.ClearField(schedule.FieldDay5, field.TypeBool)
+		_spec.SetField(schedule.FieldDay5, field.TypeJSON, value)
 	}
 	if value, ok := suo.mutation.Day6(); ok {
-		_spec.SetField(schedule.FieldDay6, field.TypeBool, value)
-	}
-	if suo.mutation.Day6Cleared() {
-		_spec.ClearField(schedule.FieldDay6, field.TypeBool)
+		_spec.SetField(schedule.FieldDay6, field.TypeJSON, value)
 	}
 	if suo.mutation.TutorCleared() {
 		edge := &sqlgraph.EdgeSpec{
