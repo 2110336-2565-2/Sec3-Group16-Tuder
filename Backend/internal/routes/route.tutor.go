@@ -14,9 +14,9 @@ func InitTutorRoutes(client *ent.Client, e *echo.Group) {
 	serviceTutor := service.NewServiceTutor(repoTutor)
 	controllerTutor := controller.NewControllerTutor(serviceTutor)
 
-	e.GET("/get-tutor", controllerTutor.GetTutorByUsername)
-	e.GET("/get-tutors", controllerTutor.GetTutors)
-	e.POST("/create-tutor", controllerTutor.CreateTutor)
-	e.PUT("/update-tutor", controllerTutor.UpdateTutor)
-	e.DELETE("/delete-tutor", controllerTutor.DeleteTutor)
+	e.GET("/tutor", controllerTutor.GetTutorByUsername)
+	e.GET("/tutors", controllerTutor.GetTutors)
+	e.POST("/tutor", controllerTutor.CreateTutor)
+	e.PUT("/tutor", controllerTutor.UpdateTutor)
+	e.DELETE("/tutor", controllerTutor.DeleteTutor)
 }

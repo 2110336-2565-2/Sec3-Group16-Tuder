@@ -23,7 +23,7 @@ func NewServiceLogin(l repositorys.RepositoryLogin) *serviceLogin {
 func (s *serviceLogin) LoginService(l *schemas.SchemaLogin) (*schemas.SchemaLoginResponses, error) {
 
 	// check password
-	luser, err := s.repository.LoginRepository(l)
+	luser, err := s.repository.Login(l)
 	if err != nil {
 		return nil, err
 	}

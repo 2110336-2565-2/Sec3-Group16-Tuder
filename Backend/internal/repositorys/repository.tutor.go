@@ -10,11 +10,11 @@ import (
 )
 
 type RepositoryTutor interface {
-	GetTutorsRepository() ([]*ent.Tutor, error)
-	GetTutorByUsernameRepository(sr *schema.SchemaGetTutor) (*ent.Tutor, error)
-	CreateTutorRepository(sr *schema.SchemaCreateTutor) (*ent.Tutor, error)
-	UpdateTutorRepository(sr *schema.SchemaUpdateTutor) (*ent.Tutor, error)
-	DeleteTutorRepository(sr *schema.SchemaDeleteTutor) error
+	GetTutors() ([]*ent.Tutor, error)
+	GetTutorByUsername(sr *schema.SchemaGetTutor) (*ent.Tutor, error)
+	CreateTutor(sr *schema.SchemaCreateTutor) (*ent.Tutor, error)
+	UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor, error)
+	DeleteTutor(sr *schema.SchemaDeleteTutor) error
 }
 
 type repositoryTutor struct {
@@ -26,7 +26,7 @@ func NewRepositoryTutor(c *ent.Client) *repositoryTutor {
 	return &repositoryTutor{client: c, ctx: context.Background()}
 }
 
-func (r *repositoryTutor) GetTutorByUsernameRepository(sr *schema.SchemaGetTutor) (*ent.Tutor, error) {
+func (r *repositoryTutor) GetTutorByUsername(sr *schema.SchemaGetTutor) (*ent.Tutor, error) {
 	tutor, err := r.client.Tutor.
 		Query().
 		Where(entTutor.HasUserWith(entUser.UsernameEQ(sr.Username))).
@@ -38,7 +38,7 @@ func (r *repositoryTutor) GetTutorByUsernameRepository(sr *schema.SchemaGetTutor
 	return tutor, nil
 }
 
-func (r *repositoryTutor) GetTutorsRepository() ([]*ent.Tutor, error) {
+func (r *repositoryTutor) GetTutors() ([]*ent.Tutor, error) {
 	tutor, err := r.client.Tutor.
 		Query().
 		WithUser().
@@ -49,7 +49,7 @@ func (r *repositoryTutor) GetTutorsRepository() ([]*ent.Tutor, error) {
 	return tutor, nil
 }
 
-func (r *repositoryTutor) CreateTutorRepository(sr *schema.SchemaCreateTutor) (*ent.Tutor, error) {
+func (r *repositoryTutor) CreateTutor(sr *schema.SchemaCreateTutor) (*ent.Tutor, error) {
 
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
@@ -58,7 +58,6 @@ func (r *repositoryTutor) CreateTutorRepository(sr *schema.SchemaCreateTutor) (*
 	}
 	// wrap the client with the transaction
 	txc := tx.Client()
-
 
 	newUser, err := txc.User.Create().
 		SetUsername(sr.Username).
@@ -92,10 +91,10 @@ func (r *repositoryTutor) CreateTutorRepository(sr *schema.SchemaCreateTutor) (*
 		return nil, err
 	}
 
-	return tutor, tx.Commit()	
+	return tutor, tx.Commit()
 }
 
-func (r *repositoryTutor) UpdateTutorRepository(sr *schema.SchemaUpdateTutor) (*ent.Tutor, error) {
+func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor, error) {
 
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
@@ -105,25 +104,8 @@ func (r *repositoryTutor) UpdateTutorRepository(sr *schema.SchemaUpdateTutor) (*
 	// wrap the client with the transaction
 	txc := tx.Client()
 
-
-	newUser, err := txc.User.Create().
-		SetFirstName(sr.Firstname).
-		SetLastName(sr.Lastname).
-		SetPhone(sr.Phone).
-		SetAddress(sr.Address).
-		SetProfilePictureURL(sr.ProfilePictureURL).
-		Save(r.ctx)
-
-	if err != nil {
-		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
-		}
-		return nil, err
-	}
-
 	tutor, err := txc.Tutor.
 		UpdateOneID(sr.ID).
-		SetUserID(newUser.ID).
 		SetDescription(sr.Description).
 		SetOmiseBankToken(sr.OmiseBankToken).
 		Save(r.ctx)
@@ -137,7 +119,7 @@ func (r *repositoryTutor) UpdateTutorRepository(sr *schema.SchemaUpdateTutor) (*
 	return tutor, tx.Commit()
 }
 
-func (r *repositoryTutor) DeleteTutorRepository(sr *schema.SchemaDeleteTutor) error {
+func (r *repositoryTutor) DeleteTutor(sr *schema.SchemaDeleteTutor) error {
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
@@ -156,5 +138,15 @@ func (r *repositoryTutor) DeleteTutorRepository(sr *schema.SchemaDeleteTutor) er
 		}
 		return err
 	}
+
+	err = txc.User.DeleteOneID(sr.ID).Exec(r.ctx)
+
+	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+		return err
+	}
+
 	return nil
 }

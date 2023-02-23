@@ -9,7 +9,7 @@ import (
 )
 
 type RepositoryLogin interface {
-	LoginRepository(l *schema.SchemaLogin) (*ent.User, error)
+	Login(l *schema.SchemaLogin) (*ent.User, error)
 }
 
 type repositoryLogin struct {
@@ -21,7 +21,7 @@ func NewRepositoryLogin(c *ent.Client) *repositoryLogin {
 	return &repositoryLogin{client: c, ctx: context.Background()}
 }
 
-func (r *repositoryLogin) LoginRepository(l *schema.SchemaLogin) (*ent.User, error) {
+func (r *repositoryLogin) Login(l *schema.SchemaLogin) (*ent.User, error) {
 
 	user, err := r.client.User.
 		Query().

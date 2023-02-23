@@ -10,17 +10,15 @@ import (
 )
 
 type controllerRegister struct {
-	studentService service.ServiceStudentRegister
-	tutorService   service.ServiceTutorRegister
+	registerService service.ServiceRegister
 }
 
-func NewControllerRegister(sS service.ServiceStudentRegister, sT service.ServiceTutorRegister) *controllerRegister {
-	return &controllerRegister{tutorService: sT, studentService: sS}
+func NewControllerRegister(s service.ServiceRegister) *controllerRegister {
+	return &controllerRegister{registerService: s}
 }
 
 func (cR *controllerRegister) RegisterUser(c echo.Context) (err error) {
 
-	
 	uR := &schema.SchemaRegister{}
 	if err := c.Bind(&uR); err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaRegisterResponse{
@@ -31,36 +29,17 @@ func (cR *controllerRegister) RegisterUser(c echo.Context) (err error) {
 		return err
 	}
 
+	userLoginInfo, err := cR.registerService.RegisterService(uR)
+	if err != nil {
 
-	role  := uR.Role
-
-	token := ""
-	if role == "student" {
-		userLoginInfo, err := cR.studentService.RegisterStudentService(uR)
-		if err != nil {
-
-			c.JSON(http.StatusBadRequest, schema.SchemaRegisterResponse{
-				Success: false,
-				Message: fmt.Sprint(err),
-				Error:   err,
-			})
-			return err
-		}
-		token = userLoginInfo.Token
+		c.JSON(http.StatusBadRequest, schema.SchemaRegisterResponse{
+			Success: false,
+			Message: fmt.Sprint(err),
+			Error:   err,
+		})
+		return err
 	}
-	if role == "tutor" {
-		userLoginInfo, err := cR.tutorService.RegisterTutorService(uR)
-		if err != nil {
-
-			c.JSON(http.StatusBadRequest, schema.SchemaRegisterResponse{
-				Success: false,
-				Message: fmt.Sprint(err),
-				Error:   err,
-			})
-			return err
-		}
-		token = userLoginInfo.Token
-	}
+	token := userLoginInfo.Token
 
 	c.JSON(http.StatusOK, schema.SchemaRegisterResponse{
 		Success: true,

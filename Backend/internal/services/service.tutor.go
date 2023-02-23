@@ -22,7 +22,7 @@ func NewServiceTutor(repository repository.RepositoryTutor) *serviceTutor {
 }
 
 func (s *serviceTutor) GetTutorByUsername(tutorGet *schemas.SchemaGetTutor) (*schemas.SchemaTutor, error) {
-	tutor, err := s.repository.GetTutorByUsernameRepository(tutorGet)
+	tutor, err := s.repository.GetTutorByUsername(tutorGet)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (s *serviceTutor) GetTutorByUsername(tutorGet *schemas.SchemaGetTutor) (*sc
 }
 
 func (s *serviceTutor) GetTutors() ([]*schemas.SchemaTutor, error) {
-	tutors, err := s.repository.GetTutorsRepository()
+	tutors, err := s.repository.GetTutors()
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (s *serviceTutor) GetTutors() ([]*schemas.SchemaTutor, error) {
 }
 
 func (s *serviceTutor) CreateTutor(tutorCreate *schemas.SchemaCreateTutor) (*schemas.SchemaTutor, error) {
-	tutor, err := s.repository.CreateTutorRepository(tutorCreate)
+	tutor, err := s.repository.CreateTutor(tutorCreate)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func (s *serviceTutor) CreateTutor(tutorCreate *schemas.SchemaCreateTutor) (*sch
 }
 
 func (s *serviceTutor) UpdateTutor(tutorUpdate *schemas.SchemaUpdateTutor) (*schemas.SchemaTutor, error) {
-	tutor, err := s.repository.UpdateTutorRepository(tutorUpdate)
+	tutor, err := s.repository.UpdateTutor(tutorUpdate)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +117,7 @@ func (s *serviceTutor) UpdateTutor(tutorUpdate *schemas.SchemaUpdateTutor) (*sch
 }
 
 func (s *serviceTutor) DeleteTutor(tutorDelete *schemas.SchemaDeleteTutor) error {
-	err := s.repository.DeleteTutorRepository(tutorDelete)
+	err := s.repository.DeleteTutor(tutorDelete)
 	if err != nil {
 		return err
 	}
