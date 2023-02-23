@@ -39,8 +39,7 @@ func (User) Fields() []ent.Field {
 
 func (User) Indexes() []ent.Index {
     return []ent.Index{
-        index.Fields("users_username_key").Unique().Fields("username").Fields("role"),
-
+        index.Fields("users_username_key").Unique().Fields("username","role"),
     }
 }
 

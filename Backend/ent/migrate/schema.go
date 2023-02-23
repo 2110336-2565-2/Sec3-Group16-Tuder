@@ -287,9 +287,9 @@ var (
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
 		Indexes: []*schema.Index{
 			{
-				Name:    "user_role",
+				Name:    "user_username_role",
 				Unique:  true,
-				Columns: []*schema.Column{UsersColumns[11]},
+				Columns: []*schema.Column{UsersColumns[1], UsersColumns[11]},
 			},
 		},
 	}
