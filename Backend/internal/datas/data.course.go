@@ -2,13 +2,13 @@ package datas
 
 import (
 	"context"
-	"log"
 	"fmt"
+	"log"
+
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	Course "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/google/uuid"
 )
-
 
 func InsertCourse(
 	client *ent.Client,
@@ -22,7 +22,7 @@ func InsertCourse(
 	pricePerHour int,
 	level Course.Level,
 	coursePictureURL string,
-) (*ent.Course) {
+) *ent.Course {
 
 	// Generate a new UUID for the course.
 	courseId := uuid.New()
@@ -49,7 +49,7 @@ func InsertCourse(
 		log.Fatalf("failed creating course: %v", err)
 	}
 
-	fmt.Println("Course created: ", course)
+	fmt.Println("Course created: ", course.ID)
 
 	return course
 }

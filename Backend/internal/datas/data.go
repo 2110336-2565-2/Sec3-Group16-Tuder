@@ -17,7 +17,6 @@ func InsertData(client *ent.Client) {
 	client.User.Delete().Exec(ctx)
 	client.Course.Delete().Exec(ctx)
 
-
 	// Insert users
 	user := InsertUser(client)
 

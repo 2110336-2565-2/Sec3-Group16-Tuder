@@ -16,10 +16,10 @@ func InsertUser(client *ent.Client) []*ent.User {
 
 	ctx := context.Background()
 
-	user1 := CreateUser(client, ctx, "jacky", "P@ssw0rd", "a", "a", "0", "Jacky no Dude hee", "Jukjeejid", "female", time.Now(), "profile url", user.RoleStudent)
+	user1 := CreateUser(client, ctx, "jacky", "P@ssw0rd", "a", "a", "0", "Jacky no love", "Jukjeejid", "female", time.Now(), "profile url", user.RoleStudent)
 	user2 := CreateUser(client, ctx, "bright", "P@ssw0rd", "b", "a", "00", "BrightMenMen", "Jukjeejid", "female", time.Now(), "profile url", user.RoleStudent)
 	user3 := CreateUser(client, ctx, "moo", "P@ssw0rd", "a", "a", "000", "MooMee (The Best)", "Jukjeejid", "male", time.Now(), "profile url", user.RoleTutor)
-	user4 := CreateUser(client, ctx, "verybighee", "P@ssw0rd", "a", "a", "0000", "BALLBYJUKJEEJID", "Datastructure", "male", time.Now(), "profile url", user.RoleTutor)
+	user4 := CreateUser(client, ctx, "ballhomhom", "P@ssw0rd", "a", "a", "0000", "BALLBY JUKJEEJID", "Datastructure", "male", time.Now(), "profile url", user.RoleTutor)
 
 	return []*ent.User{user1, user2, user3, user4}
 }
