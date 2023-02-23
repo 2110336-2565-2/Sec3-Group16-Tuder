@@ -2,6 +2,7 @@ package datas
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -11,31 +12,23 @@ import (
 	"github.com/google/uuid"
 )
 
-func InsertUser(client *ent.Client) ([]*ent.User, error) {
-	user1, err := genUser(client, "password1", "bighee1", "a", "a", "0", "Bright", "Jukjeejid", "male", time.Now(), "profile url", user.RoleStudent)
-	if err != nil {
-		log.Fatalf("failed creating user: %v", err)
-	}
+func InsertUser(client *ent.Client) []*ent.User {
 
-	user2, err := genUser(client, "password2", "bighee2", "a", "a", "0", "Bright", "Jukjeejid", "male", time.Now(), "profile url", user.RoleStudent)
-	if err != nil {
-		log.Fatalf("failed creating user: %v", err)
-	}
+	ctx := context.Background()
 
-	user3, err := genUser(client, "password3", "bighee3", "a", "a", "0", "Bright", "Jukjeejid", "male", time.Now(), "profile url", user.RoleStudent)
-	if err != nil {
-		log.Fatalf("failed creating user: %v", err)
-	}
-	user4, err := genUser(client, "password4", "bighee4", "a", "a", "0", "Bright", "Jukjeejid", "male", time.Now(), "profile url", user.RoleStudent)
-	if err != nil {
-		log.Fatalf("failed creating user: %v", err)
-	}
-	return []*ent.User{user1, user2, user3, user4}, err
+	user1 := CreateUser(client, ctx, "jacky", "P@ssw0rd", "a", "a", "0", "Jacky no Dude hee", "Jukjeejid", "female", time.Now(), "profile url", user.RoleStudent)
+	user2 := CreateUser(client, ctx, "bright", "P@ssw0rd", "b", "a", "00", "BrightMenMen", "Jukjeejid", "female", time.Now(), "profile url", user.RoleStudent)
+	user3 := CreateUser(client, ctx, "moo", "P@ssw0rd", "a", "a", "000", "MooMee (The Best)", "Jukjeejid", "male", time.Now(), "profile url", user.RoleTutor)
+	user4 := CreateUser(client, ctx, "verybighee", "P@ssw0rd", "a", "a", "0000", "BALLBYJUKJEEJID", "Datastructure", "male", time.Now(), "profile url", user.RoleTutor)
+
+	return []*ent.User{user1, user2, user3, user4}
 }
 
-func genUser(client *ent.Client,
-	pw string,
+func CreateUser(
+	client *ent.Client,
+	ctx context.Context,
 	username string,
+	pw string,
 	address string,
 	email string,
 	phone string,
@@ -45,18 +38,19 @@ func genUser(client *ent.Client,
 	birthdate time.Time,
 	profilepictureurl string,
 	role user.Role,
-) (*ent.User, error) {
+) *ent.User {
 
-	ctx := context.Background()
-
-	user1Id := uuid.New()
-
+	// Gen UUID and Hash Password
+	userId := uuid.New()
 	pw1, _ := utils.HashPassword(pw)
 
-	user1, err := client.User.Query().Where(user.Username(username)).Only(ctx)
+	// Check if user already exists
+	user, err := client.User.Query().Where(user.Username(username)).Only(ctx)
+
+	// If user does not exist, create new user
 	if err != nil {
-		user1, err = client.User.Create().
-			SetID(user1Id).
+		user, err = client.User.Create().
+			SetID(userId).
 			SetUsername(username).
 			SetPassword(pw1).
 			SetAddress(address).
@@ -73,35 +67,8 @@ func genUser(client *ent.Client,
 			log.Fatalf("failed creating user: %v", err)
 		}
 	}
-	return user1, err
+
+	fmt.Println("User created: ", user.ID)
+
+	return user
 }
-
-// user5, err := InsertUser(client, "password5", "bighee5", "a", "a", "0", "Bright", "Jukjeejid", "male", time.Now(), "profile url", user.RoleStudent)
-// if err != nil {
-//     log.Fatalf("failed creating user: %v", err)
-// }
-
-// user6, err := InsertUser(client, "password6", "bighee6", "a", "a", "0", "Bright", "Jukjeejid", "male", time.Now(), "profile url", user.RoleStudent)
-// if err != nil {
-//     log.Fatalf("failed creating user: %v", err)
-// }
-
-// user7, err := InsertUser(client, "password7", "bighee7", "a", "a", "0", "Bright", "Jukjeejid", "male", time.Now(), "profile url", user.RoleStudent)
-// if err != nil {
-//     log.Fatalf("failed creating user: %v", err)
-// }
-
-// user8, err := InsertUser(client, "password8", "bighee8", "a", "a", "0", "Bright", "Jukjeejid", "male", time.Now(), "profile url", user.RoleStudent)
-// if err != nil {
-//     log.Fatalf("failed creating user: %v", err)
-// }
-
-// user9, err := InsertUser(client, "password9", "bighee9", "a", "a", "0", "Bright", "Jukjeejid", "male", time.Now(), "profile url", user.RoleStudent)
-// if err != nil {
-//     log.Fatalf("failed creating user: %v", err)
-// }
-
-// user10, err := InsertUser(client, "password10", "bighee10", "a", "a", "0", "Bright", "Jukjeejid", "male", time.Now(), "profile url", user.RoleStudent)
-// if err != nil {
-//     log.Fatalf("failed creating user: %v", err)
-// }

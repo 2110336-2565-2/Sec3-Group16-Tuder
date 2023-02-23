@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 
-	"entgo.io/ent/dialect/sql/schema"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/migrate"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/datas"
@@ -41,18 +40,13 @@ func main() {
 
 	defer client.Close()
 
+
 	if err := client.Schema.Create(context.Background(),
-		schema.WithHooks(func(next schema.Creator) schema.Creator {
-			return schema.CreateFunc(func(ctx context.Context, tables ...*schema.Table) error {
-				// Run custom code here.
-				// tables[10].Indexes = removeIndex(tables[10].Indexes, "course_tutor_id_tutor_id_key")
-	
-				return next.Create(ctx, tables...)
-			})
-		}),
+
 		migrate.WithGlobalUniqueID(true),
 		migrate.WithDropIndex(true),
 		migrate.WithDropColumn(true),
+		
 	); err != nil {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}

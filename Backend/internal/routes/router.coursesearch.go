@@ -16,4 +16,5 @@ func InitCourseSearchRoutes(c *ent.Client, e *echo.Group) {
 
 	e.POST("/coursesearch", controllerCourseSearch.SearchContent)
 	e.POST("/courses", controllerCourseSearch.GetAllCourse)
+	
 }

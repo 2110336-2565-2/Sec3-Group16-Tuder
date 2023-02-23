@@ -59,7 +59,6 @@ func (cR *controllerCourseSearch) GetAllCourse(c echo.Context) (err error) {
 		})
 		return err
 	}
-	//fmt.Println(searchContent)
 
 	Course_search_result, err := cR.service.SearchAllCourse(searchContent)
 
