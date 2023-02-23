@@ -33,5 +33,5 @@ func ClearDB(client *ent.Client, ctx context.Context) {
 
 	client.Class.Delete().Exec(ctx)
 
-	fmt.Println("Database cleared.")
+	fmt.Print("\n\t::::::::: Database cleared! :::::::::\n")
 }

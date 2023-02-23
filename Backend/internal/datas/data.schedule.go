@@ -7,23 +7,21 @@ import (
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	"github.com/google/uuid"
-
 )
 
-func InsertSchedule(client *ent.Client, ctx context.Context, tutor []*ent.Tutor) ([]*ent.Schedule) {
-	
+func InsertSchedule(client *ent.Client, ctx context.Context, tutor []*ent.Tutor) []*ent.Schedule {
+
 	free_day, busy_day, some_day := GenerateDay()
 
+	var schedule []*ent.Schedule
 
-	schedule1 := CreateSchedule(client, ctx, tutor[0], free_day, busy_day, some_day, free_day, busy_day, some_day, free_day)
+	schedule = append(schedule, CreateSchedule(client, ctx, tutor[0], free_day, busy_day, some_day, free_day, busy_day, some_day, free_day))
 
-	schedule2 := CreateSchedule(client, ctx, tutor[1], free_day, busy_day, some_day, free_day, busy_day, some_day, free_day)
+	schedule = append(schedule, CreateSchedule(client, ctx, tutor[1], free_day, busy_day, some_day, free_day, busy_day, some_day, free_day))
 
-	return []*ent.Schedule{schedule1, schedule2}
-
+	return schedule
 
 }
-
 
 func CreateSchedule(
 	client *ent.Client,
@@ -36,10 +34,10 @@ func CreateSchedule(
 	d4 [24]bool,
 	d5 [24]bool,
 	d6 [24]bool,
-) (*ent.Schedule) {
+) *ent.Schedule {
 
 	scheduleId := uuid.New()
-	
+
 	schedule, err := client.Schedule.Create().
 		SetID(scheduleId).
 		SetTutor(tutor).
@@ -52,7 +50,6 @@ func CreateSchedule(
 		SetDay6(d6).
 		Save(ctx)
 
-
 	if err != nil {
 		log.Fatalf("failed creating schedule: %v", err)
 	}
@@ -64,18 +61,18 @@ func CreateSchedule(
 
 func GenerateDay() ([24]bool, [24]bool, [24]bool) {
 	free_day := [24]bool{}
-    busy_day := [24]bool{}
-    some_day := [24]bool{}
-    for idx, _ := range free_day {
-        free_day[idx] = true
-        busy_day[idx] = false
-        if idx < 12 {
-            some_day[idx] = true
-        } else {
-            some_day[idx] = false
-        }
-    }
+	busy_day := [24]bool{}
+	some_day := [24]bool{}
+	for idx, _ := range free_day {
+		free_day[idx] = true
+		busy_day[idx] = false
+		if idx < 12 {
+			some_day[idx] = true
+		} else {
+			some_day[idx] = false
+		}
+	}
 
 	return free_day, busy_day, some_day
-    
+
 }

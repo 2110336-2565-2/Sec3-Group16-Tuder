@@ -10,7 +10,18 @@ import (
 	"github.com/google/uuid"
 )
 
-func InsertTutor(client *ent.Client, user *ent.User, cid string, omiseId string, desc string) *ent.Tutor {
+func InsertTutor(client *ent.Client, ctx context.Context, user []*ent.User) []*ent.Tutor {
+
+	var tutor []*ent.Tutor
+
+	tutor = append(tutor, CreateTutor(client, user[0], "1", "tokn_test_5jx9z8z5q2z7q7x6z3z", "I am a tutor 1"))
+	tutor = append(tutor, CreateTutor(client, user[1], "2", "tokn_test_d9fm40fk40f45xkfe3f", "I am a tutor 2"))
+
+	return tutor
+
+}
+
+func CreateTutor(client *ent.Client, user *ent.User, cid string, omiseId string, desc string) *ent.Tutor {
 
 	ctx := context.Background()
 
