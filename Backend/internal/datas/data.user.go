@@ -44,29 +44,26 @@ func CreateUser(
 	userId := uuid.New()
 	pw1, _ := utils.HashPassword(pw)
 
-	// Check if user already exists
-	user, err := client.User.Query().Where(user.Username(username)).Only(ctx)
-
-	// If user does not exist, create new user
+	
+	user, err := client.User.Create().
+		SetID(userId).
+		SetUsername(username).
+		SetPassword(pw1).
+		SetAddress(address).
+		SetEmail(email).
+		SetPhone(phone).
+		SetFirstName(firstname).
+		SetLastName(lastname).
+		SetGender(gender).
+		SetBirthDate(birthdate).
+		SetProfilePictureURL(profilepictureurl).
+		SetRole(role).
+		Save(ctx)
+		
 	if err != nil {
-		user, err = client.User.Create().
-			SetID(userId).
-			SetUsername(username).
-			SetPassword(pw1).
-			SetAddress(address).
-			SetEmail(email).
-			SetPhone(phone).
-			SetFirstName(firstname).
-			SetLastName(lastname).
-			SetGender(gender).
-			SetBirthDate(birthdate).
-			SetProfilePictureURL(profilepictureurl).
-			SetRole(role).
-			Save(ctx)
-		if err != nil {
-			log.Fatalf("failed creating user: %v", err)
-		}
+		log.Fatalf("failed creating user: %v", err)
 	}
+	
 
 	fmt.Println("User created: ", user.ID)
 

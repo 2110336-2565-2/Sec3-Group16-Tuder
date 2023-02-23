@@ -10,17 +10,18 @@ import (
 
 func InsertStudent(client *ent.Client, ctx context.Context, user []*ent.User) ([]*ent.Student) {
 
+
+
 	var student []*ent.Student
 
-	student = append(student, CreateStudent(client, user[0]))
-	student = append(student, CreateStudent(client, user[1]))
+	student = append(student, CreateStudent(client, ctx, user[0]))
+	student = append(student, CreateStudent(client, ctx, user[1]))
 
 	return student
 }
 
-func CreateStudent(client *ent.Client, user *ent.User) (*ent.Student) {
+func CreateStudent(client *ent.Client, ctx context.Context, user *ent.User) (*ent.Student) {
 
-	ctx := context.Background()
 
 	student, err := client.Student.Create().
 		SetUserID(user.ID).

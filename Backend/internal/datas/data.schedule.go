@@ -17,7 +17,7 @@ func InsertSchedule(client *ent.Client, ctx context.Context, tutor []*ent.Tutor)
 
 	schedule = append(schedule, CreateSchedule(client, ctx, tutor[0], free_day, busy_day, some_day, free_day, busy_day, some_day, free_day))
 
-	schedule = append(schedule, CreateSchedule(client, ctx, tutor[1], free_day, busy_day, some_day, free_day, busy_day, some_day, free_day))
+	schedule = append(schedule, CreateSchedule(client, ctx, tutor[1], busy_day, some_day, free_day, some_day, busy_day, free_day, free_day))
 
 	return schedule
 
@@ -63,10 +63,10 @@ func GenerateDay() ([24]bool, [24]bool, [24]bool) {
 	free_day := [24]bool{}
 	busy_day := [24]bool{}
 	some_day := [24]bool{}
-	for idx, _ := range free_day {
+	for idx := range free_day {
 		free_day[idx] = true
 		busy_day[idx] = false
-		if idx < 12 {
+		if idx%3 == 0 {
 			some_day[idx] = true
 		} else {
 			some_day[idx] = false
