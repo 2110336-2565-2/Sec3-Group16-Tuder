@@ -29,9 +29,10 @@ export default function Course(props){
 }
 
 const CardImg = styled.img`
-    width: 100%;
-    height: 100%;
+    width: 500px;
+    height: auto;
     object-fit: cover;
+    border-radius: 10px;
 `
 
 const CardHeader = styled.div`

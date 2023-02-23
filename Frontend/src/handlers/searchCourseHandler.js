@@ -7,3 +7,7 @@ export const  searchCourseHandler = (searchData)=>{
     )
 
 }
+
+export const fetchCourseHandler = () => {
+    return api.get('api/v1/courses')
+}
