@@ -95,6 +95,14 @@ func (sc *ScheduleCreate) SetClassID(id uuid.UUID) *ScheduleCreate {
 	return sc
 }
 
+// SetNillableClassID sets the "class" edge to the Class entity by ID if the given value is not nil.
+func (sc *ScheduleCreate) SetNillableClassID(id *uuid.UUID) *ScheduleCreate {
+	if id != nil {
+		sc = sc.SetClassID(*id)
+	}
+	return sc
+}
+
 // SetClass sets the "class" edge to the Class entity.
 func (sc *ScheduleCreate) SetClass(c *Class) *ScheduleCreate {
 	return sc.SetClassID(c.ID)
@@ -166,9 +174,6 @@ func (sc *ScheduleCreate) check() error {
 	}
 	if _, ok := sc.mutation.TutorID(); !ok {
 		return &ValidationError{Name: "tutor", err: errors.New(`ent: missing required edge "Schedule.tutor"`)}
-	}
-	if _, ok := sc.mutation.ClassID(); !ok {
-		return &ValidationError{Name: "class", err: errors.New(`ent: missing required edge "Schedule.class"`)}
 	}
 	return nil
 }

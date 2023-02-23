@@ -89,6 +89,14 @@ func (su *ScheduleUpdate) SetClassID(id uuid.UUID) *ScheduleUpdate {
 	return su
 }
 
+// SetNillableClassID sets the "class" edge to the Class entity by ID if the given value is not nil.
+func (su *ScheduleUpdate) SetNillableClassID(id *uuid.UUID) *ScheduleUpdate {
+	if id != nil {
+		su = su.SetClassID(*id)
+	}
+	return su
+}
+
 // SetClass sets the "class" edge to the Class entity.
 func (su *ScheduleUpdate) SetClass(c *Class) *ScheduleUpdate {
 	return su.SetClassID(c.ID)
@@ -142,9 +150,6 @@ func (su *ScheduleUpdate) ExecX(ctx context.Context) {
 func (su *ScheduleUpdate) check() error {
 	if _, ok := su.mutation.TutorID(); su.mutation.TutorCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Schedule.tutor"`)
-	}
-	if _, ok := su.mutation.ClassID(); su.mutation.ClassCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Schedule.class"`)
 	}
 	return nil
 }
@@ -331,6 +336,14 @@ func (suo *ScheduleUpdateOne) SetClassID(id uuid.UUID) *ScheduleUpdateOne {
 	return suo
 }
 
+// SetNillableClassID sets the "class" edge to the Class entity by ID if the given value is not nil.
+func (suo *ScheduleUpdateOne) SetNillableClassID(id *uuid.UUID) *ScheduleUpdateOne {
+	if id != nil {
+		suo = suo.SetClassID(*id)
+	}
+	return suo
+}
+
 // SetClass sets the "class" edge to the Class entity.
 func (suo *ScheduleUpdateOne) SetClass(c *Class) *ScheduleUpdateOne {
 	return suo.SetClassID(c.ID)
@@ -397,9 +410,6 @@ func (suo *ScheduleUpdateOne) ExecX(ctx context.Context) {
 func (suo *ScheduleUpdateOne) check() error {
 	if _, ok := suo.mutation.TutorID(); suo.mutation.TutorCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Schedule.tutor"`)
-	}
-	if _, ok := suo.mutation.ClassID(); suo.mutation.ClassCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Schedule.class"`)
 	}
 	return nil
 }

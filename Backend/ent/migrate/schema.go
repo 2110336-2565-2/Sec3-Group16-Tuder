@@ -201,7 +201,7 @@ var (
 		{Name: "day_4", Type: field.TypeJSON},
 		{Name: "day_5", Type: field.TypeJSON},
 		{Name: "day_6", Type: field.TypeJSON},
-		{Name: "class_schedule", Type: field.TypeUUID, Unique: true},
+		{Name: "class_schedule", Type: field.TypeUUID, Unique: true, Nullable: true},
 		{Name: "tutor_schedule", Type: field.TypeUUID},
 	}
 	// SchedulesTable holds the schema information for the "schedules" table.
@@ -214,7 +214,7 @@ var (
 				Symbol:     "schedules_classes_schedule",
 				Columns:    []*schema.Column{SchedulesColumns[8]},
 				RefColumns: []*schema.Column{ClassesColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "schedules_tutors_schedule",

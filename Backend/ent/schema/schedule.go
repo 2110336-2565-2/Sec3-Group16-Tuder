@@ -35,7 +35,6 @@ func (Schedule) Edges() []ent.Edge {
 			Required(),
 		edge.From("class", Class.Type).
 			Ref("schedule").
-			Unique().
-			Required(),
+			Unique(),
 	}
 }
