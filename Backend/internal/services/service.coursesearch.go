@@ -80,7 +80,7 @@ func (s *serviceCourseSearch) PackToSchema(courses []*ent.Course) []*schemas.Cou
 		courseResponses = append(courseResponses, &schemas.CourseSearchResult{
 			Course_id:          course.ID,
 			Tutor_name:         course.Edges.Tutor.Edges.User.Username,
-			Tittle:             course.Title,
+			Title:             course.Title,
 			Subject:            course.Subject,
 			Topic:              course.Topic,
 			Estimate_time:      course.EstimatedTime,

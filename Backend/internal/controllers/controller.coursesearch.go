@@ -28,7 +28,7 @@ func (cR *controllerCourseSearch) SearchContent(c echo.Context) (err error) {
 		})
 		return err
 	}
-	//fmt.Println(searchContent)
+
 
 	Course_search_result, err := cR.service.CourseSearchService(searchContent)
 	if err != nil {

@@ -6,16 +6,16 @@ export default function Course(props){
             <CardHeader>
                 <CardImg src={props.img}/>
                 <CardContent >
-                    {props.coursename}
+                    TITLE : {props.title}
                 </CardContent>
                 <CardContent>    
-                    {props.tutor}
+                    TUTOR : {props.tutor}
                 </CardContent>
                 <CardContent>
-                    {props.topic}
+                    TOPIC : {props.topic}
                 </CardContent>  
                 <CardContent>
-                    {props.subject}
+                    SUBJECT : {props.subject}
                 </CardContent>  
                 <CardContent>
                     Time: {props.time} hr
