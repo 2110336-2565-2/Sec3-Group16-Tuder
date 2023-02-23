@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -19,19 +20,19 @@ type Schedule struct {
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
 	// Day0 holds the value of the "day_0" field.
-	Day0 *bool `json:"day_0,omitempty"`
+	Day0 [24]bool `json:"day_0,omitempty"`
 	// Day1 holds the value of the "day_1" field.
-	Day1 *bool `json:"day_1,omitempty"`
+	Day1 [24]bool `json:"day_1,omitempty"`
 	// Day2 holds the value of the "day_2" field.
-	Day2 *bool `json:"day_2,omitempty"`
+	Day2 [24]bool `json:"day_2,omitempty"`
 	// Day3 holds the value of the "day_3" field.
-	Day3 *bool `json:"day_3,omitempty"`
+	Day3 [24]bool `json:"day_3,omitempty"`
 	// Day4 holds the value of the "day_4" field.
-	Day4 *bool `json:"day_4,omitempty"`
+	Day4 [24]bool `json:"day_4,omitempty"`
 	// Day5 holds the value of the "day_5" field.
-	Day5 *bool `json:"day_5,omitempty"`
+	Day5 [24]bool `json:"day_5,omitempty"`
 	// Day6 holds the value of the "day_6" field.
-	Day6 *bool `json:"day_6,omitempty"`
+	Day6 [24]bool `json:"day_6,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ScheduleQuery when eager-loading is set.
 	Edges          ScheduleEdges `json:"edges"`
@@ -82,7 +83,7 @@ func (*Schedule) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case schedule.FieldDay0, schedule.FieldDay1, schedule.FieldDay2, schedule.FieldDay3, schedule.FieldDay4, schedule.FieldDay5, schedule.FieldDay6:
-			values[i] = new(sql.NullBool)
+			values[i] = new([]byte)
 		case schedule.FieldID:
 			values[i] = new(uuid.UUID)
 		case schedule.ForeignKeys[0]: // class_schedule
@@ -111,53 +112,60 @@ func (s *Schedule) assignValues(columns []string, values []any) error {
 				s.ID = *value
 			}
 		case schedule.FieldDay0:
-			if value, ok := values[i].(*sql.NullBool); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field day_0", values[i])
-			} else if value.Valid {
-				s.Day0 = new(bool)
-				*s.Day0 = value.Bool
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &s.Day0); err != nil {
+					return fmt.Errorf("unmarshal field day_0: %w", err)
+				}
 			}
 		case schedule.FieldDay1:
-			if value, ok := values[i].(*sql.NullBool); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field day_1", values[i])
-			} else if value.Valid {
-				s.Day1 = new(bool)
-				*s.Day1 = value.Bool
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &s.Day1); err != nil {
+					return fmt.Errorf("unmarshal field day_1: %w", err)
+				}
 			}
 		case schedule.FieldDay2:
-			if value, ok := values[i].(*sql.NullBool); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field day_2", values[i])
-			} else if value.Valid {
-				s.Day2 = new(bool)
-				*s.Day2 = value.Bool
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &s.Day2); err != nil {
+					return fmt.Errorf("unmarshal field day_2: %w", err)
+				}
 			}
 		case schedule.FieldDay3:
-			if value, ok := values[i].(*sql.NullBool); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field day_3", values[i])
-			} else if value.Valid {
-				s.Day3 = new(bool)
-				*s.Day3 = value.Bool
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &s.Day3); err != nil {
+					return fmt.Errorf("unmarshal field day_3: %w", err)
+				}
 			}
 		case schedule.FieldDay4:
-			if value, ok := values[i].(*sql.NullBool); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field day_4", values[i])
-			} else if value.Valid {
-				s.Day4 = new(bool)
-				*s.Day4 = value.Bool
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &s.Day4); err != nil {
+					return fmt.Errorf("unmarshal field day_4: %w", err)
+				}
 			}
 		case schedule.FieldDay5:
-			if value, ok := values[i].(*sql.NullBool); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field day_5", values[i])
-			} else if value.Valid {
-				s.Day5 = new(bool)
-				*s.Day5 = value.Bool
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &s.Day5); err != nil {
+					return fmt.Errorf("unmarshal field day_5: %w", err)
+				}
 			}
 		case schedule.FieldDay6:
-			if value, ok := values[i].(*sql.NullBool); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field day_6", values[i])
-			} else if value.Valid {
-				s.Day6 = new(bool)
-				*s.Day6 = value.Bool
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &s.Day6); err != nil {
+					return fmt.Errorf("unmarshal field day_6: %w", err)
+				}
 			}
 		case schedule.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -211,40 +219,26 @@ func (s *Schedule) String() string {
 	var builder strings.Builder
 	builder.WriteString("Schedule(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", s.ID))
-	if v := s.Day0; v != nil {
-		builder.WriteString("day_0=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
+	builder.WriteString("day_0=")
+	builder.WriteString(fmt.Sprintf("%v", s.Day0))
 	builder.WriteString(", ")
-	if v := s.Day1; v != nil {
-		builder.WriteString("day_1=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
+	builder.WriteString("day_1=")
+	builder.WriteString(fmt.Sprintf("%v", s.Day1))
 	builder.WriteString(", ")
-	if v := s.Day2; v != nil {
-		builder.WriteString("day_2=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
+	builder.WriteString("day_2=")
+	builder.WriteString(fmt.Sprintf("%v", s.Day2))
 	builder.WriteString(", ")
-	if v := s.Day3; v != nil {
-		builder.WriteString("day_3=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
+	builder.WriteString("day_3=")
+	builder.WriteString(fmt.Sprintf("%v", s.Day3))
 	builder.WriteString(", ")
-	if v := s.Day4; v != nil {
-		builder.WriteString("day_4=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
+	builder.WriteString("day_4=")
+	builder.WriteString(fmt.Sprintf("%v", s.Day4))
 	builder.WriteString(", ")
-	if v := s.Day5; v != nil {
-		builder.WriteString("day_5=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
+	builder.WriteString("day_5=")
+	builder.WriteString(fmt.Sprintf("%v", s.Day5))
 	builder.WriteString(", ")
-	if v := s.Day6; v != nil {
-		builder.WriteString("day_6=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
+	builder.WriteString("day_6=")
+	builder.WriteString(fmt.Sprintf("%v", s.Day6))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -5,11 +5,9 @@ package ent
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/google/uuid"
 )
@@ -21,23 +19,24 @@ type Course struct {
 	ID uuid.UUID `json:"id,omitempty"`
 	// Title holds the value of the "title" field.
 	Title string `json:"title,omitempty"`
+	// Subject holds the value of the "subject" field.
+	Subject string `json:"subject,omitempty"`
+	// Topic holds the value of the "topic" field.
+	Topic string `json:"topic,omitempty"`
 	// EstimatedTime holds the value of the "estimated_time" field.
-	EstimatedTime time.Time `json:"estimated_time,omitempty"`
+	EstimatedTime int `json:"estimated_time,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
-	// CourseStatus holds the value of the "course_status" field.
-	CourseStatus string `json:"course_status,omitempty"`
 	// PricePerHour holds the value of the "price_per_hour" field.
 	PricePerHour int `json:"price_per_hour,omitempty"`
-	// LevelID holds the value of the "level_id" field.
-	LevelID string `json:"level_id,omitempty"`
+	// Level holds the value of the "level" field.
+	Level course.Level `json:"level,omitempty"`
 	// CoursePictureURL holds the value of the "course_picture_url" field.
 	CoursePictureURL *string `json:"course_picture_url,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CourseQuery when eager-loading is set.
-	Edges          CourseEdges `json:"edges"`
-	student_course *uuid.UUID
-	tutor_course   *uuid.UUID
+	Edges        CourseEdges `json:"edges"`
+	tutor_course *uuid.UUID
 }
 
 // CourseEdges holds the relations/edges for other nodes in the graph.
@@ -46,13 +45,11 @@ type CourseEdges struct {
 	ReviewCourse []*ReviewCourse `json:"review_course,omitempty"`
 	// Class holds the value of the class edge.
 	Class []*Class `json:"class,omitempty"`
-	// Student holds the value of the student edge.
-	Student *Student `json:"student,omitempty"`
 	// Tutor holds the value of the tutor edge.
 	Tutor *Tutor `json:"tutor,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [3]bool
 }
 
 // ReviewCourseOrErr returns the ReviewCourse value or an error if the edge
@@ -73,23 +70,10 @@ func (e CourseEdges) ClassOrErr() ([]*Class, error) {
 	return nil, &NotLoadedError{edge: "class"}
 }
 
-// StudentOrErr returns the Student value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e CourseEdges) StudentOrErr() (*Student, error) {
-	if e.loadedTypes[2] {
-		if e.Student == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: student.Label}
-		}
-		return e.Student, nil
-	}
-	return nil, &NotLoadedError{edge: "student"}
-}
-
 // TutorOrErr returns the Tutor value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e CourseEdges) TutorOrErr() (*Tutor, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[2] {
 		if e.Tutor == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: tutor.Label}
@@ -104,17 +88,13 @@ func (*Course) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case course.FieldPricePerHour:
+		case course.FieldEstimatedTime, course.FieldPricePerHour:
 			values[i] = new(sql.NullInt64)
-		case course.FieldTitle, course.FieldDescription, course.FieldCourseStatus, course.FieldLevelID, course.FieldCoursePictureURL:
+		case course.FieldTitle, course.FieldSubject, course.FieldTopic, course.FieldDescription, course.FieldLevel, course.FieldCoursePictureURL:
 			values[i] = new(sql.NullString)
-		case course.FieldEstimatedTime:
-			values[i] = new(sql.NullTime)
 		case course.FieldID:
 			values[i] = new(uuid.UUID)
-		case course.ForeignKeys[0]: // student_course
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
-		case course.ForeignKeys[1]: // tutor_course
+		case course.ForeignKeys[0]: // tutor_course
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Course", columns[i])
@@ -143,11 +123,23 @@ func (c *Course) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.Title = value.String
 			}
+		case course.FieldSubject:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field subject", values[i])
+			} else if value.Valid {
+				c.Subject = value.String
+			}
+		case course.FieldTopic:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field topic", values[i])
+			} else if value.Valid {
+				c.Topic = value.String
+			}
 		case course.FieldEstimatedTime:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field estimated_time", values[i])
 			} else if value.Valid {
-				c.EstimatedTime = value.Time
+				c.EstimatedTime = int(value.Int64)
 			}
 		case course.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -155,23 +147,17 @@ func (c *Course) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.Description = value.String
 			}
-		case course.FieldCourseStatus:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field course_status", values[i])
-			} else if value.Valid {
-				c.CourseStatus = value.String
-			}
 		case course.FieldPricePerHour:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field price_per_hour", values[i])
 			} else if value.Valid {
 				c.PricePerHour = int(value.Int64)
 			}
-		case course.FieldLevelID:
+		case course.FieldLevel:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field level_id", values[i])
+				return fmt.Errorf("unexpected type %T for field level", values[i])
 			} else if value.Valid {
-				c.LevelID = value.String
+				c.Level = course.Level(value.String)
 			}
 		case course.FieldCoursePictureURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -181,13 +167,6 @@ func (c *Course) assignValues(columns []string, values []any) error {
 				*c.CoursePictureURL = value.String
 			}
 		case course.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullScanner); !ok {
-				return fmt.Errorf("unexpected type %T for field student_course", values[i])
-			} else if value.Valid {
-				c.student_course = new(uuid.UUID)
-				*c.student_course = *value.S.(*uuid.UUID)
-			}
-		case course.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field tutor_course", values[i])
 			} else if value.Valid {
@@ -207,11 +186,6 @@ func (c *Course) QueryReviewCourse() *ReviewCourseQuery {
 // QueryClass queries the "class" edge of the Course entity.
 func (c *Course) QueryClass() *ClassQuery {
 	return NewCourseClient(c.config).QueryClass(c)
-}
-
-// QueryStudent queries the "student" edge of the Course entity.
-func (c *Course) QueryStudent() *StudentQuery {
-	return NewCourseClient(c.config).QueryStudent(c)
 }
 
 // QueryTutor queries the "tutor" edge of the Course entity.
@@ -245,20 +219,23 @@ func (c *Course) String() string {
 	builder.WriteString("title=")
 	builder.WriteString(c.Title)
 	builder.WriteString(", ")
+	builder.WriteString("subject=")
+	builder.WriteString(c.Subject)
+	builder.WriteString(", ")
+	builder.WriteString("topic=")
+	builder.WriteString(c.Topic)
+	builder.WriteString(", ")
 	builder.WriteString("estimated_time=")
-	builder.WriteString(c.EstimatedTime.Format(time.ANSIC))
+	builder.WriteString(fmt.Sprintf("%v", c.EstimatedTime))
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(c.Description)
 	builder.WriteString(", ")
-	builder.WriteString("course_status=")
-	builder.WriteString(c.CourseStatus)
-	builder.WriteString(", ")
 	builder.WriteString("price_per_hour=")
 	builder.WriteString(fmt.Sprintf("%v", c.PricePerHour))
 	builder.WriteString(", ")
-	builder.WriteString("level_id=")
-	builder.WriteString(c.LevelID)
+	builder.WriteString("level=")
+	builder.WriteString(fmt.Sprintf("%v", c.Level))
 	builder.WriteString(", ")
 	if v := c.CoursePictureURL; v != nil {
 		builder.WriteString("course_picture_url=")

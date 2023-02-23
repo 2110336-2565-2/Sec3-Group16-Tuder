@@ -26,6 +26,7 @@ func (cR *controllerTutor) GetTutorByUsername(c echo.Context) (err error) {
 		})
 		return
 	}
+
 	tutor, err := cR.service.GetTutorByUsername(uR)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{

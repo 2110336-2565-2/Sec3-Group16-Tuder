@@ -27,8 +27,6 @@ func (s *serviceTutor) GetTutorByUsername(tutorGet *schemas.SchemaGetTutor) (*sc
 		return nil, err
 	}
 
-	
-
 	return &schemas.SchemaTutor{
 		ID:                tutor.ID,
 		Username:          tutor.Edges.User.Username,
@@ -53,6 +51,7 @@ func (s *serviceTutor) GetTutors() ([]*schemas.SchemaTutor, error) {
 	}
 	var tutorResponses []*schemas.SchemaTutor
 	for _, tutor := range tutors {
+
 		tutorResponses = append(tutorResponses, &schemas.SchemaTutor{
 			ID:                tutor.ID,
 			Username:          tutor.Edges.User.Username,

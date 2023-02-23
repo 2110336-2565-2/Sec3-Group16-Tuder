@@ -2,8 +2,8 @@ package schema
 
 import (
 	"entgo.io/ent"
-	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/edge"
+	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 )
 
@@ -30,8 +30,6 @@ func (Student) Fields() []ent.Field {
 func (Student) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("issue_report", IssueReport.Type),
-		edge.To("course", Course.Type).
-			Unique(),
 		edge.To("class", Class.Type),
 		edge.From("user", User.Type).
 			Ref("student").
