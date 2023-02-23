@@ -28,5 +28,5 @@ type SchemaErrorResponse struct {
 type CourseSearchResponse struct {
 	Success bool                  `json:"success"`
 	Message string                `json:"message"`
-	Data    []*CourseSearchResult `json:"Course_serach_result"`
+	Data    []*CourseSearchResult `json:"result"`
 }

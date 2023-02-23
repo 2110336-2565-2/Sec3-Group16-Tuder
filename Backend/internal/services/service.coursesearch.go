@@ -29,14 +29,14 @@ func NewServiceCourseSearch(l repositorys.RepositoryCourseSearch) *serviceCourse
 func (s *serviceCourseSearch) Interception(l1 []*schemas.CourseSearchResult, l2 []*schemas.CourseSearchResult) []*schemas.CourseSearchResult {
 	for _, course_ref := range l2 {
 		ref := course_ref.Course_id
-		stattus := true
+		status := true
 		for _, course_check := range l1 {
 			if ref == course_check.Course_id {
-				stattus = false
+				status = false
 				break
 			}
 		}
-		if stattus == true {
+		if status == true {
 			l2 = append(l2, course_ref)
 		}
 	}
@@ -62,9 +62,11 @@ func (s *serviceCourseSearch) PackToSchema(courses []*ent.Course) []*schemas.Cou
 }
 
 func (s *serviceCourseSearch) CourseSearchService(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error) {
+
 	if ((((searchContent.Title == "") && (searchContent.Subject == "")) && (searchContent.Topic == "")) && (searchContent.Tutor_name == "")) && (searchContent.Days == [7]bool{false, false, false, false, false, false, false}) {
 		return s.SearchAllCourse()
 	}
+
 	searchResult, _ := s.CourseSearchByTitle(searchContent)
 	subjectSearch, _ := s.CourseSearchBySubject(searchContent)
 	searchResult = s.Interception(subjectSearch, searchResult)
@@ -75,7 +77,7 @@ func (s *serviceCourseSearch) CourseSearchService(searchContent *schemas.CourseS
 	daySearch, _ := s.CourseSearchByDay(searchContent)
 	searchResult = s.Interception(daySearch, searchResult)
 
-	return nil, nil
+	return searchResult, nil
 }
 
 func (s *serviceCourseSearch) CourseSearchByTutor(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error) {

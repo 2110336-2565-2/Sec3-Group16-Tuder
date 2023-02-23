@@ -6,12 +6,12 @@ import { useDataContext } from '../pages/Courses';
 import { useQuery } from 'react-query';
 
 export default function CourseSearchForm(props){
-    const [searchTerm, setSearchTerm] = useState('');
+ 
     const [coursename, setCoursename] = useState('')
     const [subject, setSubject] = useState('')
     const [topic, setTopic] = useState('')
     const [tutor_name, setTutorName] = useState('')
-    const [days, setDays] = useState([0,0,0,0,0,0,0])
+    const [days, setDays] = useState([false,false,false,false,false,false,false])
 
 
     const {data, setData} = useDataContext();
@@ -21,15 +21,18 @@ export default function CourseSearchForm(props){
         'filter_courses',() =>
         {
             const searchData = {
-                searchTerm,
-                coursename,
-                subject,
-                topic,
-                tutor_name,
-                days
+        
+                "title": coursename,
+                "subject": subject,
+                "topic": topic,
+                "tutor_name": tutor_name,
+                "days": days
             }
+            console.log(searchData)
             searchCourseHandler(searchData).then((res) => {
-                setData({data:res.data})
+
+                setData({data:res.data.result});
+
             })
         },
         {
@@ -58,7 +61,7 @@ export default function CourseSearchForm(props){
         <FormRow>
             <ItemGrid justify='center' columngrid='1 / 3'>
                 <SearchBar>
-                    <SearchInput key="searchBar" placeholder="Search by a course name" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/>
+                    <SearchInput key="searchBar" placeholder="Search by a course name" value={coursename} onChange={(e) => setCoursename(e.target.value)}/>
                 </SearchBar>
             </ItemGrid>
             <ItemGrid columngrid='4'>
@@ -73,7 +76,7 @@ export default function CourseSearchForm(props){
         <FormRow>
         
             <ItemGrid justify='center' columngrid='1 / 3'>
-                    <FormInput key="tutor" placeholder="Tutor Name" value={coursename} onChange={(e) => setCoursename(e.target.value)}/>
+                    <FormInput key="tutor" placeholder="Tutor Name" value={tutor_name} onChange={(e) => setTutorName(e.target.value)}/>
             </ItemGrid>
             <ItemGrid  columngrid='4'>
                     <FormInput key="subject" placeholder="Subject" value={subject} onChange={(e) => setSubject(e.target.value)}/>
@@ -84,7 +87,7 @@ export default function CourseSearchForm(props){
                 <CheckboxLable key={val}>
                     <Checkbox value={idx} type="checkbox" onChange={e => {
                         const newDays = [...days];
-                        newDays[val] = e.target.checked ? 1 : 0;
+                        newDays[val] = e.target.checked ? true : false ;
                         setDays(newDays);
                         }
                     }/>

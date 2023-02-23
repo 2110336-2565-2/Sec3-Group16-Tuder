@@ -1,8 +1,6 @@
 package services
 
 import (
-	"fmt"
-
 	repository "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 )
@@ -53,8 +51,7 @@ func (s *serviceTutor) GetTutors() ([]*schemas.SchemaTutor, error) {
 	}
 	var tutorResponses []*schemas.SchemaTutor
 	for _, tutor := range tutors {
-		fmt.Println(tutor.Edges.User)
-		
+
 		tutorResponses = append(tutorResponses, &schemas.SchemaTutor{
 			ID:                tutor.ID,
 			Username:          tutor.Edges.User.Username,

@@ -10,6 +10,7 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
+	"github.com/google/uuid"
 )
 
 func TestData(client *ent.Client) {
@@ -22,8 +23,11 @@ func TestData(client *ent.Client) {
 	client.Course.Delete().Exec(ctx)
 
 	ps, _ := utils.HashPassword("brightHeemen")
+	user1Id := uuid.New()
+	user2Id := uuid.New()
 	user1, err := client.User.Create().
-		SetUsername("hee").
+		SetID(user1Id).
+		SetUsername("bighee").
 		SetPassword(ps).
 		SetAddress("a").
 		SetEmail("a").
@@ -41,7 +45,8 @@ func TestData(client *ent.Client) {
 	}
 
 	user2, err := client.User.Create().
-		SetUsername("bighee").
+		SetID(user2Id).
+		SetUsername("hee").
 		SetPassword(ps).
 		SetAddress("b").
 		SetEmail("b").

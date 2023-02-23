@@ -5,6 +5,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"github.com/google/uuid"
 	
 )
@@ -36,18 +37,12 @@ func (User) Fields() []ent.Field {
 	}
 }
 
-// func (UserMixin) MixinEdges() []ent.Edge {
-// 	return []ent.Edge{
-// 		edge.To("issue_report", IssueReport.Type),
-// 	}
-// }
+func (User) Indexes() []ent.Index {
+    return []ent.Index{
+        index.Fields("id"),
 
-
-// func (User) Mixin() []ent.Mixin {
-// 	return []ent.Mixin{
-// 		UserMixin{},
-// 	}
-// }
+    }
+}
 
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{

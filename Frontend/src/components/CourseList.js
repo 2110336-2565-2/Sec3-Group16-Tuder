@@ -11,17 +11,19 @@ import { useDataContext } from '../pages/Courses';
 export default function CourseList(){ 
     const {data, setData} = useDataContext();
 
-    // useEffect(() => {
-    //     // update component
-    //     // console.log(data)
-    // }, [data])
-
     const {initData, isLoading, error} = useQuery(
         'courses',() =>
         {
             fetchCourseHandler().then((res) => {
-                setData({data:res.data});
-            })
+                
+                if(res.data.success){
+                    
+                    setData({data:res.data.result});
+                }
+            }).catch((err) => {
+                console.log(err);
+            }
+            )
         },
         {
             refetchOnWindowFocus: false,
@@ -37,17 +39,25 @@ export default function CourseList(){
         return <div>Error: {error.message}</div>
     }
     
+    if (data === null) {
+        return <div>Error</div>
+    }
 
+    if(data.data === []){
+        return <div>Empty</div>
+    }
    
 
     return (
         <>
             <CourseListPage>
-                { data.data.map(item => (  
-                    <CourseListcontent key={item.course_id}>
+                {
+                    data.data.map(item => (  
+                            <CourseListcontent key={item.course_id}>
                         <Course  coursename={item.title} topic={item.topic} tutor={item.tutor_name} subject={item.subject} time={item.estimate_time} price={item.price_per_hour} img={item.course_picture_url}/>       
                     </CourseListcontent>
-                ))}
+                    ))
+                }
             </CourseListPage>
         </>
     )
