@@ -13,7 +13,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func TestData(client *ent.Client) {
+func InsertData(client *ent.Client) {
 
 	ctx := context.Background()
 
@@ -25,68 +25,78 @@ func TestData(client *ent.Client) {
 	ps, _ := utils.HashPassword("brightHeemen")
 	user1Id := uuid.New()
 	user2Id := uuid.New()
-	user1, err := client.User.Create().
-		SetID(user1Id).
-		SetUsername("bighee").
-		SetPassword(ps).
-		SetAddress("a").
-		SetEmail("a").
-		SetPhone("0").
-		SetFirstName("Bright").
-		SetLastName("Jukjeejid").
-		SetGender("male").
-		SetBirthDate(time.Now()).
-		SetProfilePictureURL("profile url").
-		SetRole(user.RoleStudent).
-		Save(ctx)
 
-	if err != nil {
-		log.Fatalf("failed creating user: %v", err)
+	exist, _ := client.User.Query().Where(user.Username("bighee")).Exist(ctx)
+	if !exist {
+		user1, err := client.User.Create().
+			SetID(user1Id).
+			SetUsername("bighee").
+			SetPassword(ps).
+			SetAddress("a").
+			SetEmail("a").
+			SetPhone("0").
+			SetFirstName("Bright").
+			SetLastName("Jukjeejid").
+			SetGender("male").
+			SetBirthDate(time.Now()).
+			SetProfilePictureURL("profile url").
+			SetRole(user.RoleStudent).
+			Save(ctx)
+
+		if err != nil {
+			log.Fatalf("failed creating user: %v", err)
+		}
+		fmt.Println(user1)
+
+		client.Student.Create().
+			SetUserID(user1.ID).
+			Save(ctx)
+
 	}
 
-	user2, err := client.User.Create().
-		SetID(user2Id).
-		SetUsername("hee").
-		SetPassword(ps).
-		SetAddress("b").
-		SetEmail("b").
-		SetPhone("1").
-		SetFirstName("Bright").
-		SetLastName("Jukjeejid").
-		SetGender("female").
-		SetProfilePictureURL("profile url").
-		SetBirthDate(time.Now()).
-		SetRole(user.RoleTutor).
-		Save(ctx)
+	exist, _ = client.User.Query().Where(user.Username("hee")).Exist(ctx)
 
-	if err != nil {
-		log.Fatalf("failed creating user: %v", err)
+	if !exist {
+
+		user2, err := client.User.Create().
+			SetID(user2Id).
+			SetUsername("hee").
+			SetPassword(ps).
+			SetAddress("b").
+			SetEmail("b").
+			SetPhone("1").
+			SetFirstName("Bright").
+			SetLastName("Jukjeejid").
+			SetGender("female").
+			SetProfilePictureURL("profile url").
+			SetBirthDate(time.Now()).
+			SetRole(user.RoleTutor).
+			Save(ctx)
+
+		if err != nil {
+			log.Fatalf("failed creating user: %v", err)
+		}
+
+		fmt.Println(user2)
+
+		tutor1, _ := client.Tutor.Create().
+			SetUserID(user2.ID).
+			SetCitizenID("1234567890123").
+			SetOmiseBankToken("bank token").
+			SetDescription("test description").
+			Save(ctx)
+
+		client.Course.Create().
+			SetTutorID(tutor1.ID).
+			SetTitle("sexeducation").
+			SetSubject("test").
+			SetTopic("topichee").
+			SetEstimatedTime(10).
+			SetDescription("test description").
+			SetPricePerHour(500).
+			SetLevel(course.LevelGrade1).
+			SetCoursePictureURL("picture url").
+			Save(ctx)
 	}
-
-	fmt.Println(user1)
-	fmt.Println(user2)
-
-	client.Student.Create().
-		SetUserID(user1.ID).
-		Save(ctx)
-
-	tutor1, _ := client.Tutor.Create().
-		SetUserID(user2.ID).
-		SetCitizenID("1234567890123").
-		SetOmiseBankToken("bank token").
-		SetDescription("test description").
-		Save(ctx)
-
-	client.Course.Create().
-		SetTutorID(tutor1.ID).
-		SetTitle("sexeducation").
-		SetSubject("test").
-		SetTopic("topichee").
-		SetEstimatedTime(10).
-		SetDescription("test description").
-		SetPricePerHour(500).
-		SetLevel(course.LevelGrade1).
-		SetCoursePictureURL("picture url").
-		Save(ctx)
 
 }
