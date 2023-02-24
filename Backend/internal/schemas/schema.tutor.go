@@ -20,6 +20,7 @@ type SchemaTutor struct {
 	Description       string    `json:"description"`
 	OmiseBankToken    string    `json:"omise_bank_token"`
 	CitizenId         string    `json:"citizen_id"`
+	Schedule          Schedule  `json:"schedule"`
 }
 
 type SchemaGetTutor struct {
@@ -49,12 +50,12 @@ type SchemaUpdateTutor struct {
 	Phone     string `json:"phone"`
 	Address   string `json:"address"`
 	//ProfilePictureURL string    `json:"profile_picture_URL"`
-	Birthdate      time.Time  `json:"birthdate"`
-	Gender         string     `json:"gender"`
-	Description    string     `json:"description"`
-	OmiseBankToken string     `json:"omise_bank_token"`
-	Email          string     `json:"email"`
-	Schedules      []Schedule `json:"schedules"`
+	Birthdate      time.Time `json:"birthdate"`
+	Gender         string    `json:"gender"`
+	Description    string    `json:"description"`
+	OmiseBankToken string    `json:"omise_bank_token"`
+	Email          string    `json:"email"`
+	Schedules      Schedule  `json:"schedules"`
 }
 
 type SchemaDeleteTutor struct {
