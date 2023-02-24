@@ -16,6 +16,7 @@ type RepositoryTutor interface {
 	UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor, error)
 	DeleteTutor(sr *schema.SchemaDeleteTutor) error
 	UpdateSchedule(sr *schema.SchemaUpdateSchedule) (*ent.Schedule, error)
+	GetSchedule(sr *schema.SchemaGetSchedule) (*ent.Schedule, error)
 }
 
 type repositoryTutor struct {
@@ -240,4 +241,20 @@ func (r *repositoryTutor) UpdateSchedule(sr *schema.SchemaUpdateSchedule) (*ent.
 		}
 	}
 	return schedule, err
+}
+
+func (r *repositoryTutor) GetSchedule(sr *schema.SchemaGetSchedule) (*ent.Schedule, error) {
+	user, err := r.client.User.Query().
+		Where(entUser.UsernameEQ(sr.Username)).
+		WithTutor().
+		Only(r.ctx)
+	if err != nil {
+		return nil, err
+	}
+	schedule, err := user.Edges.Tutor.QuerySchedule().
+		Only(r.ctx)
+	if err != nil {
+		return nil, err
+	}
+	return schedule, nil
 }

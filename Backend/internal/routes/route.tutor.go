@@ -18,6 +18,7 @@ func InitTutorRoutes(client *ent.Client, e *echo.Group) {
 	e.GET("/tutors", controllerTutor.GetTutors)
 	e.POST("/tutor", controllerTutor.CreateTutor)
 	e.PUT("/tutor", controllerTutor.UpdateTutor)
-	e.PUT("/tutor/schedule", controllerTutor.UpdateSchedule)
 	e.DELETE("/tutor", controllerTutor.DeleteTutor)
+	e.PUT("/tutor/schedule", controllerTutor.UpdateSchedule)
+	e.GET("/tutor/schedule", controllerTutor.GetTutorSchedule)
 }

@@ -1,8 +1,12 @@
 package schemas
 
+type SchemaGetSchedule struct {
+	Username string `json:"username"`
+}
+
 type SchemaUpdateSchedule struct {
-	Username string // TODO this must be removed if jwt is available
-	Schedule Schedule
+	Username string   `json:"username"` // TODO this must be removed if jwt is available
+	Schedule Schedule `json:"schedule"`
 }
 
 type SchemaRawSchedule struct {

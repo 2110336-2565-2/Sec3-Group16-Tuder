@@ -13,6 +13,7 @@ type ServiceTutor interface {
 	UpdateTutor(tutorUpdate *schemas.SchemaUpdateTutor) (*schemas.SchemaTutor, error)
 	DeleteTutor(tutorDelete *schemas.SchemaDeleteTutor) error
 	UpdateTutorSchedule(scheduleUpdate *schemas.SchemaUpdateSchedule) (*schemas.SchemaRawSchedule, error)
+	GetTutorSchedule(scheduleRequest *schemas.SchemaGetSchedule) (*schemas.SchemaRawSchedule, error)
 }
 
 type serviceTutor struct {
@@ -142,6 +143,23 @@ func (s *serviceTutor) DeleteTutor(tutorDelete *schemas.SchemaDeleteTutor) error
 
 func (s *serviceTutor) UpdateTutorSchedule(scheduleUpdate *schemas.SchemaUpdateSchedule) (*schemas.SchemaRawSchedule, error) {
 	schedule, err := s.repository.UpdateSchedule(scheduleUpdate)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	return &schemas.SchemaRawSchedule{
+		Sunday:    schedule.Day0,
+		Monday:    schedule.Day1,
+		Tuesday:   schedule.Day2,
+		Wednesday: schedule.Day3,
+		Thursday:  schedule.Day4,
+		Friday:    schedule.Day5,
+		Saturday:  schedule.Day6,
+	}, nil
+}
+
+func (s *serviceTutor) GetTutorSchedule(scheduleRequest *schemas.SchemaGetSchedule) (*schemas.SchemaRawSchedule, error) {
+	schedule, err := s.repository.GetSchedule(scheduleRequest)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err

@@ -173,3 +173,32 @@ func (cR *controllerTutor) UpdateSchedule(c echo.Context) (err error) {
 	})
 	return nil
 }
+
+func (cR controllerTutor) GetTutorSchedule(c echo.Context) (err error) {
+	s := &schema.SchemaGetSchedule{}
+	if err = c.Bind(s); err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: "invalid request payload",
+			Error:   err,
+		})
+		return
+	}
+
+	schedule, err := cR.service.GetTutorSchedule(s)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: err.Error(),
+			Error:   err,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, schema.SchemaResponses{
+		Success: true,
+		Message: "Get Schedule successfully",
+		Data:    schedule,
+	})
+	return
+}
