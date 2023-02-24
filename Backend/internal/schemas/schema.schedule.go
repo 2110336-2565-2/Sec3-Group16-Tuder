@@ -5,7 +5,7 @@ type SchemaGetSchedule struct {
 }
 
 type SchemaUpdateSchedule struct {
-	Username string   `json:"username"` // TODO this must be removed if jwt is available
+	Username string   `json:"username,omitempty"` // TODO this must be removed if jwt is available
 	Schedule Schedule `json:"schedule"`
 }
 

@@ -22,6 +22,6 @@ func InitTutorRoutes(client *ent.Client, e *echo.Group) {
 	e.POST("/tutor", controllerTutor.CreateTutor)
 	e.PUT("/tutor", controllerTutor.UpdateTutor, authMiddleware.JWT())
 	e.DELETE("/tutor", controllerTutor.DeleteTutor, authMiddleware.JWT())
-	e.PUT("/tutor/schedule", controllerTutor.UpdateSchedule)
-	e.GET("/tutor/schedule", controllerTutor.GetTutorSchedule)
+	e.PUT("/tutor/schedule", controllerTutor.UpdateSchedule, authMiddleware.JWT())
+	e.GET("/tutor/schedule", controllerTutor.GetTutorSchedule, authMiddleware.JWT())
 }

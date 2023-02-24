@@ -163,7 +163,7 @@ func (cR *controllerTutor) UpdateSchedule(c echo.Context) (err error) {
 		})
 		return
 	}
-
+	s.Username = c.Get("user").(*jwt.Token).Claims.(jwt.MapClaims)["username"].(string)
 	schedule, err := cR.service.UpdateTutorSchedule(s)
 
 	// success
@@ -185,7 +185,7 @@ func (cR controllerTutor) GetTutorSchedule(c echo.Context) (err error) {
 		})
 		return
 	}
-
+	s.Username = c.Get("user").(*jwt.Token).Claims.(jwt.MapClaims)["username"].(string)
 	schedule, err := cR.service.GetTutorSchedule(s)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
