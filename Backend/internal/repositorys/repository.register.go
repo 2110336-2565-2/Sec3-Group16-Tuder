@@ -53,7 +53,7 @@ func (r repositoryRegister) RegisterUser(sr *schemas.SchemaRegister) (*ent.User,
 		SetPhone(sr.Phone).
 		SetBirthDate(sr.Birthdate).
 		SetGender(sr.Gender).
-		SetRole(entUser.RoleStudent).
+		SetRole(entUser.Role(sr.Role)).
 		Save(r.ctx)
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {

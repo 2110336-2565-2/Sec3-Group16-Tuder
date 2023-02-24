@@ -13,7 +13,7 @@ type RepositoryTutor interface {
 	GetTutors() ([]*ent.Tutor, error)
 	GetTutorByUsername(sr *schema.SchemaGetTutor) (*ent.Tutor, error)
 	CreateTutor(sr *schema.SchemaCreateTutor) (*ent.Tutor, error)
-	UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor, error)
+	UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.User, *ent.Tutor, error)
 	DeleteTutor(sr *schema.SchemaDeleteTutor) error
 }
 
@@ -94,18 +94,45 @@ func (r *repositoryTutor) CreateTutor(sr *schema.SchemaCreateTutor) (*ent.Tutor,
 	return tutor, tx.Commit()
 }
 
-func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor, error) {
+func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.User, *ent.Tutor, error) {
 
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("starting a transaction: %w", err)
+		return nil, nil, fmt.Errorf("starting a transaction: %w", err)
 	}
 	// wrap the client with the transaction
 	txc := tx.Client()
 
-	tutor, err := txc.Tutor.
+	user, err := txc.User.
 		UpdateOneID(sr.ID).
+		SetFirstName(sr.Firstname).
+		SetLastName(sr.Lastname).
+		SetPhone(sr.Phone).
+		SetAddress(sr.Address).
+		SetBirthDate(sr.Birthdate).
+		Save(r.ctx)
+	//fmt.Print(user)
+	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+	}
+
+	aTutor, err := txc.Tutor.
+		Query().
+		Where(entTutor.HasUserWith(entUser.IDEQ(sr.ID))).
+		Only(r.ctx)
+
+	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+		return nil, nil, err
+	}
+
+	tutor, err := txc.Tutor.
+		UpdateOne(aTutor).
 		SetDescription(sr.Description).
 		SetOmiseBankToken(sr.OmiseBankToken).
 		Save(r.ctx)
@@ -114,9 +141,9 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 		if rerr := tx.Rollback(); rerr != nil {
 			err = fmt.Errorf("%w: %v", err, rerr)
 		}
-		return nil, err
+		return nil, nil, err
 	}
-	return tutor, tx.Commit()
+	return user, tutor, tx.Commit()
 }
 
 func (r *repositoryTutor) DeleteTutor(sr *schema.SchemaDeleteTutor) error {

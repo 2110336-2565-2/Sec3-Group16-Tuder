@@ -95,24 +95,24 @@ func (s *serviceTutor) CreateTutor(tutorCreate *schemas.SchemaCreateTutor) (*sch
 }
 
 func (s *serviceTutor) UpdateTutor(tutorUpdate *schemas.SchemaUpdateTutor) (*schemas.SchemaTutor, error) {
-	tutor, err := s.repository.UpdateTutor(tutorUpdate)
+	user, tutor, err := s.repository.UpdateTutor(tutorUpdate)
 	if err != nil {
 		return nil, err
 	}
 	return &schemas.SchemaTutor{
-		ID:                tutor.ID,
-		Username:          tutor.Edges.User.Username,
-		Firstname:         tutor.Edges.User.FirstName,
-		Lastname:          tutor.Edges.User.LastName,
-		Email:             tutor.Edges.User.Email,
-		Phone:             tutor.Edges.User.Phone,
-		Address:           tutor.Edges.User.Address,
-		Birthdate:         tutor.Edges.User.BirthDate,
-		Gender:            tutor.Edges.User.Gender,
-		ProfilePictureURL: *tutor.Edges.User.ProfilePictureURL,
-		Description:       *tutor.Description,
-		OmiseBankToken:    *tutor.OmiseBankToken,
-		CitizenId:         tutor.CitizenID,
+		ID:        tutor.ID,
+		Username:  user.Username,
+		Firstname: user.FirstName,
+		Lastname:  user.LastName,
+		Email:     user.Email,
+		Phone:     user.Phone,
+		Address:   user.Address,
+		Birthdate: user.BirthDate,
+		Gender:    user.Gender,
+		//ProfilePictureURL: *user.ProfilePictureURL,
+		Description:    *tutor.Description,
+		OmiseBankToken: *tutor.OmiseBankToken,
+		CitizenId:      tutor.CitizenID,
 	}, nil
 }
 
