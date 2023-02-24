@@ -43,11 +43,11 @@ type SchemaCreateTutor struct {
 }
 
 type SchemaUpdateTutor struct {
-	ID        uuid.UUID `json:"id"`
-	Firstname string    `json:"firstname"`
-	Lastname  string    `json:"lastname"`
-	Phone     string    `json:"phone"`
-	Address   string    `json:"address"`
+	Username  string `json:"username"` // TODO This must be removed when jwt is completely function
+	Firstname string `json:"firstname"`
+	Lastname  string `json:"lastname"`
+	Phone     string `json:"phone"`
+	Address   string `json:"address"`
 	//ProfilePictureURL string    `json:"profile_picture_URL"`
 	Birthdate      time.Time  `json:"birthdate"`
 	Gender         string     `json:"gender"`
