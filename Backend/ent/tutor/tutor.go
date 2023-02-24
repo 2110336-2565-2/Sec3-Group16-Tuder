@@ -23,10 +23,10 @@ const (
 	EdgeCourse = "course"
 	// EdgeReviewTutor holds the string denoting the review_tutor edge name in mutations.
 	EdgeReviewTutor = "review_tutor"
-	// EdgeSchedule holds the string denoting the schedule edge name in mutations.
-	EdgeSchedule = "schedule"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
+	// EdgeSchedule holds the string denoting the schedule edge name in mutations.
+	EdgeSchedule = "schedule"
 	// Table holds the table name of the tutor in the database.
 	Table = "tutors"
 	// IssueReportTable is the table that holds the issue_report relation/edge.
@@ -50,13 +50,6 @@ const (
 	ReviewTutorInverseTable = "review_tutors"
 	// ReviewTutorColumn is the table column denoting the review_tutor relation/edge.
 	ReviewTutorColumn = "tutor_review_tutor"
-	// ScheduleTable is the table that holds the schedule relation/edge.
-	ScheduleTable = "schedules"
-	// ScheduleInverseTable is the table name for the Schedule entity.
-	// It exists in this package in order to avoid circular dependency with the "schedule" package.
-	ScheduleInverseTable = "schedules"
-	// ScheduleColumn is the table column denoting the schedule relation/edge.
-	ScheduleColumn = "tutor_schedule"
 	// UserTable is the table that holds the user relation/edge.
 	UserTable = "tutors"
 	// UserInverseTable is the table name for the User entity.
@@ -64,6 +57,13 @@ const (
 	UserInverseTable = "users"
 	// UserColumn is the table column denoting the user relation/edge.
 	UserColumn = "user_tutor"
+	// ScheduleTable is the table that holds the schedule relation/edge.
+	ScheduleTable = "tutors"
+	// ScheduleInverseTable is the table name for the Schedule entity.
+	// It exists in this package in order to avoid circular dependency with the "schedule" package.
+	ScheduleInverseTable = "schedules"
+	// ScheduleColumn is the table column denoting the schedule relation/edge.
+	ScheduleColumn = "schedule_tutor"
 )
 
 // Columns holds all SQL columns for tutor fields.
@@ -77,6 +77,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "tutors"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
+	"schedule_tutor",
 	"user_tutor",
 }
 

@@ -64,14 +64,6 @@ func (cu *ClassUpdate) SetScheduleID(id uuid.UUID) *ClassUpdate {
 	return cu
 }
 
-// SetNillableScheduleID sets the "schedule" edge to the Schedule entity by ID if the given value is not nil.
-func (cu *ClassUpdate) SetNillableScheduleID(id *uuid.UUID) *ClassUpdate {
-	if id != nil {
-		cu = cu.SetScheduleID(*id)
-	}
-	return cu
-}
-
 // SetSchedule sets the "schedule" edge to the Schedule entity.
 func (cu *ClassUpdate) SetSchedule(s *Schedule) *ClassUpdate {
 	return cu.SetScheduleID(s.ID)
@@ -151,6 +143,9 @@ func (cu *ClassUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cu *ClassUpdate) check() error {
+	if _, ok := cu.mutation.ScheduleID(); cu.mutation.ScheduleCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Class.schedule"`)
+	}
 	if _, ok := cu.mutation.StudentID(); cu.mutation.StudentCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Class.student"`)
 	}
@@ -183,7 +178,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if cu.mutation.ScheduleCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   class.ScheduleTable,
 			Columns: []string{class.ScheduleColumn},
@@ -199,7 +194,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := cu.mutation.ScheduleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   class.ScheduleTable,
 			Columns: []string{class.ScheduleColumn},
@@ -338,14 +333,6 @@ func (cuo *ClassUpdateOne) SetScheduleID(id uuid.UUID) *ClassUpdateOne {
 	return cuo
 }
 
-// SetNillableScheduleID sets the "schedule" edge to the Schedule entity by ID if the given value is not nil.
-func (cuo *ClassUpdateOne) SetNillableScheduleID(id *uuid.UUID) *ClassUpdateOne {
-	if id != nil {
-		cuo = cuo.SetScheduleID(*id)
-	}
-	return cuo
-}
-
 // SetSchedule sets the "schedule" edge to the Schedule entity.
 func (cuo *ClassUpdateOne) SetSchedule(s *Schedule) *ClassUpdateOne {
 	return cuo.SetScheduleID(s.ID)
@@ -438,6 +425,9 @@ func (cuo *ClassUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cuo *ClassUpdateOne) check() error {
+	if _, ok := cuo.mutation.ScheduleID(); cuo.mutation.ScheduleCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Class.schedule"`)
+	}
 	if _, ok := cuo.mutation.StudentID(); cuo.mutation.StudentCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Class.student"`)
 	}
@@ -487,7 +477,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 	}
 	if cuo.mutation.ScheduleCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   class.ScheduleTable,
 			Columns: []string{class.ScheduleColumn},
@@ -503,7 +493,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 	}
 	if nodes := cuo.mutation.ScheduleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   class.ScheduleTable,
 			Columns: []string{class.ScheduleColumn},
