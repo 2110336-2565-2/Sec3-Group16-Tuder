@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
@@ -25,8 +26,9 @@ type Tutor struct {
 	CitizenID string `json:"citizen_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TutorQuery when eager-loading is set.
-	Edges      TutorEdges `json:"edges"`
-	user_tutor *uuid.UUID
+	Edges          TutorEdges `json:"edges"`
+	schedule_tutor *uuid.UUID
+	user_tutor     *uuid.UUID
 }
 
 // TutorEdges holds the relations/edges for other nodes in the graph.
@@ -37,10 +39,10 @@ type TutorEdges struct {
 	Course []*Course `json:"course,omitempty"`
 	// ReviewTutor holds the value of the review_tutor edge.
 	ReviewTutor []*ReviewTutor `json:"review_tutor,omitempty"`
-	// Schedule holds the value of the schedule edge.
-	Schedule []*Schedule `json:"schedule,omitempty"`
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
+	// Schedule holds the value of the schedule edge.
+	Schedule *Schedule `json:"schedule,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [5]bool
@@ -73,19 +75,10 @@ func (e TutorEdges) ReviewTutorOrErr() ([]*ReviewTutor, error) {
 	return nil, &NotLoadedError{edge: "review_tutor"}
 }
 
-// ScheduleOrErr returns the Schedule value or an error if the edge
-// was not loaded in eager-loading.
-func (e TutorEdges) ScheduleOrErr() ([]*Schedule, error) {
-	if e.loadedTypes[3] {
-		return e.Schedule, nil
-	}
-	return nil, &NotLoadedError{edge: "schedule"}
-}
-
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e TutorEdges) UserOrErr() (*User, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[3] {
 		if e.User == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: user.Label}
@@ -93,6 +86,19 @@ func (e TutorEdges) UserOrErr() (*User, error) {
 		return e.User, nil
 	}
 	return nil, &NotLoadedError{edge: "user"}
+}
+
+// ScheduleOrErr returns the Schedule value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e TutorEdges) ScheduleOrErr() (*Schedule, error) {
+	if e.loadedTypes[4] {
+		if e.Schedule == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: schedule.Label}
+		}
+		return e.Schedule, nil
+	}
+	return nil, &NotLoadedError{edge: "schedule"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -104,7 +110,9 @@ func (*Tutor) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case tutor.FieldID:
 			values[i] = new(uuid.UUID)
-		case tutor.ForeignKeys[0]: // user_tutor
+		case tutor.ForeignKeys[0]: // schedule_tutor
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case tutor.ForeignKeys[1]: // user_tutor
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Tutor", columns[i])
@@ -149,6 +157,13 @@ func (t *Tutor) assignValues(columns []string, values []any) error {
 			}
 		case tutor.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field schedule_tutor", values[i])
+			} else if value.Valid {
+				t.schedule_tutor = new(uuid.UUID)
+				*t.schedule_tutor = *value.S.(*uuid.UUID)
+			}
+		case tutor.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field user_tutor", values[i])
 			} else if value.Valid {
 				t.user_tutor = new(uuid.UUID)
@@ -174,14 +189,14 @@ func (t *Tutor) QueryReviewTutor() *ReviewTutorQuery {
 	return NewTutorClient(t.config).QueryReviewTutor(t)
 }
 
-// QuerySchedule queries the "schedule" edge of the Tutor entity.
-func (t *Tutor) QuerySchedule() *ScheduleQuery {
-	return NewTutorClient(t.config).QuerySchedule(t)
-}
-
 // QueryUser queries the "user" edge of the Tutor entity.
 func (t *Tutor) QueryUser() *UserQuery {
 	return NewTutorClient(t.config).QueryUser(t)
+}
+
+// QuerySchedule queries the "schedule" edge of the Tutor entity.
+func (t *Tutor) QuerySchedule() *ScheduleQuery {
+	return NewTutorClient(t.config).QuerySchedule(t)
 }
 
 // Update returns a builder for updating this Tutor.

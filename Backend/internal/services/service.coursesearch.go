@@ -14,7 +14,7 @@ type ServiceCourseSearch interface {
 	CourseSearchByTutor(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error)
 	CourseSearchByDay(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error)
 	SearchAllCourse() ([]*schemas.CourseSearchResult, error)
-	Interception(l1 []*schemas.CourseSearchResult, l2 []*schemas.CourseSearchResult) []*schemas.CourseSearchResult
+	Intercept(l [][]*schemas.CourseSearchResult) []*schemas.CourseSearchResult
 	PackToSchema(course []*ent.Course) []*schemas.CourseSearchResult
 }
 
@@ -26,31 +26,61 @@ func NewServiceCourseSearch(l repositorys.RepositoryCourseSearch) *serviceCourse
 	return &serviceCourseSearch{repository: l}
 }
 
-func (s *serviceCourseSearch) Interception(l1 []*schemas.CourseSearchResult, l2 []*schemas.CourseSearchResult) []*schemas.CourseSearchResult {
-	for _, course_ref := range l2 {
-		ref := course_ref.Course_id
-		status := true
-		for _, course_check := range l1 {
-			if ref == course_check.Course_id {
-				status = false
-				break
-			}
-		}
-		if status == true {
-			l2 = append(l2, course_ref)
+func (s *serviceCourseSearch) Intercept(l [][]*schemas.CourseSearchResult) []*schemas.CourseSearchResult {
+	result := []*schemas.CourseSearchResult{}
+	start := 0
+	for idx, r := range l {
+		if len(r) > 0 {
+			result = r
+			start = idx
+			break
 		}
 	}
-	return l2
+	for _, lx := range l[start:] {
+		tmp := []*schemas.CourseSearchResult{}
+		if len(lx) > 0 {
+			for _, course_ref := range lx {
+				id_ref := course_ref.Course_id
+				for _, course_check := range result {
+					if id_ref == course_check.Course_id {
+						tmp = append(tmp, course_ref)
+						break
+					}
+				}
+			}
+			result = tmp
+		}
+	}
+	return result
+}
+
+func (s *serviceCourseSearch) Union(l [][]*schemas.CourseSearchResult) []*schemas.CourseSearchResult {
+	result := []*schemas.CourseSearchResult{}
+	for _, lx := range l {
+		for _, course_ref := range lx {
+			id_ref := course_ref.Course_id
+			status := true
+			for _, course_check := range result {
+				if id_ref == course_check.Course_id {
+					status = false
+					break
+				}
+			}
+			if status == true {
+				result = append(result, course_ref)
+			}
+		}
+	}
+	return result
 }
 
 func (s *serviceCourseSearch) PackToSchema(courses []*ent.Course) []*schemas.CourseSearchResult {
 	var courseResponses []*schemas.CourseSearchResult
 	for _, course := range courses {
-
 		courseResponses = append(courseResponses, &schemas.CourseSearchResult{
 			Course_id:          course.ID,
 			Tutor_name:         course.Edges.Tutor.Edges.User.Username,
-			Tittle:             course.Title,
+			Title:             course.Title,
 			Subject:            course.Subject,
 			Topic:              course.Topic,
 			Estimate_time:      course.EstimatedTime,
@@ -67,15 +97,18 @@ func (s *serviceCourseSearch) CourseSearchService(searchContent *schemas.CourseS
 		return s.SearchAllCourse()
 	}
 
-	searchResult, _ := s.CourseSearchByTitle(searchContent)
+	titleResult, _ := s.CourseSearchByTitle(searchContent)
 	subjectSearch, _ := s.CourseSearchBySubject(searchContent)
-	searchResult = s.Interception(subjectSearch, searchResult)
 	topicSearch, _ := s.CourseSearchByTopic(searchContent)
-	searchResult = s.Interception(topicSearch, searchResult)
 	tutorSearch, _ := s.CourseSearchByTutor(searchContent)
-	searchResult = s.Interception(tutorSearch, searchResult)
 	daySearch, _ := s.CourseSearchByDay(searchContent)
-	searchResult = s.Interception(daySearch, searchResult)
+
+	searchResult := s.Intercept([][]*schemas.CourseSearchResult{titleResult, subjectSearch, topicSearch, tutorSearch, daySearch})
+	if len(searchResult) == 0 {
+		searchResult = s.Union([][]*schemas.CourseSearchResult{titleResult, subjectSearch, topicSearch, tutorSearch, daySearch})
+	}
+
+	// fmt.Println(daySearch)
 
 	return searchResult, nil
 }
@@ -92,6 +125,7 @@ func (s *serviceCourseSearch) CourseSearchByTutor(searchContent *schemas.CourseS
 	return courseResponses, nil
 }
 
+// ---------------------------------------------------------------------------------------------
 func (s *serviceCourseSearch) CourseSearchByTitle(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error) {
 	if searchContent.Title == "" {
 		return []*schemas.CourseSearchResult{}, nil
@@ -104,6 +138,7 @@ func (s *serviceCourseSearch) CourseSearchByTitle(searchContent *schemas.CourseS
 	return courseResponses, nil
 }
 
+// ---------------------------------------------------------------------------------------------
 func (s *serviceCourseSearch) CourseSearchByDay(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error) {
 	if searchContent.Days == [7]bool{false, false, false, false, false, false, false} {
 		return []*schemas.CourseSearchResult{}, nil
@@ -115,6 +150,8 @@ func (s *serviceCourseSearch) CourseSearchByDay(searchContent *schemas.CourseSea
 	courseResponses := s.PackToSchema(courses)
 	return courseResponses, nil
 }
+
+// ---------------------------------------------------------------------------------------------
 func (s *serviceCourseSearch) CourseSearchByTopic(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error) {
 	if searchContent.Topic == "" {
 		return []*schemas.CourseSearchResult{}, nil
@@ -127,6 +164,7 @@ func (s *serviceCourseSearch) CourseSearchByTopic(searchContent *schemas.CourseS
 	return courseResponses, nil
 }
 
+// ---------------------------------------------------------------------------------------------
 func (s *serviceCourseSearch) CourseSearchBySubject(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error) {
 	if searchContent.Subject == "" {
 		return []*schemas.CourseSearchResult{}, nil
@@ -139,6 +177,7 @@ func (s *serviceCourseSearch) CourseSearchBySubject(searchContent *schemas.Cours
 	return courseResponses, nil
 }
 
+// ---------------------------------------------------------------------------------------------
 func (s *serviceCourseSearch) SearchAllCourse() ([]*schemas.CourseSearchResult, error) {
 	courses, err := s.repository.SearchAll()
 	if err != nil {
@@ -147,3 +186,5 @@ func (s *serviceCourseSearch) SearchAllCourse() ([]*schemas.CourseSearchResult, 
 	courseResponses := s.PackToSchema(courses)
 	return courseResponses, nil
 }
+
+//---------------------------------------------------------------------------------------------

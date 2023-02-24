@@ -54,7 +54,7 @@
   "course": [
     {
       "course_id": "1",
-      "tutor_name": "Hee 1",
+      "tutor_name": "He 1",
       "title": "Course 1",
       "subject": "Subject 1",
       "topic": "Topic 1",
@@ -64,7 +64,7 @@
     },
     {
       "course_id": "2",
-      "tutor_name": "Hee 2",
+      "tutor_name": "He 2",
       "title": "Course 2",
       "subject": "Subject 2",
       "topic": "Topic 2",

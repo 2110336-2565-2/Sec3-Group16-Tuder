@@ -124,21 +124,6 @@ func (tu *TutorUpdate) AddReviewTutor(r ...*ReviewTutor) *TutorUpdate {
 	return tu.AddReviewTutorIDs(ids...)
 }
 
-// AddScheduleIDs adds the "schedule" edge to the Schedule entity by IDs.
-func (tu *TutorUpdate) AddScheduleIDs(ids ...uuid.UUID) *TutorUpdate {
-	tu.mutation.AddScheduleIDs(ids...)
-	return tu
-}
-
-// AddSchedule adds the "schedule" edges to the Schedule entity.
-func (tu *TutorUpdate) AddSchedule(s ...*Schedule) *TutorUpdate {
-	ids := make([]uuid.UUID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return tu.AddScheduleIDs(ids...)
-}
-
 // SetUserID sets the "user" edge to the User entity by ID.
 func (tu *TutorUpdate) SetUserID(id uuid.UUID) *TutorUpdate {
 	tu.mutation.SetUserID(id)
@@ -148,6 +133,17 @@ func (tu *TutorUpdate) SetUserID(id uuid.UUID) *TutorUpdate {
 // SetUser sets the "user" edge to the User entity.
 func (tu *TutorUpdate) SetUser(u *User) *TutorUpdate {
 	return tu.SetUserID(u.ID)
+}
+
+// SetScheduleID sets the "schedule" edge to the Schedule entity by ID.
+func (tu *TutorUpdate) SetScheduleID(id uuid.UUID) *TutorUpdate {
+	tu.mutation.SetScheduleID(id)
+	return tu
+}
+
+// SetSchedule sets the "schedule" edge to the Schedule entity.
+func (tu *TutorUpdate) SetSchedule(s *Schedule) *TutorUpdate {
+	return tu.SetScheduleID(s.ID)
 }
 
 // Mutation returns the TutorMutation object of the builder.
@@ -218,30 +214,15 @@ func (tu *TutorUpdate) RemoveReviewTutor(r ...*ReviewTutor) *TutorUpdate {
 	return tu.RemoveReviewTutorIDs(ids...)
 }
 
-// ClearSchedule clears all "schedule" edges to the Schedule entity.
-func (tu *TutorUpdate) ClearSchedule() *TutorUpdate {
-	tu.mutation.ClearSchedule()
-	return tu
-}
-
-// RemoveScheduleIDs removes the "schedule" edge to Schedule entities by IDs.
-func (tu *TutorUpdate) RemoveScheduleIDs(ids ...uuid.UUID) *TutorUpdate {
-	tu.mutation.RemoveScheduleIDs(ids...)
-	return tu
-}
-
-// RemoveSchedule removes "schedule" edges to Schedule entities.
-func (tu *TutorUpdate) RemoveSchedule(s ...*Schedule) *TutorUpdate {
-	ids := make([]uuid.UUID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return tu.RemoveScheduleIDs(ids...)
-}
-
 // ClearUser clears the "user" edge to the User entity.
 func (tu *TutorUpdate) ClearUser() *TutorUpdate {
 	tu.mutation.ClearUser()
+	return tu
+}
+
+// ClearSchedule clears the "schedule" edge to the Schedule entity.
+func (tu *TutorUpdate) ClearSchedule() *TutorUpdate {
+	tu.mutation.ClearSchedule()
 	return tu
 }
 
@@ -281,6 +262,9 @@ func (tu *TutorUpdate) check() error {
 	}
 	if _, ok := tu.mutation.UserID(); tu.mutation.UserCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Tutor.user"`)
+	}
+	if _, ok := tu.mutation.ScheduleID(); tu.mutation.ScheduleCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Tutor.schedule"`)
 	}
 	return nil
 }
@@ -474,60 +458,6 @@ func (tu *TutorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tu.mutation.ScheduleCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   tutor.ScheduleTable,
-			Columns: []string{tutor.ScheduleColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: schedule.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tu.mutation.RemovedScheduleIDs(); len(nodes) > 0 && !tu.mutation.ScheduleCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   tutor.ScheduleTable,
-			Columns: []string{tutor.ScheduleColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: schedule.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tu.mutation.ScheduleIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   tutor.ScheduleTable,
-			Columns: []string{tutor.ScheduleColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: schedule.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if tu.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
@@ -555,6 +485,41 @@ func (tu *TutorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if tu.mutation.ScheduleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   tutor.ScheduleTable,
+			Columns: []string{tutor.ScheduleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: schedule.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.ScheduleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   tutor.ScheduleTable,
+			Columns: []string{tutor.ScheduleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: schedule.FieldID,
 				},
 			},
 		}
@@ -674,21 +639,6 @@ func (tuo *TutorUpdateOne) AddReviewTutor(r ...*ReviewTutor) *TutorUpdateOne {
 	return tuo.AddReviewTutorIDs(ids...)
 }
 
-// AddScheduleIDs adds the "schedule" edge to the Schedule entity by IDs.
-func (tuo *TutorUpdateOne) AddScheduleIDs(ids ...uuid.UUID) *TutorUpdateOne {
-	tuo.mutation.AddScheduleIDs(ids...)
-	return tuo
-}
-
-// AddSchedule adds the "schedule" edges to the Schedule entity.
-func (tuo *TutorUpdateOne) AddSchedule(s ...*Schedule) *TutorUpdateOne {
-	ids := make([]uuid.UUID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return tuo.AddScheduleIDs(ids...)
-}
-
 // SetUserID sets the "user" edge to the User entity by ID.
 func (tuo *TutorUpdateOne) SetUserID(id uuid.UUID) *TutorUpdateOne {
 	tuo.mutation.SetUserID(id)
@@ -698,6 +648,17 @@ func (tuo *TutorUpdateOne) SetUserID(id uuid.UUID) *TutorUpdateOne {
 // SetUser sets the "user" edge to the User entity.
 func (tuo *TutorUpdateOne) SetUser(u *User) *TutorUpdateOne {
 	return tuo.SetUserID(u.ID)
+}
+
+// SetScheduleID sets the "schedule" edge to the Schedule entity by ID.
+func (tuo *TutorUpdateOne) SetScheduleID(id uuid.UUID) *TutorUpdateOne {
+	tuo.mutation.SetScheduleID(id)
+	return tuo
+}
+
+// SetSchedule sets the "schedule" edge to the Schedule entity.
+func (tuo *TutorUpdateOne) SetSchedule(s *Schedule) *TutorUpdateOne {
+	return tuo.SetScheduleID(s.ID)
 }
 
 // Mutation returns the TutorMutation object of the builder.
@@ -768,30 +729,15 @@ func (tuo *TutorUpdateOne) RemoveReviewTutor(r ...*ReviewTutor) *TutorUpdateOne 
 	return tuo.RemoveReviewTutorIDs(ids...)
 }
 
-// ClearSchedule clears all "schedule" edges to the Schedule entity.
-func (tuo *TutorUpdateOne) ClearSchedule() *TutorUpdateOne {
-	tuo.mutation.ClearSchedule()
-	return tuo
-}
-
-// RemoveScheduleIDs removes the "schedule" edge to Schedule entities by IDs.
-func (tuo *TutorUpdateOne) RemoveScheduleIDs(ids ...uuid.UUID) *TutorUpdateOne {
-	tuo.mutation.RemoveScheduleIDs(ids...)
-	return tuo
-}
-
-// RemoveSchedule removes "schedule" edges to Schedule entities.
-func (tuo *TutorUpdateOne) RemoveSchedule(s ...*Schedule) *TutorUpdateOne {
-	ids := make([]uuid.UUID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return tuo.RemoveScheduleIDs(ids...)
-}
-
 // ClearUser clears the "user" edge to the User entity.
 func (tuo *TutorUpdateOne) ClearUser() *TutorUpdateOne {
 	tuo.mutation.ClearUser()
+	return tuo
+}
+
+// ClearSchedule clears the "schedule" edge to the Schedule entity.
+func (tuo *TutorUpdateOne) ClearSchedule() *TutorUpdateOne {
+	tuo.mutation.ClearSchedule()
 	return tuo
 }
 
@@ -844,6 +790,9 @@ func (tuo *TutorUpdateOne) check() error {
 	}
 	if _, ok := tuo.mutation.UserID(); tuo.mutation.UserCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Tutor.user"`)
+	}
+	if _, ok := tuo.mutation.ScheduleID(); tuo.mutation.ScheduleCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Tutor.schedule"`)
 	}
 	return nil
 }
@@ -1054,60 +1003,6 @@ func (tuo *TutorUpdateOne) sqlSave(ctx context.Context) (_node *Tutor, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tuo.mutation.ScheduleCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   tutor.ScheduleTable,
-			Columns: []string{tutor.ScheduleColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: schedule.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tuo.mutation.RemovedScheduleIDs(); len(nodes) > 0 && !tuo.mutation.ScheduleCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   tutor.ScheduleTable,
-			Columns: []string{tutor.ScheduleColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: schedule.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tuo.mutation.ScheduleIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   tutor.ScheduleTable,
-			Columns: []string{tutor.ScheduleColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: schedule.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if tuo.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
@@ -1135,6 +1030,41 @@ func (tuo *TutorUpdateOne) sqlSave(ctx context.Context) (_node *Tutor, err error
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if tuo.mutation.ScheduleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   tutor.ScheduleTable,
+			Columns: []string{tutor.ScheduleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: schedule.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.ScheduleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   tutor.ScheduleTable,
+			Columns: []string{tutor.ScheduleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: schedule.FieldID,
 				},
 			},
 		}

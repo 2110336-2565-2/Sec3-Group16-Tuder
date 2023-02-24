@@ -78,26 +78,34 @@ func (sc *ScheduleCreate) SetNillableID(u *uuid.UUID) *ScheduleCreate {
 	return sc
 }
 
-// SetTutorID sets the "tutor" edge to the Tutor entity by ID.
-func (sc *ScheduleCreate) SetTutorID(id uuid.UUID) *ScheduleCreate {
-	sc.mutation.SetTutorID(id)
+// AddTutorIDs adds the "tutor" edge to the Tutor entity by IDs.
+func (sc *ScheduleCreate) AddTutorIDs(ids ...uuid.UUID) *ScheduleCreate {
+	sc.mutation.AddTutorIDs(ids...)
 	return sc
 }
 
-// SetTutor sets the "tutor" edge to the Tutor entity.
-func (sc *ScheduleCreate) SetTutor(t *Tutor) *ScheduleCreate {
-	return sc.SetTutorID(t.ID)
+// AddTutor adds the "tutor" edges to the Tutor entity.
+func (sc *ScheduleCreate) AddTutor(t ...*Tutor) *ScheduleCreate {
+	ids := make([]uuid.UUID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return sc.AddTutorIDs(ids...)
 }
 
-// SetClassID sets the "class" edge to the Class entity by ID.
-func (sc *ScheduleCreate) SetClassID(id uuid.UUID) *ScheduleCreate {
-	sc.mutation.SetClassID(id)
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (sc *ScheduleCreate) AddClasIDs(ids ...uuid.UUID) *ScheduleCreate {
+	sc.mutation.AddClasIDs(ids...)
 	return sc
 }
 
-// SetClass sets the "class" edge to the Class entity.
-func (sc *ScheduleCreate) SetClass(c *Class) *ScheduleCreate {
-	return sc.SetClassID(c.ID)
+// AddClass adds the "class" edges to the Class entity.
+func (sc *ScheduleCreate) AddClass(c ...*Class) *ScheduleCreate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return sc.AddClasIDs(ids...)
 }
 
 // Mutation returns the ScheduleMutation object of the builder.
@@ -164,12 +172,6 @@ func (sc *ScheduleCreate) check() error {
 	if _, ok := sc.mutation.Day6(); !ok {
 		return &ValidationError{Name: "day_6", err: errors.New(`ent: missing required field "Schedule.day_6"`)}
 	}
-	if _, ok := sc.mutation.TutorID(); !ok {
-		return &ValidationError{Name: "tutor", err: errors.New(`ent: missing required edge "Schedule.tutor"`)}
-	}
-	if _, ok := sc.mutation.ClassID(); !ok {
-		return &ValidationError{Name: "class", err: errors.New(`ent: missing required edge "Schedule.class"`)}
-	}
 	return nil
 }
 
@@ -235,8 +237,8 @@ func (sc *ScheduleCreate) createSpec() (*Schedule, *sqlgraph.CreateSpec) {
 	}
 	if nodes := sc.mutation.TutorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
 			Table:   schedule.TutorTable,
 			Columns: []string{schedule.TutorColumn},
 			Bidi:    false,
@@ -250,13 +252,12 @@ func (sc *ScheduleCreate) createSpec() (*Schedule, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.tutor_schedule = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := sc.mutation.ClassIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
 			Table:   schedule.ClassTable,
 			Columns: []string{schedule.ClassColumn},
 			Bidi:    false,
@@ -270,7 +271,6 @@ func (sc *ScheduleCreate) createSpec() (*Schedule, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.class_schedule = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

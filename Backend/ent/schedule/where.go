@@ -59,7 +59,7 @@ func HasTutor() predicate.Schedule {
 	return predicate.Schedule(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, TutorTable, TutorColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, TutorTable, TutorColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -71,7 +71,7 @@ func HasTutorWith(preds ...predicate.Tutor) predicate.Schedule {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(TutorInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, TutorTable, TutorColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, TutorTable, TutorColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
@@ -86,7 +86,7 @@ func HasClass() predicate.Schedule {
 	return predicate.Schedule(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, ClassTable, ClassColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, ClassTable, ClassColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -98,7 +98,7 @@ func HasClassWith(preds ...predicate.Class) predicate.Schedule {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ClassInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, ClassTable, ClassColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, ClassTable, ClassColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

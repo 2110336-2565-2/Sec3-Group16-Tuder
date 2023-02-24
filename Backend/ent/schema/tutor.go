@@ -1,10 +1,10 @@
 package schema
 
 import (
-	"github.com/google/uuid"
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // Todo holds the schema definition for the Todo entity.
@@ -36,8 +36,11 @@ func (Tutor) Edges() []ent.Edge {
 		edge.To("issue_report", IssueReport.Type),
 		edge.To("course", Course.Type),
 		edge.To("review_tutor", ReviewTutor.Type),
-		edge.To("schedule", Schedule.Type),
 		edge.From("user", User.Type).
+			Ref("tutor").
+			Unique().
+			Required(),
+		edge.From("schedule", Schedule.Type).
 			Ref("tutor").
 			Unique().
 			Required(),
