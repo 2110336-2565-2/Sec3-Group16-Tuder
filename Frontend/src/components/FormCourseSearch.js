@@ -1,11 +1,11 @@
-import { useState , createRef} from 'react'
+import { useState } from 'react'
 import styled from 'styled-components'
 import {day} from '../datas/DayEnum'
 import  {searchCourseHandler}  from '../handlers/searchCourseHandler';
 import { useDataContext } from '../pages/Courses';
 import { useQuery } from 'react-query';
 
-export default function CourseSearchForm(props){
+export default function CourseSearchForm(){
  
     const [coursename, setCoursename] = useState('')
     const [subject, setSubject] = useState('')
@@ -14,10 +14,10 @@ export default function CourseSearchForm(props){
     const [days, setDays] = useState([false,false,false,false,false,false,false])
 
 
-    const {data, setData} = useDataContext();
+    const {setData} = useDataContext();
 
 
-    const {initData, isLoading, error, refetch} = useQuery(
+    const {isLoading, error, refetch} = useQuery(
         'filter_courses',() =>
         {
             const searchData = {
@@ -143,17 +143,6 @@ const Checkbox = styled.input`
     padding: 10px;
     font-size: 20px;
 `
-
-const Option = styled.select`
-    width: 250px;
-    height: 50px;
-    border-radius: 16px;
-    border: 1px solid black;
-    padding: 10px;
-    font-size: 20px;
-`
-
-
 
 const ItemGrid = styled.div`
     grid-column: ${(props) => {

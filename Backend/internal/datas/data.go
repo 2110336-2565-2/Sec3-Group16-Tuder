@@ -16,7 +16,7 @@ func InsertData(client *ent.Client) {
 	util.ClearDB(client, ctx)
 
 	// Insert users
-	user := InsertUser(client)
+	user := InsertUser(client, ctx)
 
 	// Insert students
 	InsertStudent(client, ctx, user)
@@ -29,7 +29,6 @@ func InsertData(client *ent.Client) {
 
 	// Insert courses
 	InsertCourse(client, ctx, tutor)
-
 
 	fmt.Print("\n\t::::::::: Data inserted! :::::::::\n")
 
