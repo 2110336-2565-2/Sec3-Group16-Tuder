@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 
 	repository "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -24,22 +25,26 @@ func (s *serviceResetPassword) ResetPasswordService(r *schemas.SchemaResetPasswo
 	// Get user by email
 	user, err := s.repository.FindUserByEmail(r)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
 	if user == nil {
+		fmt.Println("User not Found")
 		return errors.New("user not found")
 	}
 
 	// Hash new password
 	hashedPassword, err := utils.HashPassword(r.Password)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
 	// Update user's password
 	_, err = s.repository.UpdateUserPassword(user, hashedPassword)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
