@@ -4,6 +4,8 @@ import './App.css';
 // import Router for link website
 import React, { Fragment } from 'react';
 
+import { Toaster } from 'react-hot-toast';
+
 // import components
 import Navbar from './components/Navbar.js';
 import Footer from './components/SignUpFooter';
@@ -23,6 +25,7 @@ function App() {
   
   return (
     <Fragment>
+      <Toaster />
       <Navbar />
     </Fragment>
     
