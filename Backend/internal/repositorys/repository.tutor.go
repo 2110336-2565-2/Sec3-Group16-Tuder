@@ -15,6 +15,7 @@ type RepositoryTutor interface {
 	CreateTutor(sr *schema.SchemaCreateTutor) (*ent.Tutor, error)
 	UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor, error)
 	DeleteTutor(sr *schema.SchemaDeleteTutor) error
+	UpdateSchedule(sr *schema.SchemaUpdateSchedule) (*ent.Schedule, error)
 }
 
 type repositoryTutor struct {
@@ -146,30 +147,12 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 
 	// update schedule
 	// query for schedule
-	schedule, err := tutor.QuerySchedule().Only(r.ctx)
-	if err != nil {
-		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
-		}
-		return nil, err
-	}
-	// update schedule
-	ata := sr.Schedules.AvailableTimeArrays()
-	schedule, err = txc.Schedule.
-		UpdateOne(schedule).
-		SetDay0(ata[0]).
-		SetDay1(ata[1]).
-		SetDay2(ata[2]).
-		SetDay3(ata[3]).
-		SetDay4(ata[4]).
-		SetDay5(ata[5]).
-		SetDay6(ata[6]).
-		Save(r.ctx)
-	if err != nil {
-		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
-		}
-		return nil, err
+	var schedule *ent.Schedule = nil
+	if sr.Schedule != nil {
+		schedule, err = r.UpdateSchedule(&schema.SchemaUpdateSchedule{
+			Username: sr.Username,
+			Schedule: sr.Schedule,
+		})
 	}
 
 	// reload tutor->user
@@ -208,4 +191,53 @@ func (r *repositoryTutor) DeleteTutor(sr *schema.SchemaDeleteTutor) error {
 	}
 
 	return nil
+}
+
+func (r *repositoryTutor) UpdateSchedule(sr *schema.SchemaUpdateSchedule) (*ent.Schedule, error) {
+	// create a transaction
+	tx, err := r.client.Tx(r.ctx)
+	if err != nil {
+		return nil, fmt.Errorf("starting a transaction: %w", err)
+	}
+	// wrap the client with the transaction
+	txc := tx.Client()
+
+	user, err := txc.User.Query().
+		Where(entUser.UsernameEQ(sr.Username)).
+		WithTutor().
+		Only(r.ctx)
+	if err != nil {
+		// rollback
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+	}
+
+	// load schedule
+	user.Edges.Tutor.Edges.Schedule, err = user.Edges.Tutor.QuerySchedule().Only(r.ctx)
+	if err != nil {
+		// rollback
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+	}
+
+	// update schedule
+	ata := sr.Schedule.AvailableTimeArrays()
+	schedule, err := txc.Schedule.UpdateOne(user.Edges.Tutor.Edges.Schedule).
+		SetDay0(ata[0]).
+		SetDay1(ata[1]).
+		SetDay2(ata[2]).
+		SetDay3(ata[3]).
+		SetDay4(ata[4]).
+		SetDay5(ata[5]).
+		SetDay6(ata[6]).
+		Save(r.ctx)
+	if err != nil {
+		// rollback
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+	}
+	return schedule, err
 }

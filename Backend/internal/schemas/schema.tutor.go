@@ -7,20 +7,20 @@ import (
 )
 
 type SchemaTutor struct {
-	ID                uuid.UUID `json:"id"`
-	Username          string    `json:"username"`
-	Email             string    `json:"email"`
-	Firstname         string    `json:"firstname"`
-	Lastname          string    `json:"lastname"`
-	Phone             string    `json:"phone"`
-	Address           string    `json:"address"`
-	Birthdate         time.Time `json:"birthdate"`
-	Gender            string    `json:"gender"`
-	ProfilePictureURL string    `json:"profile_picture_URL"`
-	Description       string    `json:"description"`
-	OmiseBankToken    string    `json:"omise_bank_token"`
-	CitizenId         string    `json:"citizen_id"`
-	Schedule          Schedule  `json:"schedule"`
+	ID                uuid.UUID         `json:"id"`
+	Username          string            `json:"username"`
+	Email             string            `json:"email"`
+	Firstname         string            `json:"firstname"`
+	Lastname          string            `json:"lastname"`
+	Phone             string            `json:"phone"`
+	Address           string            `json:"address"`
+	Birthdate         time.Time         `json:"birthdate"`
+	Gender            string            `json:"gender"`
+	ProfilePictureURL string            `json:"profile_picture_URL"`
+	Description       string            `json:"description"`
+	OmiseBankToken    string            `json:"omise_bank_token"`
+	CitizenId         string            `json:"citizen_id"`
+	Schedule          SchemaRawSchedule `json:"raw_schedule"`
 }
 
 type SchemaGetTutor struct {
@@ -55,7 +55,7 @@ type SchemaUpdateTutor struct {
 	Description    string    `json:"description"`
 	OmiseBankToken string    `json:"omise_bank_token"`
 	Email          string    `json:"email"`
-	Schedules      Schedule  `json:"schedules"`
+	Schedule       Schedule  `json:"schedule"`
 }
 
 type SchemaDeleteTutor struct {

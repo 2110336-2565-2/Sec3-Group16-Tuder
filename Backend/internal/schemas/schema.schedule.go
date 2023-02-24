@@ -1,5 +1,22 @@
 package schemas
 
+type SchemaUpdateSchedule struct {
+	Username string // TODO this must be removed if jwt is available
+	Schedule Schedule
+}
+
+type SchemaRawSchedule struct {
+	Sunday    [24]bool `json:"sunday"`
+	Monday    [24]bool `json:"monday"`
+	Tuesday   [24]bool `json:"tuesday"`
+	Wednesday [24]bool `json:"wednesday"`
+	Thursday  [24]bool `json:"thursday"`
+	Friday    [24]bool `json:"friday"`
+	Saturday  [24]bool `json:"saturday"`
+}
+
+// --------- Internal Struct ------------
+// these are not the base of api payload format
 type TimeSlot struct {
 	Day  int `json:"day,omitempty"`
 	Hour int `json:"hour,omitempty"`

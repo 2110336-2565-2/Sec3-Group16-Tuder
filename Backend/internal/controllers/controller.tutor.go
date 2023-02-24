@@ -151,3 +151,25 @@ func (cR *controllerTutor) DeleteTutor(c echo.Context) (err error) {
 	})
 	return nil
 }
+
+func (cR *controllerTutor) UpdateSchedule(c echo.Context) (err error) {
+	s := &schema.SchemaUpdateSchedule{}
+	if err = c.Bind(s); err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: "invalid request payload",
+			Error:   err,
+		})
+		return
+	}
+
+	schedule, err := cR.service.UpdateTutorSchedule(s)
+
+	// success
+	c.JSON(http.StatusOK, schema.SchemaResponses{
+		Success: true,
+		Message: "Schedule edited successfully",
+		Data:    schedule,
+	})
+	return nil
+}
