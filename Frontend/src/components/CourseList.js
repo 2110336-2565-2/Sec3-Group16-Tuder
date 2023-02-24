@@ -4,14 +4,11 @@ import {useQuery} from 'react-query';
 import { fetchCourseHandler } from '../handlers/searchCourseHandler';
 import { useDataContext } from '../pages/Courses';
 
-// import { useEffect , useState} from 'react';
-
-
 
 export default function CourseList(){ 
     const {data, setData} = useDataContext();
 
-    const {initData, isLoading, error} = useQuery(
+    const { isLoading, error} = useQuery(
         'courses',() =>
         {
             fetchCourseHandler().then((res) => {
