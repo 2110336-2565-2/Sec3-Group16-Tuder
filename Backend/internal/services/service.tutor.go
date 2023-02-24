@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	repository "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 )
@@ -24,6 +25,7 @@ func NewServiceTutor(repository repository.RepositoryTutor) *serviceTutor {
 func (s *serviceTutor) GetTutorByUsername(tutorGet *schemas.SchemaGetTutor) (*schemas.SchemaTutor, error) {
 	tutor, err := s.repository.GetTutorByUsername(tutorGet)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 
@@ -47,6 +49,7 @@ func (s *serviceTutor) GetTutorByUsername(tutorGet *schemas.SchemaGetTutor) (*sc
 func (s *serviceTutor) GetTutors() ([]*schemas.SchemaTutor, error) {
 	tutors, err := s.repository.GetTutors()
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	var tutorResponses []*schemas.SchemaTutor
@@ -74,6 +77,7 @@ func (s *serviceTutor) GetTutors() ([]*schemas.SchemaTutor, error) {
 func (s *serviceTutor) CreateTutor(tutorCreate *schemas.SchemaCreateTutor) (*schemas.SchemaTutor, error) {
 	tutor, err := s.repository.CreateTutor(tutorCreate)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 
@@ -95,20 +99,21 @@ func (s *serviceTutor) CreateTutor(tutorCreate *schemas.SchemaCreateTutor) (*sch
 }
 
 func (s *serviceTutor) UpdateTutor(tutorUpdate *schemas.SchemaUpdateTutor) (*schemas.SchemaTutor, error) {
-	user, tutor, err := s.repository.UpdateTutor(tutorUpdate)
+	tutor, err := s.repository.UpdateTutor(tutorUpdate)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	return &schemas.SchemaTutor{
 		ID:        tutor.ID,
-		Username:  user.Username,
-		Firstname: user.FirstName,
-		Lastname:  user.LastName,
-		Email:     user.Email,
-		Phone:     user.Phone,
-		Address:   user.Address,
-		Birthdate: user.BirthDate,
-		Gender:    user.Gender,
+		Username:  tutor.Edges.User.Username,
+		Firstname: tutor.Edges.User.FirstName,
+		Lastname:  tutor.Edges.User.LastName,
+		Email:     tutor.Edges.User.Email,
+		Phone:     tutor.Edges.User.Phone,
+		Address:   tutor.Edges.User.Address,
+		Birthdate: tutor.Edges.User.BirthDate,
+		Gender:    tutor.Edges.User.Gender,
 		//ProfilePictureURL: *user.ProfilePictureURL,
 		Description:    *tutor.Description,
 		OmiseBankToken: *tutor.OmiseBankToken,
@@ -119,6 +124,7 @@ func (s *serviceTutor) UpdateTutor(tutorUpdate *schemas.SchemaUpdateTutor) (*sch
 func (s *serviceTutor) DeleteTutor(tutorDelete *schemas.SchemaDeleteTutor) error {
 	err := s.repository.DeleteTutor(tutorDelete)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 	return nil

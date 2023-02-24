@@ -13,7 +13,7 @@ type RepositoryTutor interface {
 	GetTutors() ([]*ent.Tutor, error)
 	GetTutorByUsername(sr *schema.SchemaGetTutor) (*ent.Tutor, error)
 	CreateTutor(sr *schema.SchemaCreateTutor) (*ent.Tutor, error)
-	UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.User, *ent.Tutor, error)
+	UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor, error)
 	DeleteTutor(sr *schema.SchemaDeleteTutor) error
 }
 
@@ -94,18 +94,30 @@ func (r *repositoryTutor) CreateTutor(sr *schema.SchemaCreateTutor) (*ent.Tutor,
 	return tutor, tx.Commit()
 }
 
-func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.User, *ent.Tutor, error) {
+func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor, error) {
 
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
-		return nil, nil, fmt.Errorf("starting a transaction: %w", err)
+		return nil, fmt.Errorf("starting a transaction: %w", err)
 	}
 	// wrap the client with the transaction
 	txc := tx.Client()
 
-	user, err := txc.User.
-		UpdateOneID(sr.ID).
+	user, err := txc.User.Query().
+		Where(entUser.UsernameEQ(sr.Username)).
+		WithTutor().
+		Only(r.ctx)
+	if err != nil {
+		// rollback
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+	}
+	tutor := user.Edges.Tutor
+
+	user, err = txc.User.
+		UpdateOne(user).
 		SetFirstName(sr.Firstname).
 		SetLastName(sr.Lastname).
 		SetPhone(sr.Phone).
@@ -119,20 +131,8 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.User, 
 		}
 	}
 
-	aTutor, err := txc.Tutor.
-		Query().
-		Where(entTutor.HasUserWith(entUser.IDEQ(sr.ID))).
-		Only(r.ctx)
-
-	if err != nil {
-		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
-		}
-		return nil, nil, err
-	}
-
-	tutor, err := txc.Tutor.
-		UpdateOne(aTutor).
+	tutor, err = txc.Tutor.
+		UpdateOne(tutor).
 		SetDescription(sr.Description).
 		SetOmiseBankToken(sr.OmiseBankToken).
 		Save(r.ctx)
@@ -141,9 +141,13 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.User, 
 		if rerr := tx.Rollback(); rerr != nil {
 			err = fmt.Errorf("%w: %v", err, rerr)
 		}
-		return nil, nil, err
+		return nil, err
 	}
-	return user, tutor, tx.Commit()
+
+	// reload tutor->user
+	tutor.Edges.User, err = tutor.QueryUser().Only(r.ctx)
+
+	return tutor, tx.Commit()
 }
 
 func (r *repositoryTutor) DeleteTutor(sr *schema.SchemaDeleteTutor) error {

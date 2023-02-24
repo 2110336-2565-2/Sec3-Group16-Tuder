@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -80,7 +81,7 @@ func (s *serviceCourseSearch) PackToSchema(courses []*ent.Course) []*schemas.Cou
 		courseResponses = append(courseResponses, &schemas.CourseSearchResult{
 			Course_id:          course.ID,
 			Tutor_name:         course.Edges.Tutor.Edges.User.Username,
-			Title:             course.Title,
+			Title:              course.Title,
 			Subject:            course.Subject,
 			Topic:              course.Topic,
 			Estimate_time:      course.EstimatedTime,
@@ -119,6 +120,7 @@ func (s *serviceCourseSearch) CourseSearchByTutor(searchContent *schemas.CourseS
 	}
 	courses, err := s.repository.SearchByTutorRepository(searchContent)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	courseResponses := s.PackToSchema(courses)
@@ -132,6 +134,7 @@ func (s *serviceCourseSearch) CourseSearchByTitle(searchContent *schemas.CourseS
 	}
 	courses, err := s.repository.SearchByTitleRepository(searchContent)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	courseResponses := s.PackToSchema(courses)
@@ -145,6 +148,7 @@ func (s *serviceCourseSearch) CourseSearchByDay(searchContent *schemas.CourseSea
 	}
 	courses, err := s.repository.SearchByDayRepository(searchContent)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	courseResponses := s.PackToSchema(courses)
@@ -158,6 +162,7 @@ func (s *serviceCourseSearch) CourseSearchByTopic(searchContent *schemas.CourseS
 	}
 	courses, err := s.repository.SearchByTopicRepository(searchContent)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	courseResponses := s.PackToSchema(courses)
@@ -171,6 +176,7 @@ func (s *serviceCourseSearch) CourseSearchBySubject(searchContent *schemas.Cours
 	}
 	courses, err := s.repository.SearchBySucjectRepository(searchContent)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	courseResponses := s.PackToSchema(courses)
@@ -181,6 +187,7 @@ func (s *serviceCourseSearch) CourseSearchBySubject(searchContent *schemas.Cours
 func (s *serviceCourseSearch) SearchAllCourse() ([]*schemas.CourseSearchResult, error) {
 	courses, err := s.repository.SearchAll()
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	courseResponses := s.PackToSchema(courses)
