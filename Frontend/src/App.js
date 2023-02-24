@@ -16,6 +16,7 @@ import SignUp from './pages/SignUp.js';
 import Courses from './pages/Courses';
 import Report from './pages/Report';
 import Profile from './pages/Profile.js';
+import EditProfile from './pages/EditProfile.js';
 
 import styled from 'styled-components';
 
