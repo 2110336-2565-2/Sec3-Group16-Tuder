@@ -144,9 +144,37 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 		return nil, err
 	}
 
-	// reload tutor->user
-	tutor.Edges.User, err = tutor.QueryUser().Only(r.ctx)
+	// update schedule
+	// query for schedule
+	schedule, err := tutor.QuerySchedule().Only(r.ctx)
+	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+		return nil, err
+	}
+	// update schedule
+	ata := sr.Schedules.AvailableTimeArrays()
+	schedule, err = txc.Schedule.
+		UpdateOne(schedule).
+		SetDay0(ata[0]).
+		SetDay1(ata[1]).
+		SetDay2(ata[2]).
+		SetDay3(ata[3]).
+		SetDay4(ata[4]).
+		SetDay5(ata[5]).
+		SetDay6(ata[6]).
+		Save(r.ctx)
+	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+		return nil, err
+	}
 
+	// reload tutor->user
+	tutor.Edges.User = user
+	tutor.Edges.Schedule = schedule
 	return tutor, tx.Commit()
 }
 

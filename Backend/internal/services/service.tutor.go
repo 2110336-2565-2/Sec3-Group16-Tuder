@@ -118,6 +118,7 @@ func (s *serviceTutor) UpdateTutor(tutorUpdate *schemas.SchemaUpdateTutor) (*sch
 		Description:    *tutor.Description,
 		OmiseBankToken: *tutor.OmiseBankToken,
 		CitizenId:      tutor.CitizenID,
+		Schedule:       tutorUpdate.Schedules,
 	}, nil
 }
 
