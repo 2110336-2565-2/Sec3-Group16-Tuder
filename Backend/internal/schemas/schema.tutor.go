@@ -49,12 +49,12 @@ type SchemaUpdateTutor struct {
 	Phone     string    `json:"phone"`
 	Address   string    `json:"address"`
 	//ProfilePictureURL string    `json:"profile_picture_URL"`
-	Birthdate      time.Time `json:"birthdate"`
-	Gender         string    `json:"gender"`
-	Description    string    `json:"description"`
-	OmiseBankToken string    `json:"omise_bank_token"`
-	Email          string    `json:"email"`
-	// missing email,
+	Birthdate      time.Time  `json:"birthdate"`
+	Gender         string     `json:"gender"`
+	Description    string     `json:"description"`
+	OmiseBankToken string     `json:"omise_bank_token"`
+	Email          string     `json:"email"`
+	Schedules      []Schedule `json:"schedules"`
 }
 
 type SchemaDeleteTutor struct {
