@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/golang-jwt/jwt/v4"
 	"net/http"
 
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -102,7 +103,7 @@ func (cR *controllerTutor) UpdateTutor(c echo.Context) (err error) {
 		})
 		return
 	}
-
+	uR.Username = c.Get("user").(*jwt.Token).Claims.(jwt.MapClaims)["username"].(string)
 	tutor, err := cR.service.UpdateTutor(uR)
 
 	if err != nil {

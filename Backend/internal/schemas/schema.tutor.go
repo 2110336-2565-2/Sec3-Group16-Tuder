@@ -44,7 +44,7 @@ type SchemaCreateTutor struct {
 }
 
 type SchemaUpdateTutor struct {
-	Username  string `json:"username"` // TODO This must be removed when jwt is completely function
+	Username  string `json:"username,omitempty"` // TODO This must be removed when jwt is completely function
 	Firstname string `json:"firstname"`
 	Lastname  string `json:"lastname"`
 	Phone     string `json:"phone"`
