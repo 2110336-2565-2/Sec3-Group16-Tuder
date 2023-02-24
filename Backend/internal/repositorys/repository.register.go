@@ -8,6 +8,25 @@ import (
 	entUser "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
+	"github.com/google/uuid"
+)
+
+var (
+	// DaytimeAvailable: available 8:00-12:00 , 13:00-17:00
+	DaytimeAvailable = [24]bool{false, false, false, false, false, false,
+		false, false, true, true, true, true,
+		false, true, true, true, true, false,
+		false, false, false, false, false, false}
+	// NighttimeAvailable: available 18:00-21:00
+	NighttimeAvailable = [24]bool{false, false, false, false, false, false,
+		false, false, false, false, false, false,
+		false, false, false, false, false, false,
+		true, true, true, false, false, false}
+	// AllDayAvailable: available 8:00-12:00 , 13:00-17:00, 18:00-21:00
+	AllDayAvailable = [24]bool{false, false, false, false, false, false,
+		false, false, true, true, true, true,
+		false, true, true, true, true, false,
+		true, true, true, false, false, false}
 )
 
 type RepositoryRegister interface {
@@ -69,12 +88,27 @@ func (r repositoryRegister) RegisterUser(sr *schemas.SchemaRegister) (*ent.User,
 			Create().SetUserID(newUser.ID).
 			Save(r.ctx)
 	case "tutor":
+		// create a schedule with default value: available all day, everyday
+		var schedule *ent.Schedule
+		schedule, err = txc.Schedule.
+			Create().
+			SetID(uuid.New()).
+			SetDay0(AllDayAvailable).
+			SetDay1(AllDayAvailable).
+			SetDay2(AllDayAvailable).
+			SetDay3(AllDayAvailable).
+			SetDay4(AllDayAvailable).
+			SetDay5(AllDayAvailable).
+			SetDay6(AllDayAvailable).
+			Save(r.ctx)
+
 		_, err = txc.Tutor.
 			Create().
 			SetUser(newUser).
 			SetDescription(sr.Description).
 			SetOmiseBankToken(sr.OmiseBankToken).
 			SetCitizenID(sr.CitizenID).
+			SetSchedule(schedule).
 			Save(r.ctx)
 	default:
 		err = fmt.Errorf("User Role is invalid : %s", sr.Role)
