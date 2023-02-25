@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/google/uuid"
 )
 
@@ -49,15 +50,34 @@ func (rcc *ReviewCourseCreate) SetNillableReviewMsg(s *string) *ReviewCourseCrea
 	return rcc
 }
 
-// SetCourseID sets the "course" edge to the Course entity by ID.
-func (rcc *ReviewCourseCreate) SetCourseID(id uuid.UUID) *ReviewCourseCreate {
-	rcc.mutation.SetCourseID(id)
+// AddCourseIDs adds the "course" edge to the Course entity by IDs.
+func (rcc *ReviewCourseCreate) AddCourseIDs(ids ...uuid.UUID) *ReviewCourseCreate {
+	rcc.mutation.AddCourseIDs(ids...)
 	return rcc
 }
 
-// SetCourse sets the "course" edge to the Course entity.
-func (rcc *ReviewCourseCreate) SetCourse(c *Course) *ReviewCourseCreate {
-	return rcc.SetCourseID(c.ID)
+// AddCourse adds the "course" edges to the Course entity.
+func (rcc *ReviewCourseCreate) AddCourse(c ...*Course) *ReviewCourseCreate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return rcc.AddCourseIDs(ids...)
+}
+
+// AddStudentIDs adds the "student" edge to the Student entity by IDs.
+func (rcc *ReviewCourseCreate) AddStudentIDs(ids ...uuid.UUID) *ReviewCourseCreate {
+	rcc.mutation.AddStudentIDs(ids...)
+	return rcc
+}
+
+// AddStudent adds the "student" edges to the Student entity.
+func (rcc *ReviewCourseCreate) AddStudent(s ...*Student) *ReviewCourseCreate {
+	ids := make([]uuid.UUID, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return rcc.AddStudentIDs(ids...)
 }
 
 // Mutation returns the ReviewCourseMutation object of the builder.
@@ -99,8 +119,11 @@ func (rcc *ReviewCourseCreate) check() error {
 			return &ValidationError{Name: "score", err: fmt.Errorf(`ent: validator failed for field "ReviewCourse.score": %w`, err)}
 		}
 	}
-	if _, ok := rcc.mutation.CourseID(); !ok {
+	if len(rcc.mutation.CourseIDs()) == 0 {
 		return &ValidationError{Name: "course", err: errors.New(`ent: missing required edge "ReviewCourse.course"`)}
+	}
+	if len(rcc.mutation.StudentIDs()) == 0 {
+		return &ValidationError{Name: "student", err: errors.New(`ent: missing required edge "ReviewCourse.student"`)}
 	}
 	return nil
 }
@@ -138,10 +161,10 @@ func (rcc *ReviewCourseCreate) createSpec() (*ReviewCourse, *sqlgraph.CreateSpec
 	}
 	if nodes := rcc.mutation.CourseIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   reviewcourse.CourseTable,
-			Columns: []string{reviewcourse.CourseColumn},
+			Columns: reviewcourse.CoursePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -153,7 +176,25 @@ func (rcc *ReviewCourseCreate) createSpec() (*ReviewCourse, *sqlgraph.CreateSpec
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.course_review_course = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := rcc.mutation.StudentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   reviewcourse.StudentTable,
+			Columns: reviewcourse.StudentPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: student.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

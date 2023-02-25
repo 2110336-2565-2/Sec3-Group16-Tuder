@@ -13,8 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
 )
 
@@ -55,26 +54,15 @@ func (iru *IssueReportUpdate) SetStatus(s string) *IssueReportUpdate {
 	return iru
 }
 
-// SetStudentID sets the "student" edge to the Student entity by ID.
-func (iru *IssueReportUpdate) SetStudentID(id uuid.UUID) *IssueReportUpdate {
-	iru.mutation.SetStudentID(id)
+// SetUserID sets the "user" edge to the User entity by ID.
+func (iru *IssueReportUpdate) SetUserID(id uuid.UUID) *IssueReportUpdate {
+	iru.mutation.SetUserID(id)
 	return iru
 }
 
-// SetStudent sets the "student" edge to the Student entity.
-func (iru *IssueReportUpdate) SetStudent(s *Student) *IssueReportUpdate {
-	return iru.SetStudentID(s.ID)
-}
-
-// SetTutorID sets the "tutor" edge to the Tutor entity by ID.
-func (iru *IssueReportUpdate) SetTutorID(id uuid.UUID) *IssueReportUpdate {
-	iru.mutation.SetTutorID(id)
-	return iru
-}
-
-// SetTutor sets the "tutor" edge to the Tutor entity.
-func (iru *IssueReportUpdate) SetTutor(t *Tutor) *IssueReportUpdate {
-	return iru.SetTutorID(t.ID)
+// SetUser sets the "user" edge to the User entity.
+func (iru *IssueReportUpdate) SetUser(u *User) *IssueReportUpdate {
+	return iru.SetUserID(u.ID)
 }
 
 // Mutation returns the IssueReportMutation object of the builder.
@@ -82,15 +70,9 @@ func (iru *IssueReportUpdate) Mutation() *IssueReportMutation {
 	return iru.mutation
 }
 
-// ClearStudent clears the "student" edge to the Student entity.
-func (iru *IssueReportUpdate) ClearStudent() *IssueReportUpdate {
-	iru.mutation.ClearStudent()
-	return iru
-}
-
-// ClearTutor clears the "tutor" edge to the Tutor entity.
-func (iru *IssueReportUpdate) ClearTutor() *IssueReportUpdate {
-	iru.mutation.ClearTutor()
+// ClearUser clears the "user" edge to the User entity.
+func (iru *IssueReportUpdate) ClearUser() *IssueReportUpdate {
+	iru.mutation.ClearUser()
 	return iru
 }
 
@@ -138,11 +120,8 @@ func (iru *IssueReportUpdate) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "IssueReport.status": %w`, err)}
 		}
 	}
-	if _, ok := iru.mutation.StudentID(); iru.mutation.StudentCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "IssueReport.student"`)
-	}
-	if _, ok := iru.mutation.TutorID(); iru.mutation.TutorCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "IssueReport.tutor"`)
+	if _, ok := iru.mutation.UserID(); iru.mutation.UserCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "IssueReport.user"`)
 	}
 	return nil
 }
@@ -171,68 +150,33 @@ func (iru *IssueReportUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := iru.mutation.Status(); ok {
 		_spec.SetField(issuereport.FieldStatus, field.TypeString, value)
 	}
-	if iru.mutation.StudentCleared() {
+	if iru.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   issuereport.StudentTable,
-			Columns: []string{issuereport.StudentColumn},
+			Table:   issuereport.UserTable,
+			Columns: []string{issuereport.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: student.FieldID,
+					Column: user.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := iru.mutation.StudentIDs(); len(nodes) > 0 {
+	if nodes := iru.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   issuereport.StudentTable,
-			Columns: []string{issuereport.StudentColumn},
+			Table:   issuereport.UserTable,
+			Columns: []string{issuereport.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: student.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if iru.mutation.TutorCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   issuereport.TutorTable,
-			Columns: []string{issuereport.TutorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: tutor.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := iru.mutation.TutorIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   issuereport.TutorTable,
-			Columns: []string{issuereport.TutorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: tutor.FieldID,
+					Column: user.FieldID,
 				},
 			},
 		}
@@ -285,26 +229,15 @@ func (iruo *IssueReportUpdateOne) SetStatus(s string) *IssueReportUpdateOne {
 	return iruo
 }
 
-// SetStudentID sets the "student" edge to the Student entity by ID.
-func (iruo *IssueReportUpdateOne) SetStudentID(id uuid.UUID) *IssueReportUpdateOne {
-	iruo.mutation.SetStudentID(id)
+// SetUserID sets the "user" edge to the User entity by ID.
+func (iruo *IssueReportUpdateOne) SetUserID(id uuid.UUID) *IssueReportUpdateOne {
+	iruo.mutation.SetUserID(id)
 	return iruo
 }
 
-// SetStudent sets the "student" edge to the Student entity.
-func (iruo *IssueReportUpdateOne) SetStudent(s *Student) *IssueReportUpdateOne {
-	return iruo.SetStudentID(s.ID)
-}
-
-// SetTutorID sets the "tutor" edge to the Tutor entity by ID.
-func (iruo *IssueReportUpdateOne) SetTutorID(id uuid.UUID) *IssueReportUpdateOne {
-	iruo.mutation.SetTutorID(id)
-	return iruo
-}
-
-// SetTutor sets the "tutor" edge to the Tutor entity.
-func (iruo *IssueReportUpdateOne) SetTutor(t *Tutor) *IssueReportUpdateOne {
-	return iruo.SetTutorID(t.ID)
+// SetUser sets the "user" edge to the User entity.
+func (iruo *IssueReportUpdateOne) SetUser(u *User) *IssueReportUpdateOne {
+	return iruo.SetUserID(u.ID)
 }
 
 // Mutation returns the IssueReportMutation object of the builder.
@@ -312,15 +245,9 @@ func (iruo *IssueReportUpdateOne) Mutation() *IssueReportMutation {
 	return iruo.mutation
 }
 
-// ClearStudent clears the "student" edge to the Student entity.
-func (iruo *IssueReportUpdateOne) ClearStudent() *IssueReportUpdateOne {
-	iruo.mutation.ClearStudent()
-	return iruo
-}
-
-// ClearTutor clears the "tutor" edge to the Tutor entity.
-func (iruo *IssueReportUpdateOne) ClearTutor() *IssueReportUpdateOne {
-	iruo.mutation.ClearTutor()
+// ClearUser clears the "user" edge to the User entity.
+func (iruo *IssueReportUpdateOne) ClearUser() *IssueReportUpdateOne {
+	iruo.mutation.ClearUser()
 	return iruo
 }
 
@@ -381,11 +308,8 @@ func (iruo *IssueReportUpdateOne) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "IssueReport.status": %w`, err)}
 		}
 	}
-	if _, ok := iruo.mutation.StudentID(); iruo.mutation.StudentCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "IssueReport.student"`)
-	}
-	if _, ok := iruo.mutation.TutorID(); iruo.mutation.TutorCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "IssueReport.tutor"`)
+	if _, ok := iruo.mutation.UserID(); iruo.mutation.UserCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "IssueReport.user"`)
 	}
 	return nil
 }
@@ -431,68 +355,33 @@ func (iruo *IssueReportUpdateOne) sqlSave(ctx context.Context) (_node *IssueRepo
 	if value, ok := iruo.mutation.Status(); ok {
 		_spec.SetField(issuereport.FieldStatus, field.TypeString, value)
 	}
-	if iruo.mutation.StudentCleared() {
+	if iruo.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   issuereport.StudentTable,
-			Columns: []string{issuereport.StudentColumn},
+			Table:   issuereport.UserTable,
+			Columns: []string{issuereport.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: student.FieldID,
+					Column: user.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := iruo.mutation.StudentIDs(); len(nodes) > 0 {
+	if nodes := iruo.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   issuereport.StudentTable,
-			Columns: []string{issuereport.StudentColumn},
+			Table:   issuereport.UserTable,
+			Columns: []string{issuereport.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: student.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if iruo.mutation.TutorCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   issuereport.TutorTable,
-			Columns: []string{issuereport.TutorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: tutor.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := iruo.mutation.TutorIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   issuereport.TutorTable,
-			Columns: []string{issuereport.TutorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: tutor.FieldID,
+					Column: user.FieldID,
 				},
 			},
 		}

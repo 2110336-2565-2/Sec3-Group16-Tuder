@@ -31,19 +31,30 @@ type PaymentHistory struct {
 
 // PaymentHistoryEdges holds the relations/edges for other nodes in the graph.
 type PaymentHistoryEdges struct {
+	// Class holds the value of the class edge.
+	Class []*Class `json:"class,omitempty"`
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
 	// Payment holds the value of the payment edge.
 	Payment *Payment `json:"payment,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
+}
+
+// ClassOrErr returns the Class value or an error if the edge
+// was not loaded in eager-loading.
+func (e PaymentHistoryEdges) ClassOrErr() ([]*Class, error) {
+	if e.loadedTypes[0] {
+		return e.Class, nil
+	}
+	return nil, &NotLoadedError{edge: "class"}
 }
 
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e PaymentHistoryEdges) UserOrErr() (*User, error) {
-	if e.loadedTypes[0] {
+	if e.loadedTypes[1] {
 		if e.User == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: user.Label}
@@ -56,7 +67,7 @@ func (e PaymentHistoryEdges) UserOrErr() (*User, error) {
 // PaymentOrErr returns the Payment value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e PaymentHistoryEdges) PaymentOrErr() (*Payment, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		if e.Payment == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: payment.Label}
@@ -132,6 +143,11 @@ func (ph *PaymentHistory) assignValues(columns []string, values []any) error {
 		}
 	}
 	return nil
+}
+
+// QueryClass queries the "class" edge of the PaymentHistory entity.
+func (ph *PaymentHistory) QueryClass() *ClassQuery {
+	return NewPaymentHistoryClient(ph.config).QueryClass(ph)
 }
 
 // QueryUser queries the "user" edge of the PaymentHistory entity.

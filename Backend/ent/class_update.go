@@ -12,10 +12,10 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/google/uuid"
 )
 
@@ -58,6 +58,21 @@ func (cu *ClassUpdate) SetSuccessHour(t time.Time) *ClassUpdate {
 	return cu
 }
 
+// AddMatchIDs adds the "match" edge to the Match entity by IDs.
+func (cu *ClassUpdate) AddMatchIDs(ids ...int) *ClassUpdate {
+	cu.mutation.AddMatchIDs(ids...)
+	return cu
+}
+
+// AddMatch adds the "match" edges to the Match entity.
+func (cu *ClassUpdate) AddMatch(m ...*Match) *ClassUpdate {
+	ids := make([]int, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return cu.AddMatchIDs(ids...)
+}
+
 // SetScheduleID sets the "schedule" edge to the Schedule entity by ID.
 func (cu *ClassUpdate) SetScheduleID(id uuid.UUID) *ClassUpdate {
 	cu.mutation.SetScheduleID(id)
@@ -69,31 +84,41 @@ func (cu *ClassUpdate) SetSchedule(s *Schedule) *ClassUpdate {
 	return cu.SetScheduleID(s.ID)
 }
 
-// SetStudentID sets the "student" edge to the Student entity by ID.
-func (cu *ClassUpdate) SetStudentID(id uuid.UUID) *ClassUpdate {
-	cu.mutation.SetStudentID(id)
+// SetPaymentHistoryID sets the "payment_history" edge to the PaymentHistory entity by ID.
+func (cu *ClassUpdate) SetPaymentHistoryID(id uuid.UUID) *ClassUpdate {
+	cu.mutation.SetPaymentHistoryID(id)
 	return cu
 }
 
-// SetStudent sets the "student" edge to the Student entity.
-func (cu *ClassUpdate) SetStudent(s *Student) *ClassUpdate {
-	return cu.SetStudentID(s.ID)
-}
-
-// SetCourseID sets the "course" edge to the Course entity by ID.
-func (cu *ClassUpdate) SetCourseID(id uuid.UUID) *ClassUpdate {
-	cu.mutation.SetCourseID(id)
-	return cu
-}
-
-// SetCourse sets the "course" edge to the Course entity.
-func (cu *ClassUpdate) SetCourse(c *Course) *ClassUpdate {
-	return cu.SetCourseID(c.ID)
+// SetPaymentHistory sets the "payment_history" edge to the PaymentHistory entity.
+func (cu *ClassUpdate) SetPaymentHistory(p *PaymentHistory) *ClassUpdate {
+	return cu.SetPaymentHistoryID(p.ID)
 }
 
 // Mutation returns the ClassMutation object of the builder.
 func (cu *ClassUpdate) Mutation() *ClassMutation {
 	return cu.mutation
+}
+
+// ClearMatch clears all "match" edges to the Match entity.
+func (cu *ClassUpdate) ClearMatch() *ClassUpdate {
+	cu.mutation.ClearMatch()
+	return cu
+}
+
+// RemoveMatchIDs removes the "match" edge to Match entities by IDs.
+func (cu *ClassUpdate) RemoveMatchIDs(ids ...int) *ClassUpdate {
+	cu.mutation.RemoveMatchIDs(ids...)
+	return cu
+}
+
+// RemoveMatch removes "match" edges to Match entities.
+func (cu *ClassUpdate) RemoveMatch(m ...*Match) *ClassUpdate {
+	ids := make([]int, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return cu.RemoveMatchIDs(ids...)
 }
 
 // ClearSchedule clears the "schedule" edge to the Schedule entity.
@@ -102,15 +127,9 @@ func (cu *ClassUpdate) ClearSchedule() *ClassUpdate {
 	return cu
 }
 
-// ClearStudent clears the "student" edge to the Student entity.
-func (cu *ClassUpdate) ClearStudent() *ClassUpdate {
-	cu.mutation.ClearStudent()
-	return cu
-}
-
-// ClearCourse clears the "course" edge to the Course entity.
-func (cu *ClassUpdate) ClearCourse() *ClassUpdate {
-	cu.mutation.ClearCourse()
+// ClearPaymentHistory clears the "payment_history" edge to the PaymentHistory entity.
+func (cu *ClassUpdate) ClearPaymentHistory() *ClassUpdate {
+	cu.mutation.ClearPaymentHistory()
 	return cu
 }
 
@@ -146,11 +165,8 @@ func (cu *ClassUpdate) check() error {
 	if _, ok := cu.mutation.ScheduleID(); cu.mutation.ScheduleCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Class.schedule"`)
 	}
-	if _, ok := cu.mutation.StudentID(); cu.mutation.StudentCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Class.student"`)
-	}
-	if _, ok := cu.mutation.CourseID(); cu.mutation.CourseCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Class.course"`)
+	if _, ok := cu.mutation.PaymentHistoryID(); cu.mutation.PaymentHistoryCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Class.payment_history"`)
 	}
 	return nil
 }
@@ -176,10 +192,64 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.SuccessHour(); ok {
 		_spec.SetField(class.FieldSuccessHour, field.TypeTime, value)
 	}
+	if cu.mutation.MatchCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   class.MatchTable,
+			Columns: class.MatchPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: match.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.RemovedMatchIDs(); len(nodes) > 0 && !cu.mutation.MatchCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   class.MatchTable,
+			Columns: class.MatchPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: match.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.MatchIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   class.MatchTable,
+			Columns: class.MatchPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: match.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if cu.mutation.ScheduleCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   class.ScheduleTable,
 			Columns: []string{class.ScheduleColumn},
 			Bidi:    false,
@@ -195,7 +265,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := cu.mutation.ScheduleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   class.ScheduleTable,
 			Columns: []string{class.ScheduleColumn},
 			Bidi:    false,
@@ -211,68 +281,33 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cu.mutation.StudentCleared() {
+	if cu.mutation.PaymentHistoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   class.StudentTable,
-			Columns: []string{class.StudentColumn},
+			Table:   class.PaymentHistoryTable,
+			Columns: []string{class.PaymentHistoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: student.FieldID,
+					Column: paymenthistory.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.StudentIDs(); len(nodes) > 0 {
+	if nodes := cu.mutation.PaymentHistoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   class.StudentTable,
-			Columns: []string{class.StudentColumn},
+			Table:   class.PaymentHistoryTable,
+			Columns: []string{class.PaymentHistoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: student.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if cu.mutation.CourseCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   class.CourseTable,
-			Columns: []string{class.CourseColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.CourseIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   class.CourseTable,
-			Columns: []string{class.CourseColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
+					Column: paymenthistory.FieldID,
 				},
 			},
 		}
@@ -327,6 +362,21 @@ func (cuo *ClassUpdateOne) SetSuccessHour(t time.Time) *ClassUpdateOne {
 	return cuo
 }
 
+// AddMatchIDs adds the "match" edge to the Match entity by IDs.
+func (cuo *ClassUpdateOne) AddMatchIDs(ids ...int) *ClassUpdateOne {
+	cuo.mutation.AddMatchIDs(ids...)
+	return cuo
+}
+
+// AddMatch adds the "match" edges to the Match entity.
+func (cuo *ClassUpdateOne) AddMatch(m ...*Match) *ClassUpdateOne {
+	ids := make([]int, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return cuo.AddMatchIDs(ids...)
+}
+
 // SetScheduleID sets the "schedule" edge to the Schedule entity by ID.
 func (cuo *ClassUpdateOne) SetScheduleID(id uuid.UUID) *ClassUpdateOne {
 	cuo.mutation.SetScheduleID(id)
@@ -338,31 +388,41 @@ func (cuo *ClassUpdateOne) SetSchedule(s *Schedule) *ClassUpdateOne {
 	return cuo.SetScheduleID(s.ID)
 }
 
-// SetStudentID sets the "student" edge to the Student entity by ID.
-func (cuo *ClassUpdateOne) SetStudentID(id uuid.UUID) *ClassUpdateOne {
-	cuo.mutation.SetStudentID(id)
+// SetPaymentHistoryID sets the "payment_history" edge to the PaymentHistory entity by ID.
+func (cuo *ClassUpdateOne) SetPaymentHistoryID(id uuid.UUID) *ClassUpdateOne {
+	cuo.mutation.SetPaymentHistoryID(id)
 	return cuo
 }
 
-// SetStudent sets the "student" edge to the Student entity.
-func (cuo *ClassUpdateOne) SetStudent(s *Student) *ClassUpdateOne {
-	return cuo.SetStudentID(s.ID)
-}
-
-// SetCourseID sets the "course" edge to the Course entity by ID.
-func (cuo *ClassUpdateOne) SetCourseID(id uuid.UUID) *ClassUpdateOne {
-	cuo.mutation.SetCourseID(id)
-	return cuo
-}
-
-// SetCourse sets the "course" edge to the Course entity.
-func (cuo *ClassUpdateOne) SetCourse(c *Course) *ClassUpdateOne {
-	return cuo.SetCourseID(c.ID)
+// SetPaymentHistory sets the "payment_history" edge to the PaymentHistory entity.
+func (cuo *ClassUpdateOne) SetPaymentHistory(p *PaymentHistory) *ClassUpdateOne {
+	return cuo.SetPaymentHistoryID(p.ID)
 }
 
 // Mutation returns the ClassMutation object of the builder.
 func (cuo *ClassUpdateOne) Mutation() *ClassMutation {
 	return cuo.mutation
+}
+
+// ClearMatch clears all "match" edges to the Match entity.
+func (cuo *ClassUpdateOne) ClearMatch() *ClassUpdateOne {
+	cuo.mutation.ClearMatch()
+	return cuo
+}
+
+// RemoveMatchIDs removes the "match" edge to Match entities by IDs.
+func (cuo *ClassUpdateOne) RemoveMatchIDs(ids ...int) *ClassUpdateOne {
+	cuo.mutation.RemoveMatchIDs(ids...)
+	return cuo
+}
+
+// RemoveMatch removes "match" edges to Match entities.
+func (cuo *ClassUpdateOne) RemoveMatch(m ...*Match) *ClassUpdateOne {
+	ids := make([]int, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return cuo.RemoveMatchIDs(ids...)
 }
 
 // ClearSchedule clears the "schedule" edge to the Schedule entity.
@@ -371,15 +431,9 @@ func (cuo *ClassUpdateOne) ClearSchedule() *ClassUpdateOne {
 	return cuo
 }
 
-// ClearStudent clears the "student" edge to the Student entity.
-func (cuo *ClassUpdateOne) ClearStudent() *ClassUpdateOne {
-	cuo.mutation.ClearStudent()
-	return cuo
-}
-
-// ClearCourse clears the "course" edge to the Course entity.
-func (cuo *ClassUpdateOne) ClearCourse() *ClassUpdateOne {
-	cuo.mutation.ClearCourse()
+// ClearPaymentHistory clears the "payment_history" edge to the PaymentHistory entity.
+func (cuo *ClassUpdateOne) ClearPaymentHistory() *ClassUpdateOne {
+	cuo.mutation.ClearPaymentHistory()
 	return cuo
 }
 
@@ -428,11 +482,8 @@ func (cuo *ClassUpdateOne) check() error {
 	if _, ok := cuo.mutation.ScheduleID(); cuo.mutation.ScheduleCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Class.schedule"`)
 	}
-	if _, ok := cuo.mutation.StudentID(); cuo.mutation.StudentCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Class.student"`)
-	}
-	if _, ok := cuo.mutation.CourseID(); cuo.mutation.CourseCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Class.course"`)
+	if _, ok := cuo.mutation.PaymentHistoryID(); cuo.mutation.PaymentHistoryCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Class.payment_history"`)
 	}
 	return nil
 }
@@ -475,10 +526,64 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 	if value, ok := cuo.mutation.SuccessHour(); ok {
 		_spec.SetField(class.FieldSuccessHour, field.TypeTime, value)
 	}
+	if cuo.mutation.MatchCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   class.MatchTable,
+			Columns: class.MatchPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: match.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.RemovedMatchIDs(); len(nodes) > 0 && !cuo.mutation.MatchCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   class.MatchTable,
+			Columns: class.MatchPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: match.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.MatchIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   class.MatchTable,
+			Columns: class.MatchPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: match.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if cuo.mutation.ScheduleCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   class.ScheduleTable,
 			Columns: []string{class.ScheduleColumn},
 			Bidi:    false,
@@ -494,7 +599,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 	if nodes := cuo.mutation.ScheduleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   class.ScheduleTable,
 			Columns: []string{class.ScheduleColumn},
 			Bidi:    false,
@@ -510,68 +615,33 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cuo.mutation.StudentCleared() {
+	if cuo.mutation.PaymentHistoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   class.StudentTable,
-			Columns: []string{class.StudentColumn},
+			Table:   class.PaymentHistoryTable,
+			Columns: []string{class.PaymentHistoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: student.FieldID,
+					Column: paymenthistory.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.StudentIDs(); len(nodes) > 0 {
+	if nodes := cuo.mutation.PaymentHistoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   class.StudentTable,
-			Columns: []string{class.StudentColumn},
+			Table:   class.PaymentHistoryTable,
+			Columns: []string{class.PaymentHistoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: student.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if cuo.mutation.CourseCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   class.CourseTable,
-			Columns: []string{class.CourseColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.CourseIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   class.CourseTable,
-			Columns: []string{class.CourseColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
+					Column: paymenthistory.FieldID,
 				},
 			},
 		}

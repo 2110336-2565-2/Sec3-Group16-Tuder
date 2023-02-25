@@ -22,7 +22,11 @@ func (ReviewCourse) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("course", Course.Type).
 			Ref("review_course").
-			Unique().
+			// Unique().
+			Required(),
+		edge.From("student", Student.Type).
+			Ref("review_course").
+			// Unique().
 			Required(),
 	}
 }

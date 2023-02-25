@@ -9,9 +9,8 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/google/uuid"
 )
 
@@ -28,30 +27,37 @@ type Class struct {
 	SuccessHour time.Time `json:"success_hour,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ClassQuery when eager-loading is set.
-	Edges          ClassEdges `json:"edges"`
-	class_schedule *uuid.UUID
-	course_class   *uuid.UUID
-	schedule_class *uuid.UUID
-	student_class  *uuid.UUID
+	Edges                 ClassEdges `json:"edges"`
+	payment_history_class *uuid.UUID
+	schedule_class        *uuid.UUID
 }
 
 // ClassEdges holds the relations/edges for other nodes in the graph.
 type ClassEdges struct {
+	// Match holds the value of the match edge.
+	Match []*Match `json:"match,omitempty"`
 	// Schedule holds the value of the schedule edge.
 	Schedule *Schedule `json:"schedule,omitempty"`
-	// Student holds the value of the student edge.
-	Student *Student `json:"student,omitempty"`
-	// Course holds the value of the course edge.
-	Course *Course `json:"course,omitempty"`
+	// PaymentHistory holds the value of the payment_history edge.
+	PaymentHistory *PaymentHistory `json:"payment_history,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [3]bool
 }
 
+// MatchOrErr returns the Match value or an error if the edge
+// was not loaded in eager-loading.
+func (e ClassEdges) MatchOrErr() ([]*Match, error) {
+	if e.loadedTypes[0] {
+		return e.Match, nil
+	}
+	return nil, &NotLoadedError{edge: "match"}
+}
+
 // ScheduleOrErr returns the Schedule value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e ClassEdges) ScheduleOrErr() (*Schedule, error) {
-	if e.loadedTypes[0] {
+	if e.loadedTypes[1] {
 		if e.Schedule == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: schedule.Label}
@@ -61,30 +67,17 @@ func (e ClassEdges) ScheduleOrErr() (*Schedule, error) {
 	return nil, &NotLoadedError{edge: "schedule"}
 }
 
-// StudentOrErr returns the Student value or an error if the edge
+// PaymentHistoryOrErr returns the PaymentHistory value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ClassEdges) StudentOrErr() (*Student, error) {
-	if e.loadedTypes[1] {
-		if e.Student == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: student.Label}
-		}
-		return e.Student, nil
-	}
-	return nil, &NotLoadedError{edge: "student"}
-}
-
-// CourseOrErr returns the Course value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ClassEdges) CourseOrErr() (*Course, error) {
+func (e ClassEdges) PaymentHistoryOrErr() (*PaymentHistory, error) {
 	if e.loadedTypes[2] {
-		if e.Course == nil {
+		if e.PaymentHistory == nil {
 			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: course.Label}
+			return nil, &NotFoundError{label: paymenthistory.Label}
 		}
-		return e.Course, nil
+		return e.PaymentHistory, nil
 	}
-	return nil, &NotLoadedError{edge: "course"}
+	return nil, &NotLoadedError{edge: "payment_history"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -98,13 +91,9 @@ func (*Class) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullTime)
 		case class.FieldID:
 			values[i] = new(uuid.UUID)
-		case class.ForeignKeys[0]: // class_schedule
+		case class.ForeignKeys[0]: // payment_history_class
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
-		case class.ForeignKeys[1]: // course_class
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
-		case class.ForeignKeys[2]: // schedule_class
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
-		case class.ForeignKeys[3]: // student_class
+		case class.ForeignKeys[1]: // schedule_class
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Class", columns[i])
@@ -147,35 +136,26 @@ func (c *Class) assignValues(columns []string, values []any) error {
 			}
 		case class.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
-				return fmt.Errorf("unexpected type %T for field class_schedule", values[i])
+				return fmt.Errorf("unexpected type %T for field payment_history_class", values[i])
 			} else if value.Valid {
-				c.class_schedule = new(uuid.UUID)
-				*c.class_schedule = *value.S.(*uuid.UUID)
+				c.payment_history_class = new(uuid.UUID)
+				*c.payment_history_class = *value.S.(*uuid.UUID)
 			}
 		case class.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullScanner); !ok {
-				return fmt.Errorf("unexpected type %T for field course_class", values[i])
-			} else if value.Valid {
-				c.course_class = new(uuid.UUID)
-				*c.course_class = *value.S.(*uuid.UUID)
-			}
-		case class.ForeignKeys[2]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field schedule_class", values[i])
 			} else if value.Valid {
 				c.schedule_class = new(uuid.UUID)
 				*c.schedule_class = *value.S.(*uuid.UUID)
 			}
-		case class.ForeignKeys[3]:
-			if value, ok := values[i].(*sql.NullScanner); !ok {
-				return fmt.Errorf("unexpected type %T for field student_class", values[i])
-			} else if value.Valid {
-				c.student_class = new(uuid.UUID)
-				*c.student_class = *value.S.(*uuid.UUID)
-			}
 		}
 	}
 	return nil
+}
+
+// QueryMatch queries the "match" edge of the Class entity.
+func (c *Class) QueryMatch() *MatchQuery {
+	return NewClassClient(c.config).QueryMatch(c)
 }
 
 // QuerySchedule queries the "schedule" edge of the Class entity.
@@ -183,14 +163,9 @@ func (c *Class) QuerySchedule() *ScheduleQuery {
 	return NewClassClient(c.config).QuerySchedule(c)
 }
 
-// QueryStudent queries the "student" edge of the Class entity.
-func (c *Class) QueryStudent() *StudentQuery {
-	return NewClassClient(c.config).QueryStudent(c)
-}
-
-// QueryCourse queries the "course" edge of the Class entity.
-func (c *Class) QueryCourse() *CourseQuery {
-	return NewClassClient(c.config).QueryCourse(c)
+// QueryPaymentHistory queries the "payment_history" edge of the Class entity.
+func (c *Class) QueryPaymentHistory() *PaymentHistoryQuery {
+	return NewClassClient(c.config).QueryPaymentHistory(c)
 }
 
 // Update returns a builder for updating this Class.

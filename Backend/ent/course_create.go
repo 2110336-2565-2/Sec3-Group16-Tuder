@@ -9,8 +9,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/google/uuid"
@@ -116,19 +116,19 @@ func (cc *CourseCreate) AddReviewCourse(r ...*ReviewCourse) *CourseCreate {
 	return cc.AddReviewCourseIDs(ids...)
 }
 
-// AddClasIDs adds the "class" edge to the Class entity by IDs.
-func (cc *CourseCreate) AddClasIDs(ids ...uuid.UUID) *CourseCreate {
-	cc.mutation.AddClasIDs(ids...)
+// AddMatchIDs adds the "match" edge to the Match entity by IDs.
+func (cc *CourseCreate) AddMatchIDs(ids ...int) *CourseCreate {
+	cc.mutation.AddMatchIDs(ids...)
 	return cc
 }
 
-// AddClass adds the "class" edges to the Class entity.
-func (cc *CourseCreate) AddClass(c ...*Class) *CourseCreate {
-	ids := make([]uuid.UUID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// AddMatch adds the "match" edges to the Match entity.
+func (cc *CourseCreate) AddMatch(m ...*Match) *CourseCreate {
+	ids := make([]int, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
 	}
-	return cc.AddClasIDs(ids...)
+	return cc.AddMatchIDs(ids...)
 }
 
 // SetTutorID sets the "tutor" edge to the Tutor entity by ID.
@@ -305,10 +305,10 @@ func (cc *CourseCreate) createSpec() (*Course, *sqlgraph.CreateSpec) {
 	}
 	if nodes := cc.mutation.ReviewCourseIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   course.ReviewCourseTable,
-			Columns: []string{course.ReviewCourseColumn},
+			Columns: course.ReviewCoursePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -322,17 +322,17 @@ func (cc *CourseCreate) createSpec() (*Course, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cc.mutation.ClassIDs(); len(nodes) > 0 {
+	if nodes := cc.mutation.MatchIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   course.ClassTable,
-			Columns: []string{course.ClassColumn},
+			Table:   course.MatchTable,
+			Columns: course.MatchPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: class.FieldID,
+					Type:   field.TypeInt,
+					Column: match.FieldID,
 				},
 			},
 		}

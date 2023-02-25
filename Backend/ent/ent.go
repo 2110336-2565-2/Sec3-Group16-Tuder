@@ -14,6 +14,7 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
@@ -52,6 +53,7 @@ func columnChecker(table string) func(string) error {
 		class.Table:          class.ValidColumn,
 		course.Table:         course.ValidColumn,
 		issuereport.Table:    issuereport.ValidColumn,
+		match.Table:          match.ValidColumn,
 		payment.Table:        payment.ValidColumn,
 		paymenthistory.Table: paymenthistory.ValidColumn,
 		reviewcourse.Table:   reviewcourse.ValidColumn,

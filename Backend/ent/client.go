@@ -14,6 +14,7 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
@@ -39,6 +40,8 @@ type Client struct {
 	Course *CourseClient
 	// IssueReport is the client for interacting with the IssueReport builders.
 	IssueReport *IssueReportClient
+	// Match is the client for interacting with the Match builders.
+	Match *MatchClient
 	// Payment is the client for interacting with the Payment builders.
 	Payment *PaymentClient
 	// PaymentHistory is the client for interacting with the PaymentHistory builders.
@@ -71,6 +74,7 @@ func (c *Client) init() {
 	c.Class = NewClassClient(c.config)
 	c.Course = NewCourseClient(c.config)
 	c.IssueReport = NewIssueReportClient(c.config)
+	c.Match = NewMatchClient(c.config)
 	c.Payment = NewPaymentClient(c.config)
 	c.PaymentHistory = NewPaymentHistoryClient(c.config)
 	c.ReviewCourse = NewReviewCourseClient(c.config)
@@ -115,6 +119,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Class:          NewClassClient(cfg),
 		Course:         NewCourseClient(cfg),
 		IssueReport:    NewIssueReportClient(cfg),
+		Match:          NewMatchClient(cfg),
 		Payment:        NewPaymentClient(cfg),
 		PaymentHistory: NewPaymentHistoryClient(cfg),
 		ReviewCourse:   NewReviewCourseClient(cfg),
@@ -145,6 +150,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Class:          NewClassClient(cfg),
 		Course:         NewCourseClient(cfg),
 		IssueReport:    NewIssueReportClient(cfg),
+		Match:          NewMatchClient(cfg),
 		Payment:        NewPaymentClient(cfg),
 		PaymentHistory: NewPaymentHistoryClient(cfg),
 		ReviewCourse:   NewReviewCourseClient(cfg),
@@ -184,6 +190,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Class.Use(hooks...)
 	c.Course.Use(hooks...)
 	c.IssueReport.Use(hooks...)
+	c.Match.Use(hooks...)
 	c.Payment.Use(hooks...)
 	c.PaymentHistory.Use(hooks...)
 	c.ReviewCourse.Use(hooks...)
@@ -200,6 +207,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Class.Intercept(interceptors...)
 	c.Course.Intercept(interceptors...)
 	c.IssueReport.Intercept(interceptors...)
+	c.Match.Intercept(interceptors...)
 	c.Payment.Intercept(interceptors...)
 	c.PaymentHistory.Intercept(interceptors...)
 	c.ReviewCourse.Intercept(interceptors...)
@@ -219,6 +227,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Course.mutate(ctx, m)
 	case *IssueReportMutation:
 		return c.IssueReport.mutate(ctx, m)
+	case *MatchMutation:
+		return c.Match.mutate(ctx, m)
 	case *PaymentMutation:
 		return c.Payment.mutate(ctx, m)
 	case *PaymentHistoryMutation:
@@ -333,6 +343,22 @@ func (c *ClassClient) GetX(ctx context.Context, id uuid.UUID) *Class {
 	return obj
 }
 
+// QueryMatch queries the match edge of a Class.
+func (c *ClassClient) QueryMatch(cl *Class) *MatchQuery {
+	query := (&MatchClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cl.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(class.Table, class.FieldID, id),
+			sqlgraph.To(match.Table, match.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, class.MatchTable, class.MatchPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QuerySchedule queries the schedule edge of a Class.
 func (c *ClassClient) QuerySchedule(cl *Class) *ScheduleQuery {
 	query := (&ScheduleClient{config: c.config}).Query()
@@ -341,7 +367,7 @@ func (c *ClassClient) QuerySchedule(cl *Class) *ScheduleQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(class.Table, class.FieldID, id),
 			sqlgraph.To(schedule.Table, schedule.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, class.ScheduleTable, class.ScheduleColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, class.ScheduleTable, class.ScheduleColumn),
 		)
 		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
 		return fromV, nil
@@ -349,31 +375,15 @@ func (c *ClassClient) QuerySchedule(cl *Class) *ScheduleQuery {
 	return query
 }
 
-// QueryStudent queries the student edge of a Class.
-func (c *ClassClient) QueryStudent(cl *Class) *StudentQuery {
-	query := (&StudentClient{config: c.config}).Query()
+// QueryPaymentHistory queries the payment_history edge of a Class.
+func (c *ClassClient) QueryPaymentHistory(cl *Class) *PaymentHistoryQuery {
+	query := (&PaymentHistoryClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := cl.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(class.Table, class.FieldID, id),
-			sqlgraph.To(student.Table, student.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, class.StudentTable, class.StudentColumn),
-		)
-		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryCourse queries the course edge of a Class.
-func (c *ClassClient) QueryCourse(cl *Class) *CourseQuery {
-	query := (&CourseClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := cl.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(class.Table, class.FieldID, id),
-			sqlgraph.To(course.Table, course.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, class.CourseTable, class.CourseColumn),
+			sqlgraph.To(paymenthistory.Table, paymenthistory.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, class.PaymentHistoryTable, class.PaymentHistoryColumn),
 		)
 		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
 		return fromV, nil
@@ -507,7 +517,7 @@ func (c *CourseClient) QueryReviewCourse(co *Course) *ReviewCourseQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(course.Table, course.FieldID, id),
 			sqlgraph.To(reviewcourse.Table, reviewcourse.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, course.ReviewCourseTable, course.ReviewCourseColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, course.ReviewCourseTable, course.ReviewCoursePrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
 		return fromV, nil
@@ -515,15 +525,15 @@ func (c *CourseClient) QueryReviewCourse(co *Course) *ReviewCourseQuery {
 	return query
 }
 
-// QueryClass queries the class edge of a Course.
-func (c *CourseClient) QueryClass(co *Course) *ClassQuery {
-	query := (&ClassClient{config: c.config}).Query()
+// QueryMatch queries the match edge of a Course.
+func (c *CourseClient) QueryMatch(co *Course) *MatchQuery {
+	query := (&MatchClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := co.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(course.Table, course.FieldID, id),
-			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, course.ClassTable, course.ClassColumn),
+			sqlgraph.To(match.Table, match.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, course.MatchTable, course.MatchPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
 		return fromV, nil
@@ -665,31 +675,15 @@ func (c *IssueReportClient) GetX(ctx context.Context, id uuid.UUID) *IssueReport
 	return obj
 }
 
-// QueryStudent queries the student edge of a IssueReport.
-func (c *IssueReportClient) QueryStudent(ir *IssueReport) *StudentQuery {
-	query := (&StudentClient{config: c.config}).Query()
+// QueryUser queries the user edge of a IssueReport.
+func (c *IssueReportClient) QueryUser(ir *IssueReport) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := ir.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(issuereport.Table, issuereport.FieldID, id),
-			sqlgraph.To(student.Table, student.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, issuereport.StudentTable, issuereport.StudentColumn),
-		)
-		fromV = sqlgraph.Neighbors(ir.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryTutor queries the tutor edge of a IssueReport.
-func (c *IssueReportClient) QueryTutor(ir *IssueReport) *TutorQuery {
-	query := (&TutorClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ir.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(issuereport.Table, issuereport.FieldID, id),
-			sqlgraph.To(tutor.Table, tutor.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, issuereport.TutorTable, issuereport.TutorColumn),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, issuereport.UserTable, issuereport.UserColumn),
 		)
 		fromV = sqlgraph.Neighbors(ir.driver.Dialect(), step)
 		return fromV, nil
@@ -719,6 +713,172 @@ func (c *IssueReportClient) mutate(ctx context.Context, m *IssueReportMutation) 
 		return (&IssueReportDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown IssueReport mutation op: %q", m.Op())
+	}
+}
+
+// MatchClient is a client for the Match schema.
+type MatchClient struct {
+	config
+}
+
+// NewMatchClient returns a client for the Match from the given config.
+func NewMatchClient(c config) *MatchClient {
+	return &MatchClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `match.Hooks(f(g(h())))`.
+func (c *MatchClient) Use(hooks ...Hook) {
+	c.hooks.Match = append(c.hooks.Match, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `match.Intercept(f(g(h())))`.
+func (c *MatchClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Match = append(c.inters.Match, interceptors...)
+}
+
+// Create returns a builder for creating a Match entity.
+func (c *MatchClient) Create() *MatchCreate {
+	mutation := newMatchMutation(c.config, OpCreate)
+	return &MatchCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Match entities.
+func (c *MatchClient) CreateBulk(builders ...*MatchCreate) *MatchCreateBulk {
+	return &MatchCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Match.
+func (c *MatchClient) Update() *MatchUpdate {
+	mutation := newMatchMutation(c.config, OpUpdate)
+	return &MatchUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MatchClient) UpdateOne(m *Match) *MatchUpdateOne {
+	mutation := newMatchMutation(c.config, OpUpdateOne, withMatch(m))
+	return &MatchUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MatchClient) UpdateOneID(id int) *MatchUpdateOne {
+	mutation := newMatchMutation(c.config, OpUpdateOne, withMatchID(id))
+	return &MatchUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Match.
+func (c *MatchClient) Delete() *MatchDelete {
+	mutation := newMatchMutation(c.config, OpDelete)
+	return &MatchDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *MatchClient) DeleteOne(m *Match) *MatchDeleteOne {
+	return c.DeleteOneID(m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *MatchClient) DeleteOneID(id int) *MatchDeleteOne {
+	builder := c.Delete().Where(match.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MatchDeleteOne{builder}
+}
+
+// Query returns a query builder for Match.
+func (c *MatchClient) Query() *MatchQuery {
+	return &MatchQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeMatch},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Match entity by its id.
+func (c *MatchClient) Get(ctx context.Context, id int) (*Match, error) {
+	return c.Query().Where(match.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MatchClient) GetX(ctx context.Context, id int) *Match {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryStudent queries the student edge of a Match.
+func (c *MatchClient) QueryStudent(m *Match) *StudentQuery {
+	query := (&StudentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(match.Table, match.FieldID, id),
+			sqlgraph.To(student.Table, student.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, match.StudentTable, match.StudentPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCourse queries the course edge of a Match.
+func (c *MatchClient) QueryCourse(m *Match) *CourseQuery {
+	query := (&CourseClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(match.Table, match.FieldID, id),
+			sqlgraph.To(course.Table, course.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, match.CourseTable, match.CoursePrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryClass queries the class edge of a Match.
+func (c *MatchClient) QueryClass(m *Match) *ClassQuery {
+	query := (&ClassClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(match.Table, match.FieldID, id),
+			sqlgraph.To(class.Table, class.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, match.ClassTable, match.ClassPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *MatchClient) Hooks() []Hook {
+	return c.hooks.Match
+}
+
+// Interceptors returns the client interceptors.
+func (c *MatchClient) Interceptors() []Interceptor {
+	return c.inters.Match
+}
+
+func (c *MatchClient) mutate(ctx context.Context, m *MatchMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&MatchCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&MatchUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&MatchUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&MatchDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Match mutation op: %q", m.Op())
 	}
 }
 
@@ -965,6 +1125,22 @@ func (c *PaymentHistoryClient) GetX(ctx context.Context, id uuid.UUID) *PaymentH
 	return obj
 }
 
+// QueryClass queries the class edge of a PaymentHistory.
+func (c *PaymentHistoryClient) QueryClass(ph *PaymentHistory) *ClassQuery {
+	query := (&ClassClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ph.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(paymenthistory.Table, paymenthistory.FieldID, id),
+			sqlgraph.To(class.Table, class.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, paymenthistory.ClassTable, paymenthistory.ClassColumn),
+		)
+		fromV = sqlgraph.Neighbors(ph.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryUser queries the user edge of a PaymentHistory.
 func (c *PaymentHistoryClient) QueryUser(ph *PaymentHistory) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
@@ -1123,7 +1299,23 @@ func (c *ReviewCourseClient) QueryCourse(rc *ReviewCourse) *CourseQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(reviewcourse.Table, reviewcourse.FieldID, id),
 			sqlgraph.To(course.Table, course.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, reviewcourse.CourseTable, reviewcourse.CourseColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, reviewcourse.CourseTable, reviewcourse.CoursePrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(rc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryStudent queries the student edge of a ReviewCourse.
+func (c *ReviewCourseClient) QueryStudent(rc *ReviewCourse) *StudentQuery {
+	query := (&StudentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := rc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(reviewcourse.Table, reviewcourse.FieldID, id),
+			sqlgraph.To(student.Table, student.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, reviewcourse.StudentTable, reviewcourse.StudentPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(rc.driver.Dialect(), step)
 		return fromV, nil
@@ -1257,7 +1449,23 @@ func (c *ReviewTutorClient) QueryTutor(rt *ReviewTutor) *TutorQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(reviewtutor.Table, reviewtutor.FieldID, id),
 			sqlgraph.To(tutor.Table, tutor.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, reviewtutor.TutorTable, reviewtutor.TutorColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, reviewtutor.TutorTable, reviewtutor.TutorPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(rt.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryStudent queries the student edge of a ReviewTutor.
+func (c *ReviewTutorClient) QueryStudent(rt *ReviewTutor) *StudentQuery {
+	query := (&StudentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := rt.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(reviewtutor.Table, reviewtutor.FieldID, id),
+			sqlgraph.To(student.Table, student.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, reviewtutor.StudentTable, reviewtutor.StudentPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(rt.driver.Dialect(), step)
 		return fromV, nil
@@ -1533,15 +1741,15 @@ func (c *StudentClient) GetX(ctx context.Context, id uuid.UUID) *Student {
 	return obj
 }
 
-// QueryIssueReport queries the issue_report edge of a Student.
-func (c *StudentClient) QueryIssueReport(s *Student) *IssueReportQuery {
-	query := (&IssueReportClient{config: c.config}).Query()
+// QueryMatch queries the match edge of a Student.
+func (c *StudentClient) QueryMatch(s *Student) *MatchQuery {
+	query := (&MatchClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := s.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(student.Table, student.FieldID, id),
-			sqlgraph.To(issuereport.Table, issuereport.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, student.IssueReportTable, student.IssueReportColumn),
+			sqlgraph.To(match.Table, match.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, student.MatchTable, student.MatchPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil
@@ -1549,15 +1757,31 @@ func (c *StudentClient) QueryIssueReport(s *Student) *IssueReportQuery {
 	return query
 }
 
-// QueryClass queries the class edge of a Student.
-func (c *StudentClient) QueryClass(s *Student) *ClassQuery {
-	query := (&ClassClient{config: c.config}).Query()
+// QueryReviewCourse queries the review_course edge of a Student.
+func (c *StudentClient) QueryReviewCourse(s *Student) *ReviewCourseQuery {
+	query := (&ReviewCourseClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := s.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(student.Table, student.FieldID, id),
-			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, student.ClassTable, student.ClassColumn),
+			sqlgraph.To(reviewcourse.Table, reviewcourse.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, student.ReviewCourseTable, student.ReviewCoursePrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryReviewTutor queries the review_tutor edge of a Student.
+func (c *StudentClient) QueryReviewTutor(s *Student) *ReviewTutorQuery {
+	query := (&ReviewTutorClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(student.Table, student.FieldID, id),
+			sqlgraph.To(reviewtutor.Table, reviewtutor.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, student.ReviewTutorTable, student.ReviewTutorPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil
@@ -1739,7 +1963,7 @@ func (c *TutorClient) QueryReviewTutor(t *Tutor) *ReviewTutorQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(tutor.Table, tutor.FieldID, id),
 			sqlgraph.To(reviewtutor.Table, reviewtutor.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, tutor.ReviewTutorTable, tutor.ReviewTutorColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, tutor.ReviewTutorTable, tutor.ReviewTutorPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
@@ -1897,6 +2121,38 @@ func (c *UserClient) GetX(ctx context.Context, id uuid.UUID) *User {
 	return obj
 }
 
+// QueryStudent queries the student edge of a User.
+func (c *UserClient) QueryStudent(u *User) *StudentQuery {
+	query := (&StudentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(student.Table, student.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, user.StudentTable, user.StudentColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTutor queries the tutor edge of a User.
+func (c *UserClient) QueryTutor(u *User) *TutorQuery {
+	query := (&TutorClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(tutor.Table, tutor.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, user.TutorTable, user.TutorColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryIssueReport queries the issue_report edge of a User.
 func (c *UserClient) QueryIssueReport(u *User) *IssueReportQuery {
 	query := (&IssueReportClient{config: c.config}).Query()
@@ -1938,38 +2194,6 @@ func (c *UserClient) QueryPaymentHistory(u *User) *PaymentHistoryQuery {
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(paymenthistory.Table, paymenthistory.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.PaymentHistoryTable, user.PaymentHistoryColumn),
-		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryStudent queries the student edge of a User.
-func (c *UserClient) QueryStudent(u *User) *StudentQuery {
-	query := (&StudentClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(student.Table, student.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, user.StudentTable, user.StudentColumn),
-		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryTutor queries the tutor edge of a User.
-func (c *UserClient) QueryTutor(u *User) *TutorQuery {
-	query := (&TutorClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(tutor.Table, tutor.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, user.TutorTable, user.TutorColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil

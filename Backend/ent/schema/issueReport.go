@@ -28,11 +28,16 @@ func (IssueReport) Fields() []ent.Field {
 
 func (IssueReport) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("student", Student.Type).
-			Ref("issue_report").
-			Unique().
-			Required(),
-		edge.From("tutor", Tutor.Type).
+		// edge.From("student", Student.Type).
+		// 	Ref("issue_report").
+		// 	Unique().
+		// 	Required(),
+		// edge.From("tutor", Tutor.Type).
+		// 	Ref("issue_report").
+		// 	Unique().
+		// 	Required(),
+
+		edge.From("user", User.Type).
 			Ref("issue_report").
 			Unique().
 			Required(),

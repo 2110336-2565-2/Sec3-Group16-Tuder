@@ -8,8 +8,6 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewtutor"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
-	"github.com/google/uuid"
 )
 
 // ReviewTutor is the model entity for the ReviewTutor schema.
@@ -23,30 +21,36 @@ type ReviewTutor struct {
 	ReviewMsg *string `json:"review_msg,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ReviewTutorQuery when eager-loading is set.
-	Edges              ReviewTutorEdges `json:"edges"`
-	tutor_review_tutor *uuid.UUID
+	Edges ReviewTutorEdges `json:"edges"`
 }
 
 // ReviewTutorEdges holds the relations/edges for other nodes in the graph.
 type ReviewTutorEdges struct {
 	// Tutor holds the value of the tutor edge.
-	Tutor *Tutor `json:"tutor,omitempty"`
+	Tutor []*Tutor `json:"tutor,omitempty"`
+	// Student holds the value of the student edge.
+	Student []*Student `json:"student,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // TutorOrErr returns the Tutor value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ReviewTutorEdges) TutorOrErr() (*Tutor, error) {
+// was not loaded in eager-loading.
+func (e ReviewTutorEdges) TutorOrErr() ([]*Tutor, error) {
 	if e.loadedTypes[0] {
-		if e.Tutor == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: tutor.Label}
-		}
 		return e.Tutor, nil
 	}
 	return nil, &NotLoadedError{edge: "tutor"}
+}
+
+// StudentOrErr returns the Student value or an error if the edge
+// was not loaded in eager-loading.
+func (e ReviewTutorEdges) StudentOrErr() ([]*Student, error) {
+	if e.loadedTypes[1] {
+		return e.Student, nil
+	}
+	return nil, &NotLoadedError{edge: "student"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -60,8 +64,6 @@ func (*ReviewTutor) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case reviewtutor.FieldReviewMsg:
 			values[i] = new(sql.NullString)
-		case reviewtutor.ForeignKeys[0]: // tutor_review_tutor
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type ReviewTutor", columns[i])
 		}
@@ -97,13 +99,6 @@ func (rt *ReviewTutor) assignValues(columns []string, values []any) error {
 				rt.ReviewMsg = new(string)
 				*rt.ReviewMsg = value.String
 			}
-		case reviewtutor.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullScanner); !ok {
-				return fmt.Errorf("unexpected type %T for field tutor_review_tutor", values[i])
-			} else if value.Valid {
-				rt.tutor_review_tutor = new(uuid.UUID)
-				*rt.tutor_review_tutor = *value.S.(*uuid.UUID)
-			}
 		}
 	}
 	return nil
@@ -112,6 +107,11 @@ func (rt *ReviewTutor) assignValues(columns []string, values []any) error {
 // QueryTutor queries the "tutor" edge of the ReviewTutor entity.
 func (rt *ReviewTutor) QueryTutor() *TutorQuery {
 	return NewReviewTutorClient(rt.config).QueryTutor(rt)
+}
+
+// QueryStudent queries the "student" edge of the ReviewTutor entity.
+func (rt *ReviewTutor) QueryStudent() *StudentQuery {
+	return NewReviewTutorClient(rt.config).QueryStudent(rt)
 }
 
 // Update returns a builder for updating this ReviewTutor.
