@@ -32,19 +32,19 @@ const (
 	// Table holds the table name of the schedule in the database.
 	Table = "schedules"
 	// TutorTable is the table that holds the tutor relation/edge.
-	TutorTable = "schedules"
+	TutorTable = "tutors"
 	// TutorInverseTable is the table name for the Tutor entity.
 	// It exists in this package in order to avoid circular dependency with the "tutor" package.
 	TutorInverseTable = "tutors"
 	// TutorColumn is the table column denoting the tutor relation/edge.
-	TutorColumn = "tutor_schedule"
+	TutorColumn = "schedule_tutor"
 	// ClassTable is the table that holds the class relation/edge.
-	ClassTable = "schedules"
+	ClassTable = "classes"
 	// ClassInverseTable is the table name for the Class entity.
 	// It exists in this package in order to avoid circular dependency with the "class" package.
 	ClassInverseTable = "classes"
 	// ClassColumn is the table column denoting the class relation/edge.
-	ClassColumn = "class_schedule"
+	ClassColumn = "schedule_class"
 )
 
 // Columns holds all SQL columns for schedule fields.
@@ -59,13 +59,6 @@ var Columns = []string{
 	FieldDay6,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "schedules"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"class_schedule",
-	"tutor_schedule",
-}
-
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
@@ -73,29 +66,10 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
-			return true
-		}
-	}
 	return false
 }
 
 var (
-	// DefaultDay0 holds the default value on creation for the "day_0" field.
-	DefaultDay0 bool
-	// DefaultDay1 holds the default value on creation for the "day_1" field.
-	DefaultDay1 bool
-	// DefaultDay2 holds the default value on creation for the "day_2" field.
-	DefaultDay2 bool
-	// DefaultDay3 holds the default value on creation for the "day_3" field.
-	DefaultDay3 bool
-	// DefaultDay4 holds the default value on creation for the "day_4" field.
-	DefaultDay4 bool
-	// DefaultDay5 holds the default value on creation for the "day_5" field.
-	DefaultDay5 bool
-	// DefaultDay6 holds the default value on creation for the "day_6" field.
-	DefaultDay6 bool
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )

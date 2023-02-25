@@ -54,187 +54,12 @@ func IDLTE(id uuid.UUID) predicate.Schedule {
 	return predicate.Schedule(sql.FieldLTE(FieldID, id))
 }
 
-// Day0 applies equality check predicate on the "day_0" field. It's identical to Day0EQ.
-func Day0(v bool) predicate.Schedule {
-	return predicate.Schedule(sql.FieldEQ(FieldDay0, v))
-}
-
-// Day1 applies equality check predicate on the "day_1" field. It's identical to Day1EQ.
-func Day1(v bool) predicate.Schedule {
-	return predicate.Schedule(sql.FieldEQ(FieldDay1, v))
-}
-
-// Day2 applies equality check predicate on the "day_2" field. It's identical to Day2EQ.
-func Day2(v bool) predicate.Schedule {
-	return predicate.Schedule(sql.FieldEQ(FieldDay2, v))
-}
-
-// Day3 applies equality check predicate on the "day_3" field. It's identical to Day3EQ.
-func Day3(v bool) predicate.Schedule {
-	return predicate.Schedule(sql.FieldEQ(FieldDay3, v))
-}
-
-// Day4 applies equality check predicate on the "day_4" field. It's identical to Day4EQ.
-func Day4(v bool) predicate.Schedule {
-	return predicate.Schedule(sql.FieldEQ(FieldDay4, v))
-}
-
-// Day5 applies equality check predicate on the "day_5" field. It's identical to Day5EQ.
-func Day5(v bool) predicate.Schedule {
-	return predicate.Schedule(sql.FieldEQ(FieldDay5, v))
-}
-
-// Day6 applies equality check predicate on the "day_6" field. It's identical to Day6EQ.
-func Day6(v bool) predicate.Schedule {
-	return predicate.Schedule(sql.FieldEQ(FieldDay6, v))
-}
-
-// Day0EQ applies the EQ predicate on the "day_0" field.
-func Day0EQ(v bool) predicate.Schedule {
-	return predicate.Schedule(sql.FieldEQ(FieldDay0, v))
-}
-
-// Day0NEQ applies the NEQ predicate on the "day_0" field.
-func Day0NEQ(v bool) predicate.Schedule {
-	return predicate.Schedule(sql.FieldNEQ(FieldDay0, v))
-}
-
-// Day0IsNil applies the IsNil predicate on the "day_0" field.
-func Day0IsNil() predicate.Schedule {
-	return predicate.Schedule(sql.FieldIsNull(FieldDay0))
-}
-
-// Day0NotNil applies the NotNil predicate on the "day_0" field.
-func Day0NotNil() predicate.Schedule {
-	return predicate.Schedule(sql.FieldNotNull(FieldDay0))
-}
-
-// Day1EQ applies the EQ predicate on the "day_1" field.
-func Day1EQ(v bool) predicate.Schedule {
-	return predicate.Schedule(sql.FieldEQ(FieldDay1, v))
-}
-
-// Day1NEQ applies the NEQ predicate on the "day_1" field.
-func Day1NEQ(v bool) predicate.Schedule {
-	return predicate.Schedule(sql.FieldNEQ(FieldDay1, v))
-}
-
-// Day1IsNil applies the IsNil predicate on the "day_1" field.
-func Day1IsNil() predicate.Schedule {
-	return predicate.Schedule(sql.FieldIsNull(FieldDay1))
-}
-
-// Day1NotNil applies the NotNil predicate on the "day_1" field.
-func Day1NotNil() predicate.Schedule {
-	return predicate.Schedule(sql.FieldNotNull(FieldDay1))
-}
-
-// Day2EQ applies the EQ predicate on the "day_2" field.
-func Day2EQ(v bool) predicate.Schedule {
-	return predicate.Schedule(sql.FieldEQ(FieldDay2, v))
-}
-
-// Day2NEQ applies the NEQ predicate on the "day_2" field.
-func Day2NEQ(v bool) predicate.Schedule {
-	return predicate.Schedule(sql.FieldNEQ(FieldDay2, v))
-}
-
-// Day2IsNil applies the IsNil predicate on the "day_2" field.
-func Day2IsNil() predicate.Schedule {
-	return predicate.Schedule(sql.FieldIsNull(FieldDay2))
-}
-
-// Day2NotNil applies the NotNil predicate on the "day_2" field.
-func Day2NotNil() predicate.Schedule {
-	return predicate.Schedule(sql.FieldNotNull(FieldDay2))
-}
-
-// Day3EQ applies the EQ predicate on the "day_3" field.
-func Day3EQ(v bool) predicate.Schedule {
-	return predicate.Schedule(sql.FieldEQ(FieldDay3, v))
-}
-
-// Day3NEQ applies the NEQ predicate on the "day_3" field.
-func Day3NEQ(v bool) predicate.Schedule {
-	return predicate.Schedule(sql.FieldNEQ(FieldDay3, v))
-}
-
-// Day3IsNil applies the IsNil predicate on the "day_3" field.
-func Day3IsNil() predicate.Schedule {
-	return predicate.Schedule(sql.FieldIsNull(FieldDay3))
-}
-
-// Day3NotNil applies the NotNil predicate on the "day_3" field.
-func Day3NotNil() predicate.Schedule {
-	return predicate.Schedule(sql.FieldNotNull(FieldDay3))
-}
-
-// Day4EQ applies the EQ predicate on the "day_4" field.
-func Day4EQ(v bool) predicate.Schedule {
-	return predicate.Schedule(sql.FieldEQ(FieldDay4, v))
-}
-
-// Day4NEQ applies the NEQ predicate on the "day_4" field.
-func Day4NEQ(v bool) predicate.Schedule {
-	return predicate.Schedule(sql.FieldNEQ(FieldDay4, v))
-}
-
-// Day4IsNil applies the IsNil predicate on the "day_4" field.
-func Day4IsNil() predicate.Schedule {
-	return predicate.Schedule(sql.FieldIsNull(FieldDay4))
-}
-
-// Day4NotNil applies the NotNil predicate on the "day_4" field.
-func Day4NotNil() predicate.Schedule {
-	return predicate.Schedule(sql.FieldNotNull(FieldDay4))
-}
-
-// Day5EQ applies the EQ predicate on the "day_5" field.
-func Day5EQ(v bool) predicate.Schedule {
-	return predicate.Schedule(sql.FieldEQ(FieldDay5, v))
-}
-
-// Day5NEQ applies the NEQ predicate on the "day_5" field.
-func Day5NEQ(v bool) predicate.Schedule {
-	return predicate.Schedule(sql.FieldNEQ(FieldDay5, v))
-}
-
-// Day5IsNil applies the IsNil predicate on the "day_5" field.
-func Day5IsNil() predicate.Schedule {
-	return predicate.Schedule(sql.FieldIsNull(FieldDay5))
-}
-
-// Day5NotNil applies the NotNil predicate on the "day_5" field.
-func Day5NotNil() predicate.Schedule {
-	return predicate.Schedule(sql.FieldNotNull(FieldDay5))
-}
-
-// Day6EQ applies the EQ predicate on the "day_6" field.
-func Day6EQ(v bool) predicate.Schedule {
-	return predicate.Schedule(sql.FieldEQ(FieldDay6, v))
-}
-
-// Day6NEQ applies the NEQ predicate on the "day_6" field.
-func Day6NEQ(v bool) predicate.Schedule {
-	return predicate.Schedule(sql.FieldNEQ(FieldDay6, v))
-}
-
-// Day6IsNil applies the IsNil predicate on the "day_6" field.
-func Day6IsNil() predicate.Schedule {
-	return predicate.Schedule(sql.FieldIsNull(FieldDay6))
-}
-
-// Day6NotNil applies the NotNil predicate on the "day_6" field.
-func Day6NotNil() predicate.Schedule {
-	return predicate.Schedule(sql.FieldNotNull(FieldDay6))
-}
-
 // HasTutor applies the HasEdge predicate on the "tutor" edge.
 func HasTutor() predicate.Schedule {
 	return predicate.Schedule(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, TutorTable, TutorColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, TutorTable, TutorColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -246,7 +71,7 @@ func HasTutorWith(preds ...predicate.Tutor) predicate.Schedule {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(TutorInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, TutorTable, TutorColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, TutorTable, TutorColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
@@ -261,7 +86,7 @@ func HasClass() predicate.Schedule {
 	return predicate.Schedule(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, ClassTable, ClassColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, ClassTable, ClassColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -273,7 +98,7 @@ func HasClassWith(preds ...predicate.Class) predicate.Schedule {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ClassInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, ClassTable, ClassColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, ClassTable, ClassColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

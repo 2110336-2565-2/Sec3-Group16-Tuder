@@ -5,15 +5,15 @@ import (
 	"log"
 	"os"
 
-
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/migrate"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/middlewares"
-	routes "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/routes"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent" 
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/migrate" 
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/datas" 
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/middlewares" 
+	routes "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/routes" 
 	godotenv "github.com/joho/godotenv"
 	echo "github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/datas"
+
 )
 
 func init() {
@@ -25,6 +25,7 @@ func init() {
 }
 
 func main() {
+	
 	e := echo.New()
 
 	host := os.Getenv("SERVER_HOST")
@@ -41,15 +42,20 @@ func main() {
 
 	defer client.Close()
 
+
 	if err := client.Schema.Create(context.Background(),
+
+		migrate.WithGlobalUniqueID(true),
 		migrate.WithDropIndex(true),
-		migrate.WithDropColumn(true)); err != nil {
+		migrate.WithDropColumn(true),
+		
+	); err != nil {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
 	// test must reset db as always
-	datas.TestData(client)
-	
+	datas.InsertData(client)
+
 	routes.InitRoutes(client, e)
 	e.Use(middlewares.CorsMiddleware)
 	e.Logger.Fatal(e.Start(port))

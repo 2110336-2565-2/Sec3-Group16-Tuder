@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/golang-jwt/jwt/v4"
 	"net/http"
 
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -26,6 +27,7 @@ func (cR *controllerTutor) GetTutorByUsername(c echo.Context) (err error) {
 		})
 		return
 	}
+
 	tutor, err := cR.service.GetTutorByUsername(uR)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
@@ -101,7 +103,7 @@ func (cR *controllerTutor) UpdateTutor(c echo.Context) (err error) {
 		})
 		return
 	}
-
+	uR.Username = c.Get("user").(*jwt.Token).Claims.(jwt.MapClaims)["username"].(string)
 	tutor, err := cR.service.UpdateTutor(uR)
 
 	if err != nil {
@@ -149,4 +151,55 @@ func (cR *controllerTutor) DeleteTutor(c echo.Context) (err error) {
 		Data:    nil,
 	})
 	return nil
+}
+
+func (cR *controllerTutor) UpdateSchedule(c echo.Context) (err error) {
+	s := &schema.SchemaUpdateSchedule{}
+	if err = c.Bind(s); err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: "invalid request payload",
+			Error:   err,
+		})
+		return
+	}
+	s.Username = c.Get("user").(*jwt.Token).Claims.(jwt.MapClaims)["username"].(string)
+	schedule, err := cR.service.UpdateTutorSchedule(s)
+
+	// success
+	c.JSON(http.StatusOK, schema.SchemaResponses{
+		Success: true,
+		Message: "Schedule edited successfully",
+		Data:    schedule,
+	})
+	return nil
+}
+
+func (cR controllerTutor) GetTutorSchedule(c echo.Context) (err error) {
+	s := &schema.SchemaGetSchedule{}
+	if err = c.Bind(s); err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: "invalid request payload",
+			Error:   err,
+		})
+		return
+	}
+	s.Username = c.Get("user").(*jwt.Token).Claims.(jwt.MapClaims)["username"].(string)
+	schedule, err := cR.service.GetTutorSchedule(s)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: err.Error(),
+			Error:   err,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, schema.SchemaResponses{
+		Success: true,
+		Message: "Get Schedule successfully",
+		Data:    schedule,
+	})
+	return
 }

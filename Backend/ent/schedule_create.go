@@ -23,100 +23,44 @@ type ScheduleCreate struct {
 }
 
 // SetDay0 sets the "day_0" field.
-func (sc *ScheduleCreate) SetDay0(b bool) *ScheduleCreate {
+func (sc *ScheduleCreate) SetDay0(b [24]bool) *ScheduleCreate {
 	sc.mutation.SetDay0(b)
 	return sc
 }
 
-// SetNillableDay0 sets the "day_0" field if the given value is not nil.
-func (sc *ScheduleCreate) SetNillableDay0(b *bool) *ScheduleCreate {
-	if b != nil {
-		sc.SetDay0(*b)
-	}
-	return sc
-}
-
 // SetDay1 sets the "day_1" field.
-func (sc *ScheduleCreate) SetDay1(b bool) *ScheduleCreate {
+func (sc *ScheduleCreate) SetDay1(b [24]bool) *ScheduleCreate {
 	sc.mutation.SetDay1(b)
 	return sc
 }
 
-// SetNillableDay1 sets the "day_1" field if the given value is not nil.
-func (sc *ScheduleCreate) SetNillableDay1(b *bool) *ScheduleCreate {
-	if b != nil {
-		sc.SetDay1(*b)
-	}
-	return sc
-}
-
 // SetDay2 sets the "day_2" field.
-func (sc *ScheduleCreate) SetDay2(b bool) *ScheduleCreate {
+func (sc *ScheduleCreate) SetDay2(b [24]bool) *ScheduleCreate {
 	sc.mutation.SetDay2(b)
 	return sc
 }
 
-// SetNillableDay2 sets the "day_2" field if the given value is not nil.
-func (sc *ScheduleCreate) SetNillableDay2(b *bool) *ScheduleCreate {
-	if b != nil {
-		sc.SetDay2(*b)
-	}
-	return sc
-}
-
 // SetDay3 sets the "day_3" field.
-func (sc *ScheduleCreate) SetDay3(b bool) *ScheduleCreate {
+func (sc *ScheduleCreate) SetDay3(b [24]bool) *ScheduleCreate {
 	sc.mutation.SetDay3(b)
 	return sc
 }
 
-// SetNillableDay3 sets the "day_3" field if the given value is not nil.
-func (sc *ScheduleCreate) SetNillableDay3(b *bool) *ScheduleCreate {
-	if b != nil {
-		sc.SetDay3(*b)
-	}
-	return sc
-}
-
 // SetDay4 sets the "day_4" field.
-func (sc *ScheduleCreate) SetDay4(b bool) *ScheduleCreate {
+func (sc *ScheduleCreate) SetDay4(b [24]bool) *ScheduleCreate {
 	sc.mutation.SetDay4(b)
 	return sc
 }
 
-// SetNillableDay4 sets the "day_4" field if the given value is not nil.
-func (sc *ScheduleCreate) SetNillableDay4(b *bool) *ScheduleCreate {
-	if b != nil {
-		sc.SetDay4(*b)
-	}
-	return sc
-}
-
 // SetDay5 sets the "day_5" field.
-func (sc *ScheduleCreate) SetDay5(b bool) *ScheduleCreate {
+func (sc *ScheduleCreate) SetDay5(b [24]bool) *ScheduleCreate {
 	sc.mutation.SetDay5(b)
 	return sc
 }
 
-// SetNillableDay5 sets the "day_5" field if the given value is not nil.
-func (sc *ScheduleCreate) SetNillableDay5(b *bool) *ScheduleCreate {
-	if b != nil {
-		sc.SetDay5(*b)
-	}
-	return sc
-}
-
 // SetDay6 sets the "day_6" field.
-func (sc *ScheduleCreate) SetDay6(b bool) *ScheduleCreate {
+func (sc *ScheduleCreate) SetDay6(b [24]bool) *ScheduleCreate {
 	sc.mutation.SetDay6(b)
-	return sc
-}
-
-// SetNillableDay6 sets the "day_6" field if the given value is not nil.
-func (sc *ScheduleCreate) SetNillableDay6(b *bool) *ScheduleCreate {
-	if b != nil {
-		sc.SetDay6(*b)
-	}
 	return sc
 }
 
@@ -134,26 +78,34 @@ func (sc *ScheduleCreate) SetNillableID(u *uuid.UUID) *ScheduleCreate {
 	return sc
 }
 
-// SetTutorID sets the "tutor" edge to the Tutor entity by ID.
-func (sc *ScheduleCreate) SetTutorID(id uuid.UUID) *ScheduleCreate {
-	sc.mutation.SetTutorID(id)
+// AddTutorIDs adds the "tutor" edge to the Tutor entity by IDs.
+func (sc *ScheduleCreate) AddTutorIDs(ids ...uuid.UUID) *ScheduleCreate {
+	sc.mutation.AddTutorIDs(ids...)
 	return sc
 }
 
-// SetTutor sets the "tutor" edge to the Tutor entity.
-func (sc *ScheduleCreate) SetTutor(t *Tutor) *ScheduleCreate {
-	return sc.SetTutorID(t.ID)
+// AddTutor adds the "tutor" edges to the Tutor entity.
+func (sc *ScheduleCreate) AddTutor(t ...*Tutor) *ScheduleCreate {
+	ids := make([]uuid.UUID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return sc.AddTutorIDs(ids...)
 }
 
-// SetClassID sets the "class" edge to the Class entity by ID.
-func (sc *ScheduleCreate) SetClassID(id uuid.UUID) *ScheduleCreate {
-	sc.mutation.SetClassID(id)
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (sc *ScheduleCreate) AddClasIDs(ids ...uuid.UUID) *ScheduleCreate {
+	sc.mutation.AddClasIDs(ids...)
 	return sc
 }
 
-// SetClass sets the "class" edge to the Class entity.
-func (sc *ScheduleCreate) SetClass(c *Class) *ScheduleCreate {
-	return sc.SetClassID(c.ID)
+// AddClass adds the "class" edges to the Class entity.
+func (sc *ScheduleCreate) AddClass(c ...*Class) *ScheduleCreate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return sc.AddClasIDs(ids...)
 }
 
 // Mutation returns the ScheduleMutation object of the builder.
@@ -191,34 +143,6 @@ func (sc *ScheduleCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (sc *ScheduleCreate) defaults() {
-	if _, ok := sc.mutation.Day0(); !ok {
-		v := schedule.DefaultDay0
-		sc.mutation.SetDay0(v)
-	}
-	if _, ok := sc.mutation.Day1(); !ok {
-		v := schedule.DefaultDay1
-		sc.mutation.SetDay1(v)
-	}
-	if _, ok := sc.mutation.Day2(); !ok {
-		v := schedule.DefaultDay2
-		sc.mutation.SetDay2(v)
-	}
-	if _, ok := sc.mutation.Day3(); !ok {
-		v := schedule.DefaultDay3
-		sc.mutation.SetDay3(v)
-	}
-	if _, ok := sc.mutation.Day4(); !ok {
-		v := schedule.DefaultDay4
-		sc.mutation.SetDay4(v)
-	}
-	if _, ok := sc.mutation.Day5(); !ok {
-		v := schedule.DefaultDay5
-		sc.mutation.SetDay5(v)
-	}
-	if _, ok := sc.mutation.Day6(); !ok {
-		v := schedule.DefaultDay6
-		sc.mutation.SetDay6(v)
-	}
 	if _, ok := sc.mutation.ID(); !ok {
 		v := schedule.DefaultID()
 		sc.mutation.SetID(v)
@@ -227,11 +151,26 @@ func (sc *ScheduleCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (sc *ScheduleCreate) check() error {
-	if _, ok := sc.mutation.TutorID(); !ok {
-		return &ValidationError{Name: "tutor", err: errors.New(`ent: missing required edge "Schedule.tutor"`)}
+	if _, ok := sc.mutation.Day0(); !ok {
+		return &ValidationError{Name: "day_0", err: errors.New(`ent: missing required field "Schedule.day_0"`)}
 	}
-	if _, ok := sc.mutation.ClassID(); !ok {
-		return &ValidationError{Name: "class", err: errors.New(`ent: missing required edge "Schedule.class"`)}
+	if _, ok := sc.mutation.Day1(); !ok {
+		return &ValidationError{Name: "day_1", err: errors.New(`ent: missing required field "Schedule.day_1"`)}
+	}
+	if _, ok := sc.mutation.Day2(); !ok {
+		return &ValidationError{Name: "day_2", err: errors.New(`ent: missing required field "Schedule.day_2"`)}
+	}
+	if _, ok := sc.mutation.Day3(); !ok {
+		return &ValidationError{Name: "day_3", err: errors.New(`ent: missing required field "Schedule.day_3"`)}
+	}
+	if _, ok := sc.mutation.Day4(); !ok {
+		return &ValidationError{Name: "day_4", err: errors.New(`ent: missing required field "Schedule.day_4"`)}
+	}
+	if _, ok := sc.mutation.Day5(); !ok {
+		return &ValidationError{Name: "day_5", err: errors.New(`ent: missing required field "Schedule.day_5"`)}
+	}
+	if _, ok := sc.mutation.Day6(); !ok {
+		return &ValidationError{Name: "day_6", err: errors.New(`ent: missing required field "Schedule.day_6"`)}
 	}
 	return nil
 }
@@ -269,37 +208,37 @@ func (sc *ScheduleCreate) createSpec() (*Schedule, *sqlgraph.CreateSpec) {
 		_spec.ID.Value = &id
 	}
 	if value, ok := sc.mutation.Day0(); ok {
-		_spec.SetField(schedule.FieldDay0, field.TypeBool, value)
-		_node.Day0 = &value
+		_spec.SetField(schedule.FieldDay0, field.TypeJSON, value)
+		_node.Day0 = value
 	}
 	if value, ok := sc.mutation.Day1(); ok {
-		_spec.SetField(schedule.FieldDay1, field.TypeBool, value)
-		_node.Day1 = &value
+		_spec.SetField(schedule.FieldDay1, field.TypeJSON, value)
+		_node.Day1 = value
 	}
 	if value, ok := sc.mutation.Day2(); ok {
-		_spec.SetField(schedule.FieldDay2, field.TypeBool, value)
-		_node.Day2 = &value
+		_spec.SetField(schedule.FieldDay2, field.TypeJSON, value)
+		_node.Day2 = value
 	}
 	if value, ok := sc.mutation.Day3(); ok {
-		_spec.SetField(schedule.FieldDay3, field.TypeBool, value)
-		_node.Day3 = &value
+		_spec.SetField(schedule.FieldDay3, field.TypeJSON, value)
+		_node.Day3 = value
 	}
 	if value, ok := sc.mutation.Day4(); ok {
-		_spec.SetField(schedule.FieldDay4, field.TypeBool, value)
-		_node.Day4 = &value
+		_spec.SetField(schedule.FieldDay4, field.TypeJSON, value)
+		_node.Day4 = value
 	}
 	if value, ok := sc.mutation.Day5(); ok {
-		_spec.SetField(schedule.FieldDay5, field.TypeBool, value)
-		_node.Day5 = &value
+		_spec.SetField(schedule.FieldDay5, field.TypeJSON, value)
+		_node.Day5 = value
 	}
 	if value, ok := sc.mutation.Day6(); ok {
-		_spec.SetField(schedule.FieldDay6, field.TypeBool, value)
-		_node.Day6 = &value
+		_spec.SetField(schedule.FieldDay6, field.TypeJSON, value)
+		_node.Day6 = value
 	}
 	if nodes := sc.mutation.TutorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
 			Table:   schedule.TutorTable,
 			Columns: []string{schedule.TutorColumn},
 			Bidi:    false,
@@ -313,13 +252,12 @@ func (sc *ScheduleCreate) createSpec() (*Schedule, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.tutor_schedule = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := sc.mutation.ClassIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
 			Table:   schedule.ClassTable,
 			Columns: []string{schedule.ClassColumn},
 			Bidi:    false,
@@ -333,7 +271,6 @@ func (sc *ScheduleCreate) createSpec() (*Schedule, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.class_schedule = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

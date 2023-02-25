@@ -1,17 +1,17 @@
 package schema
 
 import (
-	
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"github.com/google/uuid"
-	
 )
 
 type User struct {
 	ent.Schema
 }
+
 // Todo holds the schema definition for the Todo entity.
 // type UserMixin struct {
 // 	mixin.Schema
@@ -36,18 +36,11 @@ func (User) Fields() []ent.Field {
 	}
 }
 
-// func (UserMixin) MixinEdges() []ent.Edge {
-// 	return []ent.Edge{
-// 		edge.To("issue_report", IssueReport.Type),
-// 	}
-// }
-
-
-// func (User) Mixin() []ent.Mixin {
-// 	return []ent.Mixin{
-// 		UserMixin{},
-// 	}
-// }
+func (User) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("users_username_key").Unique().Fields("username", "role"),
+	}
+}
 
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{

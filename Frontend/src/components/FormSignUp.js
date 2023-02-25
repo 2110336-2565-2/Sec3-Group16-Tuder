@@ -36,7 +36,7 @@ export default function FormSignUp(){
             username : username,
             password: password,
             email: email,
-            confirmpassword: confirmpassword,
+            confirm_password: confirmpassword,
             firstname: firstname,
             lastname: lastname,
             address: address,

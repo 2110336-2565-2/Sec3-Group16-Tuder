@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -80,7 +79,7 @@ func (cq *ClassQuery) QuerySchedule() *ScheduleQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(class.Table, class.FieldID, selector),
 			sqlgraph.To(schedule.Table, schedule.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, class.ScheduleTable, class.ScheduleColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, class.ScheduleTable, class.ScheduleColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -451,7 +450,7 @@ func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class,
 			cq.withCourse != nil,
 		}
 	)
-	if cq.withStudent != nil || cq.withCourse != nil {
+	if cq.withSchedule != nil || cq.withStudent != nil || cq.withCourse != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -497,30 +496,34 @@ func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class,
 }
 
 func (cq *ClassQuery) loadSchedule(ctx context.Context, query *ScheduleQuery, nodes []*Class, init func(*Class), assign func(*Class, *Schedule)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[uuid.UUID]*Class)
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Class)
 	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
+		if nodes[i].class_schedule == nil {
+			continue
+		}
+		fk := *nodes[i].class_schedule
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	query.withFKs = true
-	query.Where(predicate.Schedule(func(s *sql.Selector) {
-		s.Where(sql.InValues(class.ScheduleColumn, fks...))
-	}))
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(schedule.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.class_schedule
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "class_schedule" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "class_schedule" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "class_schedule" returned %v`, n.ID)
 		}
-		assign(node, n)
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }

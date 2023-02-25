@@ -10,8 +10,9 @@ import Courses from './pages/Courses';
 import Report from './pages/Report';
 import ForgetPassword from './pages/ForgetPassword';
 import ErrorPage from './pages/ErrorPage';
+import { QueryClientProvider, QueryClient } from 'react-query';
 
-
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
@@ -46,7 +47,9 @@ const router = createBrowserRouter([
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
     <RouterProvider router={router} />
+    </QueryClientProvider>
   </React.StrictMode>
 );
 
