@@ -18,9 +18,9 @@ export default function Profile() {
         <TopSection>
             <Role>{capitalizeFirstLetter(user.role)}</Role>
             <ProfileImageWrapper>
-            <ProfileImage src={user.profilePictureURL} />
+            <ProfileImage src={user.profile_picture_URL} />
             </ProfileImageWrapper>
-            <Name>{user.firstName + " " + user.lastName}</Name>
+            <Name>{user.first_name + " " + user.last_name}</Name>
             <Email>{user.email}</Email>
         </TopSection>
         <MiddleSection>

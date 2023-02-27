@@ -2,15 +2,15 @@ export const tutorFields = [
   {
     label: "First Name",
     type: "text",
-    id: "firstName",
-    name: "firstName",
+    id: "first_name",
+    name: "first_name",
     width: "",
   },
   {
     label: "Last Name",
     type: "text",
-    id: "lastName",
-    name: "lastName",
+    id: "last_name",
+    name: "last_name",
     width: "",
   },
   { 
@@ -30,8 +30,8 @@ export const tutorFields = [
   {
     label: "Contact Number",
     type: "text",
-    id: "contactNumber",
-    name: "contactNumber",
+    id: "phone",
+    name: "phone",
     width: "100%",
   },
   {
@@ -50,8 +50,8 @@ export const tutorFields = [
   {
     label: "Birth Date",
     type: "date",
-    id: "birthDate",
-    name: "birthDate",
+    id: "birth_date",
+    name: "birth_date",
     width: "",
   },
   {
@@ -64,44 +64,44 @@ export const tutorFields = [
   {
     label: "Available Time",
     type: "time",
-    id: "availableTime",
-    name: "availableTime",
+    id: "schedule",
+    name: "schedule",
     width: "100%",
   }
 ];
 
 export const dummyStudent = {
   role: "student",
-  profilePictureURL:
+  profile_picture_URL:
     "https://i.pinimg.com/originals/68/12/46/681246b04458bbb03a7120b68c0bad01.jpg",
-  firstName: "Mehrab",
-  lastName: "Jaidee",
+  first_name: "Mehrab",
+  last_name: "Jaidee",
   email: "mehrab@gmail.com",
   address: "123/456 Bangkoontien Nontaburi 11110",
-  contactNumber: "0812345678",
+  phone: "0812345678",
   gender: "female",
-  birthDate: "2010-10-10",
+  birth_date: "2010-10-10",
   school: "มหาวิทยาลัยนนทบุรี",
 };
 
 export const dummyTutor = {
   role: "tutor",
-  profilePictureURL:
+  profile_picture_URL:
     "https://i.pinimg.com/originals/68/12/46/681246b04458bbb03a7120b68c0bad01.jpg",
-  firstName: "Mehrab",
-  lastName: "Jaidee",
+  first_name: "Mehrab",
+  last_name: "Jaidee",
   email: "mehrab@gmail.com",
   address: "123/456 Bangkoontien Nontaburi 11110",
-  contactNumber: "0812345678",
+  phone: "0812345678",
   gender: "female",
-  birthdate: "2010-10-10",
-  citizenID: "1234567890123",
+  birth_date: "2010-10-10",
+  citizen_id: "1234567890123",
   description:
     "Experienced tutor with a passion for education and helping students succeed. With a Master's degree in Education and 5 years of teaching experience, I have a proven track record of improving student performance and confidence in subjects such as Math, English, and Science. I customize my lessons to meet each student's individual needs and learning style, creating a supportive and engaging environment for maximum success. Outside of the classroom, I enjoy reading, hiking, and trying new recipes. Let's work together to reach your educational goals!",
   bankName: "Kasikorn",
   accountNumber: "1234567890",
   accountName: "Mehrab Jaidee",
-  availableTime: [
+  schedule: [
     {
       day: "Sunday",
       timeSlot: [

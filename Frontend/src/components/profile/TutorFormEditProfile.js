@@ -8,17 +8,7 @@ import DateInput from "./DateInput";
 import TimeSelector from "./TimeSelector";
 
 export default function TutorFormEditProfile({ user }) {
-  const [formData, setFormData] = useState({
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-    address: user.address,
-    contactNumber: user.contactNumber,
-    gender: user.gender,
-    birthDate: user.birthDate,
-    description: user.description,
-    availableTime: user.availableTime,
-  });
+  const [formData, setFormData] = useState(user);
 
   const handleChange = (e) => {
     setFormData({
@@ -31,7 +21,7 @@ export default function TutorFormEditProfile({ user }) {
     <Container>
       <Title>Edit Profile</Title>
       <FormP.ProfilePictureWrapper>
-        <FormP.ProfilePicture src={user.profilePictureURL} />
+        <FormP.ProfilePicture src={formData.profile_picture_URL} />
         <FormP.CameraIconWrapper>
           <FormP.CameraIcon />
         </FormP.CameraIconWrapper>
