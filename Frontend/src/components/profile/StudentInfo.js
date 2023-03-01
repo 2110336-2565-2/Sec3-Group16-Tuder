@@ -10,7 +10,7 @@ export default function StudentInfo({user}) {
       </InfoWrapper>
       <InfoWrapper>
         <InfoTitle>Contact Number</InfoTitle>
-        <InfoContent>{user.contactNumber}</InfoContent>
+        <InfoContent>{user.phone}</InfoContent>
       </InfoWrapper>
       <InfoWrapper>
         <InfoTitle>Gender</InfoTitle>
@@ -18,7 +18,7 @@ export default function StudentInfo({user}) {
       </InfoWrapper>
       <InfoWrapper>
         <InfoTitle>Birth Date</InfoTitle>
-        <InfoContent>{user.birthdate}</InfoContent>
+        <InfoContent>{user.birth_date}</InfoContent>
       </InfoWrapper>
       <InfoWrapper>
         <InfoTitle>School</InfoTitle>

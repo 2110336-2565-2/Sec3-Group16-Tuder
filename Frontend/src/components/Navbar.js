@@ -43,7 +43,7 @@ export default function Navbar(){
         }else if(content.title === 'Sign In'){
             return <NavbarItem key="signIn"><TuderLinkNav to={content.link} key={index}>{content.title}</TuderLinkNav></NavbarItem>
         }else if(content.title === 'Sign Out'){
-            return <NavbarItem key="signOut"><TuderButton type='red-button' onClick={signOutHandler} key={index}>{content.title}</TuderButton></NavbarItem>
+            return <NavbarItem key="signOut"><TuderButton to={content.link} type='red-button' onClick={signOutHandler} key={index}>{content.title}</TuderButton></NavbarItem>
         }else{
             const urlLink = (content.link)?content.link:("/" + content.title.toLowerCase().replace(/ /g, "-"));
             return <NavbarItem key={content.title}><TuderLinkNav to= {urlLink} key={index}>{content.title}</TuderLinkNav></NavbarItem>

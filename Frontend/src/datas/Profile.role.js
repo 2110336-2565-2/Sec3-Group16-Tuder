@@ -13,12 +13,12 @@ export const tutorFields = [
     name: "last_name",
     width: "",
   },
-  { 
-    label: "Email", 
-    type: "email", 
-    id: "email", 
-    name: "email", 
-    width: "100%" 
+  {
+    label: "Email",
+    type: "email",
+    id: "email",
+    name: "email",
+    width: "100%",
   },
   {
     label: "Address",
@@ -67,7 +67,72 @@ export const tutorFields = [
     id: "schedule",
     name: "schedule",
     width: "100%",
-  }
+  },
+];
+
+export const studentFields = [
+  {
+    label: "First Name",
+    type: "text",
+    id: "first_name",
+    name: "first_name",
+    width: "",
+  },
+  {
+    label: "Last Name",
+    type: "text",
+    id: "last_name",
+    name: "last_name",
+    width: "",
+  },
+  {
+    label: "Email",
+    type: "email",
+    id: "email",
+    name: "email",
+    width: "100%",
+  },
+  {
+    label: "Address",
+    type: "text",
+    id: "address",
+    name: "address",
+    width: "100%",
+  },
+  {
+    label: "Contact Number",
+    type: "text",
+    id: "phone",
+    name: "phone",
+    width: "100%",
+  },
+  {
+    label: "Gender",
+    type: "select",
+    id: "gender",
+    name: "gender",
+    isRequired: true,
+    options: [
+      { value: "", label: "Please select", disabled: true, hidden: true },
+      { value: "male", label: "male" },
+      { value: "female", label: "female" },
+    ],
+    width: "",
+  },
+  {
+    label: "Birth Date",
+    type: "date",
+    id: "birth_date",
+    name: "birth_date",
+    width: "",
+  },
+  {
+    label: "School",
+    type: "text",
+    id: "school",
+    name: "school",
+    width: "100%",
+  },
 ];
 
 export const dummyStudent = {

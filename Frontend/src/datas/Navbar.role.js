@@ -16,7 +16,7 @@ const navbarContent = [
             {title: 'My Courses', link: '/my-courses'},
             {title: 'My Classes', link: '/my-classes'},
             {title: 'Profile', link: '/profile'},
-            {title: 'Sign Out', link: '/sign-out'},
+            {title: 'Sign Out', link: '/'},
         ]
     },
     {
@@ -25,7 +25,7 @@ const navbarContent = [
             {title: 'Home', link: '/'},
             {title: 'My Classes', link: '/my-classes'},
             {title: 'Profile', link: '/profile'},
-            {title: 'Sign Out', link: '/sign-out'},
+            {title: 'Sign Out', link: '/'},
         ]
     },
     {
