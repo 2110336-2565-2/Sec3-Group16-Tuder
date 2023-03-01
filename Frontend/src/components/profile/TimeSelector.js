@@ -3,7 +3,11 @@ import TimePicker from "react-time-picker";
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { FormP } from "./ProfileStyle";
-import { adjustFormat, isOverlapped, getMergedTimeSlot } from "../../utils/profile/timeHandler.js";
+import {
+  adjustFormat,
+  isOverlapped,
+  getMergedTimeSlot,
+} from "../../utils/profile/timeHandler.js";
 
 //icon
 import { ClockCircleOutlined, DeleteOutlined } from "@ant-design/icons";
@@ -16,7 +20,6 @@ export default function TimeSelector({
   onChange,
   width,
 }) {
-  const [availableTime , setAvailableTime] = useState(value);
   const days = [
     { day: "SUN", value: "Sunday" },
     { day: "MON", value: "Monday" },
@@ -26,6 +29,21 @@ export default function TimeSelector({
     { day: "FRI", value: "Friday" },
     { day: "SAT", value: "Saturday" },
   ];
+
+  const [availableTime, setAvailableTime] = useState(() => {
+    const initialAvailableTime = days.map((day) => ({
+      day: day.value,
+      timeSlot: [],
+    }));
+  
+    const updatedAvailableTime = initialAvailableTime.map((day) => {
+      const daySchedule = value.find((schedule) => schedule.day === day.day);
+  
+      return daySchedule ? daySchedule : day;
+    });
+    return updatedAvailableTime;
+  });
+  
   const [selectedDay, setSelectedDay] = useState("Sunday");
   const [timeSlot, setTimeSlot] = useState([]);
   // To be added timeSlot
@@ -56,7 +74,7 @@ export default function TimeSelector({
 
   const handleAddOnClick = () => {
     // Check if from === to -> Refractor this
-    if (isOverlapped(timeSlotToAdd, timeSlot)){
+    if (isOverlapped(timeSlotToAdd, timeSlot)) {
       return;
     }
     const mergedTimeSlot = getMergedTimeSlot(timeSlot, timeSlotToAdd);
@@ -78,16 +96,24 @@ export default function TimeSelector({
 
   useEffect(() => {
     const newTimeSlots = availableTime.filter((day) => day.day === selectedDay);
-    newTimeSlots.length > 0 ? setTimeSlot(newTimeSlots[0].timeSlot) : setTimeSlot([]);
+    newTimeSlots.length > 0
+      ? setTimeSlot(newTimeSlots[0].timeSlot)
+      : setTimeSlot([]);
     // Sort time slot
-    if (newTimeSlots.length === 0){
+    if (newTimeSlots.length === 0) {
       setTimeSlot([]);
-    }else{
-      setTimeSlot(newTimeSlots[0].timeSlot.sort((a, b) => {
-        const aMinutes = parseInt(a.from.split(':')[0], 10) * 60 + parseInt(a.from.split(':')[1], 10);
-        const bMinutes = parseInt(b.from.split(':')[0], 10) * 60 + parseInt(b.from.split(':')[1], 10);
-        return aMinutes - bMinutes;
-      }));
+    } else {
+      setTimeSlot(
+        newTimeSlots[0].timeSlot.sort((a, b) => {
+          const aMinutes =
+            parseInt(a.from.split(":")[0], 10) * 60 +
+            parseInt(a.from.split(":")[1], 10);
+          const bMinutes =
+            parseInt(b.from.split(":")[0], 10) * 60 +
+            parseInt(b.from.split(":")[1], 10);
+          return aMinutes - bMinutes;
+        })
+      );
     }
   }, [selectedDay, availableTime]);
 
@@ -138,9 +164,9 @@ export default function TimeSelector({
                     {time.from} - {time.to}
                   </span>
                 </SlotWrapper>
-                <DeleteIcon onClick={
-                  () => handleDeleteOnClick(time.from, time.to)
-                } />
+                <DeleteIcon
+                  onClick={() => handleDeleteOnClick(time.from, time.to)}
+                />
               </TimeSlot>
             );
           })}
