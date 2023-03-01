@@ -3,39 +3,39 @@ const navbarContent = [
         role: 'guest',
         content:[
             {title: 'Home', link: '/'},
-            {title: 'Report', link: '/Report'},
-            {title: 'Courses', link: '/Courses'},
-            {title: 'Sign In', link: '/SignIn'},
-            {title: 'Sign Up', link: '/SignUp'},
+            {title: 'Report', link: '/report'},
+            {title: 'Courses', link: '/courses'},
+            {title: 'Sign In', link: '/sign-in'},
+            {title: 'Sign Up', link: '/sign-up'},
         ]
     },
     {
         role: 'tutor',
         content:[
             {title: 'Home', link: '/'},
-            {title: 'My Courses', link: '/MyCourses'},
-            {title: 'My Classes', link: '/MyClasses'},
-            {title: 'Account', link: '/Account'},
-            {title: 'Sign Out', link: '/SignOut'},
+            {title: 'My Courses', link: '/my-courses'},
+            {title: 'My Classes', link: '/my-classes'},
+            {title: 'Profile', link: '/profile'},
+            {title: 'Sign Out', link: '/sign-out'},
         ]
     },
     {
         role: 'student',
         content:[
             {title: 'Home', link: '/'},
-            {title: 'My Classes', link: '/MyClasses'},
-            {title: 'Account', link: '/Account'},
-            {title: 'Sign Out', link: '/SignOut'},
+            {title: 'My Classes', link: '/my-classes'},
+            {title: 'Profile', link: '/profile'},
+            {title: 'Sign Out', link: '/sign-out'},
         ]
     },
     {
         role: 'admin',
         content:[
             {title: 'Home', link: '/'},
-            {title: 'Courses', link: '/Courses'},
-            {title: 'Teachers', link: '/Teachers'},
-            {title: 'Sign In', link: '/SignIn'},
-            {title: 'Sign Up', link: '/SignUp'},
+            {title: 'Courses', link: '/courses'},
+            {title: 'Teachers', link: '/teachers'},
+            {title: 'Sign In', link: '/sign-in'},
+            {title: 'Sign Up', link: '/sign-up'},
         ]
     }
 ];
