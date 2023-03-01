@@ -72,7 +72,6 @@ export const FormP = {
 
   FormContainer: styled.div`
     width: 100%;
-    padding: 0px 40px;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -82,6 +81,7 @@ export const FormP = {
 
   InputComponent: styled(FormT.Component)`
     width: ${(props) => props.width || "48%"};
+    padding: 0px;
   `,
 
   Label: styled(FormT.Label)`
