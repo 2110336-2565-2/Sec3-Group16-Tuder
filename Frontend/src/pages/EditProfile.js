@@ -1,15 +1,18 @@
 import React from "react";
 import styled from "styled-components";
+import useRole from "../hooks/useRole";
 import { dummyStudent, dummyTutor } from "../datas/Profile.role";
 
-import TutorFormEditProfile from "../components/profile/TutorFormEditProfile";
+import FormEditProfile from "../components/profile/FormEditProfile";
 
 export default function EditProfile() {
-  const user = dummyTutor;
+  // CHANGE THIS TO GET USER FROM BACKEND
+  const [role, handleRole] = useRole();
+  const user = role === "student" ? dummyStudent : dummyTutor;
 
   return (
     <Container>
-      <TutorFormEditProfile user={user} />
+      <FormEditProfile user={user} />
     </Container>
   );
 }
