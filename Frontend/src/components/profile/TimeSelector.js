@@ -3,6 +3,7 @@ import TimePicker from "react-time-picker";
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { FormP } from "./ProfileStyle";
+import { adjustFormat, isOverlapped, getMergedTimeSlot } from "../../utils/profile/timeHandler.js";
 
 //icon
 import { ClockCircleOutlined, DeleteOutlined } from "@ant-design/icons";
@@ -15,7 +16,7 @@ export default function TimeSelector({
   onChange,
   width,
 }) {
-  const availableTime = value;
+  const [availableTime , setAvailableTime] = useState(value);
   const days = [
     { day: "SUN", value: "Sunday" },
     { day: "MON", value: "Monday" },
@@ -29,17 +30,13 @@ export default function TimeSelector({
   const [timeSlot, setTimeSlot] = useState([]);
   // To be added timeSlot
   const [timeSlotToAdd, setTimeSlotToAdd] = useState({
-    from: "00:00",
-    to: "00:00",
+    from: null,
+    to: null,
   });
   const handleTimeSlotToAdd = (time, type) => {
     // mm must be 00
-    if (time && time.split(":")[1] !== "00") {
-      toast.error("Time must be in 00 minutes");
-      // set mm to 00
-      time = time.split(":")[0] + ":00";
-      console.log(time);
-    }
+    time = adjustFormat(time);
+
     if (type === "to") {
       // Check if to time is greater than from time
       if (timeSlotToAdd.from > time) {
@@ -55,13 +52,64 @@ export default function TimeSelector({
       }
       setTimeSlotToAdd({ ...timeSlotToAdd, from: time });
     }
-    console.log(timeSlotToAdd);
+  };
+
+  const handleAddOnClick = () => {
+    // Check if from === to -> Refractor this
+    if (isOverlapped(timeSlotToAdd, timeSlot)){
+      return;
+    }
+    const mergedTimeSlot = getMergedTimeSlot(timeSlot, timeSlotToAdd);
+    // Add new time slot to available time
+    for (let i = 0; i < availableTime.length; i++) {
+      if (availableTime[i].day === selectedDay) {
+        setAvailableTime([
+          ...availableTime.slice(0, i),
+          { ...availableTime[i], timeSlot: mergedTimeSlot },
+          ...availableTime.slice(i + 1),
+        ]);
+        break;
+      }
+    }
+    const e = { target: { name: name, value: availableTime } };
+    onChange(e);
+    setTimeSlotToAdd({ from: null, to: null });
   };
 
   useEffect(() => {
-    const timeSlot = availableTime.filter((day) => day.day === selectedDay);
-    timeSlot.length > 0 ? setTimeSlot(timeSlot[0].timeSlot) : setTimeSlot([]);
+    const newTimeSlots = availableTime.filter((day) => day.day === selectedDay);
+    newTimeSlots.length > 0 ? setTimeSlot(newTimeSlots[0].timeSlot) : setTimeSlot([]);
+    // Sort time slot
+    if (newTimeSlots.length === 0){
+      setTimeSlot([]);
+    }else{
+      setTimeSlot(newTimeSlots[0].timeSlot.sort((a, b) => {
+        const aMinutes = parseInt(a.from.split(':')[0], 10) * 60 + parseInt(a.from.split(':')[1], 10);
+        const bMinutes = parseInt(b.from.split(':')[0], 10) * 60 + parseInt(b.from.split(':')[1], 10);
+        return aMinutes - bMinutes;
+      }));
+    }
   }, [selectedDay, availableTime]);
+
+  const handleDeleteOnClick = (from, to) => {
+    console.log(from, to);
+    // Remove time slot from available time
+    for (let i = 0; i < availableTime.length; i++) {
+      if (availableTime[i].day === selectedDay) {
+        setAvailableTime([
+          ...availableTime.slice(0, i),
+          {
+            ...availableTime[i],
+            timeSlot: availableTime[i].timeSlot.filter(
+              (time) => time.from !== from && time.to !== to
+            ),
+          },
+          ...availableTime.slice(i + 1),
+        ]);
+        break;
+      }
+    }
+  };
 
   return (
     <FormP.InputComponent width={width}>
@@ -83,14 +131,16 @@ export default function TimeSelector({
         <TimeSlotContainer>
           {timeSlot.map((time) => {
             return (
-              <TimeSlot key={time.from + " " + time.start}>
+              <TimeSlot key={time.from + " " + time.to}>
                 <SlotWrapper>
                   <ClockIcon />
                   <span>
                     {time.from} - {time.to}
                   </span>
                 </SlotWrapper>
-                <DeleteIcon />
+                <DeleteIcon onClick={
+                  () => handleDeleteOnClick(time.from, time.to)
+                } />
               </TimeSlot>
             );
           })}
@@ -103,8 +153,6 @@ export default function TimeSelector({
               <CustomTimePicker
                 onChange={(time) => handleTimeSlotToAdd(time, "from")}
                 value={timeSlotToAdd.from}
-                clockIcon={null}
-                clearIcon={null}
                 disableClock={true}
                 format="HH:mm"
               />
@@ -114,14 +162,12 @@ export default function TimeSelector({
               <CustomTimePicker
                 onChange={(time) => handleTimeSlotToAdd(time, "to")}
                 value={timeSlotToAdd.to}
-                clockIcon={null}
-                clearIcon={null}
                 disableClock={true}
                 format="HH:mm"
               />
             </FormP.InputComponent>
           </AddFormWrapper>
-          <Button>Add</Button>
+          <Button onClick={handleAddOnClick}>Add</Button>
         </AddMenu>
       </Container>
     </FormP.InputComponent>
