@@ -2,13 +2,15 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { FormP } from "./ProfileStyle";
 import { tutorFields } from "../../datas/Profile.role";
+import FileUploader from "../global/FileUploader";
 import TextInput from "./TextInput";
 import SelectInput from "./SelectInput";
 import DateInput from "./DateInput";
 import TimeSelector from "./TimeSelector";
 
 export default function TutorFormEditProfile({ user }) {
-  const [formData, setFormData] = useState(user);
+  const [isFileUploaderOpen, setIsFileUploaderOpen] = useState(false);
+  const [formData, setFormData] = useState({...user, newProfilePicture: user.profile_picture_URL});
 
   const handleChange = (e) => {
     setFormData({
@@ -19,9 +21,14 @@ export default function TutorFormEditProfile({ user }) {
 
   return (
     <Container>
+      <FileUploader
+        isOpen={isFileUploaderOpen}
+        setIsOpen={setIsFileUploaderOpen}
+        handleChange={handleChange}
+      />
       <Title>Edit Profile</Title>
-      <FormP.ProfilePictureWrapper>
-        <FormP.ProfilePicture src={formData.profile_picture_URL} />
+      <FormP.ProfilePictureWrapper onClick={()=>setIsFileUploaderOpen(true)}>
+        <FormP.ProfilePicture src={formData.newProfilePicture} />
         <FormP.CameraIconWrapper>
           <FormP.CameraIcon />
         </FormP.CameraIconWrapper>
