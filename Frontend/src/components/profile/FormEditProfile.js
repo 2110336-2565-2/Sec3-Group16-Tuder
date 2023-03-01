@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { FormP } from "./ProfileStyle";
-import { tutorFields } from "../../datas/Profile.role";
+import { studentFields, tutorFields } from "../../datas/Profile.role";
 import FileUploader from "../global/FileUploader";
 import TextInput from "./TextInput";
 import SelectInput from "./SelectInput";
 import DateInput from "./DateInput";
 import TimeSelector from "./TimeSelector";
 
-export default function TutorFormEditProfile({ user }) {
+export default function FormEditProfile({ user }) {
+  const fields = user.role === "student" ? studentFields : tutorFields;
   const [isFileUploaderOpen, setIsFileUploaderOpen] = useState(false);
   const [formData, setFormData] = useState({...user, newProfilePicture: user.profile_picture_URL});
 
@@ -34,7 +35,7 @@ export default function TutorFormEditProfile({ user }) {
         </FormP.CameraIconWrapper>
       </FormP.ProfilePictureWrapper>
       <FormP.FormContainer>
-        {tutorFields.map((field) => {
+        {fields.map((field) => {
           if (field.type === "text" || field.type === "textArea") {
             return (
               <TextInput
