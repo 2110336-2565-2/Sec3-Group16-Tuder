@@ -6,6 +6,7 @@ import (
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	entCourse "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
+	entTutor "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 )
 
@@ -50,7 +51,6 @@ func (r *repositoryCourse) GetCourseByID(sr *schema.SchemaGetCourse) (*ent.Cours
 }
 
 func (r *repositoryCourse) CreateCourse(sr *schema.SchemaCreateCourse) (*ent.Course, error) {
-
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
@@ -58,19 +58,27 @@ func (r *repositoryCourse) CreateCourse(sr *schema.SchemaCreateCourse) (*ent.Cou
 	}
 	// wrap the client with the transaction
 	txc := tx.Client()
+	tutor, err := txc.Tutor.Query().Where(entTutor.IDEQ(sr.Tutor_id)).Only(r.ctx)
 
+	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+		return nil, fmt.Errorf("getting tutor: %w", err)
+	}
 	// create a new course
 	course, err := txc.Course.Create().
 		SetCoursePictureURL(sr.Course_picture_url).
 		SetSubject(sr.Subject).
 		SetDescription(sr.Description).
 		SetPricePerHour(sr.Price_per_hour).
-		SetTutorID(sr.Tutor_id).
+		SetTutorID(tutor.ID).
 		SetLevel(entCourse.Level(sr.Level)).
 		SetTitle(sr.Title).
 		SetTopic(sr.Topic).
 		SetEstimatedTime(sr.Estimate_time).
 		Save(r.ctx)
+
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
 			err = fmt.Errorf("%w: %v", err, rerr)

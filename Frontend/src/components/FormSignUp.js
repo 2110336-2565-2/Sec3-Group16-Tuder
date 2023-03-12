@@ -5,7 +5,7 @@ import signupContent from "../datas/SignUp.role.js";
 import styled from 'styled-components';
 
 import { useNavigate } from 'react-router-dom';
-import { Fragment } from 'react';
+
 
 
 export default function FormSignUp(){
@@ -23,7 +23,13 @@ export default function FormSignUp(){
     const [role, setRole] = useState('');
 
 
-    const [status, setStatus] = useState('waiting');
+    const valueSetter = {"First Name":setFirstName, "Last Name":setLastName,
+     "Username":setUsername, "Email": setEmail, "Password": setPassword,
+      "Confirm Password": setConfirmPassword, "Address" : setAddress,
+       "Contact Number" : setContactNumber, "Gender":setGender,
+        "Birth Date":setBirthDate, "Role":setRole}
+
+    const  setStatus = useState('waiting')[1];
  
     const navigate = useNavigate()
 
@@ -59,9 +65,9 @@ export default function FormSignUp(){
     }
 
     
-
     const signupContents = signupContent.contents;
     const signupContentElement = signupContents.map((content, index) => {
+        
         return (
         
             <FormT.Content key={index}>
@@ -72,8 +78,8 @@ export default function FormSignUp(){
                     let type = ''
                     let boxsize = ''
                     let value = ''
-                    let onChange = eval("{(e) => set" + element.replace(/\s/g, '') + "(e.target.value)}");
-                    
+                    let onChange = (e) => valueSetter[element](e.target.value);
+
                     if(element === 'Username'){
                         type = 'text'
                         boxsize = '315px'
