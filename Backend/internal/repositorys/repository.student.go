@@ -29,10 +29,11 @@ func NewRepositoryStudent(c *ent.Client) RepositoryStudent {
 }
 
 func (rS *repositoryStudent) GetStudents() ([]*ent.Student, error) {
-	students, err := rS.client.Student.Query().All(rS.ctx)
+	students, err := rS.client.Student.Query().WithUser().All(rS.ctx)
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("\nget students successful\n")
 	return students, nil
 }
 

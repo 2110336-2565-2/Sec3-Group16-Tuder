@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"net/http"
+	"github.com/golang-jwt/jwt/v4"
+
 
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 	service "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/services"
@@ -45,6 +47,24 @@ func (cS *controllerStudent) GetStudentByUsername(c echo.Context) (err error) {
 	return nil
 }
 
+func (cS *controllerStudent) GetStudents(c echo.Context) (err error) {
+	students, err := cS.studentService.GetStudents()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: err.Error(),
+			Error:   err,
+		})
+	}
+	c.JSON(http.StatusOK, schema.SchemaResponses{
+		Success: true,
+		Message: "Get students successfully",
+		Data:    students,
+	})
+	return nil
+}
+
+
 func (cS *controllerStudent) CreateStudent(c echo.Context) (err error) {
 	uR := &schema.SchemaCreateStudent{}
 	if err = c.Bind(uR); err != nil {
@@ -84,7 +104,7 @@ func (cS *controllerStudent) UpdateStudent(c echo.Context) (err error) {
 		})
 		return
 	}
-
+	uR.Username = c.Get("user").(*jwt.Token).Claims.(jwt.MapClaims)["username"].(string)
 	student, err := cS.studentService.UpdateStudent(uR)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
