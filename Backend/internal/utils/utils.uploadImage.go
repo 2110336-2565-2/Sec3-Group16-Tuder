@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"context"
@@ -18,7 +18,7 @@ func uploadImageToS3(imageBytes []byte, key string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to load AWS SDK configuration: %v", err)
 	}
-	
+
 	// Create a new S3 client
 	client := s3.NewFromConfig(cfg)
 
