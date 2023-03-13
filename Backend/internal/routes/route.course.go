@@ -13,9 +13,9 @@ func InitCourseRoutes(client *ent.Client, e *echo.Group) {
 	serviceCourse := service.NewServiceCourse(repoCourse)
 	controllerCourse := controller.NewControllerCourse(serviceCourse)
 
-	e.GET("/course", controllerCourse.GetCourseByCourseID)
+	e.GET("/course/:id", controllerCourse.GetCourseByCourseID)
 	e.GET("/courses", controllerCourse.GetCourses)
 	e.POST("/course", controllerCourse.CreateCourse)
-	e.PUT("/course", controllerCourse.UpdateCourse)
-	e.DELETE("/course", controllerCourse.DeleteCourse)
+	e.PUT("/course/:id", controllerCourse.UpdateCourse)
+	e.DELETE("/course/:id", controllerCourse.DeleteCourse)
 }

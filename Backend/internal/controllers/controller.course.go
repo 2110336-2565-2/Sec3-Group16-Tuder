@@ -5,6 +5,7 @@ import (
 
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 	service "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/services"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
@@ -17,14 +18,9 @@ func NewControllerCourse(service service.ServiceCourse) *controllerCourse {
 }
 
 func (cR *controllerCourse) GetCourseByCourseID(c echo.Context) (err error) {
-	uR := &schema.SchemaGetCourse{}
-	if err = c.Bind(uR); err != nil {
-		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
-			Success: false,
-			Message: "invalid request payload",
-			Error:   err,
-		})
-		return
+	id, _ := uuid.Parse(c.Param("id"))
+	uR := &schema.SchemaGetCourse{
+		ID: id,
 	}
 
 	course, err := cR.service.GetCourseByID(uR)
@@ -91,7 +87,10 @@ func (cR *controllerCourse) CreateCourse(c echo.Context) (err error) {
 }
 
 func (cR *controllerCourse) UpdateCourse(c echo.Context) (err error) {
-	uR := &schema.SchemaUpdateCourse{}
+	id, _ := uuid.Parse(c.Param("id"))
+	uR := &schema.SchemaUpdateCourse{
+		ID: id,
+	}
 	if err = c.Bind(uR); err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
 			Success: false,
@@ -119,7 +118,10 @@ func (cR *controllerCourse) UpdateCourse(c echo.Context) (err error) {
 }
 
 func (cR *controllerCourse) DeleteCourse(c echo.Context) (err error) {
-	uR := &schema.SchemaDeleteCourse{}
+	id, _ := uuid.Parse(c.Param("id"))
+	uR := &schema.SchemaDeleteCourse{
+		ID: id,
+	}
 	if err = c.Bind(uR); err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
 			Success: false,
