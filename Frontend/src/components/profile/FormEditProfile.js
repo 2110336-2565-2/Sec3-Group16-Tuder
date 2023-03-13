@@ -13,7 +13,7 @@ export default function FormEditProfile({ user }) {
   const navigate = useNavigate();
   const fields = user.role === "student" ? studentFields : tutorFields;
   const [isFileUploaderOpen, setIsFileUploaderOpen] = useState(false);
-  const [formData, setFormData] = useState({...user, newProfilePicture: user.profile_picture_URL});
+  const [formData, setFormData] = useState({...user, new_profile_picture: user.profile_picture_URL});
 
   // EDIT PROFILE HANDLER CHANGE THIS TO SEND DATA TO BACKEND
   const editProfileHandler = () => {
@@ -24,7 +24,10 @@ export default function FormEditProfile({ user }) {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-    });
+    })
+    // console.log("e.target.name: ", e.target.name);
+    // console.log("e.target.value: ", e.target.value);
+    console.log("formData: ", formData)
   };
 
   return (
@@ -36,7 +39,7 @@ export default function FormEditProfile({ user }) {
       />
       <Title>Edit Profile</Title>
       <FormP.ProfilePictureWrapper onClick={()=>setIsFileUploaderOpen(true)}>
-        <FormP.ProfilePicture src={formData.newProfilePicture} />
+        <FormP.ProfilePicture src={formData.new_profile_picture} />
         <FormP.CameraIconWrapper>
           <FormP.CameraIcon />
         </FormP.CameraIconWrapper>

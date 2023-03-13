@@ -13,11 +13,13 @@ export default function FileUploader({ isOpen, setIsOpen, handleChange }) {
     reader.onloadend = () => {
       handleChange({
         target: {
-          name: "newProfilePicture",
+          name: "new_profile_picture",
           value: reader.result,
         },
       });
     };
+    console.log("addedFile", addedFile)
+    console.log("reader.result", reader.result)
     setIsOpen(false);
   };
 
