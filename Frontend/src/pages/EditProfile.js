@@ -4,6 +4,7 @@ import useRole from "../hooks/useRole";
 import { dummyStudent, dummyTutor } from "../datas/Profile.role";
 
 import FormEditProfile from "../components/profile/FormEditProfile";
+import WaveFooter from "../components/global/WaveFooter";
 
 export default function EditProfile() {
   // CHANGE THIS TO GET USER FROM BACKEND
@@ -13,12 +14,14 @@ export default function EditProfile() {
   return (
     <Container>
       <FormEditProfile user={user} />
+      <WaveFooter backgroundColor={"#fdedeb"} />
     </Container>
   );
 }
 
 const Container = styled.div`
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 50px 0px;

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import StudentInfo from "../components/profile/StudentInfo.js";
 import TutorInfo from "../components/profile/TutorInfo.js";
+import WaveFooter from "../components/global/WaveFooter.js";
 import { dummyStudent, dummyTutor } from "../datas/Profile.role.js";
 import useRole from "../hooks/useRole.js";
 
@@ -41,6 +42,7 @@ export default function Profile() {
           <TutorInfo user={user} />
         )}
       </MiddleSection>
+      <WaveFooter />
     </Container>
   );
 }
