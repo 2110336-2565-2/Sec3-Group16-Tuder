@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { FormP } from "./ProfileStyle";
 import { studentFields, tutorFields } from "../../datas/Profile.role";
+import { updateStudent, updateTutor } from "../../handlers/profile/updateUser";
 import FileUploader from "../global/FileUploader";
 import TextInput from "./TextInput";
 import SelectInput from "./SelectInput";
@@ -11,13 +12,31 @@ import TimeSelector from "./TimeSelector";
 
 export default function FormEditProfile({ user }) {
   const navigate = useNavigate();
+  console.log("user: ", user)
   const fields = user.role === "student" ? studentFields : tutorFields;
   const [isFileUploaderOpen, setIsFileUploaderOpen] = useState(false);
   const [formData, setFormData] = useState({...user, new_profile_picture: user.profile_picture_URL});
 
   // EDIT PROFILE HANDLER CHANGE THIS TO SEND DATA TO BACKEND
-  const editProfileHandler = () => {
+  const submitHandler = (e) => {
+    e.preventDefault();
     console.log("edit profile");
+    console.log(formData)
+    try{
+      if(user.role === "student"){
+        updateStudent(formData).then((res)=>{
+          console.log("res: ", res)
+          navigate("/profile");
+        })
+      }else if(user.role === "tutor"){
+        updateTutor(formData).then((res)=>{
+          console.log("res: ", res)
+          navigate("/profile");
+        })
+      }
+    }catch (error){
+      console.log(error)
+    }
   };
 
   const handleChange = (e) => {
@@ -31,7 +50,7 @@ export default function FormEditProfile({ user }) {
   };
 
   return (
-    <Container>
+    <Form onSubmit={submitHandler} >
       <FileUploader
         isOpen={isFileUploaderOpen}
         setIsOpen={setIsFileUploaderOpen}
@@ -103,13 +122,13 @@ export default function FormEditProfile({ user }) {
       </FormP.FormContainer>
       <ButtonSection>
         <Button type="cancel" onClick={() => navigate("/profile")}>Cancel</Button>
-        <Button type="save" onClick={editProfileHandler}>Save</Button>
+        <Button type="submit">Save</Button>
       </ButtonSection>
-    </Container>
+    </Form>
   );
 }
 
-const Container = styled.div`
+const Form = styled.form`
   width: 50%;
   background-color: white;
   display: flex;

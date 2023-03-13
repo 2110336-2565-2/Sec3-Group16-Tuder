@@ -18,7 +18,7 @@ export default function StudentInfo({user}) {
       </InfoWrapper>
       <InfoWrapper>
         <InfoTitle>Birth Date</InfoTitle>
-        <InfoContent>{user.birth_date}</InfoContent>
+        <InfoContent>{user.birthdate}</InfoContent>
       </InfoWrapper>
       <InfoWrapper>
         <InfoTitle>School</InfoTitle>
