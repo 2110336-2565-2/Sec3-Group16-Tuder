@@ -10,6 +10,7 @@ import (
 
 type ControllerChangePassword interface {
 	ChangePassword(c echo.Context) error
+	CheckPassword(c echo.Context) error
 }
 
 type controllerChangePassword struct {
@@ -25,12 +26,58 @@ func NewControllerChangePassword(s services.ServiceChangePassword) ControllerCha
 func (cC *controllerChangePassword) ChangePassword(c echo.Context) error {
 	user := &schemas.SchemaChangePassword{}
 	if err := c.Bind(user); err != nil {
-		return c.JSON(http.StatusBadRequest, "invalid request")
+		c.JSON(http.StatusBadRequest, schemas.SchemaResponses{
+			Success: false,
+			Message: "invalid request",
+			Data:    err.Error(),
+		})
+
+		return err
 	}
 	err := cC.service.ChangePassword(user)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, "error")
+		c.JSON(http.StatusInternalServerError, schemas.SchemaResponses{
+			Success: false,
+			Message: err.Error(),
+			Data:    nil,
+		})
+		return err
 	}
-	return c.JSON(http.StatusOK, "success")
+
+	c.JSON(http.StatusOK, schemas.SchemaResponses{
+		Success: true,
+		Message: "Change password successfully",
+		Data:    nil,
+	})
+	return nil
+
+}
+
+func (cC *controllerChangePassword) CheckPassword(c echo.Context) error {
+	user := &schemas.SchemaCheckPassword{}
+	if err := c.Bind(user); err != nil {
+		c.JSON(http.StatusBadRequest, schemas.SchemaResponses{
+			Success: false,
+			Message: "invalid request",
+			Data:    err.Error(),
+		})
+		return err
+	}
+	err := cC.service.CheckPassword(user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, schemas.SchemaResponses{
+			Success: false,
+			Message: err.Error(),
+			Data:    nil,
+		})
+		return err
+	}
+
+	c.JSON(http.StatusOK, schemas.SchemaResponses{
+		Success: true,
+		Message: "Correct password",
+		Data:    nil,
+	})
+	return nil
 
 }

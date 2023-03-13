@@ -14,5 +14,6 @@ func InitChangePasswordRoutes(client *ent.Client, e *echo.Group) {
 	controllerChangePassword := controller.NewControllerChangePassword(serviceChangePassword)
 
 	e.POST("/changepassword", controllerChangePassword.ChangePassword)
+	e.POST("/changepassword-check", controllerChangePassword.CheckPassword)
 
 }

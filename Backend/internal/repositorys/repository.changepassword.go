@@ -6,10 +6,12 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	schemas "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
+	utils "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 )
 
 type RepositoryChangePassword interface {
 	ChangePassword(sc *schemas.SchemaChangePassword) error
+	CheckPassword(sc *schemas.SchemaCheckPassword) (*ent.User, error)
 }
 
 type repositoryChangePassword struct {
@@ -27,17 +29,32 @@ func NewRepositoryChangePassword(c *ent.Client) RepositoryChangePassword {
 func (r *repositoryChangePassword) ChangePassword(sc *schemas.SchemaChangePassword) error {
 	user, err := r.client.User.
 		Query().
-		Where(user.EmailEQ(sc.Email)).
+		Where(user.UsernameEQ(sc.Username)).
 		Only(r.ctx)
 	if err != nil {
 		return err
 	}
 
+	hashedPassword, _ := utils.HashPassword(sc.Password)
+
 	_, err = user.Update().
-		SetPassword(sc.NewPassword).
+		SetPassword(hashedPassword).
 		Save(r.ctx)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (r *repositoryChangePassword) CheckPassword(sc *schemas.SchemaCheckPassword) (*ent.User, error) {
+	user, err := r.client.User.
+		Query().
+		Where(user.UsernameEQ(sc.Username)).
+		Only(r.ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }

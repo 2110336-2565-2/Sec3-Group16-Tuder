@@ -1,6 +1,12 @@
 package schemas
 
 type SchemaChangePassword struct {
-	Email       string `json:"email" validate:"required,email"`
-	NewPassword string `json:"newpassword" validate:"required"`
+	Username        string `json:"username" validate:"required"`
+	Password        string `json:"password" validate:"required"`
+	ConfirmPassword string `json:"confirmpassword" validate:"required"`
+}
+
+type SchemaCheckPassword struct {
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }
