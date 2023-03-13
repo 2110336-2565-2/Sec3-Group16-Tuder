@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
+import { toast } from 'react-hot-toast';
 import checkPasswordHandler from '../handlers/checkPasswordHandler.js';
 import useUsername from '../hooks/useUsername.js';
 
@@ -22,8 +23,10 @@ export default function FormChangePassword(){
         }
         try{
             await checkPasswordHandler(checkPasswordData, navigate);
+            toast.success('Correct Password');
         } catch (error){
             console.log(error);
+            toast.error('Wrong Password');
         }
     }
 
@@ -33,11 +36,11 @@ export default function FormChangePassword(){
                 <FormT.Header>Enter your password</FormT.Header>
                 
                 <FormT.Content>
-                    <FormT.TextInput BoxSize='500px' name='email' type='text' placeholder='Enter your Password' value={password} onChange={(e)=>setPassword(e.target.value)}/>
+                    <FormT.TextInput BoxSize='500px' name='email' type='password' placeholder='Enter your Password' value={password} onChange={(e)=>setPassword(e.target.value)}/>
                 </FormT.Content>
     
                 <FormT.Content>
-                    <FormT.Button type='submit' onClick={()=>navigate("/enter-new-password")}>Send</FormT.Button>
+                    <FormT.Button type='submit'>Send</FormT.Button>
                 </FormT.Content>
             </FormFormat>
         </form>
