@@ -28,14 +28,14 @@ func NewRepositoryCourse(c *ent.Client) *repositoryCourse {
 }
 
 func (r *repositoryCourse) GetCourses() ([]*ent.Course, error) {
-	course, err := r.client.Course.
+	courses, err := r.client.Course.
 		Query().
 		WithTutor().
 		All(r.ctx)
 	if err != nil {
 		return nil, err
 	}
-	return course, nil
+	return courses, nil
 }
 
 func (r *repositoryCourse) GetCourseByID(sr *schema.SchemaGetCourse) (*ent.Course, error) {
@@ -44,6 +44,7 @@ func (r *repositoryCourse) GetCourseByID(sr *schema.SchemaGetCourse) (*ent.Cours
 		Where(entCourse.IDEQ(sr.ID)).
 		WithTutor().
 		Only(r.ctx)
+
 	if err != nil {
 		return nil, err
 	}
@@ -78,6 +79,7 @@ func (r *repositoryCourse) CreateCourse(sr *schema.SchemaCreateCourse) (*ent.Cou
 		SetTopic(sr.Topic).
 		SetEstimatedTime(sr.Estimate_time).
 		Save(r.ctx)
+	course.Edges.Tutor = tutor
 
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
@@ -96,6 +98,14 @@ func (r *repositoryCourse) UpdateCourse(sr *schema.SchemaUpdateCourse) (*ent.Cou
 	}
 	// wrap the client with the transaction
 	txc := tx.Client()
+	tutor, err := txc.Tutor.Query().Where(entTutor.IDEQ(sr.Tutor_id)).Only(r.ctx)
+
+	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+		return nil, fmt.Errorf("getting tutor: %w", err)
+	}
 
 	// update a course
 	course, err := txc.Course.UpdateOneID(sr.ID).
@@ -109,6 +119,7 @@ func (r *repositoryCourse) UpdateCourse(sr *schema.SchemaUpdateCourse) (*ent.Cou
 		SetTopic(sr.Topic).
 		SetEstimatedTime(sr.Estimate_time).
 		Save(r.ctx)
+	course.Edges.Tutor = tutor
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
 			err = fmt.Errorf("%w: %v", err, rerr)
