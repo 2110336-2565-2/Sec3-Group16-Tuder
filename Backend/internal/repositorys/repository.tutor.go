@@ -7,6 +7,8 @@ import (
 	entTutor "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	entUser "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
+
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 )
 
 type RepositoryTutor interface {
@@ -118,7 +120,7 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 	}
 	tutor := user.Edges.Tutor
 
-	profilePictureURL,_ := utils.GenerateProfilePictureURL(sr.ProfilePicture,sr.Username)
+	profilePictureURL, _ := utils.GenerateProfilePictureURL(sr.ProfilePicture, sr.Username)
 
 	user, err = txc.User.
 		UpdateOne(user).
