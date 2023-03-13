@@ -47,11 +47,11 @@ const router = createBrowserRouter([
         element: <ForgetPassword />,
       },
       {
-        path: "profile",
+        path: "/profile",
         element: <Profile />,
       },
       {
-        path: "edit-profile",
+        path: "/edit-profile",
         element: <EditProfile />,
       }
     ]
