@@ -5,7 +5,7 @@ import "github.com/google/uuid"
 type CourseSearchResult struct {
 	Course_id          uuid.UUID `json:"course_id"`
 	Tutor_name         string    `json:"tutor_name"`
-	Title             string    `json:"title"`
+	Title              string    `json:"title"`
 	Subject            string    `json:"subject"`
 	Topic              string    `json:"topic"`
 	Estimate_time      int       `json:"estimate_time"`
