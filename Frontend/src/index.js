@@ -13,6 +13,8 @@ import ForgetPassword from './pages/ForgetPassword';
 import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
 import ErrorPage from './pages/ErrorPage';
+import ChangePassword from './pages/ChangePassword';
+import EnterNewPassword from './pages/EnterNewPassword';
 import { QueryClientProvider, QueryClient } from 'react-query';
 
 Modal.setAppElement(document.getElementById('root'))
@@ -53,6 +55,14 @@ const router = createBrowserRouter([
       {
         path: "edit-profile",
         element: <EditProfile />,
+      },
+      {
+        path: "/change-password",
+        element: <ChangePassword />,
+      },
+      {
+        path: "enter-new-password",
+        element: <EnterNewPassword />,
       }
     ]
   }

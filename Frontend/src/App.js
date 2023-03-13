@@ -3,7 +3,6 @@ import './App.css';
 
 // import Router for link website
 import React, { Fragment } from 'react';
-
 import { Toaster } from 'react-hot-toast';
 
 // import components
@@ -17,6 +16,7 @@ import Courses from './pages/Courses';
 import Report from './pages/Report';
 import Profile from './pages/Profile.js';
 import EditProfile from './pages/EditProfile.js';
+// import ChangePassword from './pages/ChangePassword.js';
 
 import styled from 'styled-components';
 
