@@ -42,7 +42,7 @@ type SchemaUpdateStudent struct {
 	Lastname          string    `json:"lastname"`
 	Phone             string    `json:"phone"`
 	Address           string    `json:"address"`
-	ProfilePictureURL string    `json:"profile_picture_URL"`
+	ProfilePicture []byte    `json:"new_profile_picture"`
 	Birthdate         time.Time `json:"birthdate"`
 	Gender            string    `json:"gender"`
 }

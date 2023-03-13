@@ -3,7 +3,7 @@ package repositorys
 import (
 	"context"
 	"fmt"
-
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/Backend/internal/utils"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	entStudent "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	entUser "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
@@ -59,7 +59,7 @@ func (rS *repositoryStudent) CreateStudent(sr *schema.SchemaCreateStudent) (*ent
 		SetLastName(sr.Lastname).
 		SetPhone(sr.Phone).
 		SetAddress(sr.Address).
-		SetProfilePictureURL(sr.ProfilePictureURL).
+		SetProfilePictureURL("").
 		Save(rS.ctx)
 
 	if err != nil {
@@ -91,6 +91,8 @@ func (rS *repositoryStudent) UpdateStudent(sr *schema.SchemaUpdateStudent) (*ent
 
 	txc := tx.Client()
 
+
+
 	user, err := txc.User.Query().
 		Where(entUser.Username(sr.Username)).
 		WithStudent().
@@ -105,12 +107,14 @@ func (rS *repositoryStudent) UpdateStudent(sr *schema.SchemaUpdateStudent) (*ent
 
 	student := user.Edges.Student
 
+	profilePictureURL,_ := utils.GenerateProfilePictureURL(sr.ProfilePicture,sr.Username)
+
 	user, err = txc.User.UpdateOne(user).
 		SetFirstName(sr.Firstname).
 		SetLastName(sr.Lastname).
 		SetPhone(sr.Phone).
 		SetAddress(sr.Address).
-		SetProfilePictureURL(sr.ProfilePictureURL).
+		SetProfilePictureURL(profilePictureURL).
 		Save(rS.ctx)
 
 	if err != nil {

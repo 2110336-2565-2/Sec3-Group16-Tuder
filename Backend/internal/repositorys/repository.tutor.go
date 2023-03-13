@@ -118,6 +118,8 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 	}
 	tutor := user.Edges.Tutor
 
+	profilePictureURL,_ := utils.GenerateProfilePictureURL(sr.ProfilePicture,sr.Username)
+
 	user, err = txc.User.
 		UpdateOne(user).
 		SetFirstName(sr.Firstname).
@@ -125,6 +127,7 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 		SetPhone(sr.Phone).
 		SetAddress(sr.Address).
 		SetBirthDate(sr.Birthdate).
+		SetProfilePictureURL(profilePictureURL).
 		Save(r.ctx)
 	//fmt.Print(user)
 	if err != nil {
