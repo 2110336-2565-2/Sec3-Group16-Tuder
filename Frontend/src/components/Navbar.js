@@ -3,7 +3,7 @@ import navbarContent from '../datas/Navbar.role.js';
 import styled from 'styled-components';
 import {signOutAction} from '../handlers/signOutHandler';
 import {useNavigate} from 'react-router-dom';
-import { Fragment } from 'react';
+import React, { Fragment } from 'react';
 import useRole from '../hooks/useRole';
 
 
@@ -36,17 +36,17 @@ export default function Navbar(){
     const contents = navbarRole.content;
     // change to component for use in JSX  --> Generate NavItem for each content
     const contentElement = contents.map((content, index) => {
-        if(content === 'Home'){
-            return <NavbarItem key="home"><TuderLinkNav to='/' key={index}>{content}</TuderLinkNav></NavbarItem>
-        }else if(content === 'Sign Up'){
-            return <NavbarItem key="signUp"><TuderButton type='tudor-button' to="/SignUp" key={index}>{content}</TuderButton></NavbarItem>
-        }else if(content === 'Sign In'){
-            return <NavbarItem key="signIn"><TuderLinkNav to='/SignIn' key={index}>{content}</TuderLinkNav></NavbarItem>
-        }else if(content === 'Sign Out'){
-            return <NavbarItem key="signOut"><TuderButton type='red-button' onClick={signOutHandler} key={index}>{content}</TuderButton></NavbarItem>
+        if(content.title === 'Home'){
+            return <NavbarItem key="home"><TuderLinkNav to={content.link} key={index}>{content.title}</TuderLinkNav></NavbarItem>
+        }else if(content.title === 'Sign Up'){
+            return <NavbarItem key="signUp"><TuderButton type='tudor-button' to={content.link} key={index}>{content.title}</TuderButton></NavbarItem>
+        }else if(content.title === 'Sign In'){
+            return <NavbarItem key="signIn"><TuderLinkNav to={content.link} key={index}>{content.title}</TuderLinkNav></NavbarItem>
+        }else if(content.title === 'Sign Out'){
+            return <NavbarItem key="signOut"><TuderButton type='red-button' onClick={signOutHandler} key={index}>{content.title}</TuderButton></NavbarItem>
         }else{
-            let urlLink = "/" + content
-            return <NavbarItem key={content}><TuderLinkNav to= {urlLink} key={index}>{content}</TuderLinkNav></NavbarItem>
+            const urlLink = (content.link)?content.link:("/" + content.title.toLowerCase().replace(/ /g, "-"));
+            return <NavbarItem key={content.title}><TuderLinkNav to= {urlLink} key={index}>{content.title}</TuderLinkNav></NavbarItem>
         }
     });
 
@@ -70,7 +70,7 @@ export default function Navbar(){
 
 // styled-components for Navbar components
 const NavbarSection = styled.nav`
-    height: 50px;
+    height: 70px;
     display: flex;
     padding: 10px 30px;
     box-shadow: 0px 2.98px 7.45px rgba(0, 0, 0, 0.1);

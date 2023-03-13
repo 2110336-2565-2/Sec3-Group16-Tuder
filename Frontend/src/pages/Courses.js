@@ -1,7 +1,8 @@
 import CourseList from "../components/CourseList";
 import CourseSearchForm from "../components/FormCourseSearch";
 import styled from "styled-components";
-import { useState, createContext , useContext} from "react";
+import { Outlet } from "react-router";
+import React, { useState, createContext , useContext} from "react";
 const DataContext = createContext({
         data : {
             data: []

@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import Modal from 'react-modal';
 import './index.css';
 import App from './App';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
@@ -9,8 +10,14 @@ import SignUp from './pages/SignUp.js';
 import Courses from './pages/Courses';
 import Report from './pages/Report';
 import ForgetPassword from './pages/ForgetPassword';
+import Profile from './pages/Profile';
+import EditProfile from './pages/EditProfile';
 import ErrorPage from './pages/ErrorPage';
+import ChangePassword from './pages/ChangePassword';
+import EnterNewPassword from './pages/EnterNewPassword';
 import { QueryClientProvider, QueryClient } from 'react-query';
+
+Modal.setAppElement(document.getElementById('root'))
 
 const queryClient = new QueryClient();
 
@@ -22,24 +29,40 @@ const router = createBrowserRouter([
     children: [
       {index: true, element: <Home /> },
       {
-        path: "/Report",
+        path: "/report",
         element: <Report />,
       },
       {
-        path: "/Courses",
+        path: "/courses",
         element: <Courses />,
       },
       {
-        path: "/SignIn",
+        path: "/sign-in",
         element: <SignIn/>,
       },
       {
-        path: "/SignUp",
+        path: "/sign-up",
         element: <SignUp />,
       },
       {
-        path: "/Forgetpassword",
+        path: "/forget-password",
         element: <ForgetPassword />,
+      },
+      {
+        path: "profile",
+        element: <Profile />,
+      },
+      {
+        path: "edit-profile",
+        element: <EditProfile />,
+      },
+      {
+        path: "/change-password",
+        element: <ChangePassword />,
+      },
+      {
+        path: "enter-new-password",
+        element: <EnterNewPassword />,
       }
     ]
   }
