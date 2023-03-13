@@ -3,11 +3,12 @@ package repositorys
 import (
 	"context"
 	"fmt"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/Backend/internal/utils"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	entStudent "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	entUser "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
+
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 )
 
 type RepositoryStudent interface {
@@ -91,8 +92,6 @@ func (rS *repositoryStudent) UpdateStudent(sr *schema.SchemaUpdateStudent) (*ent
 
 	txc := tx.Client()
 
-
-
 	user, err := txc.User.Query().
 		Where(entUser.Username(sr.Username)).
 		WithStudent().
@@ -107,7 +106,7 @@ func (rS *repositoryStudent) UpdateStudent(sr *schema.SchemaUpdateStudent) (*ent
 
 	student := user.Edges.Student
 
-	profilePictureURL,_ := utils.GenerateProfilePictureURL(sr.ProfilePicture,sr.Username)
+	profilePictureURL, _ := utils.GenerateProfilePictureURL(sr.ProfilePicture, sr.Username)
 
 	user, err = txc.User.UpdateOne(user).
 		SetFirstName(sr.Firstname).

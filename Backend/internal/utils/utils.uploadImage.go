@@ -3,15 +3,14 @@ package utils
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
-
+	"bytes"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 )
 
-func uploadImageToS3(imageBytes []byte, key string) (string, error) {
-	bucket = "se2-tuder"
+func GenerateProfilePictureURL(imageBytes []byte, key string) (string, error) {
+	bucket := "se2-tuder"
 
 	// Load AWS session configuration
 	cfg, err := config.LoadDefaultConfig(context.Background())
@@ -27,8 +26,8 @@ func uploadImageToS3(imageBytes []byte, key string) (string, error) {
 
 	// Upload the image to S3
 	_, err = uploader.Upload(context.TODO(), &s3.PutObjectInput{
-		Bucket: aws.string(bucket),
-		Key:    aws.string(key),
+		Bucket: &bucket,
+		Key:    &key,
 		Body:   bytes.NewReader(imageBytes),
 	})
 	if err != nil {
