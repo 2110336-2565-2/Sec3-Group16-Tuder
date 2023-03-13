@@ -118,21 +118,6 @@ func (tc *TutorCreate) AddReviewTutor(r ...*ReviewTutor) *TutorCreate {
 	return tc.AddReviewTutorIDs(ids...)
 }
 
-// AddScheduleIDs adds the "schedule" edge to the Schedule entity by IDs.
-func (tc *TutorCreate) AddScheduleIDs(ids ...uuid.UUID) *TutorCreate {
-	tc.mutation.AddScheduleIDs(ids...)
-	return tc
-}
-
-// AddSchedule adds the "schedule" edges to the Schedule entity.
-func (tc *TutorCreate) AddSchedule(s ...*Schedule) *TutorCreate {
-	ids := make([]uuid.UUID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return tc.AddScheduleIDs(ids...)
-}
-
 // SetUserID sets the "user" edge to the User entity by ID.
 func (tc *TutorCreate) SetUserID(id uuid.UUID) *TutorCreate {
 	tc.mutation.SetUserID(id)
@@ -142,6 +127,17 @@ func (tc *TutorCreate) SetUserID(id uuid.UUID) *TutorCreate {
 // SetUser sets the "user" edge to the User entity.
 func (tc *TutorCreate) SetUser(u *User) *TutorCreate {
 	return tc.SetUserID(u.ID)
+}
+
+// SetScheduleID sets the "schedule" edge to the Schedule entity by ID.
+func (tc *TutorCreate) SetScheduleID(id uuid.UUID) *TutorCreate {
+	tc.mutation.SetScheduleID(id)
+	return tc
+}
+
+// SetSchedule sets the "schedule" edge to the Schedule entity.
+func (tc *TutorCreate) SetSchedule(s *Schedule) *TutorCreate {
+	return tc.SetScheduleID(s.ID)
 }
 
 // Mutation returns the TutorMutation object of the builder.
@@ -197,6 +193,9 @@ func (tc *TutorCreate) check() error {
 	}
 	if _, ok := tc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "Tutor.user"`)}
+	}
+	if _, ok := tc.mutation.ScheduleID(); !ok {
+		return &ValidationError{Name: "schedule", err: errors.New(`ent: missing required edge "Tutor.schedule"`)}
 	}
 	return nil
 }
@@ -302,25 +301,6 @@ func (tc *TutorCreate) createSpec() (*Tutor, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := tc.mutation.ScheduleIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   tutor.ScheduleTable,
-			Columns: []string{tutor.ScheduleColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: schedule.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
 	if nodes := tc.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
@@ -339,6 +319,26 @@ func (tc *TutorCreate) createSpec() (*Tutor, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.user_tutor = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := tc.mutation.ScheduleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   tutor.ScheduleTable,
+			Columns: []string{tutor.ScheduleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: schedule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.schedule_tutor = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

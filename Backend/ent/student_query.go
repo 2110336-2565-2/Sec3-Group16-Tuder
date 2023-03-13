@@ -12,7 +12,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
@@ -28,7 +27,6 @@ type StudentQuery struct {
 	inters          []Interceptor
 	predicates      []predicate.Student
 	withIssueReport *IssueReportQuery
-	withCourse      *CourseQuery
 	withClass       *ClassQuery
 	withUser        *UserQuery
 	withFKs         bool
@@ -83,28 +81,6 @@ func (sq *StudentQuery) QueryIssueReport() *IssueReportQuery {
 			sqlgraph.From(student.Table, student.FieldID, selector),
 			sqlgraph.To(issuereport.Table, issuereport.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, student.IssueReportTable, student.IssueReportColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryCourse chains the current query on the "course" edge.
-func (sq *StudentQuery) QueryCourse() *CourseQuery {
-	query := (&CourseClient{config: sq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := sq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := sq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(student.Table, student.FieldID, selector),
-			sqlgraph.To(course.Table, course.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, student.CourseTable, student.CourseColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -349,7 +325,6 @@ func (sq *StudentQuery) Clone() *StudentQuery {
 		inters:          append([]Interceptor{}, sq.inters...),
 		predicates:      append([]predicate.Student{}, sq.predicates...),
 		withIssueReport: sq.withIssueReport.Clone(),
-		withCourse:      sq.withCourse.Clone(),
 		withClass:       sq.withClass.Clone(),
 		withUser:        sq.withUser.Clone(),
 		// clone intermediate query.
@@ -366,17 +341,6 @@ func (sq *StudentQuery) WithIssueReport(opts ...func(*IssueReportQuery)) *Studen
 		opt(query)
 	}
 	sq.withIssueReport = query
-	return sq
-}
-
-// WithCourse tells the query-builder to eager-load the nodes that are connected to
-// the "course" edge. The optional arguments are used to configure the query builder of the edge.
-func (sq *StudentQuery) WithCourse(opts ...func(*CourseQuery)) *StudentQuery {
-	query := (&CourseClient{config: sq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	sq.withCourse = query
 	return sq
 }
 
@@ -459,9 +423,8 @@ func (sq *StudentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Stud
 		nodes       = []*Student{}
 		withFKs     = sq.withFKs
 		_spec       = sq.querySpec()
-		loadedTypes = [4]bool{
+		loadedTypes = [3]bool{
 			sq.withIssueReport != nil,
-			sq.withCourse != nil,
 			sq.withClass != nil,
 			sq.withUser != nil,
 		}
@@ -494,12 +457,6 @@ func (sq *StudentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Stud
 		if err := sq.loadIssueReport(ctx, query, nodes,
 			func(n *Student) { n.Edges.IssueReport = []*IssueReport{} },
 			func(n *Student, e *IssueReport) { n.Edges.IssueReport = append(n.Edges.IssueReport, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := sq.withCourse; query != nil {
-		if err := sq.loadCourse(ctx, query, nodes, nil,
-			func(n *Student, e *Course) { n.Edges.Course = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -545,34 +502,6 @@ func (sq *StudentQuery) loadIssueReport(ctx context.Context, query *IssueReportQ
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "student_issue_report" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (sq *StudentQuery) loadCourse(ctx context.Context, query *CourseQuery, nodes []*Student, init func(*Student), assign func(*Student, *Course)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[uuid.UUID]*Student)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-	}
-	query.withFKs = true
-	query.Where(predicate.Course(func(s *sql.Selector) {
-		s.Where(sql.InValues(student.CourseColumn, fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.student_course
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "student_course" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "student_course" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

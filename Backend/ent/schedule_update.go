@@ -31,165 +31,75 @@ func (su *ScheduleUpdate) Where(ps ...predicate.Schedule) *ScheduleUpdate {
 }
 
 // SetDay0 sets the "day_0" field.
-func (su *ScheduleUpdate) SetDay0(b bool) *ScheduleUpdate {
+func (su *ScheduleUpdate) SetDay0(b [24]bool) *ScheduleUpdate {
 	su.mutation.SetDay0(b)
 	return su
 }
 
-// SetNillableDay0 sets the "day_0" field if the given value is not nil.
-func (su *ScheduleUpdate) SetNillableDay0(b *bool) *ScheduleUpdate {
-	if b != nil {
-		su.SetDay0(*b)
-	}
-	return su
-}
-
-// ClearDay0 clears the value of the "day_0" field.
-func (su *ScheduleUpdate) ClearDay0() *ScheduleUpdate {
-	su.mutation.ClearDay0()
-	return su
-}
-
 // SetDay1 sets the "day_1" field.
-func (su *ScheduleUpdate) SetDay1(b bool) *ScheduleUpdate {
+func (su *ScheduleUpdate) SetDay1(b [24]bool) *ScheduleUpdate {
 	su.mutation.SetDay1(b)
 	return su
 }
 
-// SetNillableDay1 sets the "day_1" field if the given value is not nil.
-func (su *ScheduleUpdate) SetNillableDay1(b *bool) *ScheduleUpdate {
-	if b != nil {
-		su.SetDay1(*b)
-	}
-	return su
-}
-
-// ClearDay1 clears the value of the "day_1" field.
-func (su *ScheduleUpdate) ClearDay1() *ScheduleUpdate {
-	su.mutation.ClearDay1()
-	return su
-}
-
 // SetDay2 sets the "day_2" field.
-func (su *ScheduleUpdate) SetDay2(b bool) *ScheduleUpdate {
+func (su *ScheduleUpdate) SetDay2(b [24]bool) *ScheduleUpdate {
 	su.mutation.SetDay2(b)
 	return su
 }
 
-// SetNillableDay2 sets the "day_2" field if the given value is not nil.
-func (su *ScheduleUpdate) SetNillableDay2(b *bool) *ScheduleUpdate {
-	if b != nil {
-		su.SetDay2(*b)
-	}
-	return su
-}
-
-// ClearDay2 clears the value of the "day_2" field.
-func (su *ScheduleUpdate) ClearDay2() *ScheduleUpdate {
-	su.mutation.ClearDay2()
-	return su
-}
-
 // SetDay3 sets the "day_3" field.
-func (su *ScheduleUpdate) SetDay3(b bool) *ScheduleUpdate {
+func (su *ScheduleUpdate) SetDay3(b [24]bool) *ScheduleUpdate {
 	su.mutation.SetDay3(b)
 	return su
 }
 
-// SetNillableDay3 sets the "day_3" field if the given value is not nil.
-func (su *ScheduleUpdate) SetNillableDay3(b *bool) *ScheduleUpdate {
-	if b != nil {
-		su.SetDay3(*b)
-	}
-	return su
-}
-
-// ClearDay3 clears the value of the "day_3" field.
-func (su *ScheduleUpdate) ClearDay3() *ScheduleUpdate {
-	su.mutation.ClearDay3()
-	return su
-}
-
 // SetDay4 sets the "day_4" field.
-func (su *ScheduleUpdate) SetDay4(b bool) *ScheduleUpdate {
+func (su *ScheduleUpdate) SetDay4(b [24]bool) *ScheduleUpdate {
 	su.mutation.SetDay4(b)
 	return su
 }
 
-// SetNillableDay4 sets the "day_4" field if the given value is not nil.
-func (su *ScheduleUpdate) SetNillableDay4(b *bool) *ScheduleUpdate {
-	if b != nil {
-		su.SetDay4(*b)
-	}
-	return su
-}
-
-// ClearDay4 clears the value of the "day_4" field.
-func (su *ScheduleUpdate) ClearDay4() *ScheduleUpdate {
-	su.mutation.ClearDay4()
-	return su
-}
-
 // SetDay5 sets the "day_5" field.
-func (su *ScheduleUpdate) SetDay5(b bool) *ScheduleUpdate {
+func (su *ScheduleUpdate) SetDay5(b [24]bool) *ScheduleUpdate {
 	su.mutation.SetDay5(b)
 	return su
 }
 
-// SetNillableDay5 sets the "day_5" field if the given value is not nil.
-func (su *ScheduleUpdate) SetNillableDay5(b *bool) *ScheduleUpdate {
-	if b != nil {
-		su.SetDay5(*b)
-	}
-	return su
-}
-
-// ClearDay5 clears the value of the "day_5" field.
-func (su *ScheduleUpdate) ClearDay5() *ScheduleUpdate {
-	su.mutation.ClearDay5()
-	return su
-}
-
 // SetDay6 sets the "day_6" field.
-func (su *ScheduleUpdate) SetDay6(b bool) *ScheduleUpdate {
+func (su *ScheduleUpdate) SetDay6(b [24]bool) *ScheduleUpdate {
 	su.mutation.SetDay6(b)
 	return su
 }
 
-// SetNillableDay6 sets the "day_6" field if the given value is not nil.
-func (su *ScheduleUpdate) SetNillableDay6(b *bool) *ScheduleUpdate {
-	if b != nil {
-		su.SetDay6(*b)
+// AddTutorIDs adds the "tutor" edge to the Tutor entity by IDs.
+func (su *ScheduleUpdate) AddTutorIDs(ids ...uuid.UUID) *ScheduleUpdate {
+	su.mutation.AddTutorIDs(ids...)
+	return su
+}
+
+// AddTutor adds the "tutor" edges to the Tutor entity.
+func (su *ScheduleUpdate) AddTutor(t ...*Tutor) *ScheduleUpdate {
+	ids := make([]uuid.UUID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
+	return su.AddTutorIDs(ids...)
+}
+
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (su *ScheduleUpdate) AddClasIDs(ids ...uuid.UUID) *ScheduleUpdate {
+	su.mutation.AddClasIDs(ids...)
 	return su
 }
 
-// ClearDay6 clears the value of the "day_6" field.
-func (su *ScheduleUpdate) ClearDay6() *ScheduleUpdate {
-	su.mutation.ClearDay6()
-	return su
-}
-
-// SetTutorID sets the "tutor" edge to the Tutor entity by ID.
-func (su *ScheduleUpdate) SetTutorID(id uuid.UUID) *ScheduleUpdate {
-	su.mutation.SetTutorID(id)
-	return su
-}
-
-// SetTutor sets the "tutor" edge to the Tutor entity.
-func (su *ScheduleUpdate) SetTutor(t *Tutor) *ScheduleUpdate {
-	return su.SetTutorID(t.ID)
-}
-
-// SetClassID sets the "class" edge to the Class entity by ID.
-func (su *ScheduleUpdate) SetClassID(id uuid.UUID) *ScheduleUpdate {
-	su.mutation.SetClassID(id)
-	return su
-}
-
-// SetClass sets the "class" edge to the Class entity.
-func (su *ScheduleUpdate) SetClass(c *Class) *ScheduleUpdate {
-	return su.SetClassID(c.ID)
+// AddClass adds the "class" edges to the Class entity.
+func (su *ScheduleUpdate) AddClass(c ...*Class) *ScheduleUpdate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return su.AddClasIDs(ids...)
 }
 
 // Mutation returns the ScheduleMutation object of the builder.
@@ -197,16 +107,46 @@ func (su *ScheduleUpdate) Mutation() *ScheduleMutation {
 	return su.mutation
 }
 
-// ClearTutor clears the "tutor" edge to the Tutor entity.
+// ClearTutor clears all "tutor" edges to the Tutor entity.
 func (su *ScheduleUpdate) ClearTutor() *ScheduleUpdate {
 	su.mutation.ClearTutor()
 	return su
 }
 
-// ClearClass clears the "class" edge to the Class entity.
+// RemoveTutorIDs removes the "tutor" edge to Tutor entities by IDs.
+func (su *ScheduleUpdate) RemoveTutorIDs(ids ...uuid.UUID) *ScheduleUpdate {
+	su.mutation.RemoveTutorIDs(ids...)
+	return su
+}
+
+// RemoveTutor removes "tutor" edges to Tutor entities.
+func (su *ScheduleUpdate) RemoveTutor(t ...*Tutor) *ScheduleUpdate {
+	ids := make([]uuid.UUID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return su.RemoveTutorIDs(ids...)
+}
+
+// ClearClass clears all "class" edges to the Class entity.
 func (su *ScheduleUpdate) ClearClass() *ScheduleUpdate {
 	su.mutation.ClearClass()
 	return su
+}
+
+// RemoveClasIDs removes the "class" edge to Class entities by IDs.
+func (su *ScheduleUpdate) RemoveClasIDs(ids ...uuid.UUID) *ScheduleUpdate {
+	su.mutation.RemoveClasIDs(ids...)
+	return su
+}
+
+// RemoveClass removes "class" edges to Class entities.
+func (su *ScheduleUpdate) RemoveClass(c ...*Class) *ScheduleUpdate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return su.RemoveClasIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -236,21 +176,7 @@ func (su *ScheduleUpdate) ExecX(ctx context.Context) {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (su *ScheduleUpdate) check() error {
-	if _, ok := su.mutation.TutorID(); su.mutation.TutorCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Schedule.tutor"`)
-	}
-	if _, ok := su.mutation.ClassID(); su.mutation.ClassCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Schedule.class"`)
-	}
-	return nil
-}
-
 func (su *ScheduleUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := su.check(); err != nil {
-		return n, err
-	}
 	_spec := sqlgraph.NewUpdateSpec(schedule.Table, schedule.Columns, sqlgraph.NewFieldSpec(schedule.FieldID, field.TypeUUID))
 	if ps := su.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -260,51 +186,30 @@ func (su *ScheduleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if value, ok := su.mutation.Day0(); ok {
-		_spec.SetField(schedule.FieldDay0, field.TypeBool, value)
-	}
-	if su.mutation.Day0Cleared() {
-		_spec.ClearField(schedule.FieldDay0, field.TypeBool)
+		_spec.SetField(schedule.FieldDay0, field.TypeJSON, value)
 	}
 	if value, ok := su.mutation.Day1(); ok {
-		_spec.SetField(schedule.FieldDay1, field.TypeBool, value)
-	}
-	if su.mutation.Day1Cleared() {
-		_spec.ClearField(schedule.FieldDay1, field.TypeBool)
+		_spec.SetField(schedule.FieldDay1, field.TypeJSON, value)
 	}
 	if value, ok := su.mutation.Day2(); ok {
-		_spec.SetField(schedule.FieldDay2, field.TypeBool, value)
-	}
-	if su.mutation.Day2Cleared() {
-		_spec.ClearField(schedule.FieldDay2, field.TypeBool)
+		_spec.SetField(schedule.FieldDay2, field.TypeJSON, value)
 	}
 	if value, ok := su.mutation.Day3(); ok {
-		_spec.SetField(schedule.FieldDay3, field.TypeBool, value)
-	}
-	if su.mutation.Day3Cleared() {
-		_spec.ClearField(schedule.FieldDay3, field.TypeBool)
+		_spec.SetField(schedule.FieldDay3, field.TypeJSON, value)
 	}
 	if value, ok := su.mutation.Day4(); ok {
-		_spec.SetField(schedule.FieldDay4, field.TypeBool, value)
-	}
-	if su.mutation.Day4Cleared() {
-		_spec.ClearField(schedule.FieldDay4, field.TypeBool)
+		_spec.SetField(schedule.FieldDay4, field.TypeJSON, value)
 	}
 	if value, ok := su.mutation.Day5(); ok {
-		_spec.SetField(schedule.FieldDay5, field.TypeBool, value)
-	}
-	if su.mutation.Day5Cleared() {
-		_spec.ClearField(schedule.FieldDay5, field.TypeBool)
+		_spec.SetField(schedule.FieldDay5, field.TypeJSON, value)
 	}
 	if value, ok := su.mutation.Day6(); ok {
-		_spec.SetField(schedule.FieldDay6, field.TypeBool, value)
-	}
-	if su.mutation.Day6Cleared() {
-		_spec.ClearField(schedule.FieldDay6, field.TypeBool)
+		_spec.SetField(schedule.FieldDay6, field.TypeJSON, value)
 	}
 	if su.mutation.TutorCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
 			Table:   schedule.TutorTable,
 			Columns: []string{schedule.TutorColumn},
 			Bidi:    false,
@@ -317,10 +222,29 @@ func (su *ScheduleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
+	if nodes := su.mutation.RemovedTutorIDs(); len(nodes) > 0 && !su.mutation.TutorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   schedule.TutorTable,
+			Columns: []string{schedule.TutorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tutor.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
 	if nodes := su.mutation.TutorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
 			Table:   schedule.TutorTable,
 			Columns: []string{schedule.TutorColumn},
 			Bidi:    false,
@@ -338,8 +262,8 @@ func (su *ScheduleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if su.mutation.ClassCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
 			Table:   schedule.ClassTable,
 			Columns: []string{schedule.ClassColumn},
 			Bidi:    false,
@@ -352,10 +276,29 @@ func (su *ScheduleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
+	if nodes := su.mutation.RemovedClassIDs(); len(nodes) > 0 && !su.mutation.ClassCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   schedule.ClassTable,
+			Columns: []string{schedule.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: class.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
 	if nodes := su.mutation.ClassIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
 			Table:   schedule.ClassTable,
 			Columns: []string{schedule.ClassColumn},
 			Bidi:    false,
@@ -392,165 +335,75 @@ type ScheduleUpdateOne struct {
 }
 
 // SetDay0 sets the "day_0" field.
-func (suo *ScheduleUpdateOne) SetDay0(b bool) *ScheduleUpdateOne {
+func (suo *ScheduleUpdateOne) SetDay0(b [24]bool) *ScheduleUpdateOne {
 	suo.mutation.SetDay0(b)
 	return suo
 }
 
-// SetNillableDay0 sets the "day_0" field if the given value is not nil.
-func (suo *ScheduleUpdateOne) SetNillableDay0(b *bool) *ScheduleUpdateOne {
-	if b != nil {
-		suo.SetDay0(*b)
-	}
-	return suo
-}
-
-// ClearDay0 clears the value of the "day_0" field.
-func (suo *ScheduleUpdateOne) ClearDay0() *ScheduleUpdateOne {
-	suo.mutation.ClearDay0()
-	return suo
-}
-
 // SetDay1 sets the "day_1" field.
-func (suo *ScheduleUpdateOne) SetDay1(b bool) *ScheduleUpdateOne {
+func (suo *ScheduleUpdateOne) SetDay1(b [24]bool) *ScheduleUpdateOne {
 	suo.mutation.SetDay1(b)
 	return suo
 }
 
-// SetNillableDay1 sets the "day_1" field if the given value is not nil.
-func (suo *ScheduleUpdateOne) SetNillableDay1(b *bool) *ScheduleUpdateOne {
-	if b != nil {
-		suo.SetDay1(*b)
-	}
-	return suo
-}
-
-// ClearDay1 clears the value of the "day_1" field.
-func (suo *ScheduleUpdateOne) ClearDay1() *ScheduleUpdateOne {
-	suo.mutation.ClearDay1()
-	return suo
-}
-
 // SetDay2 sets the "day_2" field.
-func (suo *ScheduleUpdateOne) SetDay2(b bool) *ScheduleUpdateOne {
+func (suo *ScheduleUpdateOne) SetDay2(b [24]bool) *ScheduleUpdateOne {
 	suo.mutation.SetDay2(b)
 	return suo
 }
 
-// SetNillableDay2 sets the "day_2" field if the given value is not nil.
-func (suo *ScheduleUpdateOne) SetNillableDay2(b *bool) *ScheduleUpdateOne {
-	if b != nil {
-		suo.SetDay2(*b)
-	}
-	return suo
-}
-
-// ClearDay2 clears the value of the "day_2" field.
-func (suo *ScheduleUpdateOne) ClearDay2() *ScheduleUpdateOne {
-	suo.mutation.ClearDay2()
-	return suo
-}
-
 // SetDay3 sets the "day_3" field.
-func (suo *ScheduleUpdateOne) SetDay3(b bool) *ScheduleUpdateOne {
+func (suo *ScheduleUpdateOne) SetDay3(b [24]bool) *ScheduleUpdateOne {
 	suo.mutation.SetDay3(b)
 	return suo
 }
 
-// SetNillableDay3 sets the "day_3" field if the given value is not nil.
-func (suo *ScheduleUpdateOne) SetNillableDay3(b *bool) *ScheduleUpdateOne {
-	if b != nil {
-		suo.SetDay3(*b)
-	}
-	return suo
-}
-
-// ClearDay3 clears the value of the "day_3" field.
-func (suo *ScheduleUpdateOne) ClearDay3() *ScheduleUpdateOne {
-	suo.mutation.ClearDay3()
-	return suo
-}
-
 // SetDay4 sets the "day_4" field.
-func (suo *ScheduleUpdateOne) SetDay4(b bool) *ScheduleUpdateOne {
+func (suo *ScheduleUpdateOne) SetDay4(b [24]bool) *ScheduleUpdateOne {
 	suo.mutation.SetDay4(b)
 	return suo
 }
 
-// SetNillableDay4 sets the "day_4" field if the given value is not nil.
-func (suo *ScheduleUpdateOne) SetNillableDay4(b *bool) *ScheduleUpdateOne {
-	if b != nil {
-		suo.SetDay4(*b)
-	}
-	return suo
-}
-
-// ClearDay4 clears the value of the "day_4" field.
-func (suo *ScheduleUpdateOne) ClearDay4() *ScheduleUpdateOne {
-	suo.mutation.ClearDay4()
-	return suo
-}
-
 // SetDay5 sets the "day_5" field.
-func (suo *ScheduleUpdateOne) SetDay5(b bool) *ScheduleUpdateOne {
+func (suo *ScheduleUpdateOne) SetDay5(b [24]bool) *ScheduleUpdateOne {
 	suo.mutation.SetDay5(b)
 	return suo
 }
 
-// SetNillableDay5 sets the "day_5" field if the given value is not nil.
-func (suo *ScheduleUpdateOne) SetNillableDay5(b *bool) *ScheduleUpdateOne {
-	if b != nil {
-		suo.SetDay5(*b)
-	}
-	return suo
-}
-
-// ClearDay5 clears the value of the "day_5" field.
-func (suo *ScheduleUpdateOne) ClearDay5() *ScheduleUpdateOne {
-	suo.mutation.ClearDay5()
-	return suo
-}
-
 // SetDay6 sets the "day_6" field.
-func (suo *ScheduleUpdateOne) SetDay6(b bool) *ScheduleUpdateOne {
+func (suo *ScheduleUpdateOne) SetDay6(b [24]bool) *ScheduleUpdateOne {
 	suo.mutation.SetDay6(b)
 	return suo
 }
 
-// SetNillableDay6 sets the "day_6" field if the given value is not nil.
-func (suo *ScheduleUpdateOne) SetNillableDay6(b *bool) *ScheduleUpdateOne {
-	if b != nil {
-		suo.SetDay6(*b)
+// AddTutorIDs adds the "tutor" edge to the Tutor entity by IDs.
+func (suo *ScheduleUpdateOne) AddTutorIDs(ids ...uuid.UUID) *ScheduleUpdateOne {
+	suo.mutation.AddTutorIDs(ids...)
+	return suo
+}
+
+// AddTutor adds the "tutor" edges to the Tutor entity.
+func (suo *ScheduleUpdateOne) AddTutor(t ...*Tutor) *ScheduleUpdateOne {
+	ids := make([]uuid.UUID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
+	return suo.AddTutorIDs(ids...)
+}
+
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (suo *ScheduleUpdateOne) AddClasIDs(ids ...uuid.UUID) *ScheduleUpdateOne {
+	suo.mutation.AddClasIDs(ids...)
 	return suo
 }
 
-// ClearDay6 clears the value of the "day_6" field.
-func (suo *ScheduleUpdateOne) ClearDay6() *ScheduleUpdateOne {
-	suo.mutation.ClearDay6()
-	return suo
-}
-
-// SetTutorID sets the "tutor" edge to the Tutor entity by ID.
-func (suo *ScheduleUpdateOne) SetTutorID(id uuid.UUID) *ScheduleUpdateOne {
-	suo.mutation.SetTutorID(id)
-	return suo
-}
-
-// SetTutor sets the "tutor" edge to the Tutor entity.
-func (suo *ScheduleUpdateOne) SetTutor(t *Tutor) *ScheduleUpdateOne {
-	return suo.SetTutorID(t.ID)
-}
-
-// SetClassID sets the "class" edge to the Class entity by ID.
-func (suo *ScheduleUpdateOne) SetClassID(id uuid.UUID) *ScheduleUpdateOne {
-	suo.mutation.SetClassID(id)
-	return suo
-}
-
-// SetClass sets the "class" edge to the Class entity.
-func (suo *ScheduleUpdateOne) SetClass(c *Class) *ScheduleUpdateOne {
-	return suo.SetClassID(c.ID)
+// AddClass adds the "class" edges to the Class entity.
+func (suo *ScheduleUpdateOne) AddClass(c ...*Class) *ScheduleUpdateOne {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return suo.AddClasIDs(ids...)
 }
 
 // Mutation returns the ScheduleMutation object of the builder.
@@ -558,16 +411,46 @@ func (suo *ScheduleUpdateOne) Mutation() *ScheduleMutation {
 	return suo.mutation
 }
 
-// ClearTutor clears the "tutor" edge to the Tutor entity.
+// ClearTutor clears all "tutor" edges to the Tutor entity.
 func (suo *ScheduleUpdateOne) ClearTutor() *ScheduleUpdateOne {
 	suo.mutation.ClearTutor()
 	return suo
 }
 
-// ClearClass clears the "class" edge to the Class entity.
+// RemoveTutorIDs removes the "tutor" edge to Tutor entities by IDs.
+func (suo *ScheduleUpdateOne) RemoveTutorIDs(ids ...uuid.UUID) *ScheduleUpdateOne {
+	suo.mutation.RemoveTutorIDs(ids...)
+	return suo
+}
+
+// RemoveTutor removes "tutor" edges to Tutor entities.
+func (suo *ScheduleUpdateOne) RemoveTutor(t ...*Tutor) *ScheduleUpdateOne {
+	ids := make([]uuid.UUID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return suo.RemoveTutorIDs(ids...)
+}
+
+// ClearClass clears all "class" edges to the Class entity.
 func (suo *ScheduleUpdateOne) ClearClass() *ScheduleUpdateOne {
 	suo.mutation.ClearClass()
 	return suo
+}
+
+// RemoveClasIDs removes the "class" edge to Class entities by IDs.
+func (suo *ScheduleUpdateOne) RemoveClasIDs(ids ...uuid.UUID) *ScheduleUpdateOne {
+	suo.mutation.RemoveClasIDs(ids...)
+	return suo
+}
+
+// RemoveClass removes "class" edges to Class entities.
+func (suo *ScheduleUpdateOne) RemoveClass(c ...*Class) *ScheduleUpdateOne {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return suo.RemoveClasIDs(ids...)
 }
 
 // Where appends a list predicates to the ScheduleUpdate builder.
@@ -610,21 +493,7 @@ func (suo *ScheduleUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (suo *ScheduleUpdateOne) check() error {
-	if _, ok := suo.mutation.TutorID(); suo.mutation.TutorCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Schedule.tutor"`)
-	}
-	if _, ok := suo.mutation.ClassID(); suo.mutation.ClassCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Schedule.class"`)
-	}
-	return nil
-}
-
 func (suo *ScheduleUpdateOne) sqlSave(ctx context.Context) (_node *Schedule, err error) {
-	if err := suo.check(); err != nil {
-		return _node, err
-	}
 	_spec := sqlgraph.NewUpdateSpec(schedule.Table, schedule.Columns, sqlgraph.NewFieldSpec(schedule.FieldID, field.TypeUUID))
 	id, ok := suo.mutation.ID()
 	if !ok {
@@ -651,51 +520,30 @@ func (suo *ScheduleUpdateOne) sqlSave(ctx context.Context) (_node *Schedule, err
 		}
 	}
 	if value, ok := suo.mutation.Day0(); ok {
-		_spec.SetField(schedule.FieldDay0, field.TypeBool, value)
-	}
-	if suo.mutation.Day0Cleared() {
-		_spec.ClearField(schedule.FieldDay0, field.TypeBool)
+		_spec.SetField(schedule.FieldDay0, field.TypeJSON, value)
 	}
 	if value, ok := suo.mutation.Day1(); ok {
-		_spec.SetField(schedule.FieldDay1, field.TypeBool, value)
-	}
-	if suo.mutation.Day1Cleared() {
-		_spec.ClearField(schedule.FieldDay1, field.TypeBool)
+		_spec.SetField(schedule.FieldDay1, field.TypeJSON, value)
 	}
 	if value, ok := suo.mutation.Day2(); ok {
-		_spec.SetField(schedule.FieldDay2, field.TypeBool, value)
-	}
-	if suo.mutation.Day2Cleared() {
-		_spec.ClearField(schedule.FieldDay2, field.TypeBool)
+		_spec.SetField(schedule.FieldDay2, field.TypeJSON, value)
 	}
 	if value, ok := suo.mutation.Day3(); ok {
-		_spec.SetField(schedule.FieldDay3, field.TypeBool, value)
-	}
-	if suo.mutation.Day3Cleared() {
-		_spec.ClearField(schedule.FieldDay3, field.TypeBool)
+		_spec.SetField(schedule.FieldDay3, field.TypeJSON, value)
 	}
 	if value, ok := suo.mutation.Day4(); ok {
-		_spec.SetField(schedule.FieldDay4, field.TypeBool, value)
-	}
-	if suo.mutation.Day4Cleared() {
-		_spec.ClearField(schedule.FieldDay4, field.TypeBool)
+		_spec.SetField(schedule.FieldDay4, field.TypeJSON, value)
 	}
 	if value, ok := suo.mutation.Day5(); ok {
-		_spec.SetField(schedule.FieldDay5, field.TypeBool, value)
-	}
-	if suo.mutation.Day5Cleared() {
-		_spec.ClearField(schedule.FieldDay5, field.TypeBool)
+		_spec.SetField(schedule.FieldDay5, field.TypeJSON, value)
 	}
 	if value, ok := suo.mutation.Day6(); ok {
-		_spec.SetField(schedule.FieldDay6, field.TypeBool, value)
-	}
-	if suo.mutation.Day6Cleared() {
-		_spec.ClearField(schedule.FieldDay6, field.TypeBool)
+		_spec.SetField(schedule.FieldDay6, field.TypeJSON, value)
 	}
 	if suo.mutation.TutorCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
 			Table:   schedule.TutorTable,
 			Columns: []string{schedule.TutorColumn},
 			Bidi:    false,
@@ -708,10 +556,29 @@ func (suo *ScheduleUpdateOne) sqlSave(ctx context.Context) (_node *Schedule, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
+	if nodes := suo.mutation.RemovedTutorIDs(); len(nodes) > 0 && !suo.mutation.TutorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   schedule.TutorTable,
+			Columns: []string{schedule.TutorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tutor.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
 	if nodes := suo.mutation.TutorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
 			Table:   schedule.TutorTable,
 			Columns: []string{schedule.TutorColumn},
 			Bidi:    false,
@@ -729,8 +596,8 @@ func (suo *ScheduleUpdateOne) sqlSave(ctx context.Context) (_node *Schedule, err
 	}
 	if suo.mutation.ClassCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
 			Table:   schedule.ClassTable,
 			Columns: []string{schedule.ClassColumn},
 			Bidi:    false,
@@ -743,10 +610,29 @@ func (suo *ScheduleUpdateOne) sqlSave(ctx context.Context) (_node *Schedule, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
+	if nodes := suo.mutation.RemovedClassIDs(); len(nodes) > 0 && !suo.mutation.ClassCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   schedule.ClassTable,
+			Columns: []string{schedule.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: class.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
 	if nodes := suo.mutation.ClassIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
 			Table:   schedule.ClassTable,
 			Columns: []string{schedule.ClassColumn},
 			Bidi:    false,

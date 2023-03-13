@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
@@ -28,15 +27,13 @@ type Student struct {
 type StudentEdges struct {
 	// IssueReport holds the value of the issue_report edge.
 	IssueReport []*IssueReport `json:"issue_report,omitempty"`
-	// Course holds the value of the course edge.
-	Course *Course `json:"course,omitempty"`
 	// Class holds the value of the class edge.
 	Class []*Class `json:"class,omitempty"`
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [3]bool
 }
 
 // IssueReportOrErr returns the IssueReport value or an error if the edge
@@ -48,23 +45,10 @@ func (e StudentEdges) IssueReportOrErr() ([]*IssueReport, error) {
 	return nil, &NotLoadedError{edge: "issue_report"}
 }
 
-// CourseOrErr returns the Course value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e StudentEdges) CourseOrErr() (*Course, error) {
-	if e.loadedTypes[1] {
-		if e.Course == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: course.Label}
-		}
-		return e.Course, nil
-	}
-	return nil, &NotLoadedError{edge: "course"}
-}
-
 // ClassOrErr returns the Class value or an error if the edge
 // was not loaded in eager-loading.
 func (e StudentEdges) ClassOrErr() ([]*Class, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[1] {
 		return e.Class, nil
 	}
 	return nil, &NotLoadedError{edge: "class"}
@@ -73,7 +57,7 @@ func (e StudentEdges) ClassOrErr() ([]*Class, error) {
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e StudentEdges) UserOrErr() (*User, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[2] {
 		if e.User == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: user.Label}
@@ -128,11 +112,6 @@ func (s *Student) assignValues(columns []string, values []any) error {
 // QueryIssueReport queries the "issue_report" edge of the Student entity.
 func (s *Student) QueryIssueReport() *IssueReportQuery {
 	return NewStudentClient(s.config).QueryIssueReport(s)
-}
-
-// QueryCourse queries the "course" edge of the Student entity.
-func (s *Student) QueryCourse() *CourseQuery {
-	return NewStudentClient(s.config).QueryCourse(s)
 }
 
 // QueryClass queries the "class" edge of the Student entity.

@@ -45,7 +45,7 @@ export default function Navbar(){
         }else if(content.title === 'Sign Out'){
             return <NavbarItem key="signOut"><TuderButton type='red-button' onClick={signOutHandler} key={index}>{content.title}</TuderButton></NavbarItem>
         }else{
-            let urlLink = "/" + content.title
+            const urlLink = (content.link)?content.link:("/" + content.title.toLowerCase().replace(/ /g, "-"));
             return <NavbarItem key={content.title}><TuderLinkNav to= {urlLink} key={index}>{content.title}</TuderLinkNav></NavbarItem>
         }
     });

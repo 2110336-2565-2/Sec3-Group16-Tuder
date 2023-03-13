@@ -12,7 +12,7 @@ export default function TutorInfo({user}){
         </InfoWrapper>
         <InfoWrapper>
           <InfoTitle>Contact Number</InfoTitle>
-          <InfoContent>{user.contactNumber}</InfoContent>
+          <InfoContent>{user.phone}</InfoContent>
         </InfoWrapper>
         <InfoWrapper>
           <InfoTitle>Gender</InfoTitle>
@@ -20,11 +20,11 @@ export default function TutorInfo({user}){
         </InfoWrapper>
         <InfoWrapper>
           <InfoTitle>Birth Date</InfoTitle>
-          <InfoContent>{user.birthdate}</InfoContent>
+          <InfoContent>{user.birth_date}</InfoContent>
         </InfoWrapper>
         <InfoWrapper>
           <InfoTitle>Citizen ID</InfoTitle>
-          <InfoContent>{user.citizenID}</InfoContent>
+          <InfoContent>{user.citizen_id}</InfoContent>
         </InfoWrapper>
         <InfoWrapper isSpan={true}>
           <InfoTitle>Description</InfoTitle>

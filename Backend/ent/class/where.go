@@ -166,7 +166,7 @@ func HasSchedule() predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, ScheduleTable, ScheduleColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, ScheduleTable, ScheduleColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -178,7 +178,7 @@ func HasScheduleWith(preds ...predicate.Schedule) predicate.Class {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ScheduleInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, ScheduleTable, ScheduleColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, ScheduleTable, ScheduleColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

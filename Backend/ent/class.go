@@ -28,9 +28,11 @@ type Class struct {
 	SuccessHour time.Time `json:"success_hour,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ClassQuery when eager-loading is set.
-	Edges         ClassEdges `json:"edges"`
-	course_class  *uuid.UUID
-	student_class *uuid.UUID
+	Edges          ClassEdges `json:"edges"`
+	class_schedule *uuid.UUID
+	course_class   *uuid.UUID
+	schedule_class *uuid.UUID
+	student_class  *uuid.UUID
 }
 
 // ClassEdges holds the relations/edges for other nodes in the graph.
@@ -96,9 +98,13 @@ func (*Class) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullTime)
 		case class.FieldID:
 			values[i] = new(uuid.UUID)
-		case class.ForeignKeys[0]: // course_class
+		case class.ForeignKeys[0]: // class_schedule
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
-		case class.ForeignKeys[1]: // student_class
+		case class.ForeignKeys[1]: // course_class
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case class.ForeignKeys[2]: // schedule_class
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case class.ForeignKeys[3]: // student_class
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Class", columns[i])
@@ -141,12 +147,26 @@ func (c *Class) assignValues(columns []string, values []any) error {
 			}
 		case class.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field class_schedule", values[i])
+			} else if value.Valid {
+				c.class_schedule = new(uuid.UUID)
+				*c.class_schedule = *value.S.(*uuid.UUID)
+			}
+		case class.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field course_class", values[i])
 			} else if value.Valid {
 				c.course_class = new(uuid.UUID)
 				*c.course_class = *value.S.(*uuid.UUID)
 			}
-		case class.ForeignKeys[1]:
+		case class.ForeignKeys[2]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field schedule_class", values[i])
+			} else if value.Valid {
+				c.schedule_class = new(uuid.UUID)
+				*c.schedule_class = *value.S.(*uuid.UUID)
+			}
+		case class.ForeignKeys[3]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field student_class", values[i])
 			} else if value.Valid {
