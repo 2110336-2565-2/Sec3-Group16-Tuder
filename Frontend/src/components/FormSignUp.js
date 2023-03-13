@@ -1,5 +1,5 @@
 import FormT from './FormStyle.js';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import signUpHandler from '../handlers/signUpHandler.js';
 import signupContent from "../datas/SignUp.role.js";
 import styled from 'styled-components';
@@ -90,16 +90,16 @@ export default function FormSignUp(){
                         value = email
                     }else if(element === 'Password') {
                         type = 'password'
-                        boxsize = '140px'
+                        boxsize = '150px'
                         value = password
                     }
                     else if (element === 'Confirm Password'){
                         type = 'password'
-                        boxsize = '140px'
+                        boxsize = '150px'
                         value = confirmpassword
                     }else if(element === 'Birth Date'){
                         type = 'date'
-                        boxsize = '140px'
+                        boxsize = '150px'
                         value = birthdate
                     }else if(element === 'Contact Number'){
                         type = 'number'
@@ -107,17 +107,17 @@ export default function FormSignUp(){
                         value = contactnumber
                     }else if(element === 'First Name'){
                         type = 'text'
-                        boxsize = '140px'
+                        boxsize = '150px'
                         value = firstname
                         
                     }else if (element === 'Last Name'){
                         type = 'text'
-                        boxsize = '140px'
+                        boxsize = '150px'
                         value = lastname
                         
                     }else if(element === 'Gender'){
                         type = 'text'
-                        boxsize = '140px'
+                        boxsize = '150px'
                         value = gender
                     }
                     else if (element === 'Address'){
@@ -137,7 +137,7 @@ export default function FormSignUp(){
                         return(
                             <FormT.Component key={elementindex}>
                                 <FormT.Label>{element} :</FormT.Label>
-                                <FormT.Select BoxSize='170px' name={name} value={value} onChange={onChange}  required >
+                                <FormT.Select BoxSize='150px' name={name} value={value} onChange={onChange}  required >
                                     <FormT.Option value="" disabled hidden>Please select</FormT.Option>
                                     <FormT.Option value='male'>male</FormT.Option>
                                     <FormT.Option value='female'>female</FormT.Option>
@@ -166,7 +166,7 @@ export default function FormSignUp(){
                 <FormT.Content>
                     <FormT.Component>
                         <FormT.Label>As :</FormT.Label>
-                        <FormT.Select BoxSize='343px' name='role' value={role} onChange={(e) => setRole(e.target.value)}  required >
+                        <FormT.Select BoxSize='315px' name='role' value={role} onChange={(e) => setRole(e.target.value)}  required >
                             <FormT.Option value="" disabled hidden>Please select</FormT.Option>
                             <FormT.Option value='student'>Student</FormT.Option>
                             <FormT.Option value='tutor'>Tutor</FormT.Option>

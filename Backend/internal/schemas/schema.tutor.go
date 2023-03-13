@@ -7,20 +7,20 @@ import (
 )
 
 type SchemaTutor struct {
-	ID                uuid.UUID `json:"id"`
-	Username          string    `json:"username"`
-	Email             string    `json:"email"`
-	Firstname         string    `json:"firstname"`
-	Lastname          string    `json:"lastname"`
-	Phone             string    `json:"phone"`
-	Address           string    `json:"address"`
-	Birthdate         time.Time `json:"birthdate"`
-	Gender            string    `json:"gender"`
-	ProfilePictureURL string    `json:"profile_picture_URL"`
-	Description       string    `json:"description"`
-	OmiseBankToken    string    `json:"omise_bank_token"`
-	CitizenId         string    `json:"citizen_id"`
-	Schedule          Schedule  `json:"schedule"`
+	ID                uuid.UUID         `json:"id"`
+	Username          string            `json:"username"`
+	Email             string            `json:"email"`
+	Firstname         string            `json:"firstname"`
+	Lastname          string            `json:"lastname"`
+	Phone             string            `json:"phone"`
+	Address           string            `json:"address"`
+	Birthdate         time.Time         `json:"birthdate"`
+	Gender            string            `json:"gender"`
+	ProfilePictureURL string            `json:"profile_picture_URL"`
+	Description       string            `json:"description"`
+	OmiseBankToken    string            `json:"omise_bank_token"`
+	CitizenId         string            `json:"citizen_id"`
+	Schedule          SchemaRawSchedule `json:"raw_schedule"`
 }
 
 type SchemaGetTutor struct {
@@ -44,7 +44,7 @@ type SchemaCreateTutor struct {
 }
 
 type SchemaUpdateTutor struct {
-	Username  string `json:"username"` // TODO This must be removed when jwt is completely function
+	Username  string `json:"username,omitempty"` // TODO This must be removed when jwt is completely function
 	Firstname string `json:"firstname"`
 	Lastname  string `json:"lastname"`
 	Phone     string `json:"phone"`
@@ -55,7 +55,7 @@ type SchemaUpdateTutor struct {
 	Description    string    `json:"description"`
 	OmiseBankToken string    `json:"omise_bank_token"`
 	Email          string    `json:"email"`
-	Schedules      Schedule  `json:"schedules"`
+	Schedule       Schedule  `json:"schedule"`
 }
 
 type SchemaDeleteTutor struct {
