@@ -7,8 +7,8 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 export default function FormSignIn(props){
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [status, setStatus] = useState('waiting');
-    const [role, handleRole] = useOutletContext();
+    const  setStatus = useState('waiting')[1];
+    const  handleRole = useOutletContext()[1];
     
     const navigate = useNavigate();
 

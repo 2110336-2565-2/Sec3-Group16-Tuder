@@ -50,15 +50,6 @@ const SignUpInfo = styled.div`
     font-size: 50px;
 `;
 
-const ImageTudor = styled.img`
-    max-width: ${(props) => {
-        return props.maxwidth
-    }};
-    margin-top: ${(props)=>{
-        return props.mt
-    }};
-`;
-
 const ContainerWithHeight = styled.div`
     // padding: 0px 30px;
     margin-top: ${(props) => {
