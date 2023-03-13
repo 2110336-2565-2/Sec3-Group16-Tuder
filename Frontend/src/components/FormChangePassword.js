@@ -1,18 +1,23 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import checkPasswordHandler from '../handlers/checkPasswordHandler.js';
+import useUsername from '../hooks/useUsername.js';
 
 import FormT from './FormStyle.js';
 import styled from 'styled-components';
 
 export default function FormChangePassword(){
+    const [username, handleUsername] = useUsername();
     const [password, setPassword] = useState('');
 
     const navigate = useNavigate();
 
     async function submitHandler(e){
         e.preventDefault();
+        handleUsername();
+        
         const checkPasswordData = {
+            username,
             password,
         }
         try{

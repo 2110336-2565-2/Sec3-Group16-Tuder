@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import changePasswordHandler from '../handlers/changePasswordHandler.js';
+import useUsername from '../hooks/useUsername.js';
 
 import FormT from './FormStyle.js';
 import styled from 'styled-components';
 
 export default function FormEnterNewPassword(){
+    const [username, handleUsername] = useUsername();
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -13,7 +15,9 @@ export default function FormEnterNewPassword(){
 
     async function submitHandler(e){
         e.preventDefault();
+        handleUsername();
         const changePasswordData = {
+            username,
             password,
             confirmPassword,
         }
