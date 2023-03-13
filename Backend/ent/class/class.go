@@ -17,35 +17,33 @@ const (
 	FieldTotalHour = "total_hour"
 	// FieldSuccessHour holds the string denoting the success_hour field in the database.
 	FieldSuccessHour = "success_hour"
+	// EdgeMatch holds the string denoting the match edge name in mutations.
+	EdgeMatch = "match"
 	// EdgeSchedule holds the string denoting the schedule edge name in mutations.
 	EdgeSchedule = "schedule"
-	// EdgeStudent holds the string denoting the student edge name in mutations.
-	EdgeStudent = "student"
-	// EdgeCourse holds the string denoting the course edge name in mutations.
-	EdgeCourse = "course"
+	// EdgePaymentHistory holds the string denoting the payment_history edge name in mutations.
+	EdgePaymentHistory = "payment_history"
 	// Table holds the table name of the class in the database.
 	Table = "classes"
+	// MatchTable is the table that holds the match relation/edge. The primary key declared below.
+	MatchTable = "class_match"
+	// MatchInverseTable is the table name for the Match entity.
+	// It exists in this package in order to avoid circular dependency with the "match" package.
+	MatchInverseTable = "matches"
 	// ScheduleTable is the table that holds the schedule relation/edge.
 	ScheduleTable = "classes"
 	// ScheduleInverseTable is the table name for the Schedule entity.
 	// It exists in this package in order to avoid circular dependency with the "schedule" package.
 	ScheduleInverseTable = "schedules"
 	// ScheduleColumn is the table column denoting the schedule relation/edge.
-	ScheduleColumn = "class_schedule"
-	// StudentTable is the table that holds the student relation/edge.
-	StudentTable = "classes"
-	// StudentInverseTable is the table name for the Student entity.
-	// It exists in this package in order to avoid circular dependency with the "student" package.
-	StudentInverseTable = "students"
-	// StudentColumn is the table column denoting the student relation/edge.
-	StudentColumn = "student_class"
-	// CourseTable is the table that holds the course relation/edge.
-	CourseTable = "classes"
-	// CourseInverseTable is the table name for the Course entity.
-	// It exists in this package in order to avoid circular dependency with the "course" package.
-	CourseInverseTable = "courses"
-	// CourseColumn is the table column denoting the course relation/edge.
-	CourseColumn = "course_class"
+	ScheduleColumn = "schedule_class"
+	// PaymentHistoryTable is the table that holds the payment_history relation/edge.
+	PaymentHistoryTable = "classes"
+	// PaymentHistoryInverseTable is the table name for the PaymentHistory entity.
+	// It exists in this package in order to avoid circular dependency with the "paymenthistory" package.
+	PaymentHistoryInverseTable = "payment_histories"
+	// PaymentHistoryColumn is the table column denoting the payment_history relation/edge.
+	PaymentHistoryColumn = "payment_history_class"
 )
 
 // Columns holds all SQL columns for class fields.
@@ -59,11 +57,15 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "classes"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"class_schedule",
-	"course_class",
+	"payment_history_class",
 	"schedule_class",
-	"student_class",
 }
+
+var (
+	// MatchPrimaryKey and MatchColumn2 are the table columns denoting the
+	// primary key for the match relation (M2M).
+	MatchPrimaryKey = []string{"class_id", "match_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {

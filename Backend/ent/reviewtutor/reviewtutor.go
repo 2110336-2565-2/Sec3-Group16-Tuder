@@ -13,15 +13,20 @@ const (
 	FieldReviewMsg = "review_msg"
 	// EdgeTutor holds the string denoting the tutor edge name in mutations.
 	EdgeTutor = "tutor"
+	// EdgeStudent holds the string denoting the student edge name in mutations.
+	EdgeStudent = "student"
 	// Table holds the table name of the reviewtutor in the database.
 	Table = "review_tutors"
-	// TutorTable is the table that holds the tutor relation/edge.
-	TutorTable = "review_tutors"
+	// TutorTable is the table that holds the tutor relation/edge. The primary key declared below.
+	TutorTable = "tutor_review_tutor"
 	// TutorInverseTable is the table name for the Tutor entity.
 	// It exists in this package in order to avoid circular dependency with the "tutor" package.
 	TutorInverseTable = "tutors"
-	// TutorColumn is the table column denoting the tutor relation/edge.
-	TutorColumn = "tutor_review_tutor"
+	// StudentTable is the table that holds the student relation/edge. The primary key declared below.
+	StudentTable = "student_review_tutor"
+	// StudentInverseTable is the table name for the Student entity.
+	// It exists in this package in order to avoid circular dependency with the "student" package.
+	StudentInverseTable = "students"
 )
 
 // Columns holds all SQL columns for reviewtutor fields.
@@ -31,21 +36,19 @@ var Columns = []string{
 	FieldReviewMsg,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "review_tutors"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"tutor_review_tutor",
-}
+var (
+	// TutorPrimaryKey and TutorColumn2 are the table columns denoting the
+	// primary key for the tutor relation (M2M).
+	TutorPrimaryKey = []string{"tutor_id", "review_tutor_id"}
+	// StudentPrimaryKey and StudentColumn2 are the table columns denoting the
+	// primary key for the student relation (M2M).
+	StudentPrimaryKey = []string{"student_id", "review_tutor_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}

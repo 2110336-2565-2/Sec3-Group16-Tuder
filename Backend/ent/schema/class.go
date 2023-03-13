@@ -27,16 +27,22 @@ func (Class) Fields() []ent.Field {
 
 func (Class) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("schedule", Schedule.Type).
-			Unique().
-			Required(),
-		edge.From("student", Student.Type).
+		edge.To("match", Match.Type),
+		edge.From("schedule", Schedule.Type).
 			Ref("class").
 			Unique().
 			Required(),
-		edge.From("course", Course.Type).
+		edge.From("payment_history", PaymentHistory.Type).
 			Ref("class").
 			Unique().
 			Required(),
+		// edge.From("student", Student.Type).
+		// 	Ref("class").
+		// 	Unique().
+		// 	Required(),
+		// edge.From("course", Course.Type).
+		// 	Ref("class").
+		// 	Unique().
+		// 	Required(),
 	}
 }

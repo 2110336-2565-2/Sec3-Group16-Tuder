@@ -35,18 +35,32 @@ const (
 	FieldProfilePictureURL = "profile_picture_url"
 	// FieldRole holds the string denoting the role field in the database.
 	FieldRole = "role"
+	// EdgeStudent holds the string denoting the student edge name in mutations.
+	EdgeStudent = "student"
+	// EdgeTutor holds the string denoting the tutor edge name in mutations.
+	EdgeTutor = "tutor"
 	// EdgeIssueReport holds the string denoting the issue_report edge name in mutations.
 	EdgeIssueReport = "issue_report"
 	// EdgePayment holds the string denoting the payment edge name in mutations.
 	EdgePayment = "payment"
 	// EdgePaymentHistory holds the string denoting the payment_history edge name in mutations.
 	EdgePaymentHistory = "payment_history"
-	// EdgeStudent holds the string denoting the student edge name in mutations.
-	EdgeStudent = "student"
-	// EdgeTutor holds the string denoting the tutor edge name in mutations.
-	EdgeTutor = "tutor"
 	// Table holds the table name of the user in the database.
 	Table = "users"
+	// StudentTable is the table that holds the student relation/edge.
+	StudentTable = "students"
+	// StudentInverseTable is the table name for the Student entity.
+	// It exists in this package in order to avoid circular dependency with the "student" package.
+	StudentInverseTable = "students"
+	// StudentColumn is the table column denoting the student relation/edge.
+	StudentColumn = "user_student"
+	// TutorTable is the table that holds the tutor relation/edge.
+	TutorTable = "tutors"
+	// TutorInverseTable is the table name for the Tutor entity.
+	// It exists in this package in order to avoid circular dependency with the "tutor" package.
+	TutorInverseTable = "tutors"
+	// TutorColumn is the table column denoting the tutor relation/edge.
+	TutorColumn = "user_tutor"
 	// IssueReportTable is the table that holds the issue_report relation/edge.
 	IssueReportTable = "issue_reports"
 	// IssueReportInverseTable is the table name for the IssueReport entity.
@@ -68,20 +82,6 @@ const (
 	PaymentHistoryInverseTable = "payment_histories"
 	// PaymentHistoryColumn is the table column denoting the payment_history relation/edge.
 	PaymentHistoryColumn = "user_payment_history"
-	// StudentTable is the table that holds the student relation/edge.
-	StudentTable = "students"
-	// StudentInverseTable is the table name for the Student entity.
-	// It exists in this package in order to avoid circular dependency with the "student" package.
-	StudentInverseTable = "students"
-	// StudentColumn is the table column denoting the student relation/edge.
-	StudentColumn = "user_student"
-	// TutorTable is the table that holds the tutor relation/edge.
-	TutorTable = "tutors"
-	// TutorInverseTable is the table name for the Tutor entity.
-	// It exists in this package in order to avoid circular dependency with the "tutor" package.
-	TutorInverseTable = "tutors"
-	// TutorColumn is the table column denoting the tutor relation/edge.
-	TutorColumn = "user_tutor"
 )
 
 // Columns holds all SQL columns for user fields.

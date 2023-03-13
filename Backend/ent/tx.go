@@ -18,6 +18,8 @@ type Tx struct {
 	Course *CourseClient
 	// IssueReport is the client for interacting with the IssueReport builders.
 	IssueReport *IssueReportClient
+	// Match is the client for interacting with the Match builders.
+	Match *MatchClient
 	// Payment is the client for interacting with the Payment builders.
 	Payment *PaymentClient
 	// PaymentHistory is the client for interacting with the PaymentHistory builders.
@@ -168,6 +170,7 @@ func (tx *Tx) init() {
 	tx.Class = NewClassClient(tx.config)
 	tx.Course = NewCourseClient(tx.config)
 	tx.IssueReport = NewIssueReportClient(tx.config)
+	tx.Match = NewMatchClient(tx.config)
 	tx.Payment = NewPaymentClient(tx.config)
 	tx.PaymentHistory = NewPaymentHistoryClient(tx.config)
 	tx.ReviewCourse = NewReviewCourseClient(tx.config)

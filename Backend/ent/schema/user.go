@@ -44,10 +44,10 @@ func (User) Indexes() []ent.Index {
 
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
+		edge.To("student", Student.Type).Unique(),
+		edge.To("tutor", Tutor.Type).Unique(),
 		edge.To("issue_report", IssueReport.Type),
 		edge.To("payment", Payment.Type),
 		edge.To("payment_history", PaymentHistory.Type),
-		edge.To("student", Student.Type).Unique(),
-		edge.To("tutor", Tutor.Type).Unique(),
 	}
 }

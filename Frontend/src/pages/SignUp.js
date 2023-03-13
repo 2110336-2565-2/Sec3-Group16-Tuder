@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import React, { Fragment } from "react";
 import styled from "styled-components"
 import FormSignUp from "../components/FormSignUp.js";
 import Footer from "../components/SignUpFooter.js";
@@ -55,6 +55,7 @@ const ContainerWithHeight = styled.div`
     margin-top: ${(props) => {
         return props.margintop
     }};
+
 `;
 
 const SeperateSection = styled.div`

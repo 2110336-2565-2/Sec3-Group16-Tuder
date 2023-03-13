@@ -284,10 +284,10 @@ func (tc *TutorCreate) createSpec() (*Tutor, *sqlgraph.CreateSpec) {
 	}
 	if nodes := tc.mutation.ReviewTutorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   tutor.ReviewTutorTable,
-			Columns: []string{tutor.ReviewTutorColumn},
+			Columns: tutor.ReviewTutorPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

@@ -161,12 +161,39 @@ func SuccessHourLTE(v time.Time) predicate.Class {
 	return predicate.Class(sql.FieldLTE(FieldSuccessHour, v))
 }
 
+// HasMatch applies the HasEdge predicate on the "match" edge.
+func HasMatch() predicate.Class {
+	return predicate.Class(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, MatchTable, MatchPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasMatchWith applies the HasEdge predicate on the "match" edge with a given conditions (other predicates).
+func HasMatchWith(preds ...predicate.Match) predicate.Class {
+	return predicate.Class(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(MatchInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, MatchTable, MatchPrimaryKey...),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasSchedule applies the HasEdge predicate on the "schedule" edge.
 func HasSchedule() predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, ScheduleTable, ScheduleColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, ScheduleTable, ScheduleColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -178,7 +205,7 @@ func HasScheduleWith(preds ...predicate.Schedule) predicate.Class {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ScheduleInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, ScheduleTable, ScheduleColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, ScheduleTable, ScheduleColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
@@ -188,51 +215,24 @@ func HasScheduleWith(preds ...predicate.Schedule) predicate.Class {
 	})
 }
 
-// HasStudent applies the HasEdge predicate on the "student" edge.
-func HasStudent() predicate.Class {
+// HasPaymentHistory applies the HasEdge predicate on the "payment_history" edge.
+func HasPaymentHistory() predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, StudentTable, StudentColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, PaymentHistoryTable, PaymentHistoryColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasStudentWith applies the HasEdge predicate on the "student" edge with a given conditions (other predicates).
-func HasStudentWith(preds ...predicate.Student) predicate.Class {
+// HasPaymentHistoryWith applies the HasEdge predicate on the "payment_history" edge with a given conditions (other predicates).
+func HasPaymentHistoryWith(preds ...predicate.PaymentHistory) predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(StudentInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, StudentTable, StudentColumn),
-		)
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasCourse applies the HasEdge predicate on the "course" edge.
-func HasCourse() predicate.Class {
-	return predicate.Class(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, CourseTable, CourseColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasCourseWith applies the HasEdge predicate on the "course" edge with a given conditions (other predicates).
-func HasCourseWith(preds ...predicate.Course) predicate.Class {
-	return predicate.Class(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(CourseInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, CourseTable, CourseColumn),
+			sqlgraph.To(PaymentHistoryInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, PaymentHistoryTable, PaymentHistoryColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

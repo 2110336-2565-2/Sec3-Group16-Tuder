@@ -11,9 +11,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewtutor"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
@@ -22,14 +23,15 @@ import (
 // StudentQuery is the builder for querying Student entities.
 type StudentQuery struct {
 	config
-	ctx             *QueryContext
-	order           []OrderFunc
-	inters          []Interceptor
-	predicates      []predicate.Student
-	withIssueReport *IssueReportQuery
-	withClass       *ClassQuery
-	withUser        *UserQuery
-	withFKs         bool
+	ctx              *QueryContext
+	order            []OrderFunc
+	inters           []Interceptor
+	predicates       []predicate.Student
+	withMatch        *MatchQuery
+	withReviewCourse *ReviewCourseQuery
+	withReviewTutor  *ReviewTutorQuery
+	withUser         *UserQuery
+	withFKs          bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -66,9 +68,9 @@ func (sq *StudentQuery) Order(o ...OrderFunc) *StudentQuery {
 	return sq
 }
 
-// QueryIssueReport chains the current query on the "issue_report" edge.
-func (sq *StudentQuery) QueryIssueReport() *IssueReportQuery {
-	query := (&IssueReportClient{config: sq.config}).Query()
+// QueryMatch chains the current query on the "match" edge.
+func (sq *StudentQuery) QueryMatch() *MatchQuery {
+	query := (&MatchClient{config: sq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := sq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -79,8 +81,8 @@ func (sq *StudentQuery) QueryIssueReport() *IssueReportQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(student.Table, student.FieldID, selector),
-			sqlgraph.To(issuereport.Table, issuereport.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, student.IssueReportTable, student.IssueReportColumn),
+			sqlgraph.To(match.Table, match.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, student.MatchTable, student.MatchPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -88,9 +90,9 @@ func (sq *StudentQuery) QueryIssueReport() *IssueReportQuery {
 	return query
 }
 
-// QueryClass chains the current query on the "class" edge.
-func (sq *StudentQuery) QueryClass() *ClassQuery {
-	query := (&ClassClient{config: sq.config}).Query()
+// QueryReviewCourse chains the current query on the "review_course" edge.
+func (sq *StudentQuery) QueryReviewCourse() *ReviewCourseQuery {
+	query := (&ReviewCourseClient{config: sq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := sq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -101,8 +103,30 @@ func (sq *StudentQuery) QueryClass() *ClassQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(student.Table, student.FieldID, selector),
-			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, student.ClassTable, student.ClassColumn),
+			sqlgraph.To(reviewcourse.Table, reviewcourse.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, student.ReviewCourseTable, student.ReviewCoursePrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryReviewTutor chains the current query on the "review_tutor" edge.
+func (sq *StudentQuery) QueryReviewTutor() *ReviewTutorQuery {
+	query := (&ReviewTutorClient{config: sq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := sq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := sq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(student.Table, student.FieldID, selector),
+			sqlgraph.To(reviewtutor.Table, reviewtutor.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, student.ReviewTutorTable, student.ReviewTutorPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -319,39 +343,51 @@ func (sq *StudentQuery) Clone() *StudentQuery {
 		return nil
 	}
 	return &StudentQuery{
-		config:          sq.config,
-		ctx:             sq.ctx.Clone(),
-		order:           append([]OrderFunc{}, sq.order...),
-		inters:          append([]Interceptor{}, sq.inters...),
-		predicates:      append([]predicate.Student{}, sq.predicates...),
-		withIssueReport: sq.withIssueReport.Clone(),
-		withClass:       sq.withClass.Clone(),
-		withUser:        sq.withUser.Clone(),
+		config:           sq.config,
+		ctx:              sq.ctx.Clone(),
+		order:            append([]OrderFunc{}, sq.order...),
+		inters:           append([]Interceptor{}, sq.inters...),
+		predicates:       append([]predicate.Student{}, sq.predicates...),
+		withMatch:        sq.withMatch.Clone(),
+		withReviewCourse: sq.withReviewCourse.Clone(),
+		withReviewTutor:  sq.withReviewTutor.Clone(),
+		withUser:         sq.withUser.Clone(),
 		// clone intermediate query.
 		sql:  sq.sql.Clone(),
 		path: sq.path,
 	}
 }
 
-// WithIssueReport tells the query-builder to eager-load the nodes that are connected to
-// the "issue_report" edge. The optional arguments are used to configure the query builder of the edge.
-func (sq *StudentQuery) WithIssueReport(opts ...func(*IssueReportQuery)) *StudentQuery {
-	query := (&IssueReportClient{config: sq.config}).Query()
+// WithMatch tells the query-builder to eager-load the nodes that are connected to
+// the "match" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *StudentQuery) WithMatch(opts ...func(*MatchQuery)) *StudentQuery {
+	query := (&MatchClient{config: sq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	sq.withIssueReport = query
+	sq.withMatch = query
 	return sq
 }
 
-// WithClass tells the query-builder to eager-load the nodes that are connected to
-// the "class" edge. The optional arguments are used to configure the query builder of the edge.
-func (sq *StudentQuery) WithClass(opts ...func(*ClassQuery)) *StudentQuery {
-	query := (&ClassClient{config: sq.config}).Query()
+// WithReviewCourse tells the query-builder to eager-load the nodes that are connected to
+// the "review_course" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *StudentQuery) WithReviewCourse(opts ...func(*ReviewCourseQuery)) *StudentQuery {
+	query := (&ReviewCourseClient{config: sq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	sq.withClass = query
+	sq.withReviewCourse = query
+	return sq
+}
+
+// WithReviewTutor tells the query-builder to eager-load the nodes that are connected to
+// the "review_tutor" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *StudentQuery) WithReviewTutor(opts ...func(*ReviewTutorQuery)) *StudentQuery {
+	query := (&ReviewTutorClient{config: sq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	sq.withReviewTutor = query
 	return sq
 }
 
@@ -423,9 +459,10 @@ func (sq *StudentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Stud
 		nodes       = []*Student{}
 		withFKs     = sq.withFKs
 		_spec       = sq.querySpec()
-		loadedTypes = [3]bool{
-			sq.withIssueReport != nil,
-			sq.withClass != nil,
+		loadedTypes = [4]bool{
+			sq.withMatch != nil,
+			sq.withReviewCourse != nil,
+			sq.withReviewTutor != nil,
 			sq.withUser != nil,
 		}
 	)
@@ -453,17 +490,24 @@ func (sq *StudentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Stud
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := sq.withIssueReport; query != nil {
-		if err := sq.loadIssueReport(ctx, query, nodes,
-			func(n *Student) { n.Edges.IssueReport = []*IssueReport{} },
-			func(n *Student, e *IssueReport) { n.Edges.IssueReport = append(n.Edges.IssueReport, e) }); err != nil {
+	if query := sq.withMatch; query != nil {
+		if err := sq.loadMatch(ctx, query, nodes,
+			func(n *Student) { n.Edges.Match = []*Match{} },
+			func(n *Student, e *Match) { n.Edges.Match = append(n.Edges.Match, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := sq.withClass; query != nil {
-		if err := sq.loadClass(ctx, query, nodes,
-			func(n *Student) { n.Edges.Class = []*Class{} },
-			func(n *Student, e *Class) { n.Edges.Class = append(n.Edges.Class, e) }); err != nil {
+	if query := sq.withReviewCourse; query != nil {
+		if err := sq.loadReviewCourse(ctx, query, nodes,
+			func(n *Student) { n.Edges.ReviewCourse = []*ReviewCourse{} },
+			func(n *Student, e *ReviewCourse) { n.Edges.ReviewCourse = append(n.Edges.ReviewCourse, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := sq.withReviewTutor; query != nil {
+		if err := sq.loadReviewTutor(ctx, query, nodes,
+			func(n *Student) { n.Edges.ReviewTutor = []*ReviewTutor{} },
+			func(n *Student, e *ReviewTutor) { n.Edges.ReviewTutor = append(n.Edges.ReviewTutor, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -476,65 +520,186 @@ func (sq *StudentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Stud
 	return nodes, nil
 }
 
-func (sq *StudentQuery) loadIssueReport(ctx context.Context, query *IssueReportQuery, nodes []*Student, init func(*Student), assign func(*Student, *IssueReport)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[uuid.UUID]*Student)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
+func (sq *StudentQuery) loadMatch(ctx context.Context, query *MatchQuery, nodes []*Student, init func(*Student), assign func(*Student, *Match)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[uuid.UUID]*Student)
+	nids := make(map[int]map[*Student]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
 		if init != nil {
-			init(nodes[i])
+			init(node)
 		}
 	}
-	query.withFKs = true
-	query.Where(predicate.IssueReport(func(s *sql.Selector) {
-		s.Where(sql.InValues(student.IssueReportColumn, fks...))
-	}))
-	neighbors, err := query.All(ctx)
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(student.MatchTable)
+		s.Join(joinT).On(s.C(match.FieldID), joinT.C(student.MatchPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(student.MatchPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(student.MatchPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(uuid.UUID)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := *values[0].(*uuid.UUID)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Student]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Match](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.student_issue_report
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "student_issue_report" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "student_issue_report" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected "match" node returned %v`, n.ID)
 		}
-		assign(node, n)
+		for kn := range nodes {
+			assign(kn, n)
+		}
 	}
 	return nil
 }
-func (sq *StudentQuery) loadClass(ctx context.Context, query *ClassQuery, nodes []*Student, init func(*Student), assign func(*Student, *Class)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[uuid.UUID]*Student)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
+func (sq *StudentQuery) loadReviewCourse(ctx context.Context, query *ReviewCourseQuery, nodes []*Student, init func(*Student), assign func(*Student, *ReviewCourse)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[uuid.UUID]*Student)
+	nids := make(map[int]map[*Student]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
 		if init != nil {
-			init(nodes[i])
+			init(node)
 		}
 	}
-	query.withFKs = true
-	query.Where(predicate.Class(func(s *sql.Selector) {
-		s.Where(sql.InValues(student.ClassColumn, fks...))
-	}))
-	neighbors, err := query.All(ctx)
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(student.ReviewCourseTable)
+		s.Join(joinT).On(s.C(reviewcourse.FieldID), joinT.C(student.ReviewCoursePrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(student.ReviewCoursePrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(student.ReviewCoursePrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(uuid.UUID)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := *values[0].(*uuid.UUID)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Student]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*ReviewCourse](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.student_class
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "student_class" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "student_class" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected "review_course" node returned %v`, n.ID)
 		}
-		assign(node, n)
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (sq *StudentQuery) loadReviewTutor(ctx context.Context, query *ReviewTutorQuery, nodes []*Student, init func(*Student), assign func(*Student, *ReviewTutor)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[uuid.UUID]*Student)
+	nids := make(map[int]map[*Student]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(student.ReviewTutorTable)
+		s.Join(joinT).On(s.C(reviewtutor.FieldID), joinT.C(student.ReviewTutorPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(student.ReviewTutorPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(student.ReviewTutorPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(uuid.UUID)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := *values[0].(*uuid.UUID)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Student]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*ReviewTutor](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "review_tutor" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
 	}
 	return nil
 }

@@ -25,39 +25,50 @@ type Student struct {
 
 // StudentEdges holds the relations/edges for other nodes in the graph.
 type StudentEdges struct {
-	// IssueReport holds the value of the issue_report edge.
-	IssueReport []*IssueReport `json:"issue_report,omitempty"`
-	// Class holds the value of the class edge.
-	Class []*Class `json:"class,omitempty"`
+	// Match holds the value of the match edge.
+	Match []*Match `json:"match,omitempty"`
+	// ReviewCourse holds the value of the review_course edge.
+	ReviewCourse []*ReviewCourse `json:"review_course,omitempty"`
+	// ReviewTutor holds the value of the review_tutor edge.
+	ReviewTutor []*ReviewTutor `json:"review_tutor,omitempty"`
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
-// IssueReportOrErr returns the IssueReport value or an error if the edge
+// MatchOrErr returns the Match value or an error if the edge
 // was not loaded in eager-loading.
-func (e StudentEdges) IssueReportOrErr() ([]*IssueReport, error) {
+func (e StudentEdges) MatchOrErr() ([]*Match, error) {
 	if e.loadedTypes[0] {
-		return e.IssueReport, nil
+		return e.Match, nil
 	}
-	return nil, &NotLoadedError{edge: "issue_report"}
+	return nil, &NotLoadedError{edge: "match"}
 }
 
-// ClassOrErr returns the Class value or an error if the edge
+// ReviewCourseOrErr returns the ReviewCourse value or an error if the edge
 // was not loaded in eager-loading.
-func (e StudentEdges) ClassOrErr() ([]*Class, error) {
+func (e StudentEdges) ReviewCourseOrErr() ([]*ReviewCourse, error) {
 	if e.loadedTypes[1] {
-		return e.Class, nil
+		return e.ReviewCourse, nil
 	}
-	return nil, &NotLoadedError{edge: "class"}
+	return nil, &NotLoadedError{edge: "review_course"}
+}
+
+// ReviewTutorOrErr returns the ReviewTutor value or an error if the edge
+// was not loaded in eager-loading.
+func (e StudentEdges) ReviewTutorOrErr() ([]*ReviewTutor, error) {
+	if e.loadedTypes[2] {
+		return e.ReviewTutor, nil
+	}
+	return nil, &NotLoadedError{edge: "review_tutor"}
 }
 
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e StudentEdges) UserOrErr() (*User, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[3] {
 		if e.User == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: user.Label}
@@ -109,14 +120,19 @@ func (s *Student) assignValues(columns []string, values []any) error {
 	return nil
 }
 
-// QueryIssueReport queries the "issue_report" edge of the Student entity.
-func (s *Student) QueryIssueReport() *IssueReportQuery {
-	return NewStudentClient(s.config).QueryIssueReport(s)
+// QueryMatch queries the "match" edge of the Student entity.
+func (s *Student) QueryMatch() *MatchQuery {
+	return NewStudentClient(s.config).QueryMatch(s)
 }
 
-// QueryClass queries the "class" edge of the Student entity.
-func (s *Student) QueryClass() *ClassQuery {
-	return NewStudentClient(s.config).QueryClass(s)
+// QueryReviewCourse queries the "review_course" edge of the Student entity.
+func (s *Student) QueryReviewCourse() *ReviewCourseQuery {
+	return NewStudentClient(s.config).QueryReviewCourse(s)
+}
+
+// QueryReviewTutor queries the "review_tutor" edge of the Student entity.
+func (s *Student) QueryReviewTutor() *ReviewTutorQuery {
+	return NewStudentClient(s.config).QueryReviewTutor(s)
 }
 
 // QueryUser queries the "user" edge of the Student entity.

@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
@@ -54,6 +55,21 @@ func (phc *PaymentHistoryCreate) SetNillableID(u *uuid.UUID) *PaymentHistoryCrea
 		phc.SetID(*u)
 	}
 	return phc
+}
+
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (phc *PaymentHistoryCreate) AddClasIDs(ids ...uuid.UUID) *PaymentHistoryCreate {
+	phc.mutation.AddClasIDs(ids...)
+	return phc
+}
+
+// AddClass adds the "class" edges to the Class entity.
+func (phc *PaymentHistoryCreate) AddClass(c ...*Class) *PaymentHistoryCreate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return phc.AddClasIDs(ids...)
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
@@ -182,6 +198,25 @@ func (phc *PaymentHistoryCreate) createSpec() (*PaymentHistory, *sqlgraph.Create
 	if value, ok := phc.mutation.GetType(); ok {
 		_spec.SetField(paymenthistory.FieldType, field.TypeString, value)
 		_node.Type = value
+	}
+	if nodes := phc.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   paymenthistory.ClassTable,
+			Columns: []string{paymenthistory.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: class.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := phc.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

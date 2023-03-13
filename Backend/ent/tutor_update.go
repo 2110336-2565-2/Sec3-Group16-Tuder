@@ -406,10 +406,10 @@ func (tu *TutorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if tu.mutation.ReviewTutorCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   tutor.ReviewTutorTable,
-			Columns: []string{tutor.ReviewTutorColumn},
+			Columns: tutor.ReviewTutorPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -422,10 +422,10 @@ func (tu *TutorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := tu.mutation.RemovedReviewTutorIDs(); len(nodes) > 0 && !tu.mutation.ReviewTutorCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   tutor.ReviewTutorTable,
-			Columns: []string{tutor.ReviewTutorColumn},
+			Columns: tutor.ReviewTutorPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -441,10 +441,10 @@ func (tu *TutorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := tu.mutation.ReviewTutorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   tutor.ReviewTutorTable,
-			Columns: []string{tutor.ReviewTutorColumn},
+			Columns: tutor.ReviewTutorPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -951,10 +951,10 @@ func (tuo *TutorUpdateOne) sqlSave(ctx context.Context) (_node *Tutor, err error
 	}
 	if tuo.mutation.ReviewTutorCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   tutor.ReviewTutorTable,
-			Columns: []string{tutor.ReviewTutorColumn},
+			Columns: tutor.ReviewTutorPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -967,10 +967,10 @@ func (tuo *TutorUpdateOne) sqlSave(ctx context.Context) (_node *Tutor, err error
 	}
 	if nodes := tuo.mutation.RemovedReviewTutorIDs(); len(nodes) > 0 && !tuo.mutation.ReviewTutorCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   tutor.ReviewTutorTable,
-			Columns: []string{tutor.ReviewTutorColumn},
+			Columns: tutor.ReviewTutorPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -986,10 +986,10 @@ func (tuo *TutorUpdateOne) sqlSave(ctx context.Context) (_node *Tutor, err error
 	}
 	if nodes := tuo.mutation.ReviewTutorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   tutor.ReviewTutorTable,
-			Columns: []string{tutor.ReviewTutorColumn},
+			Columns: tutor.ReviewTutorPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

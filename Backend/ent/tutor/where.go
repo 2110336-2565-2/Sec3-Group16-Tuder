@@ -343,7 +343,7 @@ func HasReviewTutor() predicate.Tutor {
 	return predicate.Tutor(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ReviewTutorTable, ReviewTutorColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, ReviewTutorTable, ReviewTutorPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -355,7 +355,7 @@ func HasReviewTutorWith(preds ...predicate.ReviewTutor) predicate.Tutor {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ReviewTutorInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ReviewTutorTable, ReviewTutorColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, ReviewTutorTable, ReviewTutorPrimaryKey...),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
