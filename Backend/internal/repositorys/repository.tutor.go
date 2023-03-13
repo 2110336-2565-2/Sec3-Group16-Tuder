@@ -121,7 +121,6 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 	tutor := user.Edges.Tutor
 
 	profilePictureURL, _ := utils.GenerateProfilePictureURL(sr.ProfilePicture, sr.Username)
-
 	user, err = txc.User.
 		UpdateOne(user).
 		SetFirstName(sr.Firstname).

@@ -30,6 +30,11 @@ func (s *serviceTutor) GetTutorByUsername(tutorGet *schemas.SchemaGetTutor) (*sc
 		fmt.Println(err)
 		return nil, err
 	}
+	schedule, err := s.repository.GetSchedule(&schemas.SchemaGetSchedule{Username: tutor.Edges.User.Username})
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
 
 	return &schemas.SchemaTutor{
 		ID:                tutor.ID,
@@ -45,6 +50,15 @@ func (s *serviceTutor) GetTutorByUsername(tutorGet *schemas.SchemaGetTutor) (*sc
 		Description:       *tutor.Description,
 		OmiseBankToken:    *tutor.OmiseBankToken,
 		CitizenId:         tutor.CitizenID,
+		Schedule: 		   schemas.SchemaRawSchedule{
+			Sunday:    schedule.Day0,
+			Monday:    schedule.Day1,
+			Tuesday:   schedule.Day2,
+			Wednesday: schedule.Day3,
+			Thursday:  schedule.Day4,
+			Friday:    schedule.Day5,
+			Saturday:  schedule.Day6,
+		},
 	}, nil
 }
 
@@ -56,7 +70,28 @@ func (s *serviceTutor) GetTutors() ([]*schemas.SchemaTutor, error) {
 	}
 	var tutorResponses []*schemas.SchemaTutor
 	for _, tutor := range tutors {
-		fmt.Println(tutor.Edges.Schedule.Day3)
+
+		schedule, err := s.repository.GetSchedule(&schemas.SchemaGetSchedule{Username: tutor.Edges.User.Username})
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+		fmt.Println(tutor.ID)
+		fmt.Println(tutor.Edges.User.Username)
+		fmt.Println(tutor.Edges.User.FirstName)
+		fmt.Println(tutor.Edges.User.LastName)
+		fmt.Println(tutor.Edges.User.Email)
+		fmt.Println(tutor.Edges.User.Phone)
+		fmt.Println(tutor.Edges.User.Address)
+		fmt.Println(tutor.Edges.User.BirthDate)
+		fmt.Println(tutor.Edges.User.Gender)
+		fmt.Println(*tutor.Edges.User.ProfilePictureURL)
+		fmt.Println(*tutor.Description)
+		fmt.Println(*tutor.OmiseBankToken)
+		fmt.Println(tutor.CitizenID)
+		fmt.Println(schedule)
+		fmt.Println("=====================================")
+
 		tutorResponses = append(tutorResponses, &schemas.SchemaTutor{
 			ID:                tutor.ID,
 			Username:          tutor.Edges.User.Username,
@@ -71,17 +106,18 @@ func (s *serviceTutor) GetTutors() ([]*schemas.SchemaTutor, error) {
 			Description:       *tutor.Description,
 			OmiseBankToken:    *tutor.OmiseBankToken,
 			CitizenId:         tutor.CitizenID,
-			// Schedule: schemas.SchemaRawSchedule{
-			// 	Sunday:    tutor.Edges.Schedule.Day0,
-			// 	Monday:    tutor.Edges.Schedule.Day1,
-			// 	Tuesday:   tutor.Edges.Schedule.Day2,
-			// 	Wednesday: tutor.Edges.Schedule.Day3,
-			// 	Thursday:  tutor.Edges.Schedule.Day4,
-			// 	Friday:    tutor.Edges.Schedule.Day5,
-			// 	Saturday:  tutor.Edges.Schedule.Day6,
-			// },
+			Schedule: 		   schemas.SchemaRawSchedule{
+				Sunday:    schedule.Day0,
+				Monday:    schedule.Day1,
+				Tuesday:   schedule.Day2,
+				Wednesday: schedule.Day3,
+				Thursday:  schedule.Day4,
+				Friday:    schedule.Day5,
+				Saturday:  schedule.Day6,
+			},
 		})
 	}
+	fmt.Println("Append success, send response")
 	return tutorResponses, nil
 }
 
@@ -116,19 +152,19 @@ func (s *serviceTutor) UpdateTutor(tutorUpdate *schemas.SchemaUpdateTutor) (*sch
 		return nil, err
 	}
 	return &schemas.SchemaTutor{
-		ID:                tutor.ID,
-		Username:          tutor.Edges.User.Username,
-		Firstname:         tutor.Edges.User.FirstName,
-		Lastname:          tutor.Edges.User.LastName,
-		Email:             tutor.Edges.User.Email,
-		Phone:             tutor.Edges.User.Phone,
-		Address:           tutor.Edges.User.Address,
-		Birthdate:         tutor.Edges.User.BirthDate,
-		Gender:            tutor.Edges.User.Gender,
+		ID:        tutor.ID,
+		Username:  tutor.Edges.User.Username,
+		Firstname: tutor.Edges.User.FirstName,
+		Lastname:  tutor.Edges.User.LastName,
+		Email:     tutor.Edges.User.Email,
+		Phone:     tutor.Edges.User.Phone,
+		Address:   tutor.Edges.User.Address,
+		Birthdate: tutor.Edges.User.BirthDate,
+		Gender:    tutor.Edges.User.Gender,
 		ProfilePictureURL: *tutor.Edges.User.ProfilePictureURL,
-		Description:       *tutor.Description,
-		OmiseBankToken:    *tutor.OmiseBankToken,
-		CitizenId:         tutor.CitizenID,
+		Description:    *tutor.Description,
+		OmiseBankToken: *tutor.OmiseBankToken,
+		CitizenId:      tutor.CitizenID,
 		Schedule: schemas.SchemaRawSchedule{
 			Sunday:    tutor.Edges.Schedule.Day0,
 			Monday:    tutor.Edges.Schedule.Day1,

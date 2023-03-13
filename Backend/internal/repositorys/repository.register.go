@@ -73,6 +73,7 @@ func (r repositoryRegister) RegisterUser(sr *schemas.SchemaRegister) (*ent.User,
 		SetBirthDate(sr.Birthdate).
 		SetGender(sr.Gender).
 		SetRole(entUser.Role(sr.Role)).
+		SetProfilePictureURL("https://se2-tuder.s3.us-west-1.amazonaws.com/user-icon-vector-people-icon-profile-vector-icon-person-illustration-business-user-icon-users-group-symbol-male-user-symbol-700-223068886.jpg"). // default profile picture
 		Save(r.ctx)
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
