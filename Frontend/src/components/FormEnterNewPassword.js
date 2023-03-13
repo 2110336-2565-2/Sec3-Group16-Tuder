@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import changePasswordHandler from '../handlers/changePasswordHandler.js';
 import useUsername from '../hooks/useUsername.js';
+import { toast } from 'react-hot-toast';
 
 import FormT from './FormStyle.js';
 import styled from 'styled-components';
@@ -23,8 +24,10 @@ export default function FormEnterNewPassword(){
         }
         try{
             await changePasswordHandler(changePasswordData, navigate);
+            toast.success('Change Password Successfully');
         } catch (error){
             console.log(error);
+            toast.error('New Password and Confirm Password are not the same');
         }
     }
 
@@ -41,11 +44,11 @@ export default function FormEnterNewPassword(){
                 </Header>
                 <TextInput>
                     <FormT.Content>New Password</FormT.Content>
-                    <FormT.TextInput BoxSize='500px' name='email' type='text' placeholder='' value={password} onChange={(e)=>setPassword(e.target.value)}/>
+                    <FormT.TextInput BoxSize='500px' name='email' type='password' placeholder='' value={password} onChange={(e)=>setPassword(e.target.value)}/>
                 </TextInput>
                 <TextInput>
                     <FormT.Content>Confirm Password</FormT.Content>
-                    <FormT.TextInput BoxSize='500px' name='email' type='text' placeholder='' value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)}/>
+                    <FormT.TextInput BoxSize='500px' name='email' type='password' placeholder='' value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)}/>
                 </TextInput>
                 <FormT.Content>
                     <FormT.Button type='submit'>Send</FormT.Button>
