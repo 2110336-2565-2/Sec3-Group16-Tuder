@@ -17,12 +17,15 @@ func GenerateProfilePictureURL(imageBytes []byte, key string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to load AWS SDK configuration: %v", err)
 	}
+	fmt.Println("AWS SDK configuration loaded")
 
 	// Create a new S3 client
 	client := s3.NewFromConfig(cfg)
+	fmt.Println("S3 client created")
 
 	// Set up a new S3 uploader
 	uploader := manager.NewUploader(client)
+	fmt.Println("S3 uploader created")
 
 	// Upload the image to S3
 	_, err = uploader.Upload(context.TODO(), &s3.PutObjectInput{

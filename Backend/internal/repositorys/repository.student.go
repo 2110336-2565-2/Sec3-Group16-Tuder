@@ -114,6 +114,8 @@ func (rS *repositoryStudent) UpdateStudent(sr *schema.SchemaUpdateStudent) (*ent
 		SetLastName(sr.Lastname).
 		SetPhone(sr.Phone).
 		SetAddress(sr.Address).
+		SetBirthDate(sr.Birthdate).
+		SetGender(sr.Gender).
 		SetProfilePictureURL(profilePictureURL).
 		Save(rS.ctx)
 
