@@ -12,23 +12,67 @@ import (
 	schemas "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 )
 
-type RepositoryCancelClass interface {
+type RepositoryClass interface {
+	GetCancellingClasses() ([]*schemas.SchemaCancelRequest, error)
 	CancelClass(sc *schemas.SchemaCancelClass) (*ent.Class, error)
 }
 
-type repositoryCancelClass struct {
+type repositoryClass struct {
 	client *ent.Client
 	ctx    context.Context
 }
 
-func NewRepositoryCancelClass(c *ent.Client) RepositoryCancelClass {
-	return &repositoryCancelClass{
+func NewRepositoryClass(c *ent.Client) RepositoryClass {
+	return &repositoryClass{
 		client: c,
 		ctx:    context.Background(),
 	}
 }
 
-func (r *repositoryCancelClass) CancelClass(sc *schemas.SchemaCancelClass) (*ent.Class, error) {
+func (r *repositoryClass) GetCancellingClasses() ([]*schemas.SchemaCancelRequest, error) {
+	classes, err := r.client.Class.
+		Query().
+		Where(class.StatusEQ(class.StatusCancelling)).
+		WithMatch(
+			func(q *ent.MatchQuery) {
+				q.WithCourse(
+					func(q *ent.CourseQuery) {
+						q.WithTutor(
+							func(q *ent.TutorQuery) {
+								q.WithUser()
+							},
+						)
+					},
+				).
+					WithStudent(
+						func(q *ent.StudentQuery) {
+							q.WithUser()
+						},
+					)
+			},
+		).
+		All(r.ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var cancelRequests []*schemas.SchemaCancelRequest
+	for _, c := range classes {
+		cancelRequests = append(cancelRequests, &schemas.SchemaCancelRequest{
+			ClassID:     c.ID,
+			Course:      c.Edges.Match[0].Edges.Course[0].Title,
+			Tutorname:   c.Edges.Match[0].Edges.Course[0].Edges.Tutor.Edges.User.FirstName + " " + c.Edges.Match[0].Edges.Course[0].Edges.Tutor.Edges.User.LastName,
+			Studentname: c.Edges.Match[0].Edges.Student.Edges.User.FirstName + " " + c.Edges.Match[0].Edges.Student.Edges.User.LastName,
+			Subject:     c.Edges.Match[0].Edges.Course[0].Subject,
+			Time:        c.Edges.Match[0].Edges.Course[0].EstimatedTime,
+			Price:       c.Edges.Match[0].Edges.Course[0].PricePerHour,
+		})
+	}
+
+	return cancelRequests, nil
+}
+
+func (r *repositoryClass) CancelClass(sc *schemas.SchemaCancelClass) (*ent.Class, error) {
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
@@ -40,7 +84,7 @@ func (r *repositoryCancelClass) CancelClass(sc *schemas.SchemaCancelClass) (*ent
 	// find class
 	c, err := txc.Class.
 		Query().
-		Where(class.IDEQ(sc.ClassId)).
+		Where(class.IDEQ(sc.ClassID)).
 		WithMatch(
 			func(q *ent.MatchQuery) {
 				q.WithCourse(
@@ -75,11 +119,11 @@ func (r *repositoryCancelClass) CancelClass(sc *schemas.SchemaCancelClass) (*ent
 	}
 
 	// check if user is the owner of the class
-	if sc.Submitter_role == "tutor" {
+	if sc.SubmitterRole == "tutor" {
 		if c.Edges.Match[0].Edges.Course[0].Edges.Tutor.Edges.User.ID != sc.UserID {
 			return nil, errors.New("user is not the owner of the class")
 		}
-	} else if sc.Submitter_role == "student" {
+	} else if sc.SubmitterRole == "student" {
 		// check if user is the student of the class
 		found := false
 		for _, m := range c.Edges.Match {

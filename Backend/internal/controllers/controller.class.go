@@ -8,21 +8,40 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type ControllerCancelClass interface {
+type ControllerClass interface {
+	GetCancellingClasses(echo.Context) error
 	CancelClass(c echo.Context) error
 }
 
-type controllerCancelClass struct {
-	service services.ServiceCancelClass
+type controllerClass struct {
+	service services.ServiceClass
 }
 
-func NewControllerCancelClass(s services.ServiceCancelClass) ControllerCancelClass {
-	return &controllerCancelClass{
+func NewControllerClass(s services.ServiceClass) ControllerClass {
+	return &controllerClass{
 		service: s,
 	}
 }
 
-func (cC *controllerCancelClass) CancelClass(c echo.Context) error {
+func (cC *controllerClass) GetCancellingClasses(c echo.Context) error {
+	classes, err := cC.service.GetCancellingClasses()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, schemas.SchemaErrorResponse{
+			Success: false,
+			Message: err.Error(),
+			Error:   err,
+		})
+		return err
+	}
+	c.JSON(http.StatusOK, schemas.SchemaResponses{
+		Success: true,
+		Message: "Get classes successfully",
+		Data:    classes,
+	})
+	return nil
+}
+
+func (cC *controllerClass) CancelClass(c echo.Context) error {
 	request := &schemas.SchemaCancelClass{}
 	if err := c.Bind(request); err != nil {
 		c.JSON(http.StatusBadRequest, schemas.SchemaResponses{
