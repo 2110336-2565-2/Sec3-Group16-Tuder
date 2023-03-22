@@ -23,15 +23,16 @@ export default function Navbar(){
     }
 
     let navbarRole = null
-    if(role === 'guest'){
-        navbarRole = navbarContent[0]
-    }else if(role === 'tutor'){
-        navbarRole = navbarContent[1]
+    if(role === 'admin'){
+        navbarRole = navbarContent[3]
     }else if(role === 'student'){
         navbarRole = navbarContent[2]
+    }else if(role === 'tutor'){
+        navbarRole = navbarContent[1]
     }else{
-        navbarRole = navbarContent[3]
+        navbarRole = navbarContent[0]
     }
+    
     // raw data contents JSON
     const contents = navbarRole.content;
     // change to component for use in JSX  --> Generate NavItem for each content

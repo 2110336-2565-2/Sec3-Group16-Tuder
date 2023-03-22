@@ -1,18 +1,30 @@
-import React from "react";
+import React, { useState, createContext, useContext} from "react";
 import styled from "styled-components"
-import FormEnterNewPassword from '../components/form/FormEnterNewPassword.js'
 import WaveFooter from "../components/global/WaveFooter.js";
 
-export default function EnterNewPassword(){
+const DataContext = createContext({
+    data : {
+        data: []
+    },
+    setData : () => {}
+});
+
+export const useDataContext = () => useContext(DataContext);
+export default function CancelRequestList(){
+    const [data, setData] = useState({data:[]});
 
     return(
         <Container>
+            <DataContext.Provider value={{data, setData}}>
             <ContainerWithHeight margintop='100px'>
-                <FormEnterNewPassword />
+                
+
+
             </ContainerWithHeight>
             <WaveFooterWrapper>
                 <WaveFooter />
             </WaveFooterWrapper>
+            </DataContext.Provider>
         </Container>
         
     )

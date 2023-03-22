@@ -1,7 +1,7 @@
 import FormT from './FormStyle.js';
 import React, { useState } from 'react';
-import signUpHandler from '../handlers/signUpHandler.js';
-import signupContent from "../datas/SignUp.role.js";
+import signUpHandler from '../../handlers/signUpHandler.js';
+import signupContent from "../../datas/SignUp.role.js";
 import styled from 'styled-components';
 
 import { useNavigate } from 'react-router-dom';

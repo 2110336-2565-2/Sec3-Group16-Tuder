@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-hot-toast';
-import checkPasswordHandler from '../handlers/checkPasswordHandler.js';
-import useUsername from '../hooks/useUsername.js';
+import checkPasswordHandler from '../../handlers/checkPasswordHandler.js';
+import useUsername from '../../hooks/useUsername.js';
 
 import FormT from './FormStyle.js';
 import styled from 'styled-components';

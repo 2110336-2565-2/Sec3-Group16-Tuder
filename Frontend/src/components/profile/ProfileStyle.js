@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import FormT from "../FormStyle";
+import FormT from "../form/FormStyle";
 //icon
 import { CameraFilled } from "@ant-design/icons";
 

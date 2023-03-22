@@ -1,5 +1,5 @@
 import CourseList from "../components/CourseList";
-import CourseSearchForm from "../components/FormCourseSearch";
+import CourseSearchForm from "../components/form/FormCourseSearch";
 import styled from "styled-components";
 import { Outlet } from "react-router";
 import React, { useState, createContext , useContext} from "react";

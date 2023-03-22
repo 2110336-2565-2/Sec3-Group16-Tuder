@@ -1,7 +1,7 @@
 import React, { Fragment } from "react";
 import styled from "styled-components"
-import FormSignUp from "../components/FormSignUp.js";
-import Footer from "../components/SignUpFooter.js";
+import FormSignUp from "../components/form/FormSignUp.js";
+import Footer from "../components/footer/SignUpFooter.js";
 
 export default function SignUp(){
 

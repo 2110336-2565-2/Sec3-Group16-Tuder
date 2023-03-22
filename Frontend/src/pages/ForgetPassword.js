@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components"
-import FormForgetPassword from '../components/FormForgetPassword.js'
+import FormForgetPassword from '../components/form/FormForgetPassword.js'
 
 export default function ForgetPassword(){
 

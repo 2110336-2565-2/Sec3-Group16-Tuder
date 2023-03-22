@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components"
-import FormChangePassword from '../components/FormChangePassword.js'
+import FormChangePassword from '../components/form/FormChangePassword.js'
 import WaveFooter from "../components/global/WaveFooter.js";
 
 export default function ChangePassword(){
