@@ -47,27 +47,31 @@ export default function Profile() {
         <Name>{user.firstname + " " + user.lastname}</Name>
         <Email>{user.email}</Email>
       </TopSection>
-      <MiddleSection>
-        <TitleWrapper>
-          <Title>Information</Title>
-          <EditIcon onClick={()=>navigate("/edit-profile")} />
-        </TitleWrapper>
-        {role === "student" ? (
-          <StudentInfo user={user} />
-        ) : (
-          <TutorInfo user={user} />
-        )}
-      </MiddleSection>
-      <WaveFooter />
+      <Wrapper>
+        <MiddleSection>
+          <TitleWrapper>
+            <Title>Information</Title>
+            <EditIcon onClick={()=>navigate("/edit-profile")} />
+          </TitleWrapper>
+          {role === "student" ? (
+            <StudentInfo user={user} />
+          ) : (
+            <TutorInfo user={user} />
+          )}
+        </MiddleSection>
+        <WaveFooter />
+      </Wrapper>
     </Container>
   );
 }
 
 const Container = styled.div`
   width: 100%;
+  height: 92.2vh;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
   background-color: #fdedeb;
 `;
 
@@ -108,6 +112,11 @@ const Email = styled.span`
   font-weight: medium;
   color: #ababab;
   margin-top: 10px;
+`;
+
+const Wrapper = styled.div`
+  background-color: white;
+  width: 100%;
 `;
 
 const MiddleSection = styled.div`

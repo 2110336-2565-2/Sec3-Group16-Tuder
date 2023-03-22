@@ -198,7 +198,7 @@ export default function FormSignUp(){
                     <FormT.ContentSmall>
                         Already have an account ?
                     </FormT.ContentSmall>
-                    <FormT.Link to='/Signin' underline='none'>Sign In</FormT.Link>
+                    <FormT.Link to='/sign-in' underline='none'>Sign In</FormT.Link>
                 </FormT.Content>
             </FormT.Div>
         </SignUpForm>

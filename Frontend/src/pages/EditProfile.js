@@ -38,9 +38,10 @@ export default function EditProfile() {
 
 const Container = styled.div`
   display: flex;
+  height: 95vh;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   padding: 50px 0px;
   background-color: #fdedeb;
 `;
