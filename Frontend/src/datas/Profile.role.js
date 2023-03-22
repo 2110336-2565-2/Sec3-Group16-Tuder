@@ -126,13 +126,6 @@ export const studentFields = [
     name: "birthdate",
     width: "",
   },
-  {
-    label: "School",
-    type: "text",
-    id: "school",
-    name: "school",
-    width: "100%",
-  },
 ];
 
 export const dummyStudent = {
@@ -146,7 +139,6 @@ export const dummyStudent = {
   phone: "0812345678",
   gender: "female",
   birthdate: "2010-10-10",
-  school: "มหาวิทยาลัยนนทบุรี",
 };
 
 export const dummyTutor = {

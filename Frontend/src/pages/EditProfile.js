@@ -9,7 +9,6 @@ import FormEditProfile from "../components/profile/FormEditProfile";
 import WaveFooter from "../components/global/WaveFooter";
 
 export default function EditProfile() {
-  // CHANGE THIS TO GET USER FROM BACKEND
   const [user, setUser] = useState();
   const [role, handleRole] = useRole();
   const [username, handleUsername] = useUsername();

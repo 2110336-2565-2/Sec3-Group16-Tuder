@@ -15,9 +15,8 @@ export default function FormEditProfile({ user }) {
   console.log("user: ", user)
   const fields = user.role === "student" ? studentFields : tutorFields;
   const [isFileUploaderOpen, setIsFileUploaderOpen] = useState(false);
-  const [formData, setFormData] = useState({...user, new_profile_picture: user.profile_picture_URL});
+  const [formData, setFormData] = useState({...user});
 
-  // EDIT PROFILE HANDLER CHANGE THIS TO SEND DATA TO BACKEND
   const submitHandler = (e) => {
     e.preventDefault();
     console.log("edit profile");
@@ -40,9 +39,14 @@ export default function FormEditProfile({ user }) {
   };
 
   const handleChange = (e) => {
+    let value = e.target.value;
+    // Convert some fields format to match the database
+    if (e.target.name === "birthdate") {
+      value = new Date(e.target.value).toISOString();
+    }
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]: value,
     })
     // console.log("e.target.name: ", e.target.name);
     // console.log("e.target.value: ", e.target.value);
@@ -58,7 +62,7 @@ export default function FormEditProfile({ user }) {
       />
       <Title>Edit Profile</Title>
       <FormP.ProfilePictureWrapper onClick={()=>setIsFileUploaderOpen(true)}>
-        <FormP.ProfilePicture src={formData.new_profile_picture} />
+        <FormP.ProfilePicture src={formData.new_profile_picture || formData.profile_picture_URL} />
         <FormP.CameraIconWrapper>
           <FormP.CameraIcon />
         </FormP.CameraIconWrapper>
@@ -66,6 +70,19 @@ export default function FormEditProfile({ user }) {
       <FormP.FormContainer>
         {fields.map((field) => {
           if (field.type === "text" || field.type === "textArea") {
+            return (
+              <TextInput
+                key={field.id}
+                type={field.type}
+                label={field.label}
+                id={field.id}
+                name={field.name}
+                value={formData[field.name]}
+                onChange={handleChange}
+                width={field.width}
+              />
+            );
+          } else if (field.type === "email") {
             return (
               <TextInput
                 key={field.id}
@@ -93,13 +110,14 @@ export default function FormEditProfile({ user }) {
               />
             );
           } else if (field.type === "date") {
+            const displayedDate = formData[field.name].split("T")[0];
             return (
               <DateInput
                 key={field.id}
                 label={field.label}
                 id={field.id}
                 name={field.name}
-                value={formData[field.name]}
+                value={displayedDate}
                 onChange={handleChange}
                 width={field.width}
               />

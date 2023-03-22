@@ -2,12 +2,12 @@ import React from "react";
 import { FormP } from "./ProfileStyle";
 
 export default function TextInput({ type, label, id, name, value, onChange ,width}) {
-  if (type === "text") {
+  if (type === "text" || type === "email") {
   return (
     <FormP.InputComponent width={width}>
       <FormP.Label htmlFor={id} >{label}</FormP.Label>
       <FormP.TextInput
-        type="text"
+        type={type}
         id={id}
         name={name}
         value={value}
@@ -20,7 +20,6 @@ export default function TextInput({ type, label, id, name, value, onChange ,widt
         <FormP.Label htmlFor={id} >{label}</FormP.Label>
         <FormP.TextArea
           type="text"
-  
           id={id}
           name={name}
           value={value}
