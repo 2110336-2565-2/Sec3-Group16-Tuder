@@ -1,5 +1,6 @@
 import FormT from './FormStyle.js';
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 import signInHandler from '../handlers/signInHandler.js';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 
@@ -29,7 +30,7 @@ export default function FormSignIn(props){
         } catch (error){
 
             // Handle by do sth
-
+            toast.error(error.message);
             console.log(error);
             setStatus('error');
         }
