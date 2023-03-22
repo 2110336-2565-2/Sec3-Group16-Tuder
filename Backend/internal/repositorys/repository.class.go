@@ -15,6 +15,7 @@ import (
 type RepositoryClass interface {
 	GetCancellingClasses() ([]*schemas.SchemaCancelRequest, error)
 	CancelClass(sc *schemas.SchemaCancelClass) (*ent.Class, error)
+	ApproveClassCancellation(sc *schemas.SchemaCancelClass) error
 }
 
 type repositoryClass struct {
@@ -152,4 +153,31 @@ func (r *repositoryClass) CancelClass(sc *schemas.SchemaCancelClass) (*ent.Class
 	}
 
 	return c, tx.Commit()
+}
+
+func (r *repositoryClass) ApproveClassCancellation(sc *schemas.SchemaCancelClass) error {
+
+	c, err := r.client.Class.
+		Query().
+		Where(class.IDEQ(sc.ClassID)).
+		Only(r.ctx)
+
+	if err != nil {
+		return errors.New("class not found")
+	}
+
+	if c.Status != class.StatusCancelling {
+		return errors.New("class is not cancelling")
+	}
+
+	_, err = r.client.Class.
+		UpdateOne(c).
+		SetStatus(class.StatusCancelled).
+		Save(r.ctx)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

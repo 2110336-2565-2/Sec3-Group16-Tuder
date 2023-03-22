@@ -23,10 +23,15 @@ func InitClassRoutes(client *ent.Client, e *echo.Group) {
 	getCancellingClassesRoute.Use(mid.AdminMiddleware)
 	getCancellingClassesRoute.GET("", controllerClass.GetCancellingClasses)
 
+	// approve class cancellation
+	approveClassCancellationRoute := e.Group("/approve-class-cancellation")
+	approveClassCancellationRoute.Use(mid.JWT())
+	approveClassCancellationRoute.Use(mid.AdminMiddleware)
+	approveClassCancellationRoute.POST("", controllerClass.ApproveClassCancellation)
+
 	// cancel class
 	cancelClassRoute := e.Group("/cancel-class")
 	cancelClassRoute.Use(mid.JWT())
-
 	cancelClassRoute.POST("", controllerClass.CancelClass)
 
 }

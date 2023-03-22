@@ -11,6 +11,7 @@ import (
 type ControllerClass interface {
 	GetCancellingClasses(echo.Context) error
 	CancelClass(c echo.Context) error
+	ApproveClassCancellation(c echo.Context) error
 }
 
 type controllerClass struct {
@@ -66,6 +67,36 @@ func (cC *controllerClass) CancelClass(c echo.Context) error {
 	c.JSON(http.StatusOK, schemas.SchemaResponses{
 		Success: true,
 		Message: "Cancel request has already been sent to admin",
+		Data:    nil,
+	})
+	return nil
+
+}
+
+func (cC *controllerClass) ApproveClassCancellation(c echo.Context) error {
+
+	cancelSchema := &schemas.SchemaCancelClass{}
+	if err := c.Bind(cancelSchema); err != nil {
+		c.JSON(http.StatusBadRequest, schemas.SchemaResponses{
+			Success: false,
+			Message: "invalid request",
+			Data:    err.Error(),
+		})
+	}
+
+	err := cC.service.ApproveClassCancellation(cancelSchema)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, schemas.SchemaResponses{
+			Success: false,
+			Message: err.Error(),
+			Data:    nil,
+		})
+		return err
+	}
+
+	c.JSON(http.StatusOK, schemas.SchemaResponses{
+		Success: true,
+		Message: "Class cancellation has been approved",
 		Data:    nil,
 	})
 	return nil

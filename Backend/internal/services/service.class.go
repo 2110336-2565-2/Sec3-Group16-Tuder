@@ -8,6 +8,7 @@ import (
 type ServiceClass interface {
 	GetCancellingClasses() ([]*schemas.SchemaCancelRequest, error)
 	CancelClass(sc *schemas.SchemaCancelClass) error
+	ApproveClassCancellation(sc *schemas.SchemaCancelClass) error
 }
 
 type serviceClass struct {
@@ -20,7 +21,6 @@ func NewServiceClass(repo repositorys.RepositoryClass) ServiceClass {
 	}
 }
 
-
 func (s *serviceClass) GetCancellingClasses() ([]*schemas.SchemaCancelRequest, error) {
 	classes, err := s.repo.GetCancellingClasses()
 	if err != nil {
@@ -29,12 +29,21 @@ func (s *serviceClass) GetCancellingClasses() ([]*schemas.SchemaCancelRequest, e
 	return classes, nil
 }
 
-
 func (s *serviceClass) CancelClass(sc *schemas.SchemaCancelClass) error {
 
 	// change status of class to cancelling , wait for admin to confirm
 
 	_, err := s.repo.CancelClass(sc)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *serviceClass) ApproveClassCancellation(sc *schemas.SchemaCancelClass) error {
+
+	// change status of class to cancelled
+	err := s.repo.ApproveClassCancellation(sc)
 	if err != nil {
 		return err
 	}
