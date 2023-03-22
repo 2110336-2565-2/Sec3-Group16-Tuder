@@ -12,13 +12,14 @@ type SchemaCancelClass struct {
 }
 
 type SchemaCancelRequest struct {
-	ClassID       uuid.UUID `json:"classId"`
-	Course        string    `json:"course"`
-	Tutorname     string    `json:"tutorname"`
-	Studentname   string    `json:"studentname"`
-	Subject       string    `json:"subject"`
-	Time          int       `json:"time"`
-	Price         int       `json:"price"`
+	ClassID     uuid.UUID `json:"classId"`
+	Course      string    `json:"course"`
+	Tutorname   string    `json:"tutor_name"`
+	Studentname string    `json:"student_name"`
+	Subject     string    `json:"subject"`
+	TotalHour   int       `json:"time"`
+	SuccessHour int       `json:"success_hour"`
+	Price       int       `json:"price"`
 }
 
 type SchemaCancelRequestApprove struct {

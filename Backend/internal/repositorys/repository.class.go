@@ -65,7 +65,8 @@ func (r *repositoryClass) GetCancellingClasses() ([]*schemas.SchemaCancelRequest
 			Tutorname:   c.Edges.Match[0].Edges.Course[0].Edges.Tutor.Edges.User.FirstName + " " + c.Edges.Match[0].Edges.Course[0].Edges.Tutor.Edges.User.LastName,
 			Studentname: c.Edges.Match[0].Edges.Student.Edges.User.FirstName + " " + c.Edges.Match[0].Edges.Student.Edges.User.LastName,
 			Subject:     c.Edges.Match[0].Edges.Course[0].Subject,
-			Time:        c.Edges.Match[0].Edges.Course[0].EstimatedTime,
+			TotalHour:   c.TotalHour,
+			SuccessHour: c.SuccessHour,
 			Price:       c.Edges.Match[0].Edges.Course[0].PricePerHour,
 		})
 	}
