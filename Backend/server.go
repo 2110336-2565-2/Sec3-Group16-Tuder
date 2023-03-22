@@ -53,8 +53,8 @@ func main() {
 	// test must reset db as always
 	datas.InsertData(client)
 
-	routes.InitRoutes(client, e)
 	e.Use(middlewares.CorsMiddleware)
+	routes.InitRoutes(client, e)
 	e.Logger.Fatal(e.Start(port))
 
 }

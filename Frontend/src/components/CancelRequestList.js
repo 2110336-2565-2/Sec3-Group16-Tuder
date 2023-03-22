@@ -1,50 +1,49 @@
 import styled from 'styled-components';
-import Course from '../components/Course';
 import {useQuery} from 'react-query';
-import { fetchCourseHandler } from '../handlers/searchCourseHandler';
-import { useDataContext } from '../pages/Courses';
+import { fetchCancellingClassHandler } from '../handlers/cancellingClassHandler';
+import { useDataContext } from '../pages/CancelRequestList';
 import CancelRequest from '../components/CancelRequest';
 import React from 'react';
 
 
 export default function CancelRequestList(){ 
-    // const {data, setData} = useDataContext();
+    const {data, setData} = useDataContext();
 
-    // const { isLoading, error} = useQuery(
-    //     'courses',() =>
-    //     {
-    //         fetchCourseHandler().then((res) => {
+    const { isLoading, error} = useQuery(
+        'cancellingClass',() =>
+        {
+            fetchCancellingClassHandler().then((res) => {
                 
-    //             if(res.data.success){
-                    
-    //                 setData({data:res.data.result});
-    //             }
-    //         }).catch((err) => {
-    //             console.log(err);
-    //         }
-    //         )
-    //     },
-    //     {
-    //         refetchOnWindowFocus: false,
-    //     }
-    //     );
+                console.log(res)
+                if(res.data.success){
+                    if(res.data.data !== null)
+                        setData(res.data.data);
+                }
+            }).catch((err) => {
+                console.log(err);
+            }
+            )
+        },
+        {
+            refetchOnWindowFocus: false,
+        }
+        );
 
+    if (isLoading) {
+        return <div>Loading...</div>
+    }
 
-    // if (isLoading) {
-    //     return <div>Loading...</div>
-    // }
-
-    // if (error) {
-    //     return <div>Error: {error.message}</div>
-    // }
+    if (error) {
+        return <div>Error: {error.message}</div>
+    }
     
-    // if (data === null) {
-    //     return <div>Error</div>
-    // }
+    if (data === null) {
+        return <div>Error</div>
+    }
 
-    // if(data.data === []){
-    //     return <div>Empty</div>
-    // }
+    if(data === []){
+        return <div>Empty</div>
+    }
     
 
     return (
@@ -53,15 +52,11 @@ export default function CancelRequestList(){
             <RequestListPage>
                 
                     <RequestListcontent>
-                        <FirstRow>
-                            <FirstRowInfo>Class</FirstRowInfo>
-                            <FirstRowInfo>Course</FirstRowInfo>
-                            <FirstRowInfo>Tutor</FirstRowInfo>
-                            <FirstRowInfo>Subject</FirstRowInfo>
-                            <FirstRowInfo>Time</FirstRowInfo>
-                            <FirstRowInfo>Price</FirstRowInfo>
-                        </FirstRow>
-                        <CancelRequest  classId='50323' course='Algorithm for daily life' tutor='John' subject='Math' time='2' price='20' img='https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.freepik.com%2Fpremium-vector%2Fmathematics-education-concept_1079551.htm&psig=AOvVaw3QZ-0-2Q8' /> 
+                        <CancelRequest type="Topic" classId='ClassID' course='Course' tutor='Tutor' student='Student' subject='Subject' total_hour='Total Hours' success_hour='Success Hour'   price='Price/Hour' /> 
+                        {data.map(item => (  
+
+                            <CancelRequest key={item.classId} classId={item.classId} course={item.course} tutor={item.tutor_name} student={item.student_name} subject={item.subject} total_hour={item.total_hours} success_hour={item.success_hours}   price={item.price} /> 
+                        ))}
                         
                     </RequestListcontent>
 

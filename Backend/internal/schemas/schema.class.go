@@ -17,8 +17,8 @@ type SchemaCancelRequest struct {
 	Tutorname   string    `json:"tutor_name"`
 	Studentname string    `json:"student_name"`
 	Subject     string    `json:"subject"`
-	TotalHour   int       `json:"time"`
-	SuccessHour int       `json:"success_hour"`
+	TotalHour   int       `json:"total_hours"`
+	SuccessHour int       `json:"success_hours"`
 	Price       int       `json:"price"`
 }
 

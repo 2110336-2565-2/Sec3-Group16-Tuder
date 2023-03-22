@@ -4,16 +4,15 @@ import styled from "styled-components";
 import { Outlet } from "react-router";
 import React, { useState, createContext , useContext} from "react";
 const DataContext = createContext({
-        data : {
-            data: []
-        },
+        
+        data: [],
         setData : () => {}
     });
 
 export const useDataContext = () => useContext(DataContext);
 
 export default function Courses(){
-    const [data, setData] = useState({data:[]});
+    const [data, setData] = useState([]);
     
 
     return (

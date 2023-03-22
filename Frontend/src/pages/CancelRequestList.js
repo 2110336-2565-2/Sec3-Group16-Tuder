@@ -5,15 +5,14 @@ import { IsAdmin } from "../components/IsAuth.js";
 import CancelRequestList from "../components/CancelRequestList.js";
 
 const DataContext = createContext({
-    data : {
-        data: []
-    },
+   
+    data: [],
     setData : () => {}
 });
 
 export const useDataContext = () => useContext(DataContext);
 export default function CancelRequestListPage(){
-    const [data, setData] = useState({data:[]});
+    const [data, setData] = useState([]);
 
     return(
         <IsAdmin>

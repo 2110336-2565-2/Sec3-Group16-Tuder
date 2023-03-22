@@ -29,7 +29,7 @@ func InitClassRoutes(client *ent.Client, e *echo.Group) {
 	auditClassCancellationRoute.Use(mid.AdminMiddleware)
 	auditClassCancellationRoute.POST("", controllerClass.AuditClassCancellation)
 
-	// user acknowledge class cancellation result
+	// user acknowledge class rejected cancellation result
 	acknowledgeClassCancellationRoute := e.Group("/acknowledge-class-cancellation")
 	acknowledgeClassCancellationRoute.Use(mid.JWT())
 	acknowledgeClassCancellationRoute.POST("", controllerClass.AcknowledgeClassCancellation)
