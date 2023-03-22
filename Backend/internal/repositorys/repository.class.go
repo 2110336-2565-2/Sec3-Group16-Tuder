@@ -166,6 +166,10 @@ func (r *repositoryClass) ApproveClassCancellation(sc *schemas.SchemaCancelClass
 		return errors.New("class not found")
 	}
 
+	if c.Status == class.StatusCancelled {
+		return errors.New("class is already cancelled")
+	}
+
 	if c.Status != class.StatusCancelling {
 		return errors.New("class is not cancelling")
 	}

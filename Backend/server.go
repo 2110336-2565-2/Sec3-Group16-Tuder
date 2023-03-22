@@ -8,7 +8,6 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/migrate"
 
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/datas"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/middlewares"
 	routes "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/routes"
 	godotenv "github.com/joho/godotenv"
@@ -51,7 +50,7 @@ func main() {
 	}
 
 	// test must reset db as always
-	datas.InsertData(client)
+	// datas.InsertData(client)
 
 	routes.InitRoutes(client, e)
 	e.Use(middlewares.CorsMiddleware)
