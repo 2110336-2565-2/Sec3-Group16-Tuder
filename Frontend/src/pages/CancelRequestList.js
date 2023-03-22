@@ -1,6 +1,8 @@
 import React, { useState, createContext, useContext} from "react";
 import styled from "styled-components"
 import WaveFooter from "../components/global/WaveFooter.js";
+import { IsAdmin } from "../components/IsAuth.js";
+import CancelRequestList from "../components/CancelRequestList.js";
 
 const DataContext = createContext({
     data : {
@@ -10,22 +12,24 @@ const DataContext = createContext({
 });
 
 export const useDataContext = () => useContext(DataContext);
-export default function CancelRequestList(){
+export default function CancelRequestListPage(){
     const [data, setData] = useState({data:[]});
 
     return(
-        <Container>
-            <DataContext.Provider value={{data, setData}}>
-            <ContainerWithHeight margintop='100px'>
-                
+        <IsAdmin>
+            <Container>
+                <DataContext.Provider value={{data, setData}}>
+                <ContainerWithHeight margintop='100px'>
+                    
+                    <CancelRequestList />
 
-
-            </ContainerWithHeight>
-            <WaveFooterWrapper>
-                <WaveFooter />
-            </WaveFooterWrapper>
-            </DataContext.Provider>
-        </Container>
+                </ContainerWithHeight>
+                <WaveFooterWrapper>
+                    <WaveFooter />
+                </WaveFooterWrapper>
+                </DataContext.Provider>
+            </Container>
+        </IsAdmin>
         
     )
 }

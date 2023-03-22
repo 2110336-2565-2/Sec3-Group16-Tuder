@@ -5,6 +5,7 @@ import StudentInfo from "../components/profile/StudentInfo.js";
 import TutorInfo from "../components/profile/TutorInfo.js";
 import { dummyStudent, dummyTutor } from "../datas/Profile.role.js";
 import useRole from "../hooks/useRole.js";
+import { IsUser } from "../components/IsAuth.js";
 
 // icons
 import { EditOutlined } from "@ant-design/icons";
@@ -21,27 +22,30 @@ export default function Profile() {
   const navigate = useNavigate();
 
   return (
-    <Container>
-      <TopSection>
-        <Role>{capitalizeFirstLetter(user.role)}</Role>
-        <ProfileImageWrapper>
-          <ProfileImage src={user.profile_picture_URL} />
-        </ProfileImageWrapper>
-        <Name>{user.first_name + " " + user.last_name}</Name>
-        <Email>{user.email}</Email>
-      </TopSection>
-      <MiddleSection>
-        <TitleWrapper>
-          <Title>Information</Title>
-          <EditIcon onClick={()=>navigate("/edit-profile")} />
-        </TitleWrapper>
-        {user.role === "student" ? (
-          <StudentInfo user={user} />
-        ) : (
-          <TutorInfo user={user} />
-        )}
-      </MiddleSection>
-    </Container>
+    <IsUser>
+      <Container>
+        <TopSection>
+          <Role>{capitalizeFirstLetter(user.role)}</Role>
+          <ProfileImageWrapper>
+            <ProfileImage src={user.profile_picture_URL} />
+          </ProfileImageWrapper>
+          <Name>{user.first_name + " " + user.last_name}</Name>
+          <Email>{user.email}</Email>
+        </TopSection>
+        <MiddleSection>
+          <TitleWrapper>
+            <Title>Information</Title>
+            <EditIcon onClick={()=>navigate("/edit-profile")} />
+          </TitleWrapper>
+          {user.role === "student" ? (
+            <StudentInfo user={user} />
+          ) : (
+            <TutorInfo user={user} />
+            )}
+        </MiddleSection>
+      </Container>
+    </IsUser>
+    
   );
 }
 

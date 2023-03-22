@@ -4,6 +4,7 @@ import useRole from "../hooks/useRole";
 import { dummyStudent, dummyTutor } from "../datas/Profile.role";
 
 import FormEditProfile from "../components/profile/FormEditProfile";
+import { IsUser } from "../components/IsAuth";
 
 export default function EditProfile() {
   // CHANGE THIS TO GET USER FROM BACKEND
@@ -11,9 +12,11 @@ export default function EditProfile() {
   const user = role === "student" ? dummyStudent : dummyTutor;
 
   return (
-    <Container>
-      <FormEditProfile user={user} />
-    </Container>
+    <IsUser>
+      <Container>
+        <FormEditProfile user={user} />
+      </Container>
+    </IsUser>
   );
 }
 

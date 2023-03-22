@@ -2,18 +2,21 @@ import React from "react";
 import styled from "styled-components"
 import FormEnterNewPassword from '../components/form/FormEnterNewPassword.js'
 import WaveFooter from "../components/global/WaveFooter.js";
+import { IsUser } from "../components/IsAuth.js";
 
 export default function EnterNewPassword(){
 
     return(
-        <Container>
-            <ContainerWithHeight margintop='100px'>
-                <FormEnterNewPassword />
-            </ContainerWithHeight>
-            <WaveFooterWrapper>
-                <WaveFooter />
-            </WaveFooterWrapper>
-        </Container>
+        <IsUser>
+            <Container>
+                <ContainerWithHeight margintop='100px'>
+                    <FormEnterNewPassword />
+                </ContainerWithHeight>
+                <WaveFooterWrapper>
+                    <WaveFooter />
+                </WaveFooterWrapper>
+            </Container>
+        </IsUser>
         
     )
 }

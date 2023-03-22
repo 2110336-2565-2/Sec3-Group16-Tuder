@@ -2,18 +2,21 @@ import React from "react";
 import styled from "styled-components"
 import FormChangePassword from '../components/form/FormChangePassword.js'
 import WaveFooter from "../components/global/WaveFooter.js";
+import { IsUser } from "../components/IsAuth.js";
 
 export default function ChangePassword(){
 
     return(
-        <Container>
-            <ContainerWithHeight margintop='100px'>
-                <FormChangePassword />
-            </ContainerWithHeight>
-            <WaveFooterWrapper>
-                <WaveFooter />
-            </WaveFooterWrapper>
-        </Container>
+        <IsUser>
+            <Container>
+                <ContainerWithHeight margintop='100px'>
+                    <FormChangePassword />
+                </ContainerWithHeight>
+                <WaveFooterWrapper>
+                    <WaveFooter />
+                </WaveFooterWrapper>
+            </Container>
+        </IsUser>
         
     )
 }
