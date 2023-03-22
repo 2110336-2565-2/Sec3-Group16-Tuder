@@ -12,7 +12,6 @@ import (
 
 func InsertCourse(client *ent.Client, ctx context.Context, tutor []*ent.Tutor) []*ent.Course {
 
-
 	// Create courses
 	course1 := CreateCourse(client, tutor[0], "Mathematics for Boys lovers", "Mathematics", "Algebra", 60, "Algebra is a branch of mathematics that studies the properties of objects under the action of groups, rings, and other algebraic structures.", 100, Course.LevelGrade10, "https://picsum.photos/seed/picsum/200/100")
 	course2 := CreateCourse(client, tutor[1], "Boys licking practice in daily life", "Romantic", "How's Boys smell", 284, "Boys is a kind of thing that we need to know more about it", 2400, Course.LevelGrade12, "https://picsum.photos/seed/picsum/200/100")
@@ -25,9 +24,8 @@ func InsertCourse(client *ent.Client, ctx context.Context, tutor []*ent.Tutor) [
 	}
 
 	for _, c := range course {
-		fmt.Println("Student created: ", c.ID)
+		fmt.Println("Course created: ", c.ID)
 	}
-
 
 	return course
 }
@@ -43,7 +41,7 @@ func CreateCourse(
 	pricePerHour int,
 	level Course.Level,
 	coursePictureURL string,
-) (*ent.CourseCreate) {
+) *ent.CourseCreate {
 
 	// Generate a new UUID for the course.
 	courseId := uuid.New()

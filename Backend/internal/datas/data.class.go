@@ -13,8 +13,8 @@ import (
 func InsertClass(client *ent.Client, ctx context.Context, schedule []*ent.Schedule, ph []*ent.PaymentHistory) []*ent.Class {
 
 	// Create class
-	class1 := CreateClass(client, true, 30, 20, class.StatusCancelling, schedule[0], ph[0])
-	class2 := CreateClass(client, true, 50, 25, class.StatusCancelling, schedule[1], ph[1])
+	class1 := CreateClass(client, true, 30, 20, class.StatusScheduled, schedule[0], ph[0])
+	class2 := CreateClass(client, true, 50, 25, class.StatusScheduled, schedule[1], ph[1])
 
 	class, err := client.Class.CreateBulk(class1, class2).Save(ctx)
 

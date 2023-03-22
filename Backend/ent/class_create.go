@@ -70,14 +70,14 @@ func (cc *ClassCreate) SetNillableID(u *uuid.UUID) *ClassCreate {
 }
 
 // AddMatchIDs adds the "match" edge to the Match entity by IDs.
-func (cc *ClassCreate) AddMatchIDs(ids ...int) *ClassCreate {
+func (cc *ClassCreate) AddMatchIDs(ids ...uuid.UUID) *ClassCreate {
 	cc.mutation.AddMatchIDs(ids...)
 	return cc
 }
 
 // AddMatch adds the "match" edges to the Match entity.
 func (cc *ClassCreate) AddMatch(m ...*Match) *ClassCreate {
-	ids := make([]int, len(m))
+	ids := make([]uuid.UUID, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
@@ -236,7 +236,7 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: match.FieldID,
 				},
 			},

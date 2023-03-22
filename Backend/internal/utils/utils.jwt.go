@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 )
 
 func GenerateToken(username string, isExpire bool) (string, error) {
@@ -19,10 +20,11 @@ func GenerateToken(username string, isExpire bool) (string, error) {
 	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 }
 
-func GenerateLoginToken(username string, role string, isExpire bool) (string, error) {
+func GenerateLoginToken(username string, userid uuid.UUID, role string, isExpire bool) (string, error) {
 	claims := jwt.MapClaims{}
 	claims["authorized"] = true
 	claims["username"] = username
+	claims["userid"] = userid
 	claims["role"] = role
 	claims["iat"] = time.Now().Unix()
 	if isExpire {

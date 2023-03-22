@@ -8,22 +8,25 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
+	"github.com/google/uuid"
 )
 
 // Match is the model entity for the Match schema.
 type Match struct {
 	config
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MatchQuery when eager-loading is set.
-	Edges MatchEdges `json:"edges"`
+	Edges         MatchEdges `json:"edges"`
+	student_match *uuid.UUID
 }
 
 // MatchEdges holds the relations/edges for other nodes in the graph.
 type MatchEdges struct {
 	// Student holds the value of the student edge.
-	Student []*Student `json:"student,omitempty"`
+	Student *Student `json:"student,omitempty"`
 	// Course holds the value of the course edge.
 	Course []*Course `json:"course,omitempty"`
 	// Class holds the value of the class edge.
@@ -34,9 +37,13 @@ type MatchEdges struct {
 }
 
 // StudentOrErr returns the Student value or an error if the edge
-// was not loaded in eager-loading.
-func (e MatchEdges) StudentOrErr() ([]*Student, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e MatchEdges) StudentOrErr() (*Student, error) {
 	if e.loadedTypes[0] {
+		if e.Student == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: student.Label}
+		}
 		return e.Student, nil
 	}
 	return nil, &NotLoadedError{edge: "student"}
@@ -66,7 +73,9 @@ func (*Match) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case match.FieldID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(uuid.UUID)
+		case match.ForeignKeys[0]: // student_match
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Match", columns[i])
 		}
@@ -83,11 +92,18 @@ func (m *Match) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case match.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				m.ID = *value
 			}
-			m.ID = int(value.Int64)
+		case match.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field student_match", values[i])
+			} else if value.Valid {
+				m.student_match = new(uuid.UUID)
+				*m.student_match = *value.S.(*uuid.UUID)
+			}
 		}
 	}
 	return nil

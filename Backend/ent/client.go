@@ -762,7 +762,7 @@ func (c *MatchClient) UpdateOne(m *Match) *MatchUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *MatchClient) UpdateOneID(id int) *MatchUpdateOne {
+func (c *MatchClient) UpdateOneID(id uuid.UUID) *MatchUpdateOne {
 	mutation := newMatchMutation(c.config, OpUpdateOne, withMatchID(id))
 	return &MatchUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -779,7 +779,7 @@ func (c *MatchClient) DeleteOne(m *Match) *MatchDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *MatchClient) DeleteOneID(id int) *MatchDeleteOne {
+func (c *MatchClient) DeleteOneID(id uuid.UUID) *MatchDeleteOne {
 	builder := c.Delete().Where(match.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -796,12 +796,12 @@ func (c *MatchClient) Query() *MatchQuery {
 }
 
 // Get returns a Match entity by its id.
-func (c *MatchClient) Get(ctx context.Context, id int) (*Match, error) {
+func (c *MatchClient) Get(ctx context.Context, id uuid.UUID) (*Match, error) {
 	return c.Query().Where(match.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *MatchClient) GetX(ctx context.Context, id int) *Match {
+func (c *MatchClient) GetX(ctx context.Context, id uuid.UUID) *Match {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -817,7 +817,7 @@ func (c *MatchClient) QueryStudent(m *Match) *StudentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(match.Table, match.FieldID, id),
 			sqlgraph.To(student.Table, student.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, match.StudentTable, match.StudentPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, match.StudentTable, match.StudentColumn),
 		)
 		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
 		return fromV, nil
@@ -1749,7 +1749,7 @@ func (c *StudentClient) QueryMatch(s *Student) *MatchQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(student.Table, student.FieldID, id),
 			sqlgraph.To(match.Table, match.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, student.MatchTable, student.MatchPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, student.MatchTable, student.MatchColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil

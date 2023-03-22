@@ -33,14 +33,14 @@ func (su *StudentUpdate) Where(ps ...predicate.Student) *StudentUpdate {
 }
 
 // AddMatchIDs adds the "match" edge to the Match entity by IDs.
-func (su *StudentUpdate) AddMatchIDs(ids ...int) *StudentUpdate {
+func (su *StudentUpdate) AddMatchIDs(ids ...uuid.UUID) *StudentUpdate {
 	su.mutation.AddMatchIDs(ids...)
 	return su
 }
 
 // AddMatch adds the "match" edges to the Match entity.
 func (su *StudentUpdate) AddMatch(m ...*Match) *StudentUpdate {
-	ids := make([]int, len(m))
+	ids := make([]uuid.UUID, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
@@ -100,14 +100,14 @@ func (su *StudentUpdate) ClearMatch() *StudentUpdate {
 }
 
 // RemoveMatchIDs removes the "match" edge to Match entities by IDs.
-func (su *StudentUpdate) RemoveMatchIDs(ids ...int) *StudentUpdate {
+func (su *StudentUpdate) RemoveMatchIDs(ids ...uuid.UUID) *StudentUpdate {
 	su.mutation.RemoveMatchIDs(ids...)
 	return su
 }
 
 // RemoveMatch removes "match" edges to Match entities.
 func (su *StudentUpdate) RemoveMatch(m ...*Match) *StudentUpdate {
-	ids := make([]int, len(m))
+	ids := make([]uuid.UUID, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
@@ -211,14 +211,14 @@ func (su *StudentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if su.mutation.MatchCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   student.MatchTable,
-			Columns: student.MatchPrimaryKey,
+			Columns: []string{student.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: match.FieldID,
 				},
 			},
@@ -227,14 +227,14 @@ func (su *StudentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := su.mutation.RemovedMatchIDs(); len(nodes) > 0 && !su.mutation.MatchCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   student.MatchTable,
-			Columns: student.MatchPrimaryKey,
+			Columns: []string{student.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: match.FieldID,
 				},
 			},
@@ -246,14 +246,14 @@ func (su *StudentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := su.mutation.MatchIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   student.MatchTable,
-			Columns: student.MatchPrimaryKey,
+			Columns: []string{student.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: match.FieldID,
 				},
 			},
@@ -427,14 +427,14 @@ type StudentUpdateOne struct {
 }
 
 // AddMatchIDs adds the "match" edge to the Match entity by IDs.
-func (suo *StudentUpdateOne) AddMatchIDs(ids ...int) *StudentUpdateOne {
+func (suo *StudentUpdateOne) AddMatchIDs(ids ...uuid.UUID) *StudentUpdateOne {
 	suo.mutation.AddMatchIDs(ids...)
 	return suo
 }
 
 // AddMatch adds the "match" edges to the Match entity.
 func (suo *StudentUpdateOne) AddMatch(m ...*Match) *StudentUpdateOne {
-	ids := make([]int, len(m))
+	ids := make([]uuid.UUID, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
@@ -494,14 +494,14 @@ func (suo *StudentUpdateOne) ClearMatch() *StudentUpdateOne {
 }
 
 // RemoveMatchIDs removes the "match" edge to Match entities by IDs.
-func (suo *StudentUpdateOne) RemoveMatchIDs(ids ...int) *StudentUpdateOne {
+func (suo *StudentUpdateOne) RemoveMatchIDs(ids ...uuid.UUID) *StudentUpdateOne {
 	suo.mutation.RemoveMatchIDs(ids...)
 	return suo
 }
 
 // RemoveMatch removes "match" edges to Match entities.
 func (suo *StudentUpdateOne) RemoveMatch(m ...*Match) *StudentUpdateOne {
-	ids := make([]int, len(m))
+	ids := make([]uuid.UUID, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
@@ -635,14 +635,14 @@ func (suo *StudentUpdateOne) sqlSave(ctx context.Context) (_node *Student, err e
 	}
 	if suo.mutation.MatchCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   student.MatchTable,
-			Columns: student.MatchPrimaryKey,
+			Columns: []string{student.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: match.FieldID,
 				},
 			},
@@ -651,14 +651,14 @@ func (suo *StudentUpdateOne) sqlSave(ctx context.Context) (_node *Student, err e
 	}
 	if nodes := suo.mutation.RemovedMatchIDs(); len(nodes) > 0 && !suo.mutation.MatchCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   student.MatchTable,
-			Columns: student.MatchPrimaryKey,
+			Columns: []string{student.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: match.FieldID,
 				},
 			},
@@ -670,14 +670,14 @@ func (suo *StudentUpdateOne) sqlSave(ctx context.Context) (_node *Student, err e
 	}
 	if nodes := suo.mutation.MatchIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   student.MatchTable,
-			Columns: student.MatchPrimaryKey,
+			Columns: []string{student.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: match.FieldID,
 				},
 			},
