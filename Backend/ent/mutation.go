@@ -58,8 +58,11 @@ type ClassMutation struct {
 	typ                    string
 	id                     *uuid.UUID
 	review_avaliable       *bool
-	total_hour             *time.Time
-	success_hour           *time.Time
+	total_hour             *int
+	addtotal_hour          *int
+	success_hour           *int
+	addsuccess_hour        *int
+	status                 *class.Status
 	clearedFields          map[string]struct{}
 	match                  map[int]struct{}
 	removedmatch           map[int]struct{}
@@ -214,12 +217,13 @@ func (m *ClassMutation) ResetReviewAvaliable() {
 }
 
 // SetTotalHour sets the "total_hour" field.
-func (m *ClassMutation) SetTotalHour(t time.Time) {
-	m.total_hour = &t
+func (m *ClassMutation) SetTotalHour(i int) {
+	m.total_hour = &i
+	m.addtotal_hour = nil
 }
 
 // TotalHour returns the value of the "total_hour" field in the mutation.
-func (m *ClassMutation) TotalHour() (r time.Time, exists bool) {
+func (m *ClassMutation) TotalHour() (r int, exists bool) {
 	v := m.total_hour
 	if v == nil {
 		return
@@ -230,7 +234,7 @@ func (m *ClassMutation) TotalHour() (r time.Time, exists bool) {
 // OldTotalHour returns the old "total_hour" field's value of the Class entity.
 // If the Class object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ClassMutation) OldTotalHour(ctx context.Context) (v time.Time, err error) {
+func (m *ClassMutation) OldTotalHour(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTotalHour is only allowed on UpdateOne operations")
 	}
@@ -244,18 +248,38 @@ func (m *ClassMutation) OldTotalHour(ctx context.Context) (v time.Time, err erro
 	return oldValue.TotalHour, nil
 }
 
+// AddTotalHour adds i to the "total_hour" field.
+func (m *ClassMutation) AddTotalHour(i int) {
+	if m.addtotal_hour != nil {
+		*m.addtotal_hour += i
+	} else {
+		m.addtotal_hour = &i
+	}
+}
+
+// AddedTotalHour returns the value that was added to the "total_hour" field in this mutation.
+func (m *ClassMutation) AddedTotalHour() (r int, exists bool) {
+	v := m.addtotal_hour
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
 // ResetTotalHour resets all changes to the "total_hour" field.
 func (m *ClassMutation) ResetTotalHour() {
 	m.total_hour = nil
+	m.addtotal_hour = nil
 }
 
 // SetSuccessHour sets the "success_hour" field.
-func (m *ClassMutation) SetSuccessHour(t time.Time) {
-	m.success_hour = &t
+func (m *ClassMutation) SetSuccessHour(i int) {
+	m.success_hour = &i
+	m.addsuccess_hour = nil
 }
 
 // SuccessHour returns the value of the "success_hour" field in the mutation.
-func (m *ClassMutation) SuccessHour() (r time.Time, exists bool) {
+func (m *ClassMutation) SuccessHour() (r int, exists bool) {
 	v := m.success_hour
 	if v == nil {
 		return
@@ -266,7 +290,7 @@ func (m *ClassMutation) SuccessHour() (r time.Time, exists bool) {
 // OldSuccessHour returns the old "success_hour" field's value of the Class entity.
 // If the Class object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ClassMutation) OldSuccessHour(ctx context.Context) (v time.Time, err error) {
+func (m *ClassMutation) OldSuccessHour(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldSuccessHour is only allowed on UpdateOne operations")
 	}
@@ -280,9 +304,64 @@ func (m *ClassMutation) OldSuccessHour(ctx context.Context) (v time.Time, err er
 	return oldValue.SuccessHour, nil
 }
 
+// AddSuccessHour adds i to the "success_hour" field.
+func (m *ClassMutation) AddSuccessHour(i int) {
+	if m.addsuccess_hour != nil {
+		*m.addsuccess_hour += i
+	} else {
+		m.addsuccess_hour = &i
+	}
+}
+
+// AddedSuccessHour returns the value that was added to the "success_hour" field in this mutation.
+func (m *ClassMutation) AddedSuccessHour() (r int, exists bool) {
+	v := m.addsuccess_hour
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
 // ResetSuccessHour resets all changes to the "success_hour" field.
 func (m *ClassMutation) ResetSuccessHour() {
 	m.success_hour = nil
+	m.addsuccess_hour = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *ClassMutation) SetStatus(c class.Status) {
+	m.status = &c
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *ClassMutation) Status() (r class.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Class entity.
+// If the Class object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClassMutation) OldStatus(ctx context.Context) (v class.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *ClassMutation) ResetStatus() {
+	m.status = nil
 }
 
 // AddMatchIDs adds the "match" edge to the Match entity by ids.
@@ -451,7 +530,7 @@ func (m *ClassMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ClassMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.review_avaliable != nil {
 		fields = append(fields, class.FieldReviewAvaliable)
 	}
@@ -460,6 +539,9 @@ func (m *ClassMutation) Fields() []string {
 	}
 	if m.success_hour != nil {
 		fields = append(fields, class.FieldSuccessHour)
+	}
+	if m.status != nil {
+		fields = append(fields, class.FieldStatus)
 	}
 	return fields
 }
@@ -475,6 +557,8 @@ func (m *ClassMutation) Field(name string) (ent.Value, bool) {
 		return m.TotalHour()
 	case class.FieldSuccessHour:
 		return m.SuccessHour()
+	case class.FieldStatus:
+		return m.Status()
 	}
 	return nil, false
 }
@@ -490,6 +574,8 @@ func (m *ClassMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldTotalHour(ctx)
 	case class.FieldSuccessHour:
 		return m.OldSuccessHour(ctx)
+	case class.FieldStatus:
+		return m.OldStatus(ctx)
 	}
 	return nil, fmt.Errorf("unknown Class field %s", name)
 }
@@ -507,18 +593,25 @@ func (m *ClassMutation) SetField(name string, value ent.Value) error {
 		m.SetReviewAvaliable(v)
 		return nil
 	case class.FieldTotalHour:
-		v, ok := value.(time.Time)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTotalHour(v)
 		return nil
 	case class.FieldSuccessHour:
-		v, ok := value.(time.Time)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetSuccessHour(v)
+		return nil
+	case class.FieldStatus:
+		v, ok := value.(class.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Class field %s", name)
@@ -527,13 +620,26 @@ func (m *ClassMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *ClassMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addtotal_hour != nil {
+		fields = append(fields, class.FieldTotalHour)
+	}
+	if m.addsuccess_hour != nil {
+		fields = append(fields, class.FieldSuccessHour)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *ClassMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case class.FieldTotalHour:
+		return m.AddedTotalHour()
+	case class.FieldSuccessHour:
+		return m.AddedSuccessHour()
+	}
 	return nil, false
 }
 
@@ -542,6 +648,20 @@ func (m *ClassMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *ClassMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case class.FieldTotalHour:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTotalHour(v)
+		return nil
+	case class.FieldSuccessHour:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSuccessHour(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Class numeric field %s", name)
 }
@@ -577,6 +697,9 @@ func (m *ClassMutation) ResetField(name string) error {
 		return nil
 	case class.FieldSuccessHour:
 		m.ResetSuccessHour()
+		return nil
+	case class.FieldStatus:
+		m.ResetStatus()
 		return nil
 	}
 	return fmt.Errorf("unknown Class field %s", name)
@@ -3353,9 +3476,6 @@ type PaymentHistoryMutation struct {
 	op             Op
 	typ            string
 	id             *uuid.UUID
-	amount         *float64
-	addamount      *float64
-	_type          *string
 	clearedFields  map[string]struct{}
 	class          map[uuid.UUID]struct{}
 	removedclass   map[uuid.UUID]struct{}
@@ -3471,112 +3591,6 @@ func (m *PaymentHistoryMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
-}
-
-// SetAmount sets the "amount" field.
-func (m *PaymentHistoryMutation) SetAmount(f float64) {
-	m.amount = &f
-	m.addamount = nil
-}
-
-// Amount returns the value of the "amount" field in the mutation.
-func (m *PaymentHistoryMutation) Amount() (r float64, exists bool) {
-	v := m.amount
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldAmount returns the old "amount" field's value of the PaymentHistory entity.
-// If the PaymentHistory object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PaymentHistoryMutation) OldAmount(ctx context.Context) (v *float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldAmount is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldAmount requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAmount: %w", err)
-	}
-	return oldValue.Amount, nil
-}
-
-// AddAmount adds f to the "amount" field.
-func (m *PaymentHistoryMutation) AddAmount(f float64) {
-	if m.addamount != nil {
-		*m.addamount += f
-	} else {
-		m.addamount = &f
-	}
-}
-
-// AddedAmount returns the value that was added to the "amount" field in this mutation.
-func (m *PaymentHistoryMutation) AddedAmount() (r float64, exists bool) {
-	v := m.addamount
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearAmount clears the value of the "amount" field.
-func (m *PaymentHistoryMutation) ClearAmount() {
-	m.amount = nil
-	m.addamount = nil
-	m.clearedFields[paymenthistory.FieldAmount] = struct{}{}
-}
-
-// AmountCleared returns if the "amount" field was cleared in this mutation.
-func (m *PaymentHistoryMutation) AmountCleared() bool {
-	_, ok := m.clearedFields[paymenthistory.FieldAmount]
-	return ok
-}
-
-// ResetAmount resets all changes to the "amount" field.
-func (m *PaymentHistoryMutation) ResetAmount() {
-	m.amount = nil
-	m.addamount = nil
-	delete(m.clearedFields, paymenthistory.FieldAmount)
-}
-
-// SetType sets the "type" field.
-func (m *PaymentHistoryMutation) SetType(s string) {
-	m._type = &s
-}
-
-// GetType returns the value of the "type" field in the mutation.
-func (m *PaymentHistoryMutation) GetType() (r string, exists bool) {
-	v := m._type
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldType returns the old "type" field's value of the PaymentHistory entity.
-// If the PaymentHistory object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PaymentHistoryMutation) OldType(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldType is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldType requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldType: %w", err)
-	}
-	return oldValue.Type, nil
-}
-
-// ResetType resets all changes to the "type" field.
-func (m *PaymentHistoryMutation) ResetType() {
-	m._type = nil
 }
 
 // AddClasIDs adds the "class" edge to the Class entity by ids.
@@ -3745,13 +3759,7 @@ func (m *PaymentHistoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PaymentHistoryMutation) Fields() []string {
-	fields := make([]string, 0, 2)
-	if m.amount != nil {
-		fields = append(fields, paymenthistory.FieldAmount)
-	}
-	if m._type != nil {
-		fields = append(fields, paymenthistory.FieldType)
-	}
+	fields := make([]string, 0, 0)
 	return fields
 }
 
@@ -3759,12 +3767,6 @@ func (m *PaymentHistoryMutation) Fields() []string {
 // return value indicates that this field was not set, or was not defined in the
 // schema.
 func (m *PaymentHistoryMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case paymenthistory.FieldAmount:
-		return m.Amount()
-	case paymenthistory.FieldType:
-		return m.GetType()
-	}
 	return nil, false
 }
 
@@ -3772,12 +3774,6 @@ func (m *PaymentHistoryMutation) Field(name string) (ent.Value, bool) {
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
 func (m *PaymentHistoryMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case paymenthistory.FieldAmount:
-		return m.OldAmount(ctx)
-	case paymenthistory.FieldType:
-		return m.OldType(ctx)
-	}
 	return nil, fmt.Errorf("unknown PaymentHistory field %s", name)
 }
 
@@ -3786,20 +3782,6 @@ func (m *PaymentHistoryMutation) OldField(ctx context.Context, name string) (ent
 // type.
 func (m *PaymentHistoryMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case paymenthistory.FieldAmount:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetAmount(v)
-		return nil
-	case paymenthistory.FieldType:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetType(v)
-		return nil
 	}
 	return fmt.Errorf("unknown PaymentHistory field %s", name)
 }
@@ -3807,21 +3789,13 @@ func (m *PaymentHistoryMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *PaymentHistoryMutation) AddedFields() []string {
-	var fields []string
-	if m.addamount != nil {
-		fields = append(fields, paymenthistory.FieldAmount)
-	}
-	return fields
+	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *PaymentHistoryMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case paymenthistory.FieldAmount:
-		return m.AddedAmount()
-	}
 	return nil, false
 }
 
@@ -3829,26 +3803,13 @@ func (m *PaymentHistoryMutation) AddedField(name string) (ent.Value, bool) {
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
 func (m *PaymentHistoryMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	case paymenthistory.FieldAmount:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddAmount(v)
-		return nil
-	}
 	return fmt.Errorf("unknown PaymentHistory numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *PaymentHistoryMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(paymenthistory.FieldAmount) {
-		fields = append(fields, paymenthistory.FieldAmount)
-	}
-	return fields
+	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -3861,25 +3822,12 @@ func (m *PaymentHistoryMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *PaymentHistoryMutation) ClearField(name string) error {
-	switch name {
-	case paymenthistory.FieldAmount:
-		m.ClearAmount()
-		return nil
-	}
 	return fmt.Errorf("unknown PaymentHistory nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
 func (m *PaymentHistoryMutation) ResetField(name string) error {
-	switch name {
-	case paymenthistory.FieldAmount:
-		m.ResetAmount()
-		return nil
-	case paymenthistory.FieldType:
-		m.ResetType()
-		return nil
-	}
 	return fmt.Errorf("unknown PaymentHistory field %s", name)
 }
 

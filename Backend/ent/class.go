@@ -5,7 +5,6 @@ package ent
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
@@ -22,9 +21,11 @@ type Class struct {
 	// ReviewAvaliable holds the value of the "review_avaliable" field.
 	ReviewAvaliable bool `json:"review_avaliable,omitempty"`
 	// TotalHour holds the value of the "total_hour" field.
-	TotalHour time.Time `json:"total_hour,omitempty"`
+	TotalHour int `json:"total_hour,omitempty"`
 	// SuccessHour holds the value of the "success_hour" field.
-	SuccessHour time.Time `json:"success_hour,omitempty"`
+	SuccessHour int `json:"success_hour,omitempty"`
+	// Status holds the value of the "status" field.
+	Status class.Status `json:"status,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ClassQuery when eager-loading is set.
 	Edges                 ClassEdges `json:"edges"`
@@ -88,7 +89,9 @@ func (*Class) scanValues(columns []string) ([]any, error) {
 		case class.FieldReviewAvaliable:
 			values[i] = new(sql.NullBool)
 		case class.FieldTotalHour, class.FieldSuccessHour:
-			values[i] = new(sql.NullTime)
+			values[i] = new(sql.NullInt64)
+		case class.FieldStatus:
+			values[i] = new(sql.NullString)
 		case class.FieldID:
 			values[i] = new(uuid.UUID)
 		case class.ForeignKeys[0]: // payment_history_class
@@ -123,16 +126,22 @@ func (c *Class) assignValues(columns []string, values []any) error {
 				c.ReviewAvaliable = value.Bool
 			}
 		case class.FieldTotalHour:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field total_hour", values[i])
 			} else if value.Valid {
-				c.TotalHour = value.Time
+				c.TotalHour = int(value.Int64)
 			}
 		case class.FieldSuccessHour:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field success_hour", values[i])
 			} else if value.Valid {
-				c.SuccessHour = value.Time
+				c.SuccessHour = int(value.Int64)
+			}
+		case class.FieldStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
+			} else if value.Valid {
+				c.Status = class.Status(value.String)
 			}
 		case class.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -195,10 +204,13 @@ func (c *Class) String() string {
 	builder.WriteString(fmt.Sprintf("%v", c.ReviewAvaliable))
 	builder.WriteString(", ")
 	builder.WriteString("total_hour=")
-	builder.WriteString(c.TotalHour.Format(time.ANSIC))
+	builder.WriteString(fmt.Sprintf("%v", c.TotalHour))
 	builder.WriteString(", ")
 	builder.WriteString("success_hour=")
-	builder.WriteString(c.SuccessHour.Format(time.ANSIC))
+	builder.WriteString(fmt.Sprintf("%v", c.SuccessHour))
+	builder.WriteString(", ")
+	builder.WriteString("status=")
+	builder.WriteString(fmt.Sprintf("%v", c.Status))
 	builder.WriteByte(')')
 	return builder.String()
 }

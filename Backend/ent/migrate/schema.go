@@ -12,8 +12,9 @@ var (
 	ClassesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "review_avaliable", Type: field.TypeBool, Default: true},
-		{Name: "total_hour", Type: field.TypeTime},
-		{Name: "success_hour", Type: field.TypeTime},
+		{Name: "total_hour", Type: field.TypeInt},
+		{Name: "success_hour", Type: field.TypeInt},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"scheduled", "completed", "cancelling", "rejected", "cancelled"}},
 		{Name: "payment_history_class", Type: field.TypeUUID},
 		{Name: "schedule_class", Type: field.TypeUUID},
 	}
@@ -25,13 +26,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "classes_payment_histories_class",
-				Columns:    []*schema.Column{ClassesColumns[4]},
+				Columns:    []*schema.Column{ClassesColumns[5]},
 				RefColumns: []*schema.Column{PaymentHistoriesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "classes_schedules_class",
-				Columns:    []*schema.Column{ClassesColumns[5]},
+				Columns:    []*schema.Column{ClassesColumns[6]},
 				RefColumns: []*schema.Column{SchedulesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -127,8 +128,6 @@ var (
 	// PaymentHistoriesColumns holds the columns for the "payment_histories" table.
 	PaymentHistoriesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
-		{Name: "amount", Type: field.TypeFloat64, Nullable: true},
-		{Name: "type", Type: field.TypeString},
 		{Name: "payment_payment_history", Type: field.TypeUUID},
 		{Name: "user_payment_history", Type: field.TypeUUID},
 	}
@@ -140,13 +139,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "payment_histories_payments_payment_history",
-				Columns:    []*schema.Column{PaymentHistoriesColumns[3]},
+				Columns:    []*schema.Column{PaymentHistoriesColumns[1]},
 				RefColumns: []*schema.Column{PaymentsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "payment_histories_users_payment_history",
-				Columns:    []*schema.Column{PaymentHistoriesColumns[4]},
+				Columns:    []*schema.Column{PaymentHistoriesColumns[2]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -254,7 +253,7 @@ var (
 		{Name: "birth_date", Type: field.TypeTime},
 		{Name: "gender", Type: field.TypeString},
 		{Name: "profile_picture_url", Type: field.TypeString, Nullable: true},
-		{Name: "role", Type: field.TypeEnum, Enums: []string{"student", "tutor"}},
+		{Name: "role", Type: field.TypeEnum, Enums: []string{"student", "tutor", "admin"}},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{

@@ -84,14 +84,6 @@ func init() {
 	payment.DefaultID = paymentDescID.Default.(func() uuid.UUID)
 	paymenthistoryFields := schema.PaymentHistory{}.Fields()
 	_ = paymenthistoryFields
-	// paymenthistoryDescAmount is the schema descriptor for amount field.
-	paymenthistoryDescAmount := paymenthistoryFields[1].Descriptor()
-	// paymenthistory.AmountValidator is a validator for the "amount" field. It is called by the builders before save.
-	paymenthistory.AmountValidator = paymenthistoryDescAmount.Validators[0].(func(float64) error)
-	// paymenthistoryDescType is the schema descriptor for type field.
-	paymenthistoryDescType := paymenthistoryFields[2].Descriptor()
-	// paymenthistory.TypeValidator is a validator for the "type" field. It is called by the builders before save.
-	paymenthistory.TypeValidator = paymenthistoryDescType.Validators[0].(func(string) error)
 	// paymenthistoryDescID is the schema descriptor for id field.
 	paymenthistoryDescID := paymenthistoryFields[0].Descriptor()
 	// paymenthistory.DefaultID holds the default value on creation for the id field.

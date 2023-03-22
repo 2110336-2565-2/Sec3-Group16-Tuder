@@ -32,7 +32,7 @@ func (User) Fields() []ent.Field {
 		field.Time("birth_date"),
 		field.String("gender").NotEmpty(),
 		field.String("profile_picture_URL").Optional().Nillable(),
-		field.Enum("role").Values("student", "tutor").Nillable(),
+		field.Enum("role").Values("student", "tutor", "admin").Nillable(),
 	}
 }
 

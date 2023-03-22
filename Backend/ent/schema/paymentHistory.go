@@ -4,7 +4,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-
 	"github.com/google/uuid"
 )
 
@@ -20,8 +19,10 @@ func (PaymentHistory) Fields() []ent.Field {
 			Default(uuid.New).Unique().StorageKey("id").Immutable(),
 		// field.String("user_id").NotEmpty().Unique(),
 		// field.String("payment_id").NotEmpty().Unique(),
-		field.Float("amount").Positive().Nillable().Optional(),
-		field.String("type").NotEmpty(),
+
+		// comment due to unknown use
+		// field.Float("amount").Positive().Nillable().Optional(),
+		// field.String("type").NotEmpty(),
 	}
 }
 

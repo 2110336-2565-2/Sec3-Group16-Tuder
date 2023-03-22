@@ -30,6 +30,15 @@ func InsertData(client *ent.Client) {
 	// Insert courses
 	InsertCourse(client, ctx, tutor)
 
+	// Insert payment
+	payment := InsertPayment(client, ctx, user)
+
+	// Insert payment history
+	ph := InsertPaymentHistory(client, ctx, user, payment)
+
+	// Insert classes
+	InsertClass(client, ctx, schedule, ph)
+
 	fmt.Print("\n\t::::::::: Data inserted! :::::::::\n")
 
 }
