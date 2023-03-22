@@ -115,6 +115,7 @@ const Email = styled.span`
 `;
 
 const Wrapper = styled.div`
+  border-radius: 50px 50px 0px 0px;
   background-color: white;
   width: 100%;
 `;
