@@ -11,7 +11,8 @@ import (
 type ControllerClass interface {
 	GetCancellingClasses(echo.Context) error
 	CancelClass(c echo.Context) error
-	ApproveClassCancellation(c echo.Context) error
+	AuditClassCancellation(c echo.Context) error
+	AcknowledgeClassCancellation(c echo.Context) error
 }
 
 type controllerClass struct {
@@ -73,9 +74,9 @@ func (cC *controllerClass) CancelClass(c echo.Context) error {
 
 }
 
-func (cC *controllerClass) ApproveClassCancellation(c echo.Context) error {
+func (cC *controllerClass) AuditClassCancellation(c echo.Context) error {
 
-	cancelSchema := &schemas.SchemaCancelClass{}
+	cancelSchema := &schemas.SchemaCancelRequestApprove{}
 	if err := c.Bind(cancelSchema); err != nil {
 		c.JSON(http.StatusBadRequest, schemas.SchemaResponses{
 			Success: false,
@@ -84,7 +85,44 @@ func (cC *controllerClass) ApproveClassCancellation(c echo.Context) error {
 		})
 	}
 
-	err := cC.service.ApproveClassCancellation(cancelSchema)
+	err := cC.service.AuditClassCancellation(cancelSchema)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, schemas.SchemaResponses{
+			Success: false,
+			Message: err.Error(),
+			Data:    nil,
+		})
+		return err
+	}
+
+	result := "Approved"
+	if !cancelSchema.Approve {
+		result = "Rejected"
+	}
+
+	c.JSON(http.StatusOK, schemas.SchemaResponses{
+		Success: true,
+		Message: "Class cancellation has been " + result,
+		Data:    nil,
+	})
+	return nil
+
+}
+
+func (cC *controllerClass) AcknowledgeClassCancellation(c echo.Context) error {
+	
+	ackSchema := &schemas.SchemaUserAcknowledge{}
+	if err := c.Bind(ackSchema); err != nil {
+		c.JSON(http.StatusBadRequest, schemas.SchemaResponses{
+			Success: false,
+			Message: "invalid request",
+			Data:    err.Error(),
+		})
+	}
+
+
+
+	err := cC.service.AcknowledgeClassCancellation(ackSchema)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, schemas.SchemaResponses{
 			Success: false,
@@ -96,7 +134,7 @@ func (cC *controllerClass) ApproveClassCancellation(c echo.Context) error {
 
 	c.JSON(http.StatusOK, schemas.SchemaResponses{
 		Success: true,
-		Message: "Class cancellation has been approved",
+		Message: "Class cancellation has been acknowledged",
 		Data:    nil,
 	})
 	return nil

@@ -15,7 +15,8 @@ import (
 type RepositoryClass interface {
 	GetCancellingClasses() ([]*schemas.SchemaCancelRequest, error)
 	CancelClass(sc *schemas.SchemaCancelClass) (*ent.Class, error)
-	ApproveClassCancellation(sc *schemas.SchemaCancelClass) error
+	AuditClassCancellation(sc *schemas.SchemaCancelRequestApprove) error
+	AcknowledgeClassCancellation(sc *schemas.SchemaUserAcknowledge) error
 }
 
 type repositoryClass struct {
@@ -156,7 +157,7 @@ func (r *repositoryClass) CancelClass(sc *schemas.SchemaCancelClass) (*ent.Class
 	return c, tx.Commit()
 }
 
-func (r *repositoryClass) ApproveClassCancellation(sc *schemas.SchemaCancelClass) error {
+func (r *repositoryClass) AuditClassCancellation(sc *schemas.SchemaCancelRequestApprove) error {
 
 	c, err := r.client.Class.
 		Query().
@@ -167,17 +168,87 @@ func (r *repositoryClass) ApproveClassCancellation(sc *schemas.SchemaCancelClass
 		return errors.New("class not found")
 	}
 
-	if c.Status == class.StatusCancelled {
-		return errors.New("class is already cancelled")
+	approve := sc.Approve
+
+	if approve {
+		if c.Status == class.StatusCancelled {
+			return errors.New("class is already cancelled")
+		}
+
+		if c.Status != class.StatusCancelling {
+			return errors.New("class is not cancelling")
+		}
+
+		_, err = r.client.Class.
+			UpdateOne(c).
+			SetStatus(class.StatusCancelled).
+			Save(r.ctx)
+
+		if err != nil {
+			return err
+		}
+	} else {
+
+		if c.Status == class.StatusRejected {
+			return errors.New("class is already rejected")
+		}
+
+		if c.Status != class.StatusCancelling {
+			return errors.New("class is not cancelling")
+		}
+
+		_, err = r.client.Class.
+			UpdateOne(c).
+			SetStatus(class.StatusRejected).
+			Save(r.ctx)
+
+		if err != nil {
+			return err
+		}
 	}
 
-	if c.Status != class.StatusCancelling {
-		return errors.New("class is not cancelling")
+	return nil
+}
+
+func (r *repositoryClass) AcknowledgeClassCancellation(s *schemas.SchemaUserAcknowledge) error {
+
+	c, err := r.client.Class.
+		Query().
+		Where(class.IDEQ(s.ClassID)).
+		WithMatch(
+			func(q *ent.MatchQuery) {
+				q.WithStudent(
+					func(q *ent.StudentQuery) {
+						q.WithUser()
+					},
+				)
+			},
+		).
+		Only(r.ctx)
+
+	if err != nil {
+		return errors.New("class not found")
+	}
+
+	if c.Status != class.StatusRejected {
+		return errors.New("class is not rejected")
+	}
+
+	// check if user is the student of the class
+	found := false
+	for _, m := range c.Edges.Match {
+		if m.Edges.Student.Edges.User.ID == s.UserID {
+			found = true
+			break
+		}
+	}
+	if !found {
+		return errors.New("user is not the student of the class")
 	}
 
 	_, err = r.client.Class.
 		UpdateOne(c).
-		SetStatus(class.StatusCancelled).
+		SetStatus(class.StatusOngoing).
 		Save(r.ctx)
 
 	if err != nil {

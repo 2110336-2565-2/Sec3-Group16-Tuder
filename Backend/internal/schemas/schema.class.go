@@ -23,6 +23,12 @@ type SchemaCancelRequest struct {
 }
 
 type SchemaCancelRequestApprove struct {
-	ClassID string `json:"classId"`
-	UserID  string `json:"userId"`
+	ClassID uuid.UUID `json:"classId"`
+	UserID  uuid.UUID `json:"userId"`
+	Approve bool      `json:"approve"`
+}
+
+type SchemaUserAcknowledge struct {
+	UserID  uuid.UUID `json:"userId"`
+	ClassID uuid.UUID `json:"classId"`
 }

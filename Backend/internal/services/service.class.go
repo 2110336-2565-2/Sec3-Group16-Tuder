@@ -8,7 +8,8 @@ import (
 type ServiceClass interface {
 	GetCancellingClasses() ([]*schemas.SchemaCancelRequest, error)
 	CancelClass(sc *schemas.SchemaCancelClass) error
-	ApproveClassCancellation(sc *schemas.SchemaCancelClass) error
+	AuditClassCancellation(sc *schemas.SchemaCancelRequestApprove) error
+	AcknowledgeClassCancellation(sc *schemas.SchemaUserAcknowledge) error
 }
 
 type serviceClass struct {
@@ -40,10 +41,20 @@ func (s *serviceClass) CancelClass(sc *schemas.SchemaCancelClass) error {
 	return nil
 }
 
-func (s *serviceClass) ApproveClassCancellation(sc *schemas.SchemaCancelClass) error {
+func (s *serviceClass) AuditClassCancellation(sc *schemas.SchemaCancelRequestApprove) error {
 
 	// change status of class to cancelled
-	err := s.repo.ApproveClassCancellation(sc)
+	err := s.repo.AuditClassCancellation(sc)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *serviceClass) AcknowledgeClassCancellation(sc *schemas.SchemaUserAcknowledge) error {
+	
+	// change status of class to be default
+	err := s.repo.AcknowledgeClassCancellation(sc)
 	if err != nil {
 		return err
 	}

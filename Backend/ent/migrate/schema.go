@@ -14,7 +14,7 @@ var (
 		{Name: "review_avaliable", Type: field.TypeBool, Default: true},
 		{Name: "total_hour", Type: field.TypeInt},
 		{Name: "success_hour", Type: field.TypeInt},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"scheduled", "completed", "cancelling", "rejected", "cancelled"}},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"ongoing", "completed", "cancelling", "rejected", "cancelled"}},
 		{Name: "payment_history_class", Type: field.TypeUUID},
 		{Name: "schedule_class", Type: field.TypeUUID},
 	}
