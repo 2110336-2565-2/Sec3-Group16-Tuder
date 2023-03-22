@@ -18,10 +18,10 @@ func (Class) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).Unique().StorageKey("id").Immutable(),
-		// field.String("user_id").NotEmpty().Unique(),
 		field.Bool("review_avaliable").Default(true),
-		field.Time("total_hour"),
-		field.Time("success_hour"),
+		field.Int("total_hour"),
+		field.Int("success_hour"),
+		field.Enum("status").Values("scheduled", "completed", "cancelling", "rejected", "cancelled"),
 	}
 }
 
@@ -36,13 +36,5 @@ func (Class) Edges() []ent.Edge {
 			Ref("class").
 			Unique().
 			Required(),
-		// edge.From("student", Student.Type).
-		// 	Ref("class").
-		// 	Unique().
-		// 	Required(),
-		// edge.From("course", Course.Type).
-		// 	Ref("class").
-		// 	Unique().
-		// 	Required(),
 	}
 }

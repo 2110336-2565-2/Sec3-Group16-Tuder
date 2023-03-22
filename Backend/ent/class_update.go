@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -47,14 +46,34 @@ func (cu *ClassUpdate) SetNillableReviewAvaliable(b *bool) *ClassUpdate {
 }
 
 // SetTotalHour sets the "total_hour" field.
-func (cu *ClassUpdate) SetTotalHour(t time.Time) *ClassUpdate {
-	cu.mutation.SetTotalHour(t)
+func (cu *ClassUpdate) SetTotalHour(i int) *ClassUpdate {
+	cu.mutation.ResetTotalHour()
+	cu.mutation.SetTotalHour(i)
+	return cu
+}
+
+// AddTotalHour adds i to the "total_hour" field.
+func (cu *ClassUpdate) AddTotalHour(i int) *ClassUpdate {
+	cu.mutation.AddTotalHour(i)
 	return cu
 }
 
 // SetSuccessHour sets the "success_hour" field.
-func (cu *ClassUpdate) SetSuccessHour(t time.Time) *ClassUpdate {
-	cu.mutation.SetSuccessHour(t)
+func (cu *ClassUpdate) SetSuccessHour(i int) *ClassUpdate {
+	cu.mutation.ResetSuccessHour()
+	cu.mutation.SetSuccessHour(i)
+	return cu
+}
+
+// AddSuccessHour adds i to the "success_hour" field.
+func (cu *ClassUpdate) AddSuccessHour(i int) *ClassUpdate {
+	cu.mutation.AddSuccessHour(i)
+	return cu
+}
+
+// SetStatus sets the "status" field.
+func (cu *ClassUpdate) SetStatus(c class.Status) *ClassUpdate {
+	cu.mutation.SetStatus(c)
 	return cu
 }
 
@@ -162,6 +181,11 @@ func (cu *ClassUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cu *ClassUpdate) check() error {
+	if v, ok := cu.mutation.Status(); ok {
+		if err := class.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Class.status": %w`, err)}
+		}
+	}
 	if _, ok := cu.mutation.ScheduleID(); cu.mutation.ScheduleCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Class.schedule"`)
 	}
@@ -187,10 +211,19 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(class.FieldReviewAvaliable, field.TypeBool, value)
 	}
 	if value, ok := cu.mutation.TotalHour(); ok {
-		_spec.SetField(class.FieldTotalHour, field.TypeTime, value)
+		_spec.SetField(class.FieldTotalHour, field.TypeInt, value)
+	}
+	if value, ok := cu.mutation.AddedTotalHour(); ok {
+		_spec.AddField(class.FieldTotalHour, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.SuccessHour(); ok {
-		_spec.SetField(class.FieldSuccessHour, field.TypeTime, value)
+		_spec.SetField(class.FieldSuccessHour, field.TypeInt, value)
+	}
+	if value, ok := cu.mutation.AddedSuccessHour(); ok {
+		_spec.AddField(class.FieldSuccessHour, field.TypeInt, value)
+	}
+	if value, ok := cu.mutation.Status(); ok {
+		_spec.SetField(class.FieldStatus, field.TypeEnum, value)
 	}
 	if cu.mutation.MatchCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -351,14 +384,34 @@ func (cuo *ClassUpdateOne) SetNillableReviewAvaliable(b *bool) *ClassUpdateOne {
 }
 
 // SetTotalHour sets the "total_hour" field.
-func (cuo *ClassUpdateOne) SetTotalHour(t time.Time) *ClassUpdateOne {
-	cuo.mutation.SetTotalHour(t)
+func (cuo *ClassUpdateOne) SetTotalHour(i int) *ClassUpdateOne {
+	cuo.mutation.ResetTotalHour()
+	cuo.mutation.SetTotalHour(i)
+	return cuo
+}
+
+// AddTotalHour adds i to the "total_hour" field.
+func (cuo *ClassUpdateOne) AddTotalHour(i int) *ClassUpdateOne {
+	cuo.mutation.AddTotalHour(i)
 	return cuo
 }
 
 // SetSuccessHour sets the "success_hour" field.
-func (cuo *ClassUpdateOne) SetSuccessHour(t time.Time) *ClassUpdateOne {
-	cuo.mutation.SetSuccessHour(t)
+func (cuo *ClassUpdateOne) SetSuccessHour(i int) *ClassUpdateOne {
+	cuo.mutation.ResetSuccessHour()
+	cuo.mutation.SetSuccessHour(i)
+	return cuo
+}
+
+// AddSuccessHour adds i to the "success_hour" field.
+func (cuo *ClassUpdateOne) AddSuccessHour(i int) *ClassUpdateOne {
+	cuo.mutation.AddSuccessHour(i)
+	return cuo
+}
+
+// SetStatus sets the "status" field.
+func (cuo *ClassUpdateOne) SetStatus(c class.Status) *ClassUpdateOne {
+	cuo.mutation.SetStatus(c)
 	return cuo
 }
 
@@ -479,6 +532,11 @@ func (cuo *ClassUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cuo *ClassUpdateOne) check() error {
+	if v, ok := cuo.mutation.Status(); ok {
+		if err := class.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Class.status": %w`, err)}
+		}
+	}
 	if _, ok := cuo.mutation.ScheduleID(); cuo.mutation.ScheduleCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Class.schedule"`)
 	}
@@ -521,10 +579,19 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 		_spec.SetField(class.FieldReviewAvaliable, field.TypeBool, value)
 	}
 	if value, ok := cuo.mutation.TotalHour(); ok {
-		_spec.SetField(class.FieldTotalHour, field.TypeTime, value)
+		_spec.SetField(class.FieldTotalHour, field.TypeInt, value)
+	}
+	if value, ok := cuo.mutation.AddedTotalHour(); ok {
+		_spec.AddField(class.FieldTotalHour, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.SuccessHour(); ok {
-		_spec.SetField(class.FieldSuccessHour, field.TypeTime, value)
+		_spec.SetField(class.FieldSuccessHour, field.TypeInt, value)
+	}
+	if value, ok := cuo.mutation.AddedSuccessHour(); ok {
+		_spec.AddField(class.FieldSuccessHour, field.TypeInt, value)
+	}
+	if value, ok := cuo.mutation.Status(); ok {
+		_spec.SetField(class.FieldStatus, field.TypeEnum, value)
 	}
 	if cuo.mutation.MatchCleared() {
 		edge := &sqlgraph.EdgeSpec{

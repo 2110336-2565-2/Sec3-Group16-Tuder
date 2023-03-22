@@ -3,6 +3,8 @@
 package class
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 )
 
@@ -17,6 +19,8 @@ const (
 	FieldTotalHour = "total_hour"
 	// FieldSuccessHour holds the string denoting the success_hour field in the database.
 	FieldSuccessHour = "success_hour"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
 	// EdgeMatch holds the string denoting the match edge name in mutations.
 	EdgeMatch = "match"
 	// EdgeSchedule holds the string denoting the schedule edge name in mutations.
@@ -52,6 +56,7 @@ var Columns = []string{
 	FieldReviewAvaliable,
 	FieldTotalHour,
 	FieldSuccessHour,
+	FieldStatus,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "classes"
@@ -88,3 +93,29 @@ var (
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
+
+// Status defines the type for the "status" enum field.
+type Status string
+
+// Status values.
+const (
+	StatusScheduled  Status = "scheduled"
+	StatusCompleted  Status = "completed"
+	StatusCancelling Status = "cancelling"
+	StatusRejected   Status = "rejected"
+	StatusCancelled  Status = "cancelled"
+)
+
+func (s Status) String() string {
+	return string(s)
+}
+
+// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
+func StatusValidator(s Status) error {
+	switch s {
+	case StatusScheduled, StatusCompleted, StatusCancelling, StatusRejected, StatusCancelled:
+		return nil
+	default:
+		return fmt.Errorf("class: invalid enum value for status field: %q", s)
+	}
+}

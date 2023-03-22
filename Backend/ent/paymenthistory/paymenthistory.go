@@ -11,10 +11,6 @@ const (
 	Label = "payment_history"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldAmount holds the string denoting the amount field in the database.
-	FieldAmount = "amount"
-	// FieldType holds the string denoting the type field in the database.
-	FieldType = "type"
 	// EdgeClass holds the string denoting the class edge name in mutations.
 	EdgeClass = "class"
 	// EdgeUser holds the string denoting the user edge name in mutations.
@@ -49,8 +45,6 @@ const (
 // Columns holds all SQL columns for paymenthistory fields.
 var Columns = []string{
 	FieldID,
-	FieldAmount,
-	FieldType,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "payment_histories"
@@ -76,10 +70,6 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// AmountValidator is a validator for the "amount" field. It is called by the builders before save.
-	AmountValidator func(float64) error
-	// TypeValidator is a validator for the "type" field. It is called by the builders before save.
-	TypeValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
