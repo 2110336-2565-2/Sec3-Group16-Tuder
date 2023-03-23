@@ -562,7 +562,7 @@ func (cq *CourseQuery) loadReviewCourse(ctx context.Context, query *ReviewCourse
 func (cq *CourseQuery) loadMatch(ctx context.Context, query *MatchQuery, nodes []*Course, init func(*Course), assign func(*Course, *Match)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[uuid.UUID]*Course)
-	nids := make(map[int]map[*Course]struct{})
+	nids := make(map[uuid.UUID]map[*Course]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
 		byID[node.ID] = node
@@ -595,7 +595,7 @@ func (cq *CourseQuery) loadMatch(ctx context.Context, query *MatchQuery, nodes [
 			}
 			spec.Assign = func(columns []string, values []any) error {
 				outValue := *values[0].(*uuid.UUID)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
+				inValue := *values[1].(*uuid.UUID)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*Course]struct{}{byID[outValue]: {}}
 					return assign(columns[1:], values[1:])

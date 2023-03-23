@@ -1,9 +1,10 @@
 import React, { useState , createRef} from 'react'
 import styled from 'styled-components'
-import {day} from '../datas/DayEnum'
-import  {searchCourseHandler}  from '../handlers/searchCourseHandler';
-import { useDataContext } from '../pages/Courses';
+import {day} from '../../datas/DayEnum'
+import  {searchCourseHandler}  from '../../handlers/searchCourseHandler';
+import { useDataContext } from '../../pages/Courses';
 import { useQuery } from 'react-query';
+import {toast} from 'react-hot-toast';
 
 export default function CourseSearchForm(props){
  
@@ -28,10 +29,9 @@ export default function CourseSearchForm(props){
                 "tutor_name": tutor_name,
                 "days": days
             }
-            console.log(searchData)
             searchCourseHandler(searchData).then((res) => {
 
-                setData({data:res.data.result});
+                setData(res.data.result);
 
             })
         },
@@ -47,10 +47,16 @@ export default function CourseSearchForm(props){
 
 
     if (isLoading) {
+        toast.promise(initData, {
+            loading: 'Loading',
+            success: 'Success',
+            error: 'Error',
+        });
         return <div>Loading...</div>
     }
 
     if (error) {
+        toast.error('Error')
         return <div>Error: {error.message}</div>
     }
     

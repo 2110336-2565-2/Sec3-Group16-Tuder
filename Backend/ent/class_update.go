@@ -78,14 +78,14 @@ func (cu *ClassUpdate) SetStatus(c class.Status) *ClassUpdate {
 }
 
 // AddMatchIDs adds the "match" edge to the Match entity by IDs.
-func (cu *ClassUpdate) AddMatchIDs(ids ...int) *ClassUpdate {
+func (cu *ClassUpdate) AddMatchIDs(ids ...uuid.UUID) *ClassUpdate {
 	cu.mutation.AddMatchIDs(ids...)
 	return cu
 }
 
 // AddMatch adds the "match" edges to the Match entity.
 func (cu *ClassUpdate) AddMatch(m ...*Match) *ClassUpdate {
-	ids := make([]int, len(m))
+	ids := make([]uuid.UUID, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
@@ -126,14 +126,14 @@ func (cu *ClassUpdate) ClearMatch() *ClassUpdate {
 }
 
 // RemoveMatchIDs removes the "match" edge to Match entities by IDs.
-func (cu *ClassUpdate) RemoveMatchIDs(ids ...int) *ClassUpdate {
+func (cu *ClassUpdate) RemoveMatchIDs(ids ...uuid.UUID) *ClassUpdate {
 	cu.mutation.RemoveMatchIDs(ids...)
 	return cu
 }
 
 // RemoveMatch removes "match" edges to Match entities.
 func (cu *ClassUpdate) RemoveMatch(m ...*Match) *ClassUpdate {
-	ids := make([]int, len(m))
+	ids := make([]uuid.UUID, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
@@ -234,7 +234,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: match.FieldID,
 				},
 			},
@@ -250,7 +250,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: match.FieldID,
 				},
 			},
@@ -269,7 +269,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: match.FieldID,
 				},
 			},
@@ -416,14 +416,14 @@ func (cuo *ClassUpdateOne) SetStatus(c class.Status) *ClassUpdateOne {
 }
 
 // AddMatchIDs adds the "match" edge to the Match entity by IDs.
-func (cuo *ClassUpdateOne) AddMatchIDs(ids ...int) *ClassUpdateOne {
+func (cuo *ClassUpdateOne) AddMatchIDs(ids ...uuid.UUID) *ClassUpdateOne {
 	cuo.mutation.AddMatchIDs(ids...)
 	return cuo
 }
 
 // AddMatch adds the "match" edges to the Match entity.
 func (cuo *ClassUpdateOne) AddMatch(m ...*Match) *ClassUpdateOne {
-	ids := make([]int, len(m))
+	ids := make([]uuid.UUID, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
@@ -464,14 +464,14 @@ func (cuo *ClassUpdateOne) ClearMatch() *ClassUpdateOne {
 }
 
 // RemoveMatchIDs removes the "match" edge to Match entities by IDs.
-func (cuo *ClassUpdateOne) RemoveMatchIDs(ids ...int) *ClassUpdateOne {
+func (cuo *ClassUpdateOne) RemoveMatchIDs(ids ...uuid.UUID) *ClassUpdateOne {
 	cuo.mutation.RemoveMatchIDs(ids...)
 	return cuo
 }
 
 // RemoveMatch removes "match" edges to Match entities.
 func (cuo *ClassUpdateOne) RemoveMatch(m ...*Match) *ClassUpdateOne {
-	ids := make([]int, len(m))
+	ids := make([]uuid.UUID, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
@@ -602,7 +602,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: match.FieldID,
 				},
 			},
@@ -618,7 +618,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: match.FieldID,
 				},
 			},
@@ -637,7 +637,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: match.FieldID,
 				},
 			},

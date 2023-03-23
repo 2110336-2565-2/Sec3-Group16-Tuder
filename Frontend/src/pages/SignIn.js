@@ -1,13 +1,16 @@
 import React, { Fragment } from "react";
 import styled from "styled-components"
-import FormSignIn from "../components/FormSignIn.js";
-import Footer from "../components/SignInFooter.js";
+import FormSignIn from "../components/form/FormSignIn.js";
+import Footer from "../components/footer/SignInFooter.js";
+import { IsGuest } from "../components/IsAuth.js";
 
 export default function SignIn(){
     
 
     return(
         <Fragment>
+            <IsGuest>
+
             <ContainerWithHeight margintop='100px'>
                 <SeperateSection>
                     <ItemGrid justify='center' columngrid='1 / 3'>
@@ -18,6 +21,7 @@ export default function SignIn(){
                     </ItemGrid>
                 </SeperateSection>
             </ContainerWithHeight>
+            </IsGuest>
             <Footer/>
         </Fragment>
     )

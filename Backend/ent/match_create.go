@@ -23,19 +23,29 @@ type MatchCreate struct {
 	hooks    []Hook
 }
 
-// AddStudentIDs adds the "student" edge to the Student entity by IDs.
-func (mc *MatchCreate) AddStudentIDs(ids ...uuid.UUID) *MatchCreate {
-	mc.mutation.AddStudentIDs(ids...)
+// SetID sets the "id" field.
+func (mc *MatchCreate) SetID(u uuid.UUID) *MatchCreate {
+	mc.mutation.SetID(u)
 	return mc
 }
 
-// AddStudent adds the "student" edges to the Student entity.
-func (mc *MatchCreate) AddStudent(s ...*Student) *MatchCreate {
-	ids := make([]uuid.UUID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+// SetNillableID sets the "id" field if the given value is not nil.
+func (mc *MatchCreate) SetNillableID(u *uuid.UUID) *MatchCreate {
+	if u != nil {
+		mc.SetID(*u)
 	}
-	return mc.AddStudentIDs(ids...)
+	return mc
+}
+
+// SetStudentID sets the "student" edge to the Student entity by ID.
+func (mc *MatchCreate) SetStudentID(id uuid.UUID) *MatchCreate {
+	mc.mutation.SetStudentID(id)
+	return mc
+}
+
+// SetStudent sets the "student" edge to the Student entity.
+func (mc *MatchCreate) SetStudent(s *Student) *MatchCreate {
+	return mc.SetStudentID(s.ID)
 }
 
 // AddCourseIDs adds the "course" edge to the Course entity by IDs.
@@ -75,6 +85,7 @@ func (mc *MatchCreate) Mutation() *MatchMutation {
 
 // Save creates the Match in the database.
 func (mc *MatchCreate) Save(ctx context.Context) (*Match, error) {
+	mc.defaults()
 	return withHooks[*Match, MatchMutation](ctx, mc.sqlSave, mc.mutation, mc.hooks)
 }
 
@@ -100,9 +111,17 @@ func (mc *MatchCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (mc *MatchCreate) defaults() {
+	if _, ok := mc.mutation.ID(); !ok {
+		v := match.DefaultID()
+		mc.mutation.SetID(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (mc *MatchCreate) check() error {
-	if len(mc.mutation.StudentIDs()) == 0 {
+	if _, ok := mc.mutation.StudentID(); !ok {
 		return &ValidationError{Name: "student", err: errors.New(`ent: missing required edge "Match.student"`)}
 	}
 	if len(mc.mutation.CourseIDs()) == 0 {
@@ -125,8 +144,13 @@ func (mc *MatchCreate) sqlSave(ctx context.Context) (*Match, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != nil {
+		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
+		}
+	}
 	mc.mutation.id = &_node.ID
 	mc.mutation.done = true
 	return _node, nil
@@ -135,14 +159,18 @@ func (mc *MatchCreate) sqlSave(ctx context.Context) (*Match, error) {
 func (mc *MatchCreate) createSpec() (*Match, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Match{config: mc.config}
-		_spec = sqlgraph.NewCreateSpec(match.Table, sqlgraph.NewFieldSpec(match.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(match.Table, sqlgraph.NewFieldSpec(match.FieldID, field.TypeUUID))
 	)
+	if id, ok := mc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = &id
+	}
 	if nodes := mc.mutation.StudentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   match.StudentTable,
-			Columns: match.StudentPrimaryKey,
+			Columns: []string{match.StudentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -154,6 +182,7 @@ func (mc *MatchCreate) createSpec() (*Match, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.student_match = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := mc.mutation.CourseIDs(); len(nodes) > 0 {
@@ -211,6 +240,7 @@ func (mcb *MatchCreateBulk) Save(ctx context.Context) ([]*Match, error) {
 	for i := range mcb.builders {
 		func(i int, root context.Context) {
 			builder := mcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*MatchMutation)
 				if !ok {
@@ -237,10 +267,6 @@ func (mcb *MatchCreateBulk) Save(ctx context.Context) ([]*Match, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				mutation.done = true
 				return nodes[i], nil
 			})

@@ -1,14 +1,16 @@
 import FormT from './FormStyle.js';
 import React, { useState } from 'react';
-import signInHandler from '../handlers/signInHandler.js';
+import signInHandler from '../../handlers/signInHandler.js';
 import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useDataContext } from '../../App.js';
+import { toast } from 'react-hot-toast';
 
 
 export default function FormSignIn(props){
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const  setStatus = useState('waiting')[1];
-    const  handleRole = useOutletContext()[1];
+    const  handleRole = useDataContext()[1];
     
     const navigate = useNavigate();
 
@@ -21,16 +23,17 @@ export default function FormSignIn(props){
         }
         setStatus('submitting')
         try{
-            await signInHandler(signInData, navigate);
+            await signInHandler(signInData, navigate)
 
             // update role in state
             handleRole.handleRole();
+            toast.success('Signed in')
             setStatus('success')
         } catch (error){
 
             // Handle by do sth
 
-            console.log(error);
+            toast.error(error.message)
             setStatus('error');
         }
     }

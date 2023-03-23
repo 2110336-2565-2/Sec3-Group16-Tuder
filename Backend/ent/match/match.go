@@ -2,6 +2,10 @@
 
 package match
 
+import (
+	"github.com/google/uuid"
+)
+
 const (
 	// Label holds the string label denoting the match type in the database.
 	Label = "match"
@@ -15,11 +19,13 @@ const (
 	EdgeClass = "class"
 	// Table holds the table name of the match in the database.
 	Table = "matches"
-	// StudentTable is the table that holds the student relation/edge. The primary key declared below.
-	StudentTable = "student_match"
+	// StudentTable is the table that holds the student relation/edge.
+	StudentTable = "matches"
 	// StudentInverseTable is the table name for the Student entity.
 	// It exists in this package in order to avoid circular dependency with the "student" package.
 	StudentInverseTable = "students"
+	// StudentColumn is the table column denoting the student relation/edge.
+	StudentColumn = "student_match"
 	// CourseTable is the table that holds the course relation/edge. The primary key declared below.
 	CourseTable = "course_match"
 	// CourseInverseTable is the table name for the Course entity.
@@ -37,10 +43,13 @@ var Columns = []string{
 	FieldID,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the "matches"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"student_match",
+}
+
 var (
-	// StudentPrimaryKey and StudentColumn2 are the table columns denoting the
-	// primary key for the student relation (M2M).
-	StudentPrimaryKey = []string{"student_id", "match_id"}
 	// CoursePrimaryKey and CourseColumn2 are the table columns denoting the
 	// primary key for the course relation (M2M).
 	CoursePrimaryKey = []string{"course_id", "match_id"}
@@ -56,5 +65,15 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
+			return true
+		}
+	}
 	return false
 }
+
+var (
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
+)

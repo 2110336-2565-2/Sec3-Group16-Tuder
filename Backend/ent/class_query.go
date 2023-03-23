@@ -500,7 +500,7 @@ func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class,
 func (cq *ClassQuery) loadMatch(ctx context.Context, query *MatchQuery, nodes []*Class, init func(*Class), assign func(*Class, *Match)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[uuid.UUID]*Class)
-	nids := make(map[int]map[*Class]struct{})
+	nids := make(map[uuid.UUID]map[*Class]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
 		byID[node.ID] = node
@@ -533,7 +533,7 @@ func (cq *ClassQuery) loadMatch(ctx context.Context, query *MatchQuery, nodes []
 			}
 			spec.Assign = func(columns []string, values []any) error {
 				outValue := *values[0].(*uuid.UUID)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
+				inValue := *values[1].(*uuid.UUID)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*Class]struct{}{byID[outValue]: {}}
 					return assign(columns[1:], values[1:])

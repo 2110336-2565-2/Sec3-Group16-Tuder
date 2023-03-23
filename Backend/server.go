@@ -7,6 +7,7 @@ import (
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/migrate"
+
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/datas"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/middlewares"
 	routes "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/routes"
@@ -42,7 +43,6 @@ func main() {
 	defer client.Close()
 
 	if err := client.Schema.Create(context.Background(),
-
 		migrate.WithGlobalUniqueID(true),
 		migrate.WithDropIndex(true),
 		migrate.WithDropColumn(true),
@@ -50,11 +50,13 @@ func main() {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
-	// test must reset db as always
-	datas.InsertData(client)
+	// test data for development
+	if os.Getenv("MODE") == "dev" {
+		datas.InsertData(client)
+	}
 
-	routes.InitRoutes(client, e)
 	e.Use(middlewares.CorsMiddleware)
+	routes.InitRoutes(client, e)
 	e.Logger.Fatal(e.Start(port))
 
 }

@@ -13,8 +13,9 @@ func InsertPaymentHistory(client *ent.Client, ctx context.Context, user []*ent.U
 	// Create payment history
 	ph1 := CreatePaymentHistory(client, user[0], payment[0])
 	ph2 := CreatePaymentHistory(client, user[1], payment[1])
+	ph3 := CreatePaymentHistory(client, user[1], payment[1])
 
-	ph, err := client.PaymentHistory.CreateBulk(ph1, ph2).Save(ctx)
+	ph, err := client.PaymentHistory.CreateBulk(ph1, ph2, ph3).Save(ctx)
 
 	if err != nil {
 		log.Fatalf("failed creating payment_history: %v", err)

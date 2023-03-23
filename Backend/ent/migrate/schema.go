@@ -14,7 +14,7 @@ var (
 		{Name: "review_avaliable", Type: field.TypeBool, Default: true},
 		{Name: "total_hour", Type: field.TypeInt},
 		{Name: "success_hour", Type: field.TypeInt},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"scheduled", "completed", "cancelling", "rejected", "cancelled"}},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"ongoing", "completed", "cancelling", "rejected", "cancelled"}},
 		{Name: "payment_history_class", Type: field.TypeUUID},
 		{Name: "schedule_class", Type: field.TypeUUID},
 	}
@@ -97,13 +97,22 @@ var (
 	}
 	// MatchesColumns holds the columns for the "matches" table.
 	MatchesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "student_match", Type: field.TypeUUID},
 	}
 	// MatchesTable holds the schema information for the "matches" table.
 	MatchesTable = &schema.Table{
 		Name:       "matches",
 		Columns:    MatchesColumns,
 		PrimaryKey: []*schema.Column{MatchesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "matches_students_match",
+				Columns:    []*schema.Column{MatchesColumns[1]},
+				RefColumns: []*schema.Column{StudentsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
 	}
 	// PaymentsColumns holds the columns for the "payments" table.
 	PaymentsColumns = []*schema.Column{
@@ -271,7 +280,7 @@ var (
 	// ClassMatchColumns holds the columns for the "class_match" table.
 	ClassMatchColumns = []*schema.Column{
 		{Name: "class_id", Type: field.TypeUUID},
-		{Name: "match_id", Type: field.TypeInt},
+		{Name: "match_id", Type: field.TypeUUID},
 	}
 	// ClassMatchTable holds the schema information for the "class_match" table.
 	ClassMatchTable = &schema.Table{
@@ -321,7 +330,7 @@ var (
 	// CourseMatchColumns holds the columns for the "course_match" table.
 	CourseMatchColumns = []*schema.Column{
 		{Name: "course_id", Type: field.TypeUUID},
-		{Name: "match_id", Type: field.TypeInt},
+		{Name: "match_id", Type: field.TypeUUID},
 	}
 	// CourseMatchTable holds the schema information for the "course_match" table.
 	CourseMatchTable = &schema.Table{
@@ -338,31 +347,6 @@ var (
 			{
 				Symbol:     "course_match_match_id",
 				Columns:    []*schema.Column{CourseMatchColumns[1]},
-				RefColumns: []*schema.Column{MatchesColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
-	// StudentMatchColumns holds the columns for the "student_match" table.
-	StudentMatchColumns = []*schema.Column{
-		{Name: "student_id", Type: field.TypeUUID},
-		{Name: "match_id", Type: field.TypeInt},
-	}
-	// StudentMatchTable holds the schema information for the "student_match" table.
-	StudentMatchTable = &schema.Table{
-		Name:       "student_match",
-		Columns:    StudentMatchColumns,
-		PrimaryKey: []*schema.Column{StudentMatchColumns[0], StudentMatchColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "student_match_student_id",
-				Columns:    []*schema.Column{StudentMatchColumns[0]},
-				RefColumns: []*schema.Column{StudentsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "student_match_match_id",
-				Columns:    []*schema.Column{StudentMatchColumns[1]},
 				RefColumns: []*schema.Column{MatchesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -460,7 +444,6 @@ var (
 		ClassMatchTable,
 		CourseReviewCourseTable,
 		CourseMatchTable,
-		StudentMatchTable,
 		StudentReviewCourseTable,
 		StudentReviewTutorTable,
 		TutorReviewTutorTable,
@@ -473,6 +456,7 @@ func init() {
 	CoursesTable.ForeignKeys[0].RefTable = TutorsTable
 	IssueReportsTable.ForeignKeys[0].RefTable = TutorsTable
 	IssueReportsTable.ForeignKeys[1].RefTable = UsersTable
+	MatchesTable.ForeignKeys[0].RefTable = StudentsTable
 	PaymentsTable.ForeignKeys[0].RefTable = UsersTable
 	PaymentHistoriesTable.ForeignKeys[0].RefTable = PaymentsTable
 	PaymentHistoriesTable.ForeignKeys[1].RefTable = UsersTable
@@ -485,8 +469,6 @@ func init() {
 	CourseReviewCourseTable.ForeignKeys[1].RefTable = ReviewCoursesTable
 	CourseMatchTable.ForeignKeys[0].RefTable = CoursesTable
 	CourseMatchTable.ForeignKeys[1].RefTable = MatchesTable
-	StudentMatchTable.ForeignKeys[0].RefTable = StudentsTable
-	StudentMatchTable.ForeignKeys[1].RefTable = MatchesTable
 	StudentReviewCourseTable.ForeignKeys[0].RefTable = StudentsTable
 	StudentReviewCourseTable.ForeignKeys[1].RefTable = ReviewCoursesTable
 	StudentReviewTutorTable.ForeignKeys[0].RefTable = StudentsTable

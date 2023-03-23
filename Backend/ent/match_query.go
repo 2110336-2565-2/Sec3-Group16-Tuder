@@ -29,6 +29,7 @@ type MatchQuery struct {
 	withStudent *StudentQuery
 	withCourse  *CourseQuery
 	withClass   *ClassQuery
+	withFKs     bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -79,7 +80,7 @@ func (mq *MatchQuery) QueryStudent() *StudentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(match.Table, match.FieldID, selector),
 			sqlgraph.To(student.Table, student.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, match.StudentTable, match.StudentPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, match.StudentTable, match.StudentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
 		return fromU, nil
@@ -155,8 +156,8 @@ func (mq *MatchQuery) FirstX(ctx context.Context) *Match {
 
 // FirstID returns the first Match ID from the query.
 // Returns a *NotFoundError when no Match ID was found.
-func (mq *MatchQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (mq *MatchQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = mq.Limit(1).IDs(setContextOp(ctx, mq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -168,7 +169,7 @@ func (mq *MatchQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (mq *MatchQuery) FirstIDX(ctx context.Context) int {
+func (mq *MatchQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := mq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -206,8 +207,8 @@ func (mq *MatchQuery) OnlyX(ctx context.Context) *Match {
 // OnlyID is like Only, but returns the only Match ID in the query.
 // Returns a *NotSingularError when more than one Match ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (mq *MatchQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (mq *MatchQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = mq.Limit(2).IDs(setContextOp(ctx, mq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -223,7 +224,7 @@ func (mq *MatchQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (mq *MatchQuery) OnlyIDX(ctx context.Context) int {
+func (mq *MatchQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := mq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -251,7 +252,7 @@ func (mq *MatchQuery) AllX(ctx context.Context) []*Match {
 }
 
 // IDs executes the query and returns a list of Match IDs.
-func (mq *MatchQuery) IDs(ctx context.Context) (ids []int, err error) {
+func (mq *MatchQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
 	if mq.ctx.Unique == nil && mq.path != nil {
 		mq.Unique(true)
 	}
@@ -263,7 +264,7 @@ func (mq *MatchQuery) IDs(ctx context.Context) (ids []int, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (mq *MatchQuery) IDsX(ctx context.Context) []int {
+func (mq *MatchQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := mq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -420,6 +421,7 @@ func (mq *MatchQuery) prepareQuery(ctx context.Context) error {
 func (mq *MatchQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Match, error) {
 	var (
 		nodes       = []*Match{}
+		withFKs     = mq.withFKs
 		_spec       = mq.querySpec()
 		loadedTypes = [3]bool{
 			mq.withStudent != nil,
@@ -427,6 +429,12 @@ func (mq *MatchQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Match,
 			mq.withClass != nil,
 		}
 	)
+	if mq.withStudent != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, match.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Match).scanValues(nil, columns)
 	}
@@ -446,9 +454,8 @@ func (mq *MatchQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Match,
 		return nodes, nil
 	}
 	if query := mq.withStudent; query != nil {
-		if err := mq.loadStudent(ctx, query, nodes,
-			func(n *Match) { n.Edges.Student = []*Student{} },
-			func(n *Match, e *Student) { n.Edges.Student = append(n.Edges.Student, e) }); err != nil {
+		if err := mq.loadStudent(ctx, query, nodes, nil,
+			func(n *Match, e *Student) { n.Edges.Student = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -470,69 +477,40 @@ func (mq *MatchQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Match,
 }
 
 func (mq *MatchQuery) loadStudent(ctx context.Context, query *StudentQuery, nodes []*Match, init func(*Match), assign func(*Match, *Student)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*Match)
-	nids := make(map[uuid.UUID]map[*Match]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
-		if init != nil {
-			init(node)
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Match)
+	for i := range nodes {
+		if nodes[i].student_match == nil {
+			continue
 		}
+		fk := *nodes[i].student_match
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(match.StudentTable)
-		s.Join(joinT).On(s.C(student.FieldID), joinT.C(match.StudentPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(match.StudentPrimaryKey[1]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(match.StudentPrimaryKey[1]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
+	if len(ids) == 0 {
+		return nil
 	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := *values[1].(*uuid.UUID)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*Match]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*Student](ctx, query, qr, query.inters)
+	query.Where(student.IDIn(ids...))
+	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
+		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected "student" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "student_match" returned %v`, n.ID)
 		}
-		for kn := range nodes {
-			assign(kn, n)
+		for i := range nodes {
+			assign(nodes[i], n)
 		}
 	}
 	return nil
 }
 func (mq *MatchQuery) loadCourse(ctx context.Context, query *CourseQuery, nodes []*Match, init func(*Match), assign func(*Match, *Course)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*Match)
+	byID := make(map[uuid.UUID]*Match)
 	nids := make(map[uuid.UUID]map[*Match]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
@@ -562,10 +540,10 @@ func (mq *MatchQuery) loadCourse(ctx context.Context, query *CourseQuery, nodes 
 				if err != nil {
 					return nil, err
 				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
+				return append([]any{new(uuid.UUID)}, values...), nil
 			}
 			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
+				outValue := *values[0].(*uuid.UUID)
 				inValue := *values[1].(*uuid.UUID)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*Match]struct{}{byID[outValue]: {}}
@@ -593,7 +571,7 @@ func (mq *MatchQuery) loadCourse(ctx context.Context, query *CourseQuery, nodes 
 }
 func (mq *MatchQuery) loadClass(ctx context.Context, query *ClassQuery, nodes []*Match, init func(*Match), assign func(*Match, *Class)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*Match)
+	byID := make(map[uuid.UUID]*Match)
 	nids := make(map[uuid.UUID]map[*Match]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
@@ -623,10 +601,10 @@ func (mq *MatchQuery) loadClass(ctx context.Context, query *ClassQuery, nodes []
 				if err != nil {
 					return nil, err
 				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
+				return append([]any{new(uuid.UUID)}, values...), nil
 			}
 			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
+				outValue := *values[0].(*uuid.UUID)
 				inValue := *values[1].(*uuid.UUID)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*Match]struct{}{byID[outValue]: {}}
@@ -663,7 +641,7 @@ func (mq *MatchQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (mq *MatchQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(match.Table, match.Columns, sqlgraph.NewFieldSpec(match.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(match.Table, match.Columns, sqlgraph.NewFieldSpec(match.FieldID, field.TypeUUID))
 	_spec.From = mq.sql
 	if unique := mq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

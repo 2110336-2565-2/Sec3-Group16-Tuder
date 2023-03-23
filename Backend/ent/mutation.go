@@ -64,8 +64,8 @@ type ClassMutation struct {
 	addsuccess_hour        *int
 	status                 *class.Status
 	clearedFields          map[string]struct{}
-	match                  map[int]struct{}
-	removedmatch           map[int]struct{}
+	match                  map[uuid.UUID]struct{}
+	removedmatch           map[uuid.UUID]struct{}
 	clearedmatch           bool
 	schedule               *uuid.UUID
 	clearedschedule        bool
@@ -365,9 +365,9 @@ func (m *ClassMutation) ResetStatus() {
 }
 
 // AddMatchIDs adds the "match" edge to the Match entity by ids.
-func (m *ClassMutation) AddMatchIDs(ids ...int) {
+func (m *ClassMutation) AddMatchIDs(ids ...uuid.UUID) {
 	if m.match == nil {
-		m.match = make(map[int]struct{})
+		m.match = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.match[ids[i]] = struct{}{}
@@ -385,9 +385,9 @@ func (m *ClassMutation) MatchCleared() bool {
 }
 
 // RemoveMatchIDs removes the "match" edge to the Match entity by IDs.
-func (m *ClassMutation) RemoveMatchIDs(ids ...int) {
+func (m *ClassMutation) RemoveMatchIDs(ids ...uuid.UUID) {
 	if m.removedmatch == nil {
-		m.removedmatch = make(map[int]struct{})
+		m.removedmatch = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.match, ids[i])
@@ -396,7 +396,7 @@ func (m *ClassMutation) RemoveMatchIDs(ids ...int) {
 }
 
 // RemovedMatch returns the removed IDs of the "match" edge to the Match entity.
-func (m *ClassMutation) RemovedMatchIDs() (ids []int) {
+func (m *ClassMutation) RemovedMatchIDs() (ids []uuid.UUID) {
 	for id := range m.removedmatch {
 		ids = append(ids, id)
 	}
@@ -404,7 +404,7 @@ func (m *ClassMutation) RemovedMatchIDs() (ids []int) {
 }
 
 // MatchIDs returns the "match" edge IDs in the mutation.
-func (m *ClassMutation) MatchIDs() (ids []int) {
+func (m *ClassMutation) MatchIDs() (ids []uuid.UUID) {
 	for id := range m.match {
 		ids = append(ids, id)
 	}
@@ -845,8 +845,8 @@ type CourseMutation struct {
 	review_course        map[int]struct{}
 	removedreview_course map[int]struct{}
 	clearedreview_course bool
-	match                map[int]struct{}
-	removedmatch         map[int]struct{}
+	match                map[uuid.UUID]struct{}
+	removedmatch         map[uuid.UUID]struct{}
 	clearedmatch         bool
 	tutor                *uuid.UUID
 	clearedtutor         bool
@@ -1368,9 +1368,9 @@ func (m *CourseMutation) ResetReviewCourse() {
 }
 
 // AddMatchIDs adds the "match" edge to the Match entity by ids.
-func (m *CourseMutation) AddMatchIDs(ids ...int) {
+func (m *CourseMutation) AddMatchIDs(ids ...uuid.UUID) {
 	if m.match == nil {
-		m.match = make(map[int]struct{})
+		m.match = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.match[ids[i]] = struct{}{}
@@ -1388,9 +1388,9 @@ func (m *CourseMutation) MatchCleared() bool {
 }
 
 // RemoveMatchIDs removes the "match" edge to the Match entity by IDs.
-func (m *CourseMutation) RemoveMatchIDs(ids ...int) {
+func (m *CourseMutation) RemoveMatchIDs(ids ...uuid.UUID) {
 	if m.removedmatch == nil {
-		m.removedmatch = make(map[int]struct{})
+		m.removedmatch = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.match, ids[i])
@@ -1399,7 +1399,7 @@ func (m *CourseMutation) RemoveMatchIDs(ids ...int) {
 }
 
 // RemovedMatch returns the removed IDs of the "match" edge to the Match entity.
-func (m *CourseMutation) RemovedMatchIDs() (ids []int) {
+func (m *CourseMutation) RemovedMatchIDs() (ids []uuid.UUID) {
 	for id := range m.removedmatch {
 		ids = append(ids, id)
 	}
@@ -1407,7 +1407,7 @@ func (m *CourseMutation) RemovedMatchIDs() (ids []int) {
 }
 
 // MatchIDs returns the "match" edge IDs in the mutation.
-func (m *CourseMutation) MatchIDs() (ids []int) {
+func (m *CourseMutation) MatchIDs() (ids []uuid.UUID) {
 	for id := range m.match {
 		ids = append(ids, id)
 	}
@@ -2446,10 +2446,9 @@ type MatchMutation struct {
 	config
 	op             Op
 	typ            string
-	id             *int
+	id             *uuid.UUID
 	clearedFields  map[string]struct{}
-	student        map[uuid.UUID]struct{}
-	removedstudent map[uuid.UUID]struct{}
+	student        *uuid.UUID
 	clearedstudent bool
 	course         map[uuid.UUID]struct{}
 	removedcourse  map[uuid.UUID]struct{}
@@ -2482,7 +2481,7 @@ func newMatchMutation(c config, op Op, opts ...matchOption) *MatchMutation {
 }
 
 // withMatchID sets the ID field of the mutation.
-func withMatchID(id int) matchOption {
+func withMatchID(id uuid.UUID) matchOption {
 	return func(m *MatchMutation) {
 		var (
 			err   error
@@ -2532,9 +2531,15 @@ func (m MatchMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Match entities.
+func (m *MatchMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *MatchMutation) ID() (id int, exists bool) {
+func (m *MatchMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -2545,12 +2550,12 @@ func (m *MatchMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *MatchMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *MatchMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []int{id}, nil
+			return []uuid.UUID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -2560,14 +2565,9 @@ func (m *MatchMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
-// AddStudentIDs adds the "student" edge to the Student entity by ids.
-func (m *MatchMutation) AddStudentIDs(ids ...uuid.UUID) {
-	if m.student == nil {
-		m.student = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		m.student[ids[i]] = struct{}{}
-	}
+// SetStudentID sets the "student" edge to the Student entity by id.
+func (m *MatchMutation) SetStudentID(id uuid.UUID) {
+	m.student = &id
 }
 
 // ClearStudent clears the "student" edge to the Student entity.
@@ -2580,29 +2580,20 @@ func (m *MatchMutation) StudentCleared() bool {
 	return m.clearedstudent
 }
 
-// RemoveStudentIDs removes the "student" edge to the Student entity by IDs.
-func (m *MatchMutation) RemoveStudentIDs(ids ...uuid.UUID) {
-	if m.removedstudent == nil {
-		m.removedstudent = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		delete(m.student, ids[i])
-		m.removedstudent[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedStudent returns the removed IDs of the "student" edge to the Student entity.
-func (m *MatchMutation) RemovedStudentIDs() (ids []uuid.UUID) {
-	for id := range m.removedstudent {
-		ids = append(ids, id)
+// StudentID returns the "student" edge ID in the mutation.
+func (m *MatchMutation) StudentID() (id uuid.UUID, exists bool) {
+	if m.student != nil {
+		return *m.student, true
 	}
 	return
 }
 
 // StudentIDs returns the "student" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// StudentID instead. It exists only for internal usage by the builders.
 func (m *MatchMutation) StudentIDs() (ids []uuid.UUID) {
-	for id := range m.student {
-		ids = append(ids, id)
+	if id := m.student; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -2611,7 +2602,6 @@ func (m *MatchMutation) StudentIDs() (ids []uuid.UUID) {
 func (m *MatchMutation) ResetStudent() {
 	m.student = nil
 	m.clearedstudent = false
-	m.removedstudent = nil
 }
 
 // AddCourseIDs adds the "course" edge to the Course entity by ids.
@@ -2848,11 +2838,9 @@ func (m *MatchMutation) AddedEdges() []string {
 func (m *MatchMutation) AddedIDs(name string) []ent.Value {
 	switch name {
 	case match.EdgeStudent:
-		ids := make([]ent.Value, 0, len(m.student))
-		for id := range m.student {
-			ids = append(ids, id)
+		if id := m.student; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	case match.EdgeCourse:
 		ids := make([]ent.Value, 0, len(m.course))
 		for id := range m.course {
@@ -2872,9 +2860,6 @@ func (m *MatchMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *MatchMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 3)
-	if m.removedstudent != nil {
-		edges = append(edges, match.EdgeStudent)
-	}
 	if m.removedcourse != nil {
 		edges = append(edges, match.EdgeCourse)
 	}
@@ -2888,12 +2873,6 @@ func (m *MatchMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *MatchMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case match.EdgeStudent:
-		ids := make([]ent.Value, 0, len(m.removedstudent))
-		for id := range m.removedstudent {
-			ids = append(ids, id)
-		}
-		return ids
 	case match.EdgeCourse:
 		ids := make([]ent.Value, 0, len(m.removedcourse))
 		for id := range m.removedcourse {
@@ -2943,6 +2922,9 @@ func (m *MatchMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *MatchMutation) ClearEdge(name string) error {
 	switch name {
+	case match.EdgeStudent:
+		m.ClearStudent()
+		return nil
 	}
 	return fmt.Errorf("unknown Match unique edge %s", name)
 }
@@ -6058,8 +6040,8 @@ type StudentMutation struct {
 	typ                  string
 	id                   *uuid.UUID
 	clearedFields        map[string]struct{}
-	match                map[int]struct{}
-	removedmatch         map[int]struct{}
+	match                map[uuid.UUID]struct{}
+	removedmatch         map[uuid.UUID]struct{}
 	clearedmatch         bool
 	review_course        map[int]struct{}
 	removedreview_course map[int]struct{}
@@ -6179,9 +6161,9 @@ func (m *StudentMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 }
 
 // AddMatchIDs adds the "match" edge to the Match entity by ids.
-func (m *StudentMutation) AddMatchIDs(ids ...int) {
+func (m *StudentMutation) AddMatchIDs(ids ...uuid.UUID) {
 	if m.match == nil {
-		m.match = make(map[int]struct{})
+		m.match = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.match[ids[i]] = struct{}{}
@@ -6199,9 +6181,9 @@ func (m *StudentMutation) MatchCleared() bool {
 }
 
 // RemoveMatchIDs removes the "match" edge to the Match entity by IDs.
-func (m *StudentMutation) RemoveMatchIDs(ids ...int) {
+func (m *StudentMutation) RemoveMatchIDs(ids ...uuid.UUID) {
 	if m.removedmatch == nil {
-		m.removedmatch = make(map[int]struct{})
+		m.removedmatch = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.match, ids[i])
@@ -6210,7 +6192,7 @@ func (m *StudentMutation) RemoveMatchIDs(ids ...int) {
 }
 
 // RemovedMatch returns the removed IDs of the "match" edge to the Match entity.
-func (m *StudentMutation) RemovedMatchIDs() (ids []int) {
+func (m *StudentMutation) RemovedMatchIDs() (ids []uuid.UUID) {
 	for id := range m.removedmatch {
 		ids = append(ids, id)
 	}
@@ -6218,7 +6200,7 @@ func (m *StudentMutation) RemovedMatchIDs() (ids []int) {
 }
 
 // MatchIDs returns the "match" edge IDs in the mutation.
-func (m *StudentMutation) MatchIDs() (ids []int) {
+func (m *StudentMutation) MatchIDs() (ids []uuid.UUID) {
 	for id := range m.match {
 		ids = append(ids, id)
 	}

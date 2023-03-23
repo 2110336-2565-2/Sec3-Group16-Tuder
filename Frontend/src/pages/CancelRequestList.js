@@ -1,22 +1,34 @@
-import React from "react";
+import React, { useState, createContext, useContext} from "react";
 import styled from "styled-components"
-import FormEnterNewPassword from '../components/form/FormEnterNewPassword.js'
 import WaveFooter from "../components/global/WaveFooter.js";
-import { IsUser } from "../components/IsAuth.js";
+import { IsAdmin } from "../components/IsAuth.js";
+import CancelRequestList from "../components/CancelRequestList.js";
 
-export default function EnterNewPassword(){
+const DataContext = createContext({
+   
+    data: [],
+    setData : () => {}
+});
+
+export const useDataContext = () => useContext(DataContext);
+export default function CancelRequestListPage(){
+    const [data, setData] = useState([]);
 
     return(
-        <IsUser>
+        <IsAdmin>
             <Container>
+                <DataContext.Provider value={{data, setData}}>
                 <ContainerWithHeight margintop='100px'>
-                    <FormEnterNewPassword />
+                    
+                    <CancelRequestList />
+
                 </ContainerWithHeight>
                 <WaveFooterWrapper>
                     <WaveFooter />
                 </WaveFooterWrapper>
+                </DataContext.Provider>
             </Container>
-        </IsUser>
+        </IsAdmin>
         
     )
 }
