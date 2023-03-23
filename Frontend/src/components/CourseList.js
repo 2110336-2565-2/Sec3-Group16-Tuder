@@ -51,8 +51,8 @@ export default function CourseList(){
                 {
                     data.map(item => (  
                             <CourseListcontent key={item.course_id}>
-                        <Course  title={item.title} topic={item.topic} tutor={item.tutor_name} subject={item.subject} time={item.estimate_time} price={item.price_per_hour} img={item.course_picture_url}/>       
-                    </CourseListcontent>
+                                <Course  title={item.title} topic={item.topic} tutor={item.tutor_name} subject={item.subject} time={item.estimate_time} price={item.price_per_hour} img={item.course_picture_url}/>       
+                            </CourseListcontent>
                     ))
                 }
             </CourseListPage>

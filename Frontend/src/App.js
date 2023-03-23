@@ -2,7 +2,7 @@
 import './App.css';
 
 // import Router for link website
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 
 // import components
@@ -20,14 +20,27 @@ import EditProfile from './pages/EditProfile.js';
 
 import styled from 'styled-components';
 
+import { createContext, useContext } from 'react';
+import useRole from './hooks/useRole';
+import { verify } from './utils/jwtGet';
 
+const DataContext = createContext({
+  role:'guest',
+  handleRole: () => {}
+});
+
+export const useDataContext = () => useContext(DataContext);
 
 function App() {
-  
+  const [role, handleRole] = useRole();
+
+
   return (
     <Fragment>
+      <DataContext.Provider value={[{role}, {handleRole}]}>
       <Toaster />
       <Navbar />
+      </DataContext.Provider>
     </Fragment>
     
   );

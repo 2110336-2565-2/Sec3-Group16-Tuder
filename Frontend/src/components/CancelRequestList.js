@@ -3,7 +3,7 @@ import {useQuery} from 'react-query';
 import { fetchCancellingClassHandler } from '../handlers/cancellingClassHandler';
 import { useDataContext } from '../pages/CancelRequestList';
 import CancelRequest from '../components/CancelRequest';
-import React from 'react';
+import React,{useNavigate} from 'react';
 
 
 export default function CancelRequestList(){ 
@@ -14,13 +14,14 @@ export default function CancelRequestList(){
         {
             fetchCancellingClassHandler().then((res) => {
                 
-                console.log(res)
                 if(res.data.success){
                     if(res.data.data !== null)
                         setData(res.data.data);
                 }
             }).catch((err) => {
                 console.log(err);
+                alert("Unauthorized, please login again");
+                window.location.href = "/sign-in";
             }
             )
         },
@@ -44,6 +45,10 @@ export default function CancelRequestList(){
     if(data === []){
         return <div>Empty</div>
     }
+
+    const removeItem = (classId) => {
+        setData(data.filter(item => item.classId !== classId));
+    }
     
 
     return (
@@ -55,7 +60,7 @@ export default function CancelRequestList(){
                         <CancelRequest type="Topic" classId='ClassID' course='Course' tutor='Tutor' student='Student' subject='Subject' total_hour='Total Hours' success_hour='Success Hour'   price='Price/Hour' /> 
                         {data.map(item => (  
 
-                            <CancelRequest key={item.classId} classId={item.classId} course={item.course} tutor={item.tutor_name} student={item.student_name} subject={item.subject} total_hour={item.total_hours} success_hour={item.success_hours}   price={item.price} /> 
+                            <CancelRequest key={item.classId} removeItem={removeItem} classId={item.classId} course={item.course} tutor={item.tutor_name} student={item.student_name} subject={item.subject} total_hour={item.total_hours} success_hour={item.success_hours}   price={item.price} /> 
                         ))}
                         
                     </RequestListcontent>
@@ -92,24 +97,6 @@ const RequestListcontent = styled.div`
     flex-direction: column;
     gap: 20px;
     
-`
-
-const FirstRow = styled.div`
-    display: flex;
-    flex-direction: row;
-    gap: 20px;
-    justify-content: left;
-    margin-left: 10px;
-    
-`
-
-const FirstRowInfo = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    font-size: 20px;
-    margin-top: 15px;
-    margin-right: 10px;
 `
 
 

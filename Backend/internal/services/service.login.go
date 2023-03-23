@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -26,7 +25,7 @@ func (s *serviceLogin) LoginService(l *schemas.SchemaLogin) (*schemas.SchemaLogi
 	// check password
 	luser, err := s.repository.Login(l)
 	if err != nil {
-		fmt.Println(err)
+		// fmt.Println(err)
 		return nil, err
 	}
 

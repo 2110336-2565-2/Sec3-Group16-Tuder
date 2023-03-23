@@ -1,59 +1,63 @@
-import React from "react";
-import useRole  from "../hooks/useRole";
-import {Navigate}  from "react-router-dom";
+import { useDataContext } from "../App";
+import {verify} from "../utils/jwtGet";
 
 export function IsTutor({children}) {
-    const [role, handleRole] = useRole();
+    const [role, handleRole] = useDataContext();
 
-    if(role === "tutor"){
+    if(verify() && role.role === "tutor"){
         return children;
     }else{
-        return <Navigate to="/"/>
+        alert("Unauthorized Access, Please Login again")
+        window.location.href = "/sign-in";
+        return
     }
 }
 
 export function IsStudent({children}) {
-    const [role, handleRole] = useRole();
+    const [role, handleRole] = useDataContext();
 
-    if(role === "student"){
+    if(verify() && role.role === "student"){
         return children;
     }else{
-        return <Navigate to="/"/>
+        alert("Unauthorized Access, Please Login again")
+        window.location.href = "/sign-in";
+        return
     }
 }
 
 export function IsAdmin({children}) {
-    const [role, handleRole] = useRole();
+    const [role, handleRole] = useDataContext();
 
-    if(role === "admin"){
+    if(verify() && role.role === "admin"){
         return children;
     }else{
-        return <Navigate to="/"/>
+        alert("Unauthorized Access, Please Login again")
+        window.location.href = "/sign-in";
+        return
     }
 }
 
 export function IsGuest({children}) {
-    const [role, handleRole] = useRole();
-
-    if(role === "guest"){
+    const [role, handleRole] = useDataContext();
+    
+    if( role.role === "guest"){
         return children;
     }else{
-        return <Navigate to="/"/>
+        window.location.href = "/";
+        return
     }
 }
 
 export function IsUser({children}) {
-    const [role, handleRole] = useRole();
+    const [role, handleRole] = useDataContext();
 
-    if(role === "student" || role === "tutor"){
+    if(verify() && (role.role === "student" || role.role === "tutor")){
         return children;
     }else{
-        return <Navigate to="/"/>
+        alert("Please Login to access this page")
+        window.location.href = "/sign-in";
+        return
     }
-}
-
-export function AuthVerify({children}) {
-    
 }
 
 

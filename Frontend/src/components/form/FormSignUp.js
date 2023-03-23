@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import signUpHandler from '../../handlers/signUpHandler.js';
 import signupContent from "../../datas/SignUp.role.js";
 import styled from 'styled-components';
+import { toast } from 'react-hot-toast';
 
 import { useNavigate } from 'react-router-dom';
 
@@ -54,12 +55,13 @@ export default function FormSignUp(){
          setStatus('submitting')
          try{
             await signUpHandler(signUpData, navigate);
+            toast.success('Sign up successfully')
             setStatus('success')
         } catch (error){
 
             // Handle by do sth
 
-            console.log(error);
+            toast.error(error.message)
             setStatus('error');
         }
     }

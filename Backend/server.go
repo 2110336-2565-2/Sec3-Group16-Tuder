@@ -50,8 +50,10 @@ func main() {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
-	// test must reset db as always
-	datas.InsertData(client)
+	// test data for development
+	if os.Getenv("MODE") == "dev" {
+		datas.InsertData(client)
+	}
 
 	e.Use(middlewares.CorsMiddleware)
 	routes.InitRoutes(client, e)

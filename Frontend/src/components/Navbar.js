@@ -3,16 +3,26 @@ import navbarContent from '../datas/Navbar.role.js';
 import styled from 'styled-components';
 import {signOutAction} from '../handlers/signOutHandler';
 import {useNavigate} from 'react-router-dom';
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import useRole from '../hooks/useRole';
+import { useDataContext } from '../App.js';
+import { toast } from 'react-hot-toast';
 
 
 
 export default function Navbar(){
     // choose Navbar contents array from role 
     
-    const [role, handleRole] = useRole();
+    var [role, handleRole] = useDataContext();
+    role = role.role;
+    handleRole = handleRole.handleRole;
     const navigate = useNavigate();
+
+    window.addEventListener('storage', () => {
+        handleRole();
+    })
+
+    
 
     
     
@@ -20,6 +30,14 @@ export default function Navbar(){
         e.preventDefault();
         signOutAction(navigate);
         handleRole();
+        toast.success('Signed Out', {style: {     
+            color: '#713200',
+          },
+          iconTheme: {
+            primary: '#DC143C',
+            
+          },
+        });
     }
 
     let navbarRole = null

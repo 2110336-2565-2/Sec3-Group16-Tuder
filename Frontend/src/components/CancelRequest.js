@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components"
 import { submitApprovmentHandler, submitRejectionHandler } from "../handlers/cancellingClassHandler";
-
+import {toast} from 'react-hot-toast';
 
 
 
@@ -17,12 +17,16 @@ export default function CancelRequest(props){
 
         submitApprovmentHandler(classId).then((res) => {
             if(res.data.success){
-                alert("Approve Successfully");
-                //reload page
-                window.location.reload();
+                toast.success("Approve Successfully");
+                //delete component
+                props.removeItem(classId);
+                
+                
             }
         }).catch((err) => {
             console.log(err);
+            toast.error("Approve Failed");
+            
         }
         )
     }
@@ -30,18 +34,21 @@ export default function CancelRequest(props){
     const submitReject = (classId) => {
 
         // confirmation before submit
+        
         if(!window.confirm("Are you sure to reject this request?")){
             return;
         }
 
         submitRejectionHandler(classId).then((res) => {
             if(res.data.success){
-                alert("Rejected Successfully");
-                //reload page
-                window.location.reload();
+                toast.success("Rejected Successfully",{iconTheme: {primary: '#DAA520', secondary: '#fff'}});
+                //delete component
+                props.removeItem(classId);
+                
             }
         }).catch((err) => {
             console.log(err);
+            toast.error("Reject Failed");
         }
         )
     }
@@ -134,7 +141,9 @@ const RejectButton = styled.button`
 const ClassInfo = styled.div`
     display: flex;
     flex-direction: column;
-    width: 200px;   
+    justify-content: center;
+    width: 150px;   
+    height: 100px;
     gap: 10px;
     font-size: 20px;
     margin-top: 15px;
