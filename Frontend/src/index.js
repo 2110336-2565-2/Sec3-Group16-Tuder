@@ -12,6 +12,7 @@ import Report from './pages/Report';
 import ForgetPassword from './pages/ForgetPassword';
 import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
+import Review from './pages/Review';
 import ErrorPage from './pages/ErrorPage';
 import { QueryClientProvider, QueryClient } from 'react-query';
 
@@ -53,7 +54,11 @@ const router = createBrowserRouter([
       {
         path: "/edit-profile",
         element: <EditProfile />,
-      }
+      },
+      {
+        path: "/review/:id",
+        element: <Review />,
+      },
     ]
   }
 ])
