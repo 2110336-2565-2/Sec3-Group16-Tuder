@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 export default function WaveFooter({ backgroundColor, bottom }) {
   return (
-    <Container>
+    <Container backgroundColor={backgroundColor}>
       <Image
         src="/images/waveFooter.svg"
         alt="wave"
@@ -16,6 +16,7 @@ export default function WaveFooter({ backgroundColor, bottom }) {
 
 const Container = styled.div`
   width: 100%;
+  background-color: ${(props) => props.backgroundColor};
 `;
 
 const Image = styled.img`
