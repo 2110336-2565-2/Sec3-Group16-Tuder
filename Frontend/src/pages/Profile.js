@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import StudentInfo from "../components/profile/StudentInfo.js";
 import TutorInfo from "../components/profile/TutorInfo.js";
-import WaveFooter from "../components/global/WaveFooter.js";
+import Footer from "../components/global/Footer.js";
 // import { dummyStudent, dummyTutor } from "../datas/Profile.role.js";
 import { getStudentByUsername, getTutorByUsername } from "../handlers/profile/getUserHandler.js";
 import useRole from "../hooks/useRole.js";
@@ -59,15 +59,14 @@ export default function Profile() {
             <TutorInfo user={user} />
           )}
         </MiddleSection>
-        <WaveFooter />
       </Wrapper>
+      <Footer />
     </Container>
   );
 }
 
 const Container = styled.div`
   width: 100%;
-  height: 92.2vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -117,6 +116,7 @@ const Email = styled.span`
 const Wrapper = styled.div`
   border-radius: 50px 50px 0px 0px;
   background-color: white;
+  margin-top: 10px;
   width: 100%;
 `;
 

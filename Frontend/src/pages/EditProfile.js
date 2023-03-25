@@ -30,15 +30,22 @@ export default function EditProfile() {
 
   return (
     <Container>
-      {user?<FormEditProfile user={user} />:<h1>Loading..</h1>}
-      <WaveFooter backgroundColor={"#fdedeb"} />
+      <Wrapper>
+        {user?<FormEditProfile user={user} />:<h1>Loading..</h1>}
+      </Wrapper>
+      <WaveFooter backgroundColor="#fdedeb" />
     </Container>
   );
 }
 
 const Container = styled.div`
   display: flex;
-  height: 95vh;
+  flex-direction: column;
+`;
+
+const Wrapper = styled.div`
+  display: flex;
+  min-height: 95vh;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
