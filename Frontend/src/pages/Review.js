@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/global/Button";
 import TextInput from "../components/profile/TextInput";
+import Footer from "../components/global/Footer";
 import { confirm } from "../components/global/customToast";
 
 export default function Review() {
@@ -54,16 +55,17 @@ export default function Review() {
           <Button variance="submit" type="submit" >Send</Button>
         </ButtonSection>
       </Form>
+      <Footer />
     </Container>
   );
 }
 
 const Container = styled.div`
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   background-color: #fdedeb;
-  height: 80vh;
 `;
 
 const Form = styled.form`
@@ -74,6 +76,7 @@ const Form = styled.form`
   width: 80%;
   background-color: white;
   padding: 30px 75px;
+  margin: 150px 0px;
   border-radius: 10px;
 `;
 
