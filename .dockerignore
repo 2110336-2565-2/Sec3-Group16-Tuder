@@ -1,0 +1,15 @@
+.github/*
+.vscode/*
+dist
+infra
+node_modules
+.editorconfig
+.env
+.env.example
+.eslintrc.json
+.prettierignore
+.prettierrc
+docker-compose.yml
+jest.config.js
+jest.config.ts
+README.md
