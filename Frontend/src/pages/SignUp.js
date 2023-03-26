@@ -1,12 +1,14 @@
 import React, { Fragment } from "react";
 import styled from "styled-components"
-import FormSignUp from "../components/FormSignUp.js";
 import WaveFooter from "../components/global/WaveFooter.js";
+import { IsGuest } from "../components/IsAuth.js";
+import FormSignUp from "../components/form/FormSignUp.js";
 
 export default function SignUp(){
 
     return(
         <Fragment>
+            <IsGuest>
             <ContainerWithHeight margintop='0px'>
                 <SeperateSection>
                     <ItemGrid justify='center' columngrid='1 / 2'>
@@ -25,6 +27,7 @@ export default function SignUp(){
                 </SeperateSection>
             </ContainerWithHeight>
             <WaveFooter />
+            </IsGuest>
         </Fragment>
     )
 }

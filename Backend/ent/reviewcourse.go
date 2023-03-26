@@ -7,9 +7,7 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
-	"github.com/google/uuid"
 )
 
 // ReviewCourse is the model entity for the ReviewCourse schema.
@@ -23,30 +21,36 @@ type ReviewCourse struct {
 	ReviewMsg *string `json:"review_msg,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ReviewCourseQuery when eager-loading is set.
-	Edges                ReviewCourseEdges `json:"edges"`
-	course_review_course *uuid.UUID
+	Edges ReviewCourseEdges `json:"edges"`
 }
 
 // ReviewCourseEdges holds the relations/edges for other nodes in the graph.
 type ReviewCourseEdges struct {
 	// Course holds the value of the course edge.
-	Course *Course `json:"course,omitempty"`
+	Course []*Course `json:"course,omitempty"`
+	// Student holds the value of the student edge.
+	Student []*Student `json:"student,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // CourseOrErr returns the Course value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ReviewCourseEdges) CourseOrErr() (*Course, error) {
+// was not loaded in eager-loading.
+func (e ReviewCourseEdges) CourseOrErr() ([]*Course, error) {
 	if e.loadedTypes[0] {
-		if e.Course == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: course.Label}
-		}
 		return e.Course, nil
 	}
 	return nil, &NotLoadedError{edge: "course"}
+}
+
+// StudentOrErr returns the Student value or an error if the edge
+// was not loaded in eager-loading.
+func (e ReviewCourseEdges) StudentOrErr() ([]*Student, error) {
+	if e.loadedTypes[1] {
+		return e.Student, nil
+	}
+	return nil, &NotLoadedError{edge: "student"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -60,8 +64,6 @@ func (*ReviewCourse) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case reviewcourse.FieldReviewMsg:
 			values[i] = new(sql.NullString)
-		case reviewcourse.ForeignKeys[0]: // course_review_course
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type ReviewCourse", columns[i])
 		}
@@ -97,13 +99,6 @@ func (rc *ReviewCourse) assignValues(columns []string, values []any) error {
 				rc.ReviewMsg = new(string)
 				*rc.ReviewMsg = value.String
 			}
-		case reviewcourse.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullScanner); !ok {
-				return fmt.Errorf("unexpected type %T for field course_review_course", values[i])
-			} else if value.Valid {
-				rc.course_review_course = new(uuid.UUID)
-				*rc.course_review_course = *value.S.(*uuid.UUID)
-			}
 		}
 	}
 	return nil
@@ -112,6 +107,11 @@ func (rc *ReviewCourse) assignValues(columns []string, values []any) error {
 // QueryCourse queries the "course" edge of the ReviewCourse entity.
 func (rc *ReviewCourse) QueryCourse() *CourseQuery {
 	return NewReviewCourseClient(rc.config).QueryCourse(rc)
+}
+
+// QueryStudent queries the "student" edge of the ReviewCourse entity.
+func (rc *ReviewCourse) QueryStudent() *StudentQuery {
+	return NewReviewCourseClient(rc.config).QueryStudent(rc)
 }
 
 // Update returns a builder for updating this ReviewCourse.

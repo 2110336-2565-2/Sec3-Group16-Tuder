@@ -13,15 +13,20 @@ const (
 	FieldReviewMsg = "review_msg"
 	// EdgeCourse holds the string denoting the course edge name in mutations.
 	EdgeCourse = "course"
+	// EdgeStudent holds the string denoting the student edge name in mutations.
+	EdgeStudent = "student"
 	// Table holds the table name of the reviewcourse in the database.
 	Table = "review_courses"
-	// CourseTable is the table that holds the course relation/edge.
-	CourseTable = "review_courses"
+	// CourseTable is the table that holds the course relation/edge. The primary key declared below.
+	CourseTable = "course_review_course"
 	// CourseInverseTable is the table name for the Course entity.
 	// It exists in this package in order to avoid circular dependency with the "course" package.
 	CourseInverseTable = "courses"
-	// CourseColumn is the table column denoting the course relation/edge.
-	CourseColumn = "course_review_course"
+	// StudentTable is the table that holds the student relation/edge. The primary key declared below.
+	StudentTable = "student_review_course"
+	// StudentInverseTable is the table name for the Student entity.
+	// It exists in this package in order to avoid circular dependency with the "student" package.
+	StudentInverseTable = "students"
 )
 
 // Columns holds all SQL columns for reviewcourse fields.
@@ -31,21 +36,19 @@ var Columns = []string{
 	FieldReviewMsg,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "review_courses"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"course_review_course",
-}
+var (
+	// CoursePrimaryKey and CourseColumn2 are the table columns denoting the
+	// primary key for the course relation (M2M).
+	CoursePrimaryKey = []string{"course_id", "review_course_id"}
+	// StudentPrimaryKey and StudentColumn2 are the table columns denoting the
+	// primary key for the student relation (M2M).
+	StudentPrimaryKey = []string{"student_id", "review_course_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}

@@ -30,6 +30,7 @@ type (
 		Class          []ent.Hook
 		Course         []ent.Hook
 		IssueReport    []ent.Hook
+		Match          []ent.Hook
 		Payment        []ent.Hook
 		PaymentHistory []ent.Hook
 		ReviewCourse   []ent.Hook
@@ -43,6 +44,7 @@ type (
 		Class          []ent.Interceptor
 		Course         []ent.Interceptor
 		IssueReport    []ent.Interceptor
+		Match          []ent.Interceptor
 		Payment        []ent.Interceptor
 		PaymentHistory []ent.Interceptor
 		ReviewCourse   []ent.Interceptor

@@ -193,7 +193,7 @@ func HasTutor() predicate.ReviewTutor {
 	return predicate.ReviewTutor(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, TutorTable, TutorColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, TutorTable, TutorPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -205,7 +205,34 @@ func HasTutorWith(preds ...predicate.Tutor) predicate.ReviewTutor {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(TutorInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, TutorTable, TutorColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, TutorTable, TutorPrimaryKey...),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasStudent applies the HasEdge predicate on the "student" edge.
+func HasStudent() predicate.ReviewTutor {
+	return predicate.ReviewTutor(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, StudentTable, StudentPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasStudentWith applies the HasEdge predicate on the "student" edge with a given conditions (other predicates).
+func HasStudentWith(preds ...predicate.Student) predicate.ReviewTutor {
+	return predicate.ReviewTutor(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(StudentInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, StudentTable, StudentPrimaryKey...),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -11,24 +12,24 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/google/uuid"
 )
 
 // ClassQuery is the builder for querying Class entities.
 type ClassQuery struct {
 	config
-	ctx          *QueryContext
-	order        []OrderFunc
-	inters       []Interceptor
-	predicates   []predicate.Class
-	withSchedule *ScheduleQuery
-	withStudent  *StudentQuery
-	withCourse   *CourseQuery
-	withFKs      bool
+	ctx                *QueryContext
+	order              []OrderFunc
+	inters             []Interceptor
+	predicates         []predicate.Class
+	withMatch          *MatchQuery
+	withSchedule       *ScheduleQuery
+	withPaymentHistory *PaymentHistoryQuery
+	withFKs            bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -65,6 +66,28 @@ func (cq *ClassQuery) Order(o ...OrderFunc) *ClassQuery {
 	return cq
 }
 
+// QueryMatch chains the current query on the "match" edge.
+func (cq *ClassQuery) QueryMatch() *MatchQuery {
+	query := (&MatchClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(class.Table, class.FieldID, selector),
+			sqlgraph.To(match.Table, match.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, class.MatchTable, class.MatchPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QuerySchedule chains the current query on the "schedule" edge.
 func (cq *ClassQuery) QuerySchedule() *ScheduleQuery {
 	query := (&ScheduleClient{config: cq.config}).Query()
@@ -79,7 +102,7 @@ func (cq *ClassQuery) QuerySchedule() *ScheduleQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(class.Table, class.FieldID, selector),
 			sqlgraph.To(schedule.Table, schedule.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, class.ScheduleTable, class.ScheduleColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, class.ScheduleTable, class.ScheduleColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -87,9 +110,9 @@ func (cq *ClassQuery) QuerySchedule() *ScheduleQuery {
 	return query
 }
 
-// QueryStudent chains the current query on the "student" edge.
-func (cq *ClassQuery) QueryStudent() *StudentQuery {
-	query := (&StudentClient{config: cq.config}).Query()
+// QueryPaymentHistory chains the current query on the "payment_history" edge.
+func (cq *ClassQuery) QueryPaymentHistory() *PaymentHistoryQuery {
+	query := (&PaymentHistoryClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -100,30 +123,8 @@ func (cq *ClassQuery) QueryStudent() *StudentQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(class.Table, class.FieldID, selector),
-			sqlgraph.To(student.Table, student.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, class.StudentTable, class.StudentColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryCourse chains the current query on the "course" edge.
-func (cq *ClassQuery) QueryCourse() *CourseQuery {
-	query := (&CourseClient{config: cq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := cq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(class.Table, class.FieldID, selector),
-			sqlgraph.To(course.Table, course.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, class.CourseTable, class.CourseColumn),
+			sqlgraph.To(paymenthistory.Table, paymenthistory.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, class.PaymentHistoryTable, class.PaymentHistoryColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -318,18 +319,29 @@ func (cq *ClassQuery) Clone() *ClassQuery {
 		return nil
 	}
 	return &ClassQuery{
-		config:       cq.config,
-		ctx:          cq.ctx.Clone(),
-		order:        append([]OrderFunc{}, cq.order...),
-		inters:       append([]Interceptor{}, cq.inters...),
-		predicates:   append([]predicate.Class{}, cq.predicates...),
-		withSchedule: cq.withSchedule.Clone(),
-		withStudent:  cq.withStudent.Clone(),
-		withCourse:   cq.withCourse.Clone(),
+		config:             cq.config,
+		ctx:                cq.ctx.Clone(),
+		order:              append([]OrderFunc{}, cq.order...),
+		inters:             append([]Interceptor{}, cq.inters...),
+		predicates:         append([]predicate.Class{}, cq.predicates...),
+		withMatch:          cq.withMatch.Clone(),
+		withSchedule:       cq.withSchedule.Clone(),
+		withPaymentHistory: cq.withPaymentHistory.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
 	}
+}
+
+// WithMatch tells the query-builder to eager-load the nodes that are connected to
+// the "match" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *ClassQuery) WithMatch(opts ...func(*MatchQuery)) *ClassQuery {
+	query := (&MatchClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withMatch = query
+	return cq
 }
 
 // WithSchedule tells the query-builder to eager-load the nodes that are connected to
@@ -343,25 +355,14 @@ func (cq *ClassQuery) WithSchedule(opts ...func(*ScheduleQuery)) *ClassQuery {
 	return cq
 }
 
-// WithStudent tells the query-builder to eager-load the nodes that are connected to
-// the "student" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *ClassQuery) WithStudent(opts ...func(*StudentQuery)) *ClassQuery {
-	query := (&StudentClient{config: cq.config}).Query()
+// WithPaymentHistory tells the query-builder to eager-load the nodes that are connected to
+// the "payment_history" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *ClassQuery) WithPaymentHistory(opts ...func(*PaymentHistoryQuery)) *ClassQuery {
+	query := (&PaymentHistoryClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	cq.withStudent = query
-	return cq
-}
-
-// WithCourse tells the query-builder to eager-load the nodes that are connected to
-// the "course" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *ClassQuery) WithCourse(opts ...func(*CourseQuery)) *ClassQuery {
-	query := (&CourseClient{config: cq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	cq.withCourse = query
+	cq.withPaymentHistory = query
 	return cq
 }
 
@@ -445,12 +446,12 @@ func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class,
 		withFKs     = cq.withFKs
 		_spec       = cq.querySpec()
 		loadedTypes = [3]bool{
+			cq.withMatch != nil,
 			cq.withSchedule != nil,
-			cq.withStudent != nil,
-			cq.withCourse != nil,
+			cq.withPaymentHistory != nil,
 		}
 	)
-	if cq.withSchedule != nil || cq.withStudent != nil || cq.withCourse != nil {
+	if cq.withSchedule != nil || cq.withPaymentHistory != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -474,35 +475,97 @@ func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := cq.withMatch; query != nil {
+		if err := cq.loadMatch(ctx, query, nodes,
+			func(n *Class) { n.Edges.Match = []*Match{} },
+			func(n *Class, e *Match) { n.Edges.Match = append(n.Edges.Match, e) }); err != nil {
+			return nil, err
+		}
+	}
 	if query := cq.withSchedule; query != nil {
 		if err := cq.loadSchedule(ctx, query, nodes, nil,
 			func(n *Class, e *Schedule) { n.Edges.Schedule = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := cq.withStudent; query != nil {
-		if err := cq.loadStudent(ctx, query, nodes, nil,
-			func(n *Class, e *Student) { n.Edges.Student = e }); err != nil {
-			return nil, err
-		}
-	}
-	if query := cq.withCourse; query != nil {
-		if err := cq.loadCourse(ctx, query, nodes, nil,
-			func(n *Class, e *Course) { n.Edges.Course = e }); err != nil {
+	if query := cq.withPaymentHistory; query != nil {
+		if err := cq.loadPaymentHistory(ctx, query, nodes, nil,
+			func(n *Class, e *PaymentHistory) { n.Edges.PaymentHistory = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
+func (cq *ClassQuery) loadMatch(ctx context.Context, query *MatchQuery, nodes []*Class, init func(*Class), assign func(*Class, *Match)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[uuid.UUID]*Class)
+	nids := make(map[uuid.UUID]map[*Class]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(class.MatchTable)
+		s.Join(joinT).On(s.C(match.FieldID), joinT.C(class.MatchPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(class.MatchPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(class.MatchPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(uuid.UUID)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := *values[0].(*uuid.UUID)
+				inValue := *values[1].(*uuid.UUID)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Class]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Match](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "match" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
 func (cq *ClassQuery) loadSchedule(ctx context.Context, query *ScheduleQuery, nodes []*Class, init func(*Class), assign func(*Class, *Schedule)) error {
 	ids := make([]uuid.UUID, 0, len(nodes))
 	nodeids := make(map[uuid.UUID][]*Class)
 	for i := range nodes {
-		if nodes[i].class_schedule == nil {
+		if nodes[i].schedule_class == nil {
 			continue
 		}
-		fk := *nodes[i].class_schedule
+		fk := *nodes[i].schedule_class
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -519,7 +582,7 @@ func (cq *ClassQuery) loadSchedule(ctx context.Context, query *ScheduleQuery, no
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "class_schedule" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "schedule_class" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -527,14 +590,14 @@ func (cq *ClassQuery) loadSchedule(ctx context.Context, query *ScheduleQuery, no
 	}
 	return nil
 }
-func (cq *ClassQuery) loadStudent(ctx context.Context, query *StudentQuery, nodes []*Class, init func(*Class), assign func(*Class, *Student)) error {
+func (cq *ClassQuery) loadPaymentHistory(ctx context.Context, query *PaymentHistoryQuery, nodes []*Class, init func(*Class), assign func(*Class, *PaymentHistory)) error {
 	ids := make([]uuid.UUID, 0, len(nodes))
 	nodeids := make(map[uuid.UUID][]*Class)
 	for i := range nodes {
-		if nodes[i].student_class == nil {
+		if nodes[i].payment_history_class == nil {
 			continue
 		}
-		fk := *nodes[i].student_class
+		fk := *nodes[i].payment_history_class
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -543,7 +606,7 @@ func (cq *ClassQuery) loadStudent(ctx context.Context, query *StudentQuery, node
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(student.IDIn(ids...))
+	query.Where(paymenthistory.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -551,39 +614,7 @@ func (cq *ClassQuery) loadStudent(ctx context.Context, query *StudentQuery, node
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "student_class" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
-func (cq *ClassQuery) loadCourse(ctx context.Context, query *CourseQuery, nodes []*Class, init func(*Class), assign func(*Class, *Course)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*Class)
-	for i := range nodes {
-		if nodes[i].course_class == nil {
-			continue
-		}
-		fk := *nodes[i].course_class
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(course.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "course_class" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "payment_history_class" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

@@ -7,6 +7,7 @@ import { dummyStudent, dummyTutor } from "../datas/Profile.role";
 
 import FormEditProfile from "../components/profile/FormEditProfile";
 import WaveFooter from "../components/global/WaveFooter";
+import { IsUser } from "../components/IsAuth";
 
 export default function EditProfile() {
   const [user, setUser] = useState();
@@ -30,10 +31,12 @@ export default function EditProfile() {
 
   return (
     <Container>
+      <IsUser>
       <Wrapper>
         {user?<FormEditProfile user={user} />:<h1>Loading..</h1>}
       </Wrapper>
       <WaveFooter backgroundColor="#fdedeb" />
+      </IsUser>
     </Container>
   );
 }

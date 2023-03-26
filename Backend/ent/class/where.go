@@ -3,8 +3,6 @@
 package class
 
 import (
-	"time"
-
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
@@ -62,12 +60,12 @@ func ReviewAvaliable(v bool) predicate.Class {
 }
 
 // TotalHour applies equality check predicate on the "total_hour" field. It's identical to TotalHourEQ.
-func TotalHour(v time.Time) predicate.Class {
+func TotalHour(v int) predicate.Class {
 	return predicate.Class(sql.FieldEQ(FieldTotalHour, v))
 }
 
 // SuccessHour applies equality check predicate on the "success_hour" field. It's identical to SuccessHourEQ.
-func SuccessHour(v time.Time) predicate.Class {
+func SuccessHour(v int) predicate.Class {
 	return predicate.Class(sql.FieldEQ(FieldSuccessHour, v))
 }
 
@@ -82,83 +80,130 @@ func ReviewAvaliableNEQ(v bool) predicate.Class {
 }
 
 // TotalHourEQ applies the EQ predicate on the "total_hour" field.
-func TotalHourEQ(v time.Time) predicate.Class {
+func TotalHourEQ(v int) predicate.Class {
 	return predicate.Class(sql.FieldEQ(FieldTotalHour, v))
 }
 
 // TotalHourNEQ applies the NEQ predicate on the "total_hour" field.
-func TotalHourNEQ(v time.Time) predicate.Class {
+func TotalHourNEQ(v int) predicate.Class {
 	return predicate.Class(sql.FieldNEQ(FieldTotalHour, v))
 }
 
 // TotalHourIn applies the In predicate on the "total_hour" field.
-func TotalHourIn(vs ...time.Time) predicate.Class {
+func TotalHourIn(vs ...int) predicate.Class {
 	return predicate.Class(sql.FieldIn(FieldTotalHour, vs...))
 }
 
 // TotalHourNotIn applies the NotIn predicate on the "total_hour" field.
-func TotalHourNotIn(vs ...time.Time) predicate.Class {
+func TotalHourNotIn(vs ...int) predicate.Class {
 	return predicate.Class(sql.FieldNotIn(FieldTotalHour, vs...))
 }
 
 // TotalHourGT applies the GT predicate on the "total_hour" field.
-func TotalHourGT(v time.Time) predicate.Class {
+func TotalHourGT(v int) predicate.Class {
 	return predicate.Class(sql.FieldGT(FieldTotalHour, v))
 }
 
 // TotalHourGTE applies the GTE predicate on the "total_hour" field.
-func TotalHourGTE(v time.Time) predicate.Class {
+func TotalHourGTE(v int) predicate.Class {
 	return predicate.Class(sql.FieldGTE(FieldTotalHour, v))
 }
 
 // TotalHourLT applies the LT predicate on the "total_hour" field.
-func TotalHourLT(v time.Time) predicate.Class {
+func TotalHourLT(v int) predicate.Class {
 	return predicate.Class(sql.FieldLT(FieldTotalHour, v))
 }
 
 // TotalHourLTE applies the LTE predicate on the "total_hour" field.
-func TotalHourLTE(v time.Time) predicate.Class {
+func TotalHourLTE(v int) predicate.Class {
 	return predicate.Class(sql.FieldLTE(FieldTotalHour, v))
 }
 
 // SuccessHourEQ applies the EQ predicate on the "success_hour" field.
-func SuccessHourEQ(v time.Time) predicate.Class {
+func SuccessHourEQ(v int) predicate.Class {
 	return predicate.Class(sql.FieldEQ(FieldSuccessHour, v))
 }
 
 // SuccessHourNEQ applies the NEQ predicate on the "success_hour" field.
-func SuccessHourNEQ(v time.Time) predicate.Class {
+func SuccessHourNEQ(v int) predicate.Class {
 	return predicate.Class(sql.FieldNEQ(FieldSuccessHour, v))
 }
 
 // SuccessHourIn applies the In predicate on the "success_hour" field.
-func SuccessHourIn(vs ...time.Time) predicate.Class {
+func SuccessHourIn(vs ...int) predicate.Class {
 	return predicate.Class(sql.FieldIn(FieldSuccessHour, vs...))
 }
 
 // SuccessHourNotIn applies the NotIn predicate on the "success_hour" field.
-func SuccessHourNotIn(vs ...time.Time) predicate.Class {
+func SuccessHourNotIn(vs ...int) predicate.Class {
 	return predicate.Class(sql.FieldNotIn(FieldSuccessHour, vs...))
 }
 
 // SuccessHourGT applies the GT predicate on the "success_hour" field.
-func SuccessHourGT(v time.Time) predicate.Class {
+func SuccessHourGT(v int) predicate.Class {
 	return predicate.Class(sql.FieldGT(FieldSuccessHour, v))
 }
 
 // SuccessHourGTE applies the GTE predicate on the "success_hour" field.
-func SuccessHourGTE(v time.Time) predicate.Class {
+func SuccessHourGTE(v int) predicate.Class {
 	return predicate.Class(sql.FieldGTE(FieldSuccessHour, v))
 }
 
 // SuccessHourLT applies the LT predicate on the "success_hour" field.
-func SuccessHourLT(v time.Time) predicate.Class {
+func SuccessHourLT(v int) predicate.Class {
 	return predicate.Class(sql.FieldLT(FieldSuccessHour, v))
 }
 
 // SuccessHourLTE applies the LTE predicate on the "success_hour" field.
-func SuccessHourLTE(v time.Time) predicate.Class {
+func SuccessHourLTE(v int) predicate.Class {
 	return predicate.Class(sql.FieldLTE(FieldSuccessHour, v))
+}
+
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v Status) predicate.Class {
+	return predicate.Class(sql.FieldEQ(FieldStatus, v))
+}
+
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v Status) predicate.Class {
+	return predicate.Class(sql.FieldNEQ(FieldStatus, v))
+}
+
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...Status) predicate.Class {
+	return predicate.Class(sql.FieldIn(FieldStatus, vs...))
+}
+
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...Status) predicate.Class {
+	return predicate.Class(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// HasMatch applies the HasEdge predicate on the "match" edge.
+func HasMatch() predicate.Class {
+	return predicate.Class(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, MatchTable, MatchPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasMatchWith applies the HasEdge predicate on the "match" edge with a given conditions (other predicates).
+func HasMatchWith(preds ...predicate.Match) predicate.Class {
+	return predicate.Class(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(MatchInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, MatchTable, MatchPrimaryKey...),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // HasSchedule applies the HasEdge predicate on the "schedule" edge.
@@ -166,7 +211,7 @@ func HasSchedule() predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, ScheduleTable, ScheduleColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, ScheduleTable, ScheduleColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -178,7 +223,7 @@ func HasScheduleWith(preds ...predicate.Schedule) predicate.Class {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ScheduleInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, ScheduleTable, ScheduleColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, ScheduleTable, ScheduleColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
@@ -188,51 +233,24 @@ func HasScheduleWith(preds ...predicate.Schedule) predicate.Class {
 	})
 }
 
-// HasStudent applies the HasEdge predicate on the "student" edge.
-func HasStudent() predicate.Class {
+// HasPaymentHistory applies the HasEdge predicate on the "payment_history" edge.
+func HasPaymentHistory() predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, StudentTable, StudentColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, PaymentHistoryTable, PaymentHistoryColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasStudentWith applies the HasEdge predicate on the "student" edge with a given conditions (other predicates).
-func HasStudentWith(preds ...predicate.Student) predicate.Class {
+// HasPaymentHistoryWith applies the HasEdge predicate on the "payment_history" edge with a given conditions (other predicates).
+func HasPaymentHistoryWith(preds ...predicate.PaymentHistory) predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(StudentInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, StudentTable, StudentColumn),
-		)
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasCourse applies the HasEdge predicate on the "course" edge.
-func HasCourse() predicate.Class {
-	return predicate.Class(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, CourseTable, CourseColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasCourseWith applies the HasEdge predicate on the "course" edge with a given conditions (other predicates).
-func HasCourseWith(preds ...predicate.Course) predicate.Class {
-	return predicate.Class(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(CourseInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, CourseTable, CourseColumn),
+			sqlgraph.To(PaymentHistoryInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, PaymentHistoryTable, PaymentHistoryColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

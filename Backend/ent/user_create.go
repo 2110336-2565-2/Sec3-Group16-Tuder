@@ -114,6 +114,44 @@ func (uc *UserCreate) SetNillableID(u *uuid.UUID) *UserCreate {
 	return uc
 }
 
+// SetStudentID sets the "student" edge to the Student entity by ID.
+func (uc *UserCreate) SetStudentID(id uuid.UUID) *UserCreate {
+	uc.mutation.SetStudentID(id)
+	return uc
+}
+
+// SetNillableStudentID sets the "student" edge to the Student entity by ID if the given value is not nil.
+func (uc *UserCreate) SetNillableStudentID(id *uuid.UUID) *UserCreate {
+	if id != nil {
+		uc = uc.SetStudentID(*id)
+	}
+	return uc
+}
+
+// SetStudent sets the "student" edge to the Student entity.
+func (uc *UserCreate) SetStudent(s *Student) *UserCreate {
+	return uc.SetStudentID(s.ID)
+}
+
+// SetTutorID sets the "tutor" edge to the Tutor entity by ID.
+func (uc *UserCreate) SetTutorID(id uuid.UUID) *UserCreate {
+	uc.mutation.SetTutorID(id)
+	return uc
+}
+
+// SetNillableTutorID sets the "tutor" edge to the Tutor entity by ID if the given value is not nil.
+func (uc *UserCreate) SetNillableTutorID(id *uuid.UUID) *UserCreate {
+	if id != nil {
+		uc = uc.SetTutorID(*id)
+	}
+	return uc
+}
+
+// SetTutor sets the "tutor" edge to the Tutor entity.
+func (uc *UserCreate) SetTutor(t *Tutor) *UserCreate {
+	return uc.SetTutorID(t.ID)
+}
+
 // AddIssueReportIDs adds the "issue_report" edge to the IssueReport entity by IDs.
 func (uc *UserCreate) AddIssueReportIDs(ids ...uuid.UUID) *UserCreate {
 	uc.mutation.AddIssueReportIDs(ids...)
@@ -157,44 +195,6 @@ func (uc *UserCreate) AddPaymentHistory(p ...*PaymentHistory) *UserCreate {
 		ids[i] = p[i].ID
 	}
 	return uc.AddPaymentHistoryIDs(ids...)
-}
-
-// SetStudentID sets the "student" edge to the Student entity by ID.
-func (uc *UserCreate) SetStudentID(id uuid.UUID) *UserCreate {
-	uc.mutation.SetStudentID(id)
-	return uc
-}
-
-// SetNillableStudentID sets the "student" edge to the Student entity by ID if the given value is not nil.
-func (uc *UserCreate) SetNillableStudentID(id *uuid.UUID) *UserCreate {
-	if id != nil {
-		uc = uc.SetStudentID(*id)
-	}
-	return uc
-}
-
-// SetStudent sets the "student" edge to the Student entity.
-func (uc *UserCreate) SetStudent(s *Student) *UserCreate {
-	return uc.SetStudentID(s.ID)
-}
-
-// SetTutorID sets the "tutor" edge to the Tutor entity by ID.
-func (uc *UserCreate) SetTutorID(id uuid.UUID) *UserCreate {
-	uc.mutation.SetTutorID(id)
-	return uc
-}
-
-// SetNillableTutorID sets the "tutor" edge to the Tutor entity by ID if the given value is not nil.
-func (uc *UserCreate) SetNillableTutorID(id *uuid.UUID) *UserCreate {
-	if id != nil {
-		uc = uc.SetTutorID(*id)
-	}
-	return uc
-}
-
-// SetTutor sets the "tutor" edge to the Tutor entity.
-func (uc *UserCreate) SetTutor(t *Tutor) *UserCreate {
-	return uc.SetTutorID(t.ID)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -394,6 +394,44 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldRole, field.TypeEnum, value)
 		_node.Role = &value
 	}
+	if nodes := uc.mutation.StudentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   user.StudentTable,
+			Columns: []string{user.StudentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: student.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.TutorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   user.TutorTable,
+			Columns: []string{user.TutorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tutor.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	if nodes := uc.mutation.IssueReportIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -443,44 +481,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: paymenthistory.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := uc.mutation.StudentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   user.StudentTable,
-			Columns: []string{user.StudentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: student.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := uc.mutation.TutorIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   user.TutorTable,
-			Columns: []string{user.TutorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: tutor.FieldID,
 				},
 			},
 		}

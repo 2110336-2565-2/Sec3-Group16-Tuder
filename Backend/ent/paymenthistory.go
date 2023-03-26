@@ -15,13 +15,9 @@ import (
 
 // PaymentHistory is the model entity for the PaymentHistory schema.
 type PaymentHistory struct {
-	config `json:"-"`
+	config
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
-	// Amount holds the value of the "amount" field.
-	Amount *float64 `json:"amount,omitempty"`
-	// Type holds the value of the "type" field.
-	Type string `json:"type,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PaymentHistoryQuery when eager-loading is set.
 	Edges                   PaymentHistoryEdges `json:"edges"`
@@ -31,19 +27,30 @@ type PaymentHistory struct {
 
 // PaymentHistoryEdges holds the relations/edges for other nodes in the graph.
 type PaymentHistoryEdges struct {
+	// Class holds the value of the class edge.
+	Class []*Class `json:"class,omitempty"`
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
 	// Payment holds the value of the payment edge.
 	Payment *Payment `json:"payment,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
+}
+
+// ClassOrErr returns the Class value or an error if the edge
+// was not loaded in eager-loading.
+func (e PaymentHistoryEdges) ClassOrErr() ([]*Class, error) {
+	if e.loadedTypes[0] {
+		return e.Class, nil
+	}
+	return nil, &NotLoadedError{edge: "class"}
 }
 
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e PaymentHistoryEdges) UserOrErr() (*User, error) {
-	if e.loadedTypes[0] {
+	if e.loadedTypes[1] {
 		if e.User == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: user.Label}
@@ -56,7 +63,7 @@ func (e PaymentHistoryEdges) UserOrErr() (*User, error) {
 // PaymentOrErr returns the Payment value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e PaymentHistoryEdges) PaymentOrErr() (*Payment, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		if e.Payment == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: payment.Label}
@@ -71,10 +78,6 @@ func (*PaymentHistory) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case paymenthistory.FieldAmount:
-			values[i] = new(sql.NullFloat64)
-		case paymenthistory.FieldType:
-			values[i] = new(sql.NullString)
 		case paymenthistory.FieldID:
 			values[i] = new(uuid.UUID)
 		case paymenthistory.ForeignKeys[0]: // payment_payment_history
@@ -102,19 +105,6 @@ func (ph *PaymentHistory) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				ph.ID = *value
 			}
-		case paymenthistory.FieldAmount:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
-				return fmt.Errorf("unexpected type %T for field amount", values[i])
-			} else if value.Valid {
-				ph.Amount = new(float64)
-				*ph.Amount = value.Float64
-			}
-		case paymenthistory.FieldType:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field type", values[i])
-			} else if value.Valid {
-				ph.Type = value.String
-			}
 		case paymenthistory.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field payment_payment_history", values[i])
@@ -132,6 +122,11 @@ func (ph *PaymentHistory) assignValues(columns []string, values []any) error {
 		}
 	}
 	return nil
+}
+
+// QueryClass queries the "class" edge of the PaymentHistory entity.
+func (ph *PaymentHistory) QueryClass() *ClassQuery {
+	return NewPaymentHistoryClient(ph.config).QueryClass(ph)
 }
 
 // QueryUser queries the "user" edge of the PaymentHistory entity.
@@ -166,14 +161,7 @@ func (ph *PaymentHistory) Unwrap() *PaymentHistory {
 func (ph *PaymentHistory) String() string {
 	var builder strings.Builder
 	builder.WriteString("PaymentHistory(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", ph.ID))
-	if v := ph.Amount; v != nil {
-		builder.WriteString("amount=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
-	builder.WriteString(", ")
-	builder.WriteString("type=")
-	builder.WriteString(ph.Type)
+	builder.WriteString(fmt.Sprintf("id=%v", ph.ID))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -8,6 +8,7 @@ import Footer from "../components/global/Footer.js";
 import { getStudentByUsername, getTutorByUsername } from "../handlers/profile/getUserHandler.js";
 import useRole from "../hooks/useRole.js";
 import useUsername from "../hooks/useUsername.js";
+import { IsUser } from "../components/IsAuth.js";
 
 // icons
 import { EditOutlined } from "@ant-design/icons";
@@ -39,6 +40,7 @@ export default function Profile() {
 
   return (
     <Container>
+      <IsUser>
       <TopSection>
         <Role>{capitalizeFirstLetter(role)}</Role>
         <ProfileImageWrapper>
@@ -61,7 +63,9 @@ export default function Profile() {
         </MiddleSection>
       </Wrapper>
       <Footer />
+    </IsUser>
     </Container>
+    
   );
 }
 

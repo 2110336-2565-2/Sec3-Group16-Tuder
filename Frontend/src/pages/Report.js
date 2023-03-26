@@ -1,7 +1,10 @@
 import React from 'react'
-
+import { IsUser } from '../components/IsAuth.js'
 export default function Report(){
     return (
-        <h1>This is Report Page</h1>
+        <IsUser>
+
+            <h1>This is Report Page</h1>
+        </IsUser>
     )
 }
