@@ -1,13 +1,14 @@
 import React from "react";
 import styled from "styled-components";
 
-export default function WaveFooter({ backgroundColor }) {
+export default function WaveFooter({ backgroundColor, bottom }) {
   return (
-    <Container>
+    <Container backgroundColor={backgroundColor}>
       <Image
         src="/images/waveFooter.svg"
         alt="wave"
         backgroundColor={backgroundColor}
+        bottom={bottom}
       />
     </Container>
   );
@@ -15,12 +16,12 @@ export default function WaveFooter({ backgroundColor }) {
 
 const Container = styled.div`
   width: 100%;
-  position: relative;
+  background-color: ${(props) => props.backgroundColor};
 `;
 
 const Image = styled.img`
-  margin-top: 30px;
   width: 100%;
-  position: absolute;
-  background-color: ${(props) => props.backgroundColor || "white"};
+  position: relative;
+  bottom: -4px;
+  background-color: ${(props) => props.backgroundColor};
 `;

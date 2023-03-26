@@ -83,13 +83,10 @@ export default function Navbar(){
 }
 
 
-
-
-
-
 // styled-components for Navbar components
 const NavbarSection = styled.nav`
     height: 70px;
+    width: 100%;
     display: flex;
     padding: 10px 30px;
     box-shadow: 0px 2.98px 7.45px rgba(0, 0, 0, 0.1);

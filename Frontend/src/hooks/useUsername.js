@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import {getUsername} from '../utils/jwtGet';
+import { getUsername } from '../utils/jwtGet';
 
 
 export default function useUsername(){

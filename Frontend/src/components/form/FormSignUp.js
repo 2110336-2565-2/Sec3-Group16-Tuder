@@ -1,7 +1,7 @@
 import FormT from './FormStyle.js';
 import React, { useState } from 'react';
 import signUpHandler from '../../handlers/signUpHandler.js';
-import signupContent from "../../datas/SignUp.role.js";
+import signupContent, {tutorSpecificContent} from "../../datas/SignUp.role.js";
 import styled from 'styled-components';
 import { toast } from 'react-hot-toast';
 
@@ -22,6 +22,7 @@ export default function FormSignUp(){
     const [gender, setGender] = useState('');
     const [birthdate, setBirthDate] = useState('');
     const [role, setRole] = useState('');
+    const [citizenID, setCitizenID] = useState('');
 
 
     const valueSetter = {"First Name":setFirstName, "Last Name":setLastName,
@@ -50,7 +51,8 @@ export default function FormSignUp(){
             phone:  contactnumber,
             birthdate: birthdateISO,
             gender: gender,
-            role: role
+            role: role,
+            citizen_id: role==='tutor'? citizenID : ''
          }
          setStatus('submitting')
          try{
@@ -68,6 +70,7 @@ export default function FormSignUp(){
 
     
     const signupContents = signupContent.contents;
+    const tutorSpecificContents = tutorSpecificContent.contents;
     const signupContentElement = signupContents.map((content, index) => {
         
         return (
@@ -143,7 +146,6 @@ export default function FormSignUp(){
                                     <FormT.Option value="" disabled hidden>Please select</FormT.Option>
                                     <FormT.Option value='male'>male</FormT.Option>
                                     <FormT.Option value='female'>female</FormT.Option>
-                                    <FormT.Option value='-'>I don't like hee</FormT.Option>
                                 </FormT.Select>
                             </FormT.Component>
                         )
@@ -159,6 +161,26 @@ export default function FormSignUp(){
             </FormT.Content>
         )
     });
+    const tutorSpecificContentElement = tutorSpecificContents.map((content, index) => {
+        return (
+            <FormT.Content key={'tutor'+index}>
+                {
+                    content.map((element, elementindex) => {
+                        const pholder = 'Enter your ' + element;
+                        const name = element.replace(' ', '_').toLowerCase()
+                        if (element === 'Citizen ID'){
+                            return (
+                                <FormT.Component key={elementindex}>
+                                    <FormT.Label>{element} :</FormT.Label>
+                                    <FormT.TextInput BoxSize='315px' name={name} type='text' placeholder={pholder} onChange={(e)=>setCitizenID(e.target.value)} required/>
+                                </FormT.Component>
+                            )
+                        }
+                    })
+                }
+            </FormT.Content>
+        )
+    })
     return(
         <SignUpForm onSubmit={submitHandler}>
             <FormT.Div FormW='500px'>
@@ -175,6 +197,7 @@ export default function FormSignUp(){
                         </FormT.Select>
                     </FormT.Component>
                 </FormT.Content>
+                {role === 'tutor' ? tutorSpecificContentElement : null}
                 <FormT.Content>
                     <FormT.Button type='submit'>Sign Up</FormT.Button>
                 </FormT.Content>
@@ -182,7 +205,7 @@ export default function FormSignUp(){
                     <FormT.ContentSmall>
                         Already have an account ?
                     </FormT.ContentSmall>
-                    <FormT.Link to='/Signin' underline='none'>Sign In</FormT.Link>
+                    <FormT.Link to='/sign-in' underline='none'>Sign In</FormT.Link>
                 </FormT.Content>
             </FormT.Div>
         </SignUpForm>

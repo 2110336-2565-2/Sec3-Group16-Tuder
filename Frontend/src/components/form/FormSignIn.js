@@ -67,7 +67,7 @@ export default function FormSignIn(props){
                     <FormT.ContentSmall>
                         Don't have an account ?
                     </FormT.ContentSmall>
-                    <FormT.Link to='/Signup' underline='none'>Sign Up</FormT.Link>
+                    <FormT.Link to='/sign-up' underline='none'>Sign Up</FormT.Link>
                 </FormT.Content>
             </FormT.Div>
         </form>

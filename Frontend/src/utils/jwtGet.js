@@ -12,14 +12,13 @@ export function getRole(){
     }
 }
 
-
 export function getUsername(){
     const token = localStorage.getItem('jwtToken');
     if(token){
         const decoded = jwt_decode(token);
         return decoded.username;
     }else{
-        return 'guest';
+        return '';
     }
 }
 

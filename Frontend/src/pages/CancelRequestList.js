@@ -35,7 +35,7 @@ export default function CancelRequestListPage(){
 
 const ContainerWithHeight = styled.div`
     display: flex;
-    flex-direction: column
+    flex-direction: column;
     padding: 0px 30px;
     margin-top: ${(props) => {
         return props.margintop

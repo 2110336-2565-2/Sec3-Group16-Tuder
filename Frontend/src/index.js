@@ -12,6 +12,7 @@ import Report from './pages/Report';
 import ForgetPassword from './pages/ForgetPassword';
 import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
+import Review from './pages/Review';
 import ErrorPage from './pages/ErrorPage';
 import ChangePassword from './pages/ChangePassword';
 import EnterNewPassword from './pages/EnterNewPassword';
@@ -50,12 +51,16 @@ const router = createBrowserRouter([
         element: <ForgetPassword />,
       },
       {
-        path: "profile",
+        path: "/profile",
         element: <Profile />,
       },
       {
-        path: "edit-profile",
+        path: "/edit-profile",
         element: <EditProfile />,
+      },
+      {
+        path: "/review/:id",
+        element: <Review />,
       },
       {
         path: "/change-password",

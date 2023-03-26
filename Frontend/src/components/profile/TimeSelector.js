@@ -8,6 +8,7 @@ import {
   isOverlapped,
   getMergedTimeSlot,
 } from "../../utils/profile/timeHandler.js";
+import { convertBackendSchedulesToFrontend } from "../../utils/profile/scheduleConverter";
 
 //icon
 import { ClockCircleOutlined, DeleteOutlined } from "@ant-design/icons";
@@ -20,6 +21,7 @@ export default function TimeSelector({
   onChange,
   width,
 }) {
+;
   const days = [
     { day: "SUN", value: "Sunday" },
     { day: "MON", value: "Monday" },
@@ -31,19 +33,22 @@ export default function TimeSelector({
   ];
 
   const [availableTime, setAvailableTime] = useState(() => {
+    // Convert the schedules from the backend to the frontend format
+    // const convertedSchedules = convertBackendSchedulesToFrontend(value);
+
     const initialAvailableTime = days.map((day) => ({
       day: day.value,
       timeSlot: [],
     }));
-  
+
     const updatedAvailableTime = initialAvailableTime.map((day) => {
       const daySchedule = value.find((schedule) => schedule.day === day.day);
-  
+
       return daySchedule ? daySchedule : day;
     });
     return updatedAvailableTime;
   });
-  
+
   const [selectedDay, setSelectedDay] = useState("Sunday");
   const [timeSlot, setTimeSlot] = useState([]);
   // To be added timeSlot
