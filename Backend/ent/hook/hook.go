@@ -45,6 +45,18 @@ func (f IssueReportFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value,
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.IssueReportMutation", m)
 }
 
+// The MatchFunc type is an adapter to allow the use of ordinary
+// function as Match mutator.
+type MatchFunc func(context.Context, *ent.MatchMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MatchFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.MatchMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MatchMutation", m)
+}
+
 // The PaymentFunc type is an adapter to allow the use of ordinary
 // function as Payment mutator.
 type PaymentFunc func(context.Context, *ent.PaymentMutation) (ent.Value, error)

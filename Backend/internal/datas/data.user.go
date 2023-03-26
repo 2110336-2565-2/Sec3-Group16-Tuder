@@ -12,21 +12,31 @@ import (
 	"github.com/google/uuid"
 )
 
-func InsertUser(client *ent.Client) []*ent.User {
+func InsertUser(client *ent.Client, ctx context.Context) []*ent.User {
 
-	ctx := context.Background()
+	// Create users
+	user1 := CreateUser(client, "jacky", "P@ssw0rd", "a", "a", "0", "Jacky no love", "JUKJEEJID", "female", time.Now(), "profile url", user.RoleStudent)
+	user2 := CreateUser(client, "bright", "P@ssw0rd", "b", "a", "00", "BrightMenMen", "JUKJEEJID", "female", time.Now(), "profile url", user.RoleStudent)
+	user3 := CreateUser(client, "moo", "P@ssw0rd", "a", "a", "000", "MooMee (The Best)", "JUKJEEJID", "male", time.Now(), "profile url", user.RoleTutor)
+	user4 := CreateUser(client, "ballhomhom", "P@ssw0rd", "a", "a", "0000", "BALLBY JUKJEEJID", "Datastructure", "male", time.Now(), "profile url", user.RoleTutor)
+	user5 := CreateUser(client, "admin1", "P@ssw0rd", "a", "a", "0000", "ADMIN1", "JUKJEEJID", "male", time.Now(), "profile url", user.RoleAdmin)
+	user6 := CreateUser(client, "admin2", "P@ssw0rd", "b", "b", "0000", "ADMIN2", "JUKJEEJID", "male", time.Now(), "profile url", user.RoleAdmin)
 
-	user1 := CreateUser(client, ctx, "jacky", "P@ssw0rd", "a", "a", "0", "Jacky no love", "Jukjeejid", "female", time.Now(), "profile url", user.RoleStudent)
-	user2 := CreateUser(client, ctx, "bright", "P@ssw0rd", "b", "a", "00", "BrightMenMen", "Jukjeejid", "female", time.Now(), "profile url", user.RoleStudent)
-	user3 := CreateUser(client, ctx, "moo", "P@ssw0rd", "a", "a", "000", "MooMee (The Best)", "Jukjeejid", "male", time.Now(), "profile url", user.RoleTutor)
-	user4 := CreateUser(client, ctx, "ballhomhom", "P@ssw0rd", "a", "a", "0000", "BALLBY JUKJEEJID", "Datastructure", "male", time.Now(), "profile url", user.RoleTutor)
+	user, err := client.User.CreateBulk(user1, user2, user3, user4, user5, user6).Save(ctx)
 
-	return []*ent.User{user1, user2, user3, user4}
+	if err != nil {
+		log.Fatalf("failed creating user: %v", err)
+	}
+
+	for _, u := range user {
+		fmt.Println("User created: ", u.ID)
+	}
+
+	return user
 }
 
 func CreateUser(
 	client *ent.Client,
-	ctx context.Context,
 	username string,
 	pw string,
 	address string,
@@ -38,14 +48,13 @@ func CreateUser(
 	birthdate time.Time,
 	profilepictureurl string,
 	role user.Role,
-) *ent.User {
+) *ent.UserCreate {
 
 	// Gen UUID and Hash Password
 	userId := uuid.New()
 	pw1, _ := utils.HashPassword(pw)
 
-	
-	user, err := client.User.Create().
+	userCreate := client.User.Create().
 		SetID(userId).
 		SetUsername(username).
 		SetPassword(pw1).
@@ -57,15 +66,7 @@ func CreateUser(
 		SetGender(gender).
 		SetBirthDate(birthdate).
 		SetProfilePictureURL(profilepictureurl).
-		SetRole(role).
-		Save(ctx)
-		
-	if err != nil {
-		log.Fatalf("failed creating user: %v", err)
-	}
-	
+		SetRole(role)
 
-	fmt.Println("User created: ", user.ID)
-
-	return user
+	return userCreate
 }

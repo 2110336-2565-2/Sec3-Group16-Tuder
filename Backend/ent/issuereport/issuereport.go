@@ -19,26 +19,17 @@ const (
 	FieldReportDate = "report_date"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
-	// EdgeStudent holds the string denoting the student edge name in mutations.
-	EdgeStudent = "student"
-	// EdgeTutor holds the string denoting the tutor edge name in mutations.
-	EdgeTutor = "tutor"
+	// EdgeUser holds the string denoting the user edge name in mutations.
+	EdgeUser = "user"
 	// Table holds the table name of the issuereport in the database.
 	Table = "issue_reports"
-	// StudentTable is the table that holds the student relation/edge.
-	StudentTable = "issue_reports"
-	// StudentInverseTable is the table name for the Student entity.
-	// It exists in this package in order to avoid circular dependency with the "student" package.
-	StudentInverseTable = "students"
-	// StudentColumn is the table column denoting the student relation/edge.
-	StudentColumn = "student_issue_report"
-	// TutorTable is the table that holds the tutor relation/edge.
-	TutorTable = "issue_reports"
-	// TutorInverseTable is the table name for the Tutor entity.
-	// It exists in this package in order to avoid circular dependency with the "tutor" package.
-	TutorInverseTable = "tutors"
-	// TutorColumn is the table column denoting the tutor relation/edge.
-	TutorColumn = "tutor_issue_report"
+	// UserTable is the table that holds the user relation/edge.
+	UserTable = "issue_reports"
+	// UserInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	UserInverseTable = "users"
+	// UserColumn is the table column denoting the user relation/edge.
+	UserColumn = "user_issue_report"
 )
 
 // Columns holds all SQL columns for issuereport fields.
@@ -53,7 +44,6 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "issue_reports"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"student_issue_report",
 	"tutor_issue_report",
 	"user_issue_report",
 }

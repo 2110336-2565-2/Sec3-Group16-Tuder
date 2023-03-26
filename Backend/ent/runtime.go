@@ -6,6 +6,7 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
@@ -76,6 +77,12 @@ func init() {
 	issuereportDescID := issuereportFields[0].Descriptor()
 	// issuereport.DefaultID holds the default value on creation for the id field.
 	issuereport.DefaultID = issuereportDescID.Default.(func() uuid.UUID)
+	matchFields := schema.Match{}.Fields()
+	_ = matchFields
+	// matchDescID is the schema descriptor for id field.
+	matchDescID := matchFields[0].Descriptor()
+	// match.DefaultID holds the default value on creation for the id field.
+	match.DefaultID = matchDescID.Default.(func() uuid.UUID)
 	paymentFields := schema.Payment{}.Fields()
 	_ = paymentFields
 	// paymentDescID is the schema descriptor for id field.
@@ -84,14 +91,6 @@ func init() {
 	payment.DefaultID = paymentDescID.Default.(func() uuid.UUID)
 	paymenthistoryFields := schema.PaymentHistory{}.Fields()
 	_ = paymenthistoryFields
-	// paymenthistoryDescAmount is the schema descriptor for amount field.
-	paymenthistoryDescAmount := paymenthistoryFields[1].Descriptor()
-	// paymenthistory.AmountValidator is a validator for the "amount" field. It is called by the builders before save.
-	paymenthistory.AmountValidator = paymenthistoryDescAmount.Validators[0].(func(float64) error)
-	// paymenthistoryDescType is the schema descriptor for type field.
-	paymenthistoryDescType := paymenthistoryFields[2].Descriptor()
-	// paymenthistory.TypeValidator is a validator for the "type" field. It is called by the builders before save.
-	paymenthistory.TypeValidator = paymenthistoryDescType.Validators[0].(func(string) error)
 	// paymenthistoryDescID is the schema descriptor for id field.
 	paymenthistoryDescID := paymenthistoryFields[0].Descriptor()
 	// paymenthistory.DefaultID holds the default value on creation for the id field.

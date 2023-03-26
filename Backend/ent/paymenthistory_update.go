@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
@@ -30,37 +31,19 @@ func (phu *PaymentHistoryUpdate) Where(ps ...predicate.PaymentHistory) *PaymentH
 	return phu
 }
 
-// SetAmount sets the "amount" field.
-func (phu *PaymentHistoryUpdate) SetAmount(f float64) *PaymentHistoryUpdate {
-	phu.mutation.ResetAmount()
-	phu.mutation.SetAmount(f)
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (phu *PaymentHistoryUpdate) AddClasIDs(ids ...uuid.UUID) *PaymentHistoryUpdate {
+	phu.mutation.AddClasIDs(ids...)
 	return phu
 }
 
-// SetNillableAmount sets the "amount" field if the given value is not nil.
-func (phu *PaymentHistoryUpdate) SetNillableAmount(f *float64) *PaymentHistoryUpdate {
-	if f != nil {
-		phu.SetAmount(*f)
+// AddClass adds the "class" edges to the Class entity.
+func (phu *PaymentHistoryUpdate) AddClass(c ...*Class) *PaymentHistoryUpdate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
-	return phu
-}
-
-// AddAmount adds f to the "amount" field.
-func (phu *PaymentHistoryUpdate) AddAmount(f float64) *PaymentHistoryUpdate {
-	phu.mutation.AddAmount(f)
-	return phu
-}
-
-// ClearAmount clears the value of the "amount" field.
-func (phu *PaymentHistoryUpdate) ClearAmount() *PaymentHistoryUpdate {
-	phu.mutation.ClearAmount()
-	return phu
-}
-
-// SetType sets the "type" field.
-func (phu *PaymentHistoryUpdate) SetType(s string) *PaymentHistoryUpdate {
-	phu.mutation.SetType(s)
-	return phu
+	return phu.AddClasIDs(ids...)
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
@@ -88,6 +71,27 @@ func (phu *PaymentHistoryUpdate) SetPayment(p *Payment) *PaymentHistoryUpdate {
 // Mutation returns the PaymentHistoryMutation object of the builder.
 func (phu *PaymentHistoryUpdate) Mutation() *PaymentHistoryMutation {
 	return phu.mutation
+}
+
+// ClearClass clears all "class" edges to the Class entity.
+func (phu *PaymentHistoryUpdate) ClearClass() *PaymentHistoryUpdate {
+	phu.mutation.ClearClass()
+	return phu
+}
+
+// RemoveClasIDs removes the "class" edge to Class entities by IDs.
+func (phu *PaymentHistoryUpdate) RemoveClasIDs(ids ...uuid.UUID) *PaymentHistoryUpdate {
+	phu.mutation.RemoveClasIDs(ids...)
+	return phu
+}
+
+// RemoveClass removes "class" edges to Class entities.
+func (phu *PaymentHistoryUpdate) RemoveClass(c ...*Class) *PaymentHistoryUpdate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return phu.RemoveClasIDs(ids...)
 }
 
 // ClearUser clears the "user" edge to the User entity.
@@ -131,16 +135,6 @@ func (phu *PaymentHistoryUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (phu *PaymentHistoryUpdate) check() error {
-	if v, ok := phu.mutation.Amount(); ok {
-		if err := paymenthistory.AmountValidator(v); err != nil {
-			return &ValidationError{Name: "amount", err: fmt.Errorf(`ent: validator failed for field "PaymentHistory.amount": %w`, err)}
-		}
-	}
-	if v, ok := phu.mutation.GetType(); ok {
-		if err := paymenthistory.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "PaymentHistory.type": %w`, err)}
-		}
-	}
 	if _, ok := phu.mutation.UserID(); phu.mutation.UserCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "PaymentHistory.user"`)
 	}
@@ -162,17 +156,59 @@ func (phu *PaymentHistoryUpdate) sqlSave(ctx context.Context) (n int, err error)
 			}
 		}
 	}
-	if value, ok := phu.mutation.Amount(); ok {
-		_spec.SetField(paymenthistory.FieldAmount, field.TypeFloat64, value)
+	if phu.mutation.ClassCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   paymenthistory.ClassTable,
+			Columns: []string{paymenthistory.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: class.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if value, ok := phu.mutation.AddedAmount(); ok {
-		_spec.AddField(paymenthistory.FieldAmount, field.TypeFloat64, value)
+	if nodes := phu.mutation.RemovedClassIDs(); len(nodes) > 0 && !phu.mutation.ClassCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   paymenthistory.ClassTable,
+			Columns: []string{paymenthistory.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: class.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if phu.mutation.AmountCleared() {
-		_spec.ClearField(paymenthistory.FieldAmount, field.TypeFloat64)
-	}
-	if value, ok := phu.mutation.GetType(); ok {
-		_spec.SetField(paymenthistory.FieldType, field.TypeString, value)
+	if nodes := phu.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   paymenthistory.ClassTable,
+			Columns: []string{paymenthistory.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: class.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if phu.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -264,37 +300,19 @@ type PaymentHistoryUpdateOne struct {
 	mutation *PaymentHistoryMutation
 }
 
-// SetAmount sets the "amount" field.
-func (phuo *PaymentHistoryUpdateOne) SetAmount(f float64) *PaymentHistoryUpdateOne {
-	phuo.mutation.ResetAmount()
-	phuo.mutation.SetAmount(f)
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (phuo *PaymentHistoryUpdateOne) AddClasIDs(ids ...uuid.UUID) *PaymentHistoryUpdateOne {
+	phuo.mutation.AddClasIDs(ids...)
 	return phuo
 }
 
-// SetNillableAmount sets the "amount" field if the given value is not nil.
-func (phuo *PaymentHistoryUpdateOne) SetNillableAmount(f *float64) *PaymentHistoryUpdateOne {
-	if f != nil {
-		phuo.SetAmount(*f)
+// AddClass adds the "class" edges to the Class entity.
+func (phuo *PaymentHistoryUpdateOne) AddClass(c ...*Class) *PaymentHistoryUpdateOne {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
-	return phuo
-}
-
-// AddAmount adds f to the "amount" field.
-func (phuo *PaymentHistoryUpdateOne) AddAmount(f float64) *PaymentHistoryUpdateOne {
-	phuo.mutation.AddAmount(f)
-	return phuo
-}
-
-// ClearAmount clears the value of the "amount" field.
-func (phuo *PaymentHistoryUpdateOne) ClearAmount() *PaymentHistoryUpdateOne {
-	phuo.mutation.ClearAmount()
-	return phuo
-}
-
-// SetType sets the "type" field.
-func (phuo *PaymentHistoryUpdateOne) SetType(s string) *PaymentHistoryUpdateOne {
-	phuo.mutation.SetType(s)
-	return phuo
+	return phuo.AddClasIDs(ids...)
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
@@ -322,6 +340,27 @@ func (phuo *PaymentHistoryUpdateOne) SetPayment(p *Payment) *PaymentHistoryUpdat
 // Mutation returns the PaymentHistoryMutation object of the builder.
 func (phuo *PaymentHistoryUpdateOne) Mutation() *PaymentHistoryMutation {
 	return phuo.mutation
+}
+
+// ClearClass clears all "class" edges to the Class entity.
+func (phuo *PaymentHistoryUpdateOne) ClearClass() *PaymentHistoryUpdateOne {
+	phuo.mutation.ClearClass()
+	return phuo
+}
+
+// RemoveClasIDs removes the "class" edge to Class entities by IDs.
+func (phuo *PaymentHistoryUpdateOne) RemoveClasIDs(ids ...uuid.UUID) *PaymentHistoryUpdateOne {
+	phuo.mutation.RemoveClasIDs(ids...)
+	return phuo
+}
+
+// RemoveClass removes "class" edges to Class entities.
+func (phuo *PaymentHistoryUpdateOne) RemoveClass(c ...*Class) *PaymentHistoryUpdateOne {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return phuo.RemoveClasIDs(ids...)
 }
 
 // ClearUser clears the "user" edge to the User entity.
@@ -378,16 +417,6 @@ func (phuo *PaymentHistoryUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (phuo *PaymentHistoryUpdateOne) check() error {
-	if v, ok := phuo.mutation.Amount(); ok {
-		if err := paymenthistory.AmountValidator(v); err != nil {
-			return &ValidationError{Name: "amount", err: fmt.Errorf(`ent: validator failed for field "PaymentHistory.amount": %w`, err)}
-		}
-	}
-	if v, ok := phuo.mutation.GetType(); ok {
-		if err := paymenthistory.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "PaymentHistory.type": %w`, err)}
-		}
-	}
 	if _, ok := phuo.mutation.UserID(); phuo.mutation.UserCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "PaymentHistory.user"`)
 	}
@@ -426,17 +455,59 @@ func (phuo *PaymentHistoryUpdateOne) sqlSave(ctx context.Context) (_node *Paymen
 			}
 		}
 	}
-	if value, ok := phuo.mutation.Amount(); ok {
-		_spec.SetField(paymenthistory.FieldAmount, field.TypeFloat64, value)
+	if phuo.mutation.ClassCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   paymenthistory.ClassTable,
+			Columns: []string{paymenthistory.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: class.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if value, ok := phuo.mutation.AddedAmount(); ok {
-		_spec.AddField(paymenthistory.FieldAmount, field.TypeFloat64, value)
+	if nodes := phuo.mutation.RemovedClassIDs(); len(nodes) > 0 && !phuo.mutation.ClassCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   paymenthistory.ClassTable,
+			Columns: []string{paymenthistory.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: class.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if phuo.mutation.AmountCleared() {
-		_spec.ClearField(paymenthistory.FieldAmount, field.TypeFloat64)
-	}
-	if value, ok := phuo.mutation.GetType(); ok {
-		_spec.SetField(paymenthistory.FieldType, field.TypeString, value)
+	if nodes := phuo.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   paymenthistory.ClassTable,
+			Columns: []string{paymenthistory.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: class.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if phuo.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{

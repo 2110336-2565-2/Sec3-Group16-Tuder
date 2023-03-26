@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
@@ -20,26 +21,6 @@ type PaymentHistoryCreate struct {
 	config
 	mutation *PaymentHistoryMutation
 	hooks    []Hook
-}
-
-// SetAmount sets the "amount" field.
-func (phc *PaymentHistoryCreate) SetAmount(f float64) *PaymentHistoryCreate {
-	phc.mutation.SetAmount(f)
-	return phc
-}
-
-// SetNillableAmount sets the "amount" field if the given value is not nil.
-func (phc *PaymentHistoryCreate) SetNillableAmount(f *float64) *PaymentHistoryCreate {
-	if f != nil {
-		phc.SetAmount(*f)
-	}
-	return phc
-}
-
-// SetType sets the "type" field.
-func (phc *PaymentHistoryCreate) SetType(s string) *PaymentHistoryCreate {
-	phc.mutation.SetType(s)
-	return phc
 }
 
 // SetID sets the "id" field.
@@ -54,6 +35,21 @@ func (phc *PaymentHistoryCreate) SetNillableID(u *uuid.UUID) *PaymentHistoryCrea
 		phc.SetID(*u)
 	}
 	return phc
+}
+
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (phc *PaymentHistoryCreate) AddClasIDs(ids ...uuid.UUID) *PaymentHistoryCreate {
+	phc.mutation.AddClasIDs(ids...)
+	return phc
+}
+
+// AddClass adds the "class" edges to the Class entity.
+func (phc *PaymentHistoryCreate) AddClass(c ...*Class) *PaymentHistoryCreate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return phc.AddClasIDs(ids...)
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
@@ -121,19 +117,6 @@ func (phc *PaymentHistoryCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (phc *PaymentHistoryCreate) check() error {
-	if v, ok := phc.mutation.Amount(); ok {
-		if err := paymenthistory.AmountValidator(v); err != nil {
-			return &ValidationError{Name: "amount", err: fmt.Errorf(`ent: validator failed for field "PaymentHistory.amount": %w`, err)}
-		}
-	}
-	if _, ok := phc.mutation.GetType(); !ok {
-		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "PaymentHistory.type"`)}
-	}
-	if v, ok := phc.mutation.GetType(); ok {
-		if err := paymenthistory.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "PaymentHistory.type": %w`, err)}
-		}
-	}
 	if _, ok := phc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "PaymentHistory.user"`)}
 	}
@@ -175,13 +158,24 @@ func (phc *PaymentHistoryCreate) createSpec() (*PaymentHistory, *sqlgraph.Create
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := phc.mutation.Amount(); ok {
-		_spec.SetField(paymenthistory.FieldAmount, field.TypeFloat64, value)
-		_node.Amount = &value
-	}
-	if value, ok := phc.mutation.GetType(); ok {
-		_spec.SetField(paymenthistory.FieldType, field.TypeString, value)
-		_node.Type = value
+	if nodes := phc.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   paymenthistory.ClassTable,
+			Columns: []string{paymenthistory.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: class.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := phc.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

@@ -1,13 +1,14 @@
 import React, { Fragment } from "react";
 import styled from "styled-components"
-import FormSignUp from "../components/FormSignUp.js";
-import Footer from "../components/SignUpFooter.js";
+import WaveFooter from "../components/global/WaveFooter.js";
+import { IsGuest } from "../components/IsAuth.js";
+import FormSignUp from "../components/form/FormSignUp.js";
 
 export default function SignUp(){
 
     return(
         <Fragment>
-
+            <IsGuest>
             <ContainerWithHeight margintop='0px'>
                 <SeperateSection>
                     <ItemGrid justify='center' columngrid='1 / 2'>
@@ -17,7 +18,7 @@ export default function SignUp(){
                             Started With <br/>
                             Matching system
                             </SignUpInfo>
-                            
+                            <Image src="/images/signupDecorator.svg" alt="decorator"/>
                         </BlackDiv>               
                     </ItemGrid>
                     <ItemGrid columngrid='3 / 4'>
@@ -25,7 +26,8 @@ export default function SignUp(){
                     </ItemGrid>
                 </SeperateSection>
             </ContainerWithHeight>
-            <Footer/>
+            <WaveFooter />
+            </IsGuest>
         </Fragment>
     )
 }
@@ -33,30 +35,26 @@ export default function SignUp(){
 
 // styled-components
 const BlackDiv = styled.div`
-position: relative;
-width: 800px;
-height: 950px;
-
-background: #45424A;
+    position: relative;
+    width: 100%;
+    height: 110%;
+    padding: 60px 100px 0px 100px;
+    background: #45424A;
 
 `;
 
-const SignUpInfo = styled.div`
+const SignUpInfo = styled.p`
     display: grid;
     text-align: left;
     color: white;
-    padding-top: 60px;
-    padding-left: 100px;
     font-size: 50px;
 `;
 
-const ImageTudor = styled.img`
-    max-width: ${(props) => {
-        return props.maxwidth
-    }};
-    margin-top: ${(props)=>{
-        return props.mt
-    }};
+const Image = styled.img`
+    position: absolute;
+    height: 65%;
+    bottom: 1%;
+    left: 30%;
 `;
 
 const ContainerWithHeight = styled.div`
@@ -69,9 +67,11 @@ const ContainerWithHeight = styled.div`
 
 const SeperateSection = styled.div`
     display: grid;
+    width: 100%;
 `;
 
 const ItemGrid = styled.div`
+    width: 100%;
     grid-column: ${(props) => {
         return props.columngrid
     }};

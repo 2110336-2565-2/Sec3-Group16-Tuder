@@ -15,6 +15,9 @@ type Course func(*sql.Selector)
 // IssueReport is the predicate function for issuereport builders.
 type IssueReport func(*sql.Selector)
 
+// Match is the predicate function for match builders.
+type Match func(*sql.Selector)
+
 // Payment is the predicate function for payment builders.
 type Payment func(*sql.Selector)
 

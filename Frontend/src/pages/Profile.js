@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import StudentInfo from "../components/profile/StudentInfo.js";
 import TutorInfo from "../components/profile/TutorInfo.js";
-import { dummyStudent, dummyTutor } from "../datas/Profile.role.js";
+import Footer from "../components/global/Footer.js";
+// import { dummyStudent, dummyTutor } from "../datas/Profile.role.js";
+import { getStudentByUsername, getTutorByUsername } from "../handlers/profile/getUserHandler.js";
 import useRole from "../hooks/useRole.js";
+import useUsername from "../hooks/useUsername.js";
+import { IsUser } from "../components/IsAuth.js";
 
 // icons
 import { EditOutlined } from "@ant-design/icons";
@@ -14,34 +18,54 @@ export default function Profile() {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
   // CHANGE THIS TO GET USER FROM BACKEND
+  const [user, setUser] = useState({});
   const [role, handleRole] = useRole();
-  const user = role==="student" ? dummyStudent : dummyTutor;
+  const [username, handleUsername] = useUsername();
+  useEffect(() => {
+    if (role === "student") {
+      getStudentByUsername(username).then((res) => {
+        setUser(res.data.data);
+        console.log("res.data.data: ", res.data.data);
+      });
+    } else if (role === "tutor") {
+      getTutorByUsername(username).then((res) => {
+        setUser(res.data.data);
+        console.log("res.data.data: ", res.data.data);
+      });
+    }
+  }, [role]);
   // ------------------------------------
 
   const navigate = useNavigate();
 
   return (
     <Container>
+      <IsUser>
       <TopSection>
-        <Role>{capitalizeFirstLetter(user.role)}</Role>
+        <Role>{capitalizeFirstLetter(role)}</Role>
         <ProfileImageWrapper>
           <ProfileImage src={user.profile_picture_URL} />
         </ProfileImageWrapper>
-        <Name>{user.first_name + " " + user.last_name}</Name>
+        <Name>{user.firstname + " " + user.lastname}</Name>
         <Email>{user.email}</Email>
       </TopSection>
-      <MiddleSection>
-        <TitleWrapper>
-          <Title>Information</Title>
-          <EditIcon onClick={()=>navigate("/edit-profile")} />
-        </TitleWrapper>
-        {user.role === "student" ? (
-          <StudentInfo user={user} />
-        ) : (
-          <TutorInfo user={user} />
-        )}
-      </MiddleSection>
+      <Wrapper>
+        <MiddleSection>
+          <TitleWrapper>
+            <Title>Information</Title>
+            <EditIcon onClick={()=>navigate("/edit-profile")} />
+          </TitleWrapper>
+          {role === "student" ? (
+            <StudentInfo user={user} />
+          ) : (
+            <TutorInfo user={user} />
+          )}
+        </MiddleSection>
+      </Wrapper>
+      <Footer />
+    </IsUser>
     </Container>
+    
   );
 }
 
@@ -50,6 +74,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
   background-color: #fdedeb;
 `;
 
@@ -90,6 +115,13 @@ const Email = styled.span`
   font-weight: medium;
   color: #ababab;
   margin-top: 10px;
+`;
+
+const Wrapper = styled.div`
+  border-radius: 50px 50px 0px 0px;
+  background-color: white;
+  margin-top: 10px;
+  width: 100%;
 `;
 
 const MiddleSection = styled.div`

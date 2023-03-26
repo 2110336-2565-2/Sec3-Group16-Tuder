@@ -2,15 +2,15 @@ export const tutorFields = [
   {
     label: "First Name",
     type: "text",
-    id: "first_name",
-    name: "first_name",
+    id: "firstname",
+    name: "firstname",
     width: "",
   },
   {
     label: "Last Name",
     type: "text",
-    id: "last_name",
-    name: "last_name",
+    id: "lastname",
+    name: "lastname",
     width: "",
   },
   {
@@ -50,8 +50,8 @@ export const tutorFields = [
   {
     label: "Birth Date",
     type: "date",
-    id: "birth_date",
-    name: "birth_date",
+    id: "birthdate",
+    name: "birthdate",
     width: "",
   },
   {
@@ -74,15 +74,15 @@ export const studentFields = [
   {
     label: "First Name",
     type: "text",
-    id: "first_name",
-    name: "first_name",
+    id: "firstname",
+    name: "firstname",
     width: "",
   },
   {
     label: "Last Name",
     type: "text",
-    id: "last_name",
-    name: "last_name",
+    id: "lastname",
+    name: "lastname",
     width: "",
   },
   {
@@ -122,16 +122,9 @@ export const studentFields = [
   {
     label: "Birth Date",
     type: "date",
-    id: "birth_date",
-    name: "birth_date",
+    id: "birthdate",
+    name: "birthdate",
     width: "",
-  },
-  {
-    label: "School",
-    type: "text",
-    id: "school",
-    name: "school",
-    width: "100%",
   },
 ];
 
@@ -139,27 +132,26 @@ export const dummyStudent = {
   role: "student",
   profile_picture_URL:
     "https://i.pinimg.com/originals/68/12/46/681246b04458bbb03a7120b68c0bad01.jpg",
-  first_name: "Mehrab",
-  last_name: "Jaidee",
+  firstname: "Mehrab",
+  lastname: "Jaidee",
   email: "mehrab@gmail.com",
   address: "123/456 Bangkoontien Nontaburi 11110",
   phone: "0812345678",
   gender: "female",
-  birth_date: "2010-10-10",
-  school: "มหาวิทยาลัยนนทบุรี",
+  birthdate: "2010-10-10",
 };
 
 export const dummyTutor = {
   role: "tutor",
   profile_picture_URL:
     "https://i.pinimg.com/originals/68/12/46/681246b04458bbb03a7120b68c0bad01.jpg",
-  first_name: "Mehrab",
-  last_name: "Jaidee",
+  firstname: "Mehrab",
+  lastname: "Jaidee",
   email: "mehrab@gmail.com",
   address: "123/456 Bangkoontien Nontaburi 11110",
   phone: "0812345678",
   gender: "female",
-  birth_date: "2010-10-10",
+  birthdate: "2010-10-10",
   citizen_id: "1234567890123",
   description:
     "Experienced tutor with a passion for education and helping students succeed. With a Master's degree in Education and 5 years of teaching experience, I have a proven track record of improving student performance and confidence in subjects such as Math, English, and Science. I customize my lessons to meet each student's individual needs and learning style, creating a supportive and engaging environment for maximum success. Outside of the classroom, I enjoy reading, hiking, and trying new recipes. Let's work together to reach your educational goals!",

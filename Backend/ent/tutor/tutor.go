@@ -43,13 +43,11 @@ const (
 	CourseInverseTable = "courses"
 	// CourseColumn is the table column denoting the course relation/edge.
 	CourseColumn = "tutor_course"
-	// ReviewTutorTable is the table that holds the review_tutor relation/edge.
-	ReviewTutorTable = "review_tutors"
+	// ReviewTutorTable is the table that holds the review_tutor relation/edge. The primary key declared below.
+	ReviewTutorTable = "tutor_review_tutor"
 	// ReviewTutorInverseTable is the table name for the ReviewTutor entity.
 	// It exists in this package in order to avoid circular dependency with the "reviewtutor" package.
 	ReviewTutorInverseTable = "review_tutors"
-	// ReviewTutorColumn is the table column denoting the review_tutor relation/edge.
-	ReviewTutorColumn = "tutor_review_tutor"
 	// UserTable is the table that holds the user relation/edge.
 	UserTable = "tutors"
 	// UserInverseTable is the table name for the User entity.
@@ -80,6 +78,12 @@ var ForeignKeys = []string{
 	"schedule_tutor",
 	"user_tutor",
 }
+
+var (
+	// ReviewTutorPrimaryKey and ReviewTutorColumn2 are the table columns denoting the
+	// primary key for the review_tutor relation (M2M).
+	ReviewTutorPrimaryKey = []string{"tutor_id", "review_tutor_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {

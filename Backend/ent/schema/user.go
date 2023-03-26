@@ -32,7 +32,7 @@ func (User) Fields() []ent.Field {
 		field.Time("birth_date"),
 		field.String("gender").NotEmpty(),
 		field.String("profile_picture_URL").Optional().Nillable(),
-		field.Enum("role").Values("student", "tutor").Nillable(),
+		field.Enum("role").Values("student", "tutor", "admin").Nillable(),
 	}
 }
 
@@ -44,10 +44,10 @@ func (User) Indexes() []ent.Index {
 
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
+		edge.To("student", Student.Type).Unique(),
+		edge.To("tutor", Tutor.Type).Unique(),
 		edge.To("issue_report", IssueReport.Type),
 		edge.To("payment", Payment.Type),
 		edge.To("payment_history", PaymentHistory.Type),
-		edge.To("student", Student.Type).Unique(),
-		edge.To("tutor", Tutor.Type).Unique(),
 	}
 }

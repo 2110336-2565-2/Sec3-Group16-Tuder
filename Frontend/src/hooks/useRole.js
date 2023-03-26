@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import getRole from '../utils/jwtGet';
+import {getRole} from '../utils/jwtGet';
 
 
 export default function useRole(){
