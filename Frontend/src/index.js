@@ -17,6 +17,7 @@ import ErrorPage from './pages/ErrorPage';
 import ChangePassword from './pages/ChangePassword';
 import EnterNewPassword from './pages/EnterNewPassword';
 import CancelRequestList from './pages/CancelRequestList';
+import CourseReviews from './pages/CourseReviews';
 import { QueryClientProvider, QueryClient } from 'react-query';
 
 Modal.setAppElement(document.getElementById('root'))
@@ -59,8 +60,12 @@ const router = createBrowserRouter([
         element: <EditProfile />,
       },
       {
-        path: "/review/:id",
+        path: "/review/:courseID",
         element: <Review />,
+      },
+      {
+        path: "course-reviews/:courseID",
+        element: <CourseReviews />,
       },
       {
         path: "/change-password",
@@ -73,7 +78,7 @@ const router = createBrowserRouter([
       {
         path: "cancel-request-list",
         element: <CancelRequestList />,
-      }
+      },
     ]
   }
 ])
