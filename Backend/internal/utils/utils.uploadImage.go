@@ -39,7 +39,7 @@ func GenerateProfilePictureURL(imageBytes []byte, key string) (string, error) {
 	}
 
 	// Generate the S3 object URL
-	objectURL := fmt.Sprintf("https://%s.s3.amazonaws.com/%s", bucket, key)
+	objectURL := fmt.Sprintf("https://%s.s3.amazonaws.com/%s.jpg", bucket, key)
 
 	return objectURL, nil
 }

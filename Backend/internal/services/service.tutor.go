@@ -76,21 +76,6 @@ func (s *serviceTutor) GetTutors() ([]*schemas.SchemaTutor, error) {
 			fmt.Println(err)
 			return nil, err
 		}
-		fmt.Println(tutor.ID)
-		fmt.Println(tutor.Edges.User.Username)
-		fmt.Println(tutor.Edges.User.FirstName)
-		fmt.Println(tutor.Edges.User.LastName)
-		fmt.Println(tutor.Edges.User.Email)
-		fmt.Println(tutor.Edges.User.Phone)
-		fmt.Println(tutor.Edges.User.Address)
-		fmt.Println(tutor.Edges.User.BirthDate)
-		fmt.Println(tutor.Edges.User.Gender)
-		fmt.Println(*tutor.Edges.User.ProfilePictureURL)
-		fmt.Println(*tutor.Description)
-		fmt.Println(*tutor.OmiseBankToken)
-		fmt.Println(tutor.CitizenID)
-		fmt.Println(schedule)
-		fmt.Println("=====================================")
 
 		tutorResponses = append(tutorResponses, &schemas.SchemaTutor{
 			ID:                tutor.ID,
@@ -117,7 +102,6 @@ func (s *serviceTutor) GetTutors() ([]*schemas.SchemaTutor, error) {
 			},
 		})
 	}
-	fmt.Println("Append success, send response")
 	return tutorResponses, nil
 }
 
