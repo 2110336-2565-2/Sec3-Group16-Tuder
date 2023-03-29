@@ -3,6 +3,9 @@ package schema
 import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
+	"entgo.io/ent/schema/field"
+
+	"time"
 )
 
 // Todo holds the schema definition for the Todo entity.
@@ -12,9 +15,11 @@ type ReviewCourse struct {
 
 // Mixin of Tutor
 
-func (ReviewCourse) Mixin() []ent.Mixin {
-	return []ent.Mixin{
-		ReviewMixin{},
+func (ReviewCourse) Fields() []ent.Field {
+	return []ent.Field{
+		field.Float32("score").Positive().Nillable().Optional(),
+		field.String("review_msg").Optional().Nillable(),
+		field.Time("review_time_at").Default(time.Now).Immutable(),
 	}
 }
 
