@@ -9,13 +9,13 @@ import (
 )
 
 // Todo holds the schema definition for the Todo entity.
-type ReviewCourse struct {
+type Review struct {
 	ent.Schema
 }
 
 // Mixin of Tutor
 
-func (ReviewCourse) Fields() []ent.Field {
+func (Review) Fields() []ent.Field {
 	return []ent.Field{
 		field.Float32("score").Positive().Nillable().Optional(),
 		field.String("review_msg").Optional().Nillable(),
@@ -23,14 +23,14 @@ func (ReviewCourse) Fields() []ent.Field {
 	}
 }
 
-func (ReviewCourse) Edges() []ent.Edge {
+func (Review) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("course", Course.Type).
-			Ref("review_course").
+			Ref("review").
 			// Unique().
 			Required(),
 		edge.From("student", Student.Type).
-			Ref("review_course").
+			Ref("review").
 			// Unique().
 			Required(),
 	}

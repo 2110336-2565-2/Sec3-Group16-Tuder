@@ -41,8 +41,8 @@ type Course struct {
 
 // CourseEdges holds the relations/edges for other nodes in the graph.
 type CourseEdges struct {
-	// ReviewCourse holds the value of the review_course edge.
-	ReviewCourse []*ReviewCourse `json:"review_course,omitempty"`
+	// Review holds the value of the review edge.
+	Review []*Review `json:"review,omitempty"`
 	// Match holds the value of the match edge.
 	Match []*Match `json:"match,omitempty"`
 	// Tutor holds the value of the tutor edge.
@@ -52,13 +52,13 @@ type CourseEdges struct {
 	loadedTypes [3]bool
 }
 
-// ReviewCourseOrErr returns the ReviewCourse value or an error if the edge
+// ReviewOrErr returns the Review value or an error if the edge
 // was not loaded in eager-loading.
-func (e CourseEdges) ReviewCourseOrErr() ([]*ReviewCourse, error) {
+func (e CourseEdges) ReviewOrErr() ([]*Review, error) {
 	if e.loadedTypes[0] {
-		return e.ReviewCourse, nil
+		return e.Review, nil
 	}
-	return nil, &NotLoadedError{edge: "review_course"}
+	return nil, &NotLoadedError{edge: "review"}
 }
 
 // MatchOrErr returns the Match value or an error if the edge
@@ -178,9 +178,9 @@ func (c *Course) assignValues(columns []string, values []any) error {
 	return nil
 }
 
-// QueryReviewCourse queries the "review_course" edge of the Course entity.
-func (c *Course) QueryReviewCourse() *ReviewCourseQuery {
-	return NewCourseClient(c.config).QueryReviewCourse(c)
+// QueryReview queries the "review" edge of the Course entity.
+func (c *Course) QueryReview() *ReviewQuery {
+	return NewCourseClient(c.config).QueryReview(c)
 }
 
 // QueryMatch queries the "match" edge of the Course entity.

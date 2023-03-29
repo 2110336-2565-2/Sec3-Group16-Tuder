@@ -81,28 +81,16 @@ func (f PaymentHistoryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Val
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PaymentHistoryMutation", m)
 }
 
-// The ReviewCourseFunc type is an adapter to allow the use of ordinary
-// function as ReviewCourse mutator.
-type ReviewCourseFunc func(context.Context, *ent.ReviewCourseMutation) (ent.Value, error)
+// The ReviewFunc type is an adapter to allow the use of ordinary
+// function as Review mutator.
+type ReviewFunc func(context.Context, *ent.ReviewMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f ReviewCourseFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.ReviewCourseMutation); ok {
+func (f ReviewFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ReviewMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ReviewCourseMutation", m)
-}
-
-// The ReviewTutorFunc type is an adapter to allow the use of ordinary
-// function as ReviewTutor mutator.
-type ReviewTutorFunc func(context.Context, *ent.ReviewTutorMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f ReviewTutorFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.ReviewTutorMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ReviewTutorMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ReviewMutation", m)
 }
 
 // The ScheduleFunc type is an adapter to allow the use of ordinary

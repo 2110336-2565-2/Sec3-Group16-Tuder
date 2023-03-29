@@ -10,8 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewtutor"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/review"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
@@ -53,34 +52,19 @@ func (sc *StudentCreate) AddMatch(m ...*Match) *StudentCreate {
 	return sc.AddMatchIDs(ids...)
 }
 
-// AddReviewCourseIDs adds the "review_course" edge to the ReviewCourse entity by IDs.
-func (sc *StudentCreate) AddReviewCourseIDs(ids ...int) *StudentCreate {
-	sc.mutation.AddReviewCourseIDs(ids...)
+// AddReviewIDs adds the "review" edge to the Review entity by IDs.
+func (sc *StudentCreate) AddReviewIDs(ids ...int) *StudentCreate {
+	sc.mutation.AddReviewIDs(ids...)
 	return sc
 }
 
-// AddReviewCourse adds the "review_course" edges to the ReviewCourse entity.
-func (sc *StudentCreate) AddReviewCourse(r ...*ReviewCourse) *StudentCreate {
+// AddReview adds the "review" edges to the Review entity.
+func (sc *StudentCreate) AddReview(r ...*Review) *StudentCreate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return sc.AddReviewCourseIDs(ids...)
-}
-
-// AddReviewTutorIDs adds the "review_tutor" edge to the ReviewTutor entity by IDs.
-func (sc *StudentCreate) AddReviewTutorIDs(ids ...int) *StudentCreate {
-	sc.mutation.AddReviewTutorIDs(ids...)
-	return sc
-}
-
-// AddReviewTutor adds the "review_tutor" edges to the ReviewTutor entity.
-func (sc *StudentCreate) AddReviewTutor(r ...*ReviewTutor) *StudentCreate {
-	ids := make([]int, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
-	}
-	return sc.AddReviewTutorIDs(ids...)
+	return sc.AddReviewIDs(ids...)
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
@@ -194,36 +178,17 @@ func (sc *StudentCreate) createSpec() (*Student, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := sc.mutation.ReviewCourseIDs(); len(nodes) > 0 {
+	if nodes := sc.mutation.ReviewIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   student.ReviewCourseTable,
-			Columns: student.ReviewCoursePrimaryKey,
+			Table:   student.ReviewTable,
+			Columns: student.ReviewPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: reviewcourse.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := sc.mutation.ReviewTutorIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   student.ReviewTutorTable,
-			Columns: student.ReviewTutorPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: reviewtutor.FieldID,
+					Column: review.FieldID,
 				},
 			},
 		}

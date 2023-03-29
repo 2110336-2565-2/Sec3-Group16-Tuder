@@ -81,51 +81,24 @@ func HasMatchWith(preds ...predicate.Match) predicate.Student {
 	})
 }
 
-// HasReviewCourse applies the HasEdge predicate on the "review_course" edge.
-func HasReviewCourse() predicate.Student {
+// HasReview applies the HasEdge predicate on the "review" edge.
+func HasReview() predicate.Student {
 	return predicate.Student(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ReviewCourseTable, ReviewCoursePrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, ReviewTable, ReviewPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasReviewCourseWith applies the HasEdge predicate on the "review_course" edge with a given conditions (other predicates).
-func HasReviewCourseWith(preds ...predicate.ReviewCourse) predicate.Student {
+// HasReviewWith applies the HasEdge predicate on the "review" edge with a given conditions (other predicates).
+func HasReviewWith(preds ...predicate.Review) predicate.Student {
 	return predicate.Student(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(ReviewCourseInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ReviewCourseTable, ReviewCoursePrimaryKey...),
-		)
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasReviewTutor applies the HasEdge predicate on the "review_tutor" edge.
-func HasReviewTutor() predicate.Student {
-	return predicate.Student(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ReviewTutorTable, ReviewTutorPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasReviewTutorWith applies the HasEdge predicate on the "review_tutor" edge with a given conditions (other predicates).
-func HasReviewTutorWith(preds ...predicate.ReviewTutor) predicate.Student {
-	return predicate.Student(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(ReviewTutorInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ReviewTutorTable, ReviewTutorPrimaryKey...),
+			sqlgraph.To(ReviewInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, ReviewTable, ReviewPrimaryKey...),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
