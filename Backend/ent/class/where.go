@@ -184,7 +184,7 @@ func HasMatch() predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, MatchTable, MatchPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, MatchTable, MatchColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -196,7 +196,7 @@ func HasMatchWith(preds ...predicate.Match) predicate.Class {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(MatchInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, MatchTable, MatchPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, MatchTable, MatchColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

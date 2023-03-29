@@ -9,7 +9,7 @@ type ServiceClass interface {
 	GetCancellingClasses() ([]*schemas.SchemaCancelRequest, error)
 	CancelClass(sc *schemas.SchemaCancelClass) error
 	AuditClassCancellation(sc *schemas.SchemaCancelRequestApprove) error
-	AcknowledgeClassCancellation(sc *schemas.SchemaUserAcknowledge) error
+	// AcknowledgeClassCancellation(sc *schemas.SchemaUserAcknowledge) error
 }
 
 type serviceClass struct {
@@ -32,7 +32,7 @@ func (s *serviceClass) GetCancellingClasses() ([]*schemas.SchemaCancelRequest, e
 
 func (s *serviceClass) CancelClass(sc *schemas.SchemaCancelClass) error {
 
-	// change status of class to cancelling , wait for admin to confirm
+	// create cancel request , wait for admin to confirm
 
 	_, err := s.repo.CancelClass(sc)
 	if err != nil {
@@ -51,12 +51,12 @@ func (s *serviceClass) AuditClassCancellation(sc *schemas.SchemaCancelRequestApp
 	return nil
 }
 
-func (s *serviceClass) AcknowledgeClassCancellation(sc *schemas.SchemaUserAcknowledge) error {
-	
-	// change status of class to be default
-	err := s.repo.AcknowledgeClassCancellation(sc)
-	if err != nil {
-		return err
-	}
-	return nil
-}
+// func (s *serviceClass) AcknowledgeClassCancellation(sc *schemas.SchemaUserAcknowledge) error {
+
+// 	// change status of class to be default
+// 	err := s.repo.AcknowledgeClassCancellation(sc)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }

@@ -86,7 +86,7 @@ func HasCourse() predicate.Match {
 	return predicate.Match(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, CourseTable, CoursePrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, CourseTable, CourseColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -98,7 +98,7 @@ func HasCourseWith(preds ...predicate.Course) predicate.Match {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(CourseInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, CourseTable, CoursePrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, CourseTable, CourseColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
@@ -113,7 +113,7 @@ func HasClass() predicate.Match {
 	return predicate.Match(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, ClassTable, ClassPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, ClassTable, ClassColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -125,7 +125,34 @@ func HasClassWith(preds ...predicate.Class) predicate.Match {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ClassInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, ClassTable, ClassPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, ClassTable, ClassColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasClassCancelRequest applies the HasEdge predicate on the "class_cancel_request" edge.
+func HasClassCancelRequest() predicate.Match {
+	return predicate.Match(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, ClassCancelRequestTable, ClassCancelRequestColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasClassCancelRequestWith applies the HasEdge predicate on the "class_cancel_request" edge with a given conditions (other predicates).
+func HasClassCancelRequestWith(preds ...predicate.ClassCancelRequest) predicate.Match {
+	return predicate.Match(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ClassCancelRequestInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, ClassCancelRequestTable, ClassCancelRequestColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

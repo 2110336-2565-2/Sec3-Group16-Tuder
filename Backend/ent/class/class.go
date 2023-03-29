@@ -29,11 +29,13 @@ const (
 	EdgePaymentHistory = "payment_history"
 	// Table holds the table name of the class in the database.
 	Table = "classes"
-	// MatchTable is the table that holds the match relation/edge. The primary key declared below.
-	MatchTable = "class_match"
+	// MatchTable is the table that holds the match relation/edge.
+	MatchTable = "matches"
 	// MatchInverseTable is the table name for the Match entity.
 	// It exists in this package in order to avoid circular dependency with the "match" package.
 	MatchInverseTable = "matches"
+	// MatchColumn is the table column denoting the match relation/edge.
+	MatchColumn = "class_match"
 	// ScheduleTable is the table that holds the schedule relation/edge.
 	ScheduleTable = "classes"
 	// ScheduleInverseTable is the table name for the Schedule entity.
@@ -66,12 +68,6 @@ var ForeignKeys = []string{
 	"schedule_class",
 }
 
-var (
-	// MatchPrimaryKey and MatchColumn2 are the table columns denoting the
-	// primary key for the match relation (M2M).
-	MatchPrimaryKey = []string{"class_id", "match_id"}
-)
-
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
@@ -99,11 +95,9 @@ type Status string
 
 // Status values.
 const (
-	StatusOngoing    Status = "ongoing"
-	StatusCompleted  Status = "completed"
-	StatusCancelling Status = "cancelling"
-	StatusRejected   Status = "rejected"
-	StatusCancelled  Status = "cancelled"
+	StatusOngoing   Status = "ongoing"
+	StatusCompleted Status = "completed"
+	StatusCancelled Status = "cancelled"
 )
 
 func (s Status) String() string {
@@ -113,7 +107,7 @@ func (s Status) String() string {
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s Status) error {
 	switch s {
-	case StatusOngoing, StatusCompleted, StatusCancelling, StatusRejected, StatusCancelled:
+	case StatusOngoing, StatusCompleted, StatusCancelled:
 		return nil
 	default:
 		return fmt.Errorf("class: invalid enum value for status field: %q", s)

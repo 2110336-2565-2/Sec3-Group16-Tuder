@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/classcancelrequest"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
@@ -36,6 +37,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// Class is the client for interacting with the Class builders.
 	Class *ClassClient
+	// ClassCancelRequest is the client for interacting with the ClassCancelRequest builders.
+	ClassCancelRequest *ClassCancelRequestClient
 	// Course is the client for interacting with the Course builders.
 	Course *CourseClient
 	// IssueReport is the client for interacting with the IssueReport builders.
@@ -72,6 +75,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Class = NewClassClient(c.config)
+	c.ClassCancelRequest = NewClassCancelRequestClient(c.config)
 	c.Course = NewCourseClient(c.config)
 	c.IssueReport = NewIssueReportClient(c.config)
 	c.Match = NewMatchClient(c.config)
@@ -114,20 +118,21 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:            ctx,
-		config:         cfg,
-		Class:          NewClassClient(cfg),
-		Course:         NewCourseClient(cfg),
-		IssueReport:    NewIssueReportClient(cfg),
-		Match:          NewMatchClient(cfg),
-		Payment:        NewPaymentClient(cfg),
-		PaymentHistory: NewPaymentHistoryClient(cfg),
-		ReviewCourse:   NewReviewCourseClient(cfg),
-		ReviewTutor:    NewReviewTutorClient(cfg),
-		Schedule:       NewScheduleClient(cfg),
-		Student:        NewStudentClient(cfg),
-		Tutor:          NewTutorClient(cfg),
-		User:           NewUserClient(cfg),
+		ctx:                ctx,
+		config:             cfg,
+		Class:              NewClassClient(cfg),
+		ClassCancelRequest: NewClassCancelRequestClient(cfg),
+		Course:             NewCourseClient(cfg),
+		IssueReport:        NewIssueReportClient(cfg),
+		Match:              NewMatchClient(cfg),
+		Payment:            NewPaymentClient(cfg),
+		PaymentHistory:     NewPaymentHistoryClient(cfg),
+		ReviewCourse:       NewReviewCourseClient(cfg),
+		ReviewTutor:        NewReviewTutorClient(cfg),
+		Schedule:           NewScheduleClient(cfg),
+		Student:            NewStudentClient(cfg),
+		Tutor:              NewTutorClient(cfg),
+		User:               NewUserClient(cfg),
 	}, nil
 }
 
@@ -145,20 +150,21 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:            ctx,
-		config:         cfg,
-		Class:          NewClassClient(cfg),
-		Course:         NewCourseClient(cfg),
-		IssueReport:    NewIssueReportClient(cfg),
-		Match:          NewMatchClient(cfg),
-		Payment:        NewPaymentClient(cfg),
-		PaymentHistory: NewPaymentHistoryClient(cfg),
-		ReviewCourse:   NewReviewCourseClient(cfg),
-		ReviewTutor:    NewReviewTutorClient(cfg),
-		Schedule:       NewScheduleClient(cfg),
-		Student:        NewStudentClient(cfg),
-		Tutor:          NewTutorClient(cfg),
-		User:           NewUserClient(cfg),
+		ctx:                ctx,
+		config:             cfg,
+		Class:              NewClassClient(cfg),
+		ClassCancelRequest: NewClassCancelRequestClient(cfg),
+		Course:             NewCourseClient(cfg),
+		IssueReport:        NewIssueReportClient(cfg),
+		Match:              NewMatchClient(cfg),
+		Payment:            NewPaymentClient(cfg),
+		PaymentHistory:     NewPaymentHistoryClient(cfg),
+		ReviewCourse:       NewReviewCourseClient(cfg),
+		ReviewTutor:        NewReviewTutorClient(cfg),
+		Schedule:           NewScheduleClient(cfg),
+		Student:            NewStudentClient(cfg),
+		Tutor:              NewTutorClient(cfg),
+		User:               NewUserClient(cfg),
 	}, nil
 }
 
@@ -188,6 +194,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Class.Use(hooks...)
+	c.ClassCancelRequest.Use(hooks...)
 	c.Course.Use(hooks...)
 	c.IssueReport.Use(hooks...)
 	c.Match.Use(hooks...)
@@ -205,6 +212,7 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Class.Intercept(interceptors...)
+	c.ClassCancelRequest.Intercept(interceptors...)
 	c.Course.Intercept(interceptors...)
 	c.IssueReport.Intercept(interceptors...)
 	c.Match.Intercept(interceptors...)
@@ -223,6 +231,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *ClassMutation:
 		return c.Class.mutate(ctx, m)
+	case *ClassCancelRequestMutation:
+		return c.ClassCancelRequest.mutate(ctx, m)
 	case *CourseMutation:
 		return c.Course.mutate(ctx, m)
 	case *IssueReportMutation:
@@ -351,7 +361,7 @@ func (c *ClassClient) QueryMatch(cl *Class) *MatchQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(class.Table, class.FieldID, id),
 			sqlgraph.To(match.Table, match.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, class.MatchTable, class.MatchPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, class.MatchTable, class.MatchColumn),
 		)
 		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
 		return fromV, nil
@@ -413,6 +423,156 @@ func (c *ClassClient) mutate(ctx context.Context, m *ClassMutation) (Value, erro
 		return (&ClassDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Class mutation op: %q", m.Op())
+	}
+}
+
+// ClassCancelRequestClient is a client for the ClassCancelRequest schema.
+type ClassCancelRequestClient struct {
+	config
+}
+
+// NewClassCancelRequestClient returns a client for the ClassCancelRequest from the given config.
+func NewClassCancelRequestClient(c config) *ClassCancelRequestClient {
+	return &ClassCancelRequestClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `classcancelrequest.Hooks(f(g(h())))`.
+func (c *ClassCancelRequestClient) Use(hooks ...Hook) {
+	c.hooks.ClassCancelRequest = append(c.hooks.ClassCancelRequest, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `classcancelrequest.Intercept(f(g(h())))`.
+func (c *ClassCancelRequestClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ClassCancelRequest = append(c.inters.ClassCancelRequest, interceptors...)
+}
+
+// Create returns a builder for creating a ClassCancelRequest entity.
+func (c *ClassCancelRequestClient) Create() *ClassCancelRequestCreate {
+	mutation := newClassCancelRequestMutation(c.config, OpCreate)
+	return &ClassCancelRequestCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ClassCancelRequest entities.
+func (c *ClassCancelRequestClient) CreateBulk(builders ...*ClassCancelRequestCreate) *ClassCancelRequestCreateBulk {
+	return &ClassCancelRequestCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ClassCancelRequest.
+func (c *ClassCancelRequestClient) Update() *ClassCancelRequestUpdate {
+	mutation := newClassCancelRequestMutation(c.config, OpUpdate)
+	return &ClassCancelRequestUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ClassCancelRequestClient) UpdateOne(ccr *ClassCancelRequest) *ClassCancelRequestUpdateOne {
+	mutation := newClassCancelRequestMutation(c.config, OpUpdateOne, withClassCancelRequest(ccr))
+	return &ClassCancelRequestUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ClassCancelRequestClient) UpdateOneID(id uuid.UUID) *ClassCancelRequestUpdateOne {
+	mutation := newClassCancelRequestMutation(c.config, OpUpdateOne, withClassCancelRequestID(id))
+	return &ClassCancelRequestUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ClassCancelRequest.
+func (c *ClassCancelRequestClient) Delete() *ClassCancelRequestDelete {
+	mutation := newClassCancelRequestMutation(c.config, OpDelete)
+	return &ClassCancelRequestDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ClassCancelRequestClient) DeleteOne(ccr *ClassCancelRequest) *ClassCancelRequestDeleteOne {
+	return c.DeleteOneID(ccr.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ClassCancelRequestClient) DeleteOneID(id uuid.UUID) *ClassCancelRequestDeleteOne {
+	builder := c.Delete().Where(classcancelrequest.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ClassCancelRequestDeleteOne{builder}
+}
+
+// Query returns a query builder for ClassCancelRequest.
+func (c *ClassCancelRequestClient) Query() *ClassCancelRequestQuery {
+	return &ClassCancelRequestQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeClassCancelRequest},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ClassCancelRequest entity by its id.
+func (c *ClassCancelRequestClient) Get(ctx context.Context, id uuid.UUID) (*ClassCancelRequest, error) {
+	return c.Query().Where(classcancelrequest.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ClassCancelRequestClient) GetX(ctx context.Context, id uuid.UUID) *ClassCancelRequest {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryMatch queries the match edge of a ClassCancelRequest.
+func (c *ClassCancelRequestClient) QueryMatch(ccr *ClassCancelRequest) *MatchQuery {
+	query := (&MatchClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ccr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(classcancelrequest.Table, classcancelrequest.FieldID, id),
+			sqlgraph.To(match.Table, match.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, classcancelrequest.MatchTable, classcancelrequest.MatchColumn),
+		)
+		fromV = sqlgraph.Neighbors(ccr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUser queries the user edge of a ClassCancelRequest.
+func (c *ClassCancelRequestClient) QueryUser(ccr *ClassCancelRequest) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ccr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(classcancelrequest.Table, classcancelrequest.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, classcancelrequest.UserTable, classcancelrequest.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(ccr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ClassCancelRequestClient) Hooks() []Hook {
+	return c.hooks.ClassCancelRequest
+}
+
+// Interceptors returns the client interceptors.
+func (c *ClassCancelRequestClient) Interceptors() []Interceptor {
+	return c.inters.ClassCancelRequest
+}
+
+func (c *ClassCancelRequestClient) mutate(ctx context.Context, m *ClassCancelRequestMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ClassCancelRequestCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ClassCancelRequestUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ClassCancelRequestUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ClassCancelRequestDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ClassCancelRequest mutation op: %q", m.Op())
 	}
 }
 
@@ -533,7 +693,7 @@ func (c *CourseClient) QueryMatch(co *Course) *MatchQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(course.Table, course.FieldID, id),
 			sqlgraph.To(match.Table, match.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, course.MatchTable, course.MatchPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, course.MatchTable, course.MatchColumn),
 		)
 		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
 		return fromV, nil
@@ -833,7 +993,7 @@ func (c *MatchClient) QueryCourse(m *Match) *CourseQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(match.Table, match.FieldID, id),
 			sqlgraph.To(course.Table, course.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, match.CourseTable, match.CoursePrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, match.CourseTable, match.CourseColumn),
 		)
 		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
 		return fromV, nil
@@ -849,7 +1009,23 @@ func (c *MatchClient) QueryClass(m *Match) *ClassQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(match.Table, match.FieldID, id),
 			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, match.ClassTable, match.ClassPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, match.ClassTable, match.ClassColumn),
+		)
+		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryClassCancelRequest queries the class_cancel_request edge of a Match.
+func (c *MatchClient) QueryClassCancelRequest(m *Match) *ClassCancelRequestQuery {
+	query := (&ClassCancelRequestClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(match.Table, match.FieldID, id),
+			sqlgraph.To(classcancelrequest.Table, classcancelrequest.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, match.ClassCancelRequestTable, match.ClassCancelRequestColumn),
 		)
 		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
 		return fromV, nil
@@ -2194,6 +2370,22 @@ func (c *UserClient) QueryPaymentHistory(u *User) *PaymentHistoryQuery {
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(paymenthistory.Table, paymenthistory.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.PaymentHistoryTable, user.PaymentHistoryColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryClassCancelRequest queries the class_cancel_request edge of a User.
+func (c *UserClient) QueryClassCancelRequest(u *User) *ClassCancelRequestQuery {
+	query := (&ClassCancelRequestClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(classcancelrequest.Table, classcancelrequest.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.ClassCancelRequestTable, user.ClassCancelRequestColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil

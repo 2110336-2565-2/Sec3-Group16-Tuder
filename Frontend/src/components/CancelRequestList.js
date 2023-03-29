@@ -3,11 +3,13 @@ import {useQuery} from 'react-query';
 import { fetchCancellingClassHandler } from '../handlers/cancellingClassHandler';
 import { useDataContext } from '../pages/CancelRequestList';
 import CancelRequest from '../components/CancelRequest';
-import React,{useNavigate} from 'react';
+import React from 'react';
+import {useNavigate} from 'react-router-dom';
 
 
 export default function CancelRequestList(){ 
     const {data, setData} = useDataContext();
+    const navigate = useNavigate();
 
     const { isLoading, error} = useQuery(
         'cancellingClass',() =>
@@ -53,14 +55,15 @@ export default function CancelRequestList(){
 
     return (
         <Container>
-            <h1>Cancel-Class Requests</h1>
+            <h1>Class Cancellation Requests</h1>
             <RequestListPage>
                 
                     <RequestListcontent>
-                        <CancelRequest type="Topic" classId='ClassID' course='Course' tutor='Tutor' student='Student' subject='Subject' total_hour='Total Hours' success_hour='Success Hour'   price='Price/Hour' /> 
-                        {data.map(item => (  
+                        {data.map(item => (
+                            <div onClick={(e) =>navigate('/cancel-request-detail')}>
 
-                            <CancelRequest key={item.classId} removeItem={removeItem} classId={item.classId} course={item.course} tutor={item.tutor_name} student={item.student_name} subject={item.subject} total_hour={item.total_hours} success_hour={item.success_hours}   price={item.price} /> 
+                            <CancelRequest  title="big hee" img="/images/index.png" course="hee" reporter="Name of hee" report_date="Today" status="ongoing"/>
+                            </div>
                         ))}
                         
                     </RequestListcontent>
@@ -77,7 +80,6 @@ const Container = styled.div`
     gap: 20px;
     justify-content: center;
     align-items: center;
-    border: 1px solid black;
     padding: 20px;
     margin-top: 20px;
     margin-bottom: 20px;

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/classcancelrequest"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
@@ -37,18 +38,19 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeClass          = "Class"
-	TypeCourse         = "Course"
-	TypeIssueReport    = "IssueReport"
-	TypeMatch          = "Match"
-	TypePayment        = "Payment"
-	TypePaymentHistory = "PaymentHistory"
-	TypeReviewCourse   = "ReviewCourse"
-	TypeReviewTutor    = "ReviewTutor"
-	TypeSchedule       = "Schedule"
-	TypeStudent        = "Student"
-	TypeTutor          = "Tutor"
-	TypeUser           = "User"
+	TypeClass              = "Class"
+	TypeClassCancelRequest = "ClassCancelRequest"
+	TypeCourse             = "Course"
+	TypeIssueReport        = "IssueReport"
+	TypeMatch              = "Match"
+	TypePayment            = "Payment"
+	TypePaymentHistory     = "PaymentHistory"
+	TypeReviewCourse       = "ReviewCourse"
+	TypeReviewTutor        = "ReviewTutor"
+	TypeSchedule           = "Schedule"
+	TypeStudent            = "Student"
+	TypeTutor              = "Tutor"
+	TypeUser               = "User"
 )
 
 // ClassMutation represents an operation that mutates the Class nodes in the graph.
@@ -823,6 +825,680 @@ func (m *ClassMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Class edge %s", name)
+}
+
+// ClassCancelRequestMutation represents an operation that mutates the ClassCancelRequest nodes in the graph.
+type ClassCancelRequestMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *uuid.UUID
+	title         *string
+	report_date   *time.Time
+	img_url       *string
+	description   *string
+	status        *classcancelrequest.Status
+	clearedFields map[string]struct{}
+	match         *uuid.UUID
+	clearedmatch  bool
+	user          *uuid.UUID
+	cleareduser   bool
+	done          bool
+	oldValue      func(context.Context) (*ClassCancelRequest, error)
+	predicates    []predicate.ClassCancelRequest
+}
+
+var _ ent.Mutation = (*ClassCancelRequestMutation)(nil)
+
+// classcancelrequestOption allows management of the mutation configuration using functional options.
+type classcancelrequestOption func(*ClassCancelRequestMutation)
+
+// newClassCancelRequestMutation creates new mutation for the ClassCancelRequest entity.
+func newClassCancelRequestMutation(c config, op Op, opts ...classcancelrequestOption) *ClassCancelRequestMutation {
+	m := &ClassCancelRequestMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeClassCancelRequest,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withClassCancelRequestID sets the ID field of the mutation.
+func withClassCancelRequestID(id uuid.UUID) classcancelrequestOption {
+	return func(m *ClassCancelRequestMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ClassCancelRequest
+		)
+		m.oldValue = func(ctx context.Context) (*ClassCancelRequest, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ClassCancelRequest.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withClassCancelRequest sets the old ClassCancelRequest of the mutation.
+func withClassCancelRequest(node *ClassCancelRequest) classcancelrequestOption {
+	return func(m *ClassCancelRequestMutation) {
+		m.oldValue = func(context.Context) (*ClassCancelRequest, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ClassCancelRequestMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ClassCancelRequestMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of ClassCancelRequest entities.
+func (m *ClassCancelRequestMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ClassCancelRequestMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ClassCancelRequestMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uuid.UUID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ClassCancelRequest.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetTitle sets the "title" field.
+func (m *ClassCancelRequestMutation) SetTitle(s string) {
+	m.title = &s
+}
+
+// Title returns the value of the "title" field in the mutation.
+func (m *ClassCancelRequestMutation) Title() (r string, exists bool) {
+	v := m.title
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTitle returns the old "title" field's value of the ClassCancelRequest entity.
+// If the ClassCancelRequest object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClassCancelRequestMutation) OldTitle(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTitle requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
+	}
+	return oldValue.Title, nil
+}
+
+// ResetTitle resets all changes to the "title" field.
+func (m *ClassCancelRequestMutation) ResetTitle() {
+	m.title = nil
+}
+
+// SetReportDate sets the "report_date" field.
+func (m *ClassCancelRequestMutation) SetReportDate(t time.Time) {
+	m.report_date = &t
+}
+
+// ReportDate returns the value of the "report_date" field in the mutation.
+func (m *ClassCancelRequestMutation) ReportDate() (r time.Time, exists bool) {
+	v := m.report_date
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldReportDate returns the old "report_date" field's value of the ClassCancelRequest entity.
+// If the ClassCancelRequest object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClassCancelRequestMutation) OldReportDate(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldReportDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldReportDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldReportDate: %w", err)
+	}
+	return oldValue.ReportDate, nil
+}
+
+// ResetReportDate resets all changes to the "report_date" field.
+func (m *ClassCancelRequestMutation) ResetReportDate() {
+	m.report_date = nil
+}
+
+// SetImgURL sets the "img_url" field.
+func (m *ClassCancelRequestMutation) SetImgURL(s string) {
+	m.img_url = &s
+}
+
+// ImgURL returns the value of the "img_url" field in the mutation.
+func (m *ClassCancelRequestMutation) ImgURL() (r string, exists bool) {
+	v := m.img_url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldImgURL returns the old "img_url" field's value of the ClassCancelRequest entity.
+// If the ClassCancelRequest object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClassCancelRequestMutation) OldImgURL(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldImgURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldImgURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldImgURL: %w", err)
+	}
+	return oldValue.ImgURL, nil
+}
+
+// ResetImgURL resets all changes to the "img_url" field.
+func (m *ClassCancelRequestMutation) ResetImgURL() {
+	m.img_url = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *ClassCancelRequestMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *ClassCancelRequestMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the ClassCancelRequest entity.
+// If the ClassCancelRequest object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClassCancelRequestMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *ClassCancelRequestMutation) ResetDescription() {
+	m.description = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *ClassCancelRequestMutation) SetStatus(c classcancelrequest.Status) {
+	m.status = &c
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *ClassCancelRequestMutation) Status() (r classcancelrequest.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the ClassCancelRequest entity.
+// If the ClassCancelRequest object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClassCancelRequestMutation) OldStatus(ctx context.Context) (v classcancelrequest.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *ClassCancelRequestMutation) ResetStatus() {
+	m.status = nil
+}
+
+// SetMatchID sets the "match" edge to the Match entity by id.
+func (m *ClassCancelRequestMutation) SetMatchID(id uuid.UUID) {
+	m.match = &id
+}
+
+// ClearMatch clears the "match" edge to the Match entity.
+func (m *ClassCancelRequestMutation) ClearMatch() {
+	m.clearedmatch = true
+}
+
+// MatchCleared reports if the "match" edge to the Match entity was cleared.
+func (m *ClassCancelRequestMutation) MatchCleared() bool {
+	return m.clearedmatch
+}
+
+// MatchID returns the "match" edge ID in the mutation.
+func (m *ClassCancelRequestMutation) MatchID() (id uuid.UUID, exists bool) {
+	if m.match != nil {
+		return *m.match, true
+	}
+	return
+}
+
+// MatchIDs returns the "match" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// MatchID instead. It exists only for internal usage by the builders.
+func (m *ClassCancelRequestMutation) MatchIDs() (ids []uuid.UUID) {
+	if id := m.match; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetMatch resets all changes to the "match" edge.
+func (m *ClassCancelRequestMutation) ResetMatch() {
+	m.match = nil
+	m.clearedmatch = false
+}
+
+// SetUserID sets the "user" edge to the User entity by id.
+func (m *ClassCancelRequestMutation) SetUserID(id uuid.UUID) {
+	m.user = &id
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (m *ClassCancelRequestMutation) ClearUser() {
+	m.cleareduser = true
+}
+
+// UserCleared reports if the "user" edge to the User entity was cleared.
+func (m *ClassCancelRequestMutation) UserCleared() bool {
+	return m.cleareduser
+}
+
+// UserID returns the "user" edge ID in the mutation.
+func (m *ClassCancelRequestMutation) UserID() (id uuid.UUID, exists bool) {
+	if m.user != nil {
+		return *m.user, true
+	}
+	return
+}
+
+// UserIDs returns the "user" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UserID instead. It exists only for internal usage by the builders.
+func (m *ClassCancelRequestMutation) UserIDs() (ids []uuid.UUID) {
+	if id := m.user; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUser resets all changes to the "user" edge.
+func (m *ClassCancelRequestMutation) ResetUser() {
+	m.user = nil
+	m.cleareduser = false
+}
+
+// Where appends a list predicates to the ClassCancelRequestMutation builder.
+func (m *ClassCancelRequestMutation) Where(ps ...predicate.ClassCancelRequest) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ClassCancelRequestMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ClassCancelRequestMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ClassCancelRequest, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ClassCancelRequestMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ClassCancelRequestMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ClassCancelRequest).
+func (m *ClassCancelRequestMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ClassCancelRequestMutation) Fields() []string {
+	fields := make([]string, 0, 5)
+	if m.title != nil {
+		fields = append(fields, classcancelrequest.FieldTitle)
+	}
+	if m.report_date != nil {
+		fields = append(fields, classcancelrequest.FieldReportDate)
+	}
+	if m.img_url != nil {
+		fields = append(fields, classcancelrequest.FieldImgURL)
+	}
+	if m.description != nil {
+		fields = append(fields, classcancelrequest.FieldDescription)
+	}
+	if m.status != nil {
+		fields = append(fields, classcancelrequest.FieldStatus)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ClassCancelRequestMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case classcancelrequest.FieldTitle:
+		return m.Title()
+	case classcancelrequest.FieldReportDate:
+		return m.ReportDate()
+	case classcancelrequest.FieldImgURL:
+		return m.ImgURL()
+	case classcancelrequest.FieldDescription:
+		return m.Description()
+	case classcancelrequest.FieldStatus:
+		return m.Status()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ClassCancelRequestMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case classcancelrequest.FieldTitle:
+		return m.OldTitle(ctx)
+	case classcancelrequest.FieldReportDate:
+		return m.OldReportDate(ctx)
+	case classcancelrequest.FieldImgURL:
+		return m.OldImgURL(ctx)
+	case classcancelrequest.FieldDescription:
+		return m.OldDescription(ctx)
+	case classcancelrequest.FieldStatus:
+		return m.OldStatus(ctx)
+	}
+	return nil, fmt.Errorf("unknown ClassCancelRequest field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ClassCancelRequestMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case classcancelrequest.FieldTitle:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTitle(v)
+		return nil
+	case classcancelrequest.FieldReportDate:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetReportDate(v)
+		return nil
+	case classcancelrequest.FieldImgURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetImgURL(v)
+		return nil
+	case classcancelrequest.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case classcancelrequest.FieldStatus:
+		v, ok := value.(classcancelrequest.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ClassCancelRequest field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ClassCancelRequestMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ClassCancelRequestMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ClassCancelRequestMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown ClassCancelRequest numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ClassCancelRequestMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ClassCancelRequestMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ClassCancelRequestMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown ClassCancelRequest nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ClassCancelRequestMutation) ResetField(name string) error {
+	switch name {
+	case classcancelrequest.FieldTitle:
+		m.ResetTitle()
+		return nil
+	case classcancelrequest.FieldReportDate:
+		m.ResetReportDate()
+		return nil
+	case classcancelrequest.FieldImgURL:
+		m.ResetImgURL()
+		return nil
+	case classcancelrequest.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case classcancelrequest.FieldStatus:
+		m.ResetStatus()
+		return nil
+	}
+	return fmt.Errorf("unknown ClassCancelRequest field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ClassCancelRequestMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.match != nil {
+		edges = append(edges, classcancelrequest.EdgeMatch)
+	}
+	if m.user != nil {
+		edges = append(edges, classcancelrequest.EdgeUser)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ClassCancelRequestMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case classcancelrequest.EdgeMatch:
+		if id := m.match; id != nil {
+			return []ent.Value{*id}
+		}
+	case classcancelrequest.EdgeUser:
+		if id := m.user; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ClassCancelRequestMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ClassCancelRequestMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ClassCancelRequestMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedmatch {
+		edges = append(edges, classcancelrequest.EdgeMatch)
+	}
+	if m.cleareduser {
+		edges = append(edges, classcancelrequest.EdgeUser)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ClassCancelRequestMutation) EdgeCleared(name string) bool {
+	switch name {
+	case classcancelrequest.EdgeMatch:
+		return m.clearedmatch
+	case classcancelrequest.EdgeUser:
+		return m.cleareduser
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ClassCancelRequestMutation) ClearEdge(name string) error {
+	switch name {
+	case classcancelrequest.EdgeMatch:
+		m.ClearMatch()
+		return nil
+	case classcancelrequest.EdgeUser:
+		m.ClearUser()
+		return nil
+	}
+	return fmt.Errorf("unknown ClassCancelRequest unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ClassCancelRequestMutation) ResetEdge(name string) error {
+	switch name {
+	case classcancelrequest.EdgeMatch:
+		m.ResetMatch()
+		return nil
+	case classcancelrequest.EdgeUser:
+		m.ResetUser()
+		return nil
+	}
+	return fmt.Errorf("unknown ClassCancelRequest edge %s", name)
 }
 
 // CourseMutation represents an operation that mutates the Course nodes in the graph.
@@ -2444,21 +3120,21 @@ func (m *IssueReportMutation) ResetEdge(name string) error {
 // MatchMutation represents an operation that mutates the Match nodes in the graph.
 type MatchMutation struct {
 	config
-	op             Op
-	typ            string
-	id             *uuid.UUID
-	clearedFields  map[string]struct{}
-	student        *uuid.UUID
-	clearedstudent bool
-	course         map[uuid.UUID]struct{}
-	removedcourse  map[uuid.UUID]struct{}
-	clearedcourse  bool
-	class          map[uuid.UUID]struct{}
-	removedclass   map[uuid.UUID]struct{}
-	clearedclass   bool
-	done           bool
-	oldValue       func(context.Context) (*Match, error)
-	predicates     []predicate.Match
+	op                          Op
+	typ                         string
+	id                          *uuid.UUID
+	clearedFields               map[string]struct{}
+	student                     *uuid.UUID
+	clearedstudent              bool
+	course                      *uuid.UUID
+	clearedcourse               bool
+	class                       *uuid.UUID
+	clearedclass                bool
+	class_cancel_request        *uuid.UUID
+	clearedclass_cancel_request bool
+	done                        bool
+	oldValue                    func(context.Context) (*Match, error)
+	predicates                  []predicate.Match
 }
 
 var _ ent.Mutation = (*MatchMutation)(nil)
@@ -2604,14 +3280,9 @@ func (m *MatchMutation) ResetStudent() {
 	m.clearedstudent = false
 }
 
-// AddCourseIDs adds the "course" edge to the Course entity by ids.
-func (m *MatchMutation) AddCourseIDs(ids ...uuid.UUID) {
-	if m.course == nil {
-		m.course = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		m.course[ids[i]] = struct{}{}
-	}
+// SetCourseID sets the "course" edge to the Course entity by id.
+func (m *MatchMutation) SetCourseID(id uuid.UUID) {
+	m.course = &id
 }
 
 // ClearCourse clears the "course" edge to the Course entity.
@@ -2624,29 +3295,20 @@ func (m *MatchMutation) CourseCleared() bool {
 	return m.clearedcourse
 }
 
-// RemoveCourseIDs removes the "course" edge to the Course entity by IDs.
-func (m *MatchMutation) RemoveCourseIDs(ids ...uuid.UUID) {
-	if m.removedcourse == nil {
-		m.removedcourse = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		delete(m.course, ids[i])
-		m.removedcourse[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedCourse returns the removed IDs of the "course" edge to the Course entity.
-func (m *MatchMutation) RemovedCourseIDs() (ids []uuid.UUID) {
-	for id := range m.removedcourse {
-		ids = append(ids, id)
+// CourseID returns the "course" edge ID in the mutation.
+func (m *MatchMutation) CourseID() (id uuid.UUID, exists bool) {
+	if m.course != nil {
+		return *m.course, true
 	}
 	return
 }
 
 // CourseIDs returns the "course" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CourseID instead. It exists only for internal usage by the builders.
 func (m *MatchMutation) CourseIDs() (ids []uuid.UUID) {
-	for id := range m.course {
-		ids = append(ids, id)
+	if id := m.course; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -2655,17 +3317,11 @@ func (m *MatchMutation) CourseIDs() (ids []uuid.UUID) {
 func (m *MatchMutation) ResetCourse() {
 	m.course = nil
 	m.clearedcourse = false
-	m.removedcourse = nil
 }
 
-// AddClasIDs adds the "class" edge to the Class entity by ids.
-func (m *MatchMutation) AddClasIDs(ids ...uuid.UUID) {
-	if m.class == nil {
-		m.class = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		m.class[ids[i]] = struct{}{}
-	}
+// SetClassID sets the "class" edge to the Class entity by id.
+func (m *MatchMutation) SetClassID(id uuid.UUID) {
+	m.class = &id
 }
 
 // ClearClass clears the "class" edge to the Class entity.
@@ -2678,29 +3334,20 @@ func (m *MatchMutation) ClassCleared() bool {
 	return m.clearedclass
 }
 
-// RemoveClasIDs removes the "class" edge to the Class entity by IDs.
-func (m *MatchMutation) RemoveClasIDs(ids ...uuid.UUID) {
-	if m.removedclass == nil {
-		m.removedclass = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		delete(m.class, ids[i])
-		m.removedclass[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedClass returns the removed IDs of the "class" edge to the Class entity.
-func (m *MatchMutation) RemovedClassIDs() (ids []uuid.UUID) {
-	for id := range m.removedclass {
-		ids = append(ids, id)
+// ClassID returns the "class" edge ID in the mutation.
+func (m *MatchMutation) ClassID() (id uuid.UUID, exists bool) {
+	if m.class != nil {
+		return *m.class, true
 	}
 	return
 }
 
 // ClassIDs returns the "class" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ClassID instead. It exists only for internal usage by the builders.
 func (m *MatchMutation) ClassIDs() (ids []uuid.UUID) {
-	for id := range m.class {
-		ids = append(ids, id)
+	if id := m.class; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -2709,7 +3356,45 @@ func (m *MatchMutation) ClassIDs() (ids []uuid.UUID) {
 func (m *MatchMutation) ResetClass() {
 	m.class = nil
 	m.clearedclass = false
-	m.removedclass = nil
+}
+
+// SetClassCancelRequestID sets the "class_cancel_request" edge to the ClassCancelRequest entity by id.
+func (m *MatchMutation) SetClassCancelRequestID(id uuid.UUID) {
+	m.class_cancel_request = &id
+}
+
+// ClearClassCancelRequest clears the "class_cancel_request" edge to the ClassCancelRequest entity.
+func (m *MatchMutation) ClearClassCancelRequest() {
+	m.clearedclass_cancel_request = true
+}
+
+// ClassCancelRequestCleared reports if the "class_cancel_request" edge to the ClassCancelRequest entity was cleared.
+func (m *MatchMutation) ClassCancelRequestCleared() bool {
+	return m.clearedclass_cancel_request
+}
+
+// ClassCancelRequestID returns the "class_cancel_request" edge ID in the mutation.
+func (m *MatchMutation) ClassCancelRequestID() (id uuid.UUID, exists bool) {
+	if m.class_cancel_request != nil {
+		return *m.class_cancel_request, true
+	}
+	return
+}
+
+// ClassCancelRequestIDs returns the "class_cancel_request" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ClassCancelRequestID instead. It exists only for internal usage by the builders.
+func (m *MatchMutation) ClassCancelRequestIDs() (ids []uuid.UUID) {
+	if id := m.class_cancel_request; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetClassCancelRequest resets all changes to the "class_cancel_request" edge.
+func (m *MatchMutation) ResetClassCancelRequest() {
+	m.class_cancel_request = nil
+	m.clearedclass_cancel_request = false
 }
 
 // Where appends a list predicates to the MatchMutation builder.
@@ -2820,7 +3505,7 @@ func (m *MatchMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *MatchMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.student != nil {
 		edges = append(edges, match.EdgeStudent)
 	}
@@ -2829,6 +3514,9 @@ func (m *MatchMutation) AddedEdges() []string {
 	}
 	if m.class != nil {
 		edges = append(edges, match.EdgeClass)
+	}
+	if m.class_cancel_request != nil {
+		edges = append(edges, match.EdgeClassCancelRequest)
 	}
 	return edges
 }
@@ -2842,56 +3530,36 @@ func (m *MatchMutation) AddedIDs(name string) []ent.Value {
 			return []ent.Value{*id}
 		}
 	case match.EdgeCourse:
-		ids := make([]ent.Value, 0, len(m.course))
-		for id := range m.course {
-			ids = append(ids, id)
+		if id := m.course; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	case match.EdgeClass:
-		ids := make([]ent.Value, 0, len(m.class))
-		for id := range m.class {
-			ids = append(ids, id)
+		if id := m.class; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
+	case match.EdgeClassCancelRequest:
+		if id := m.class_cancel_request; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *MatchMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
-	if m.removedcourse != nil {
-		edges = append(edges, match.EdgeCourse)
-	}
-	if m.removedclass != nil {
-		edges = append(edges, match.EdgeClass)
-	}
+	edges := make([]string, 0, 4)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *MatchMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case match.EdgeCourse:
-		ids := make([]ent.Value, 0, len(m.removedcourse))
-		for id := range m.removedcourse {
-			ids = append(ids, id)
-		}
-		return ids
-	case match.EdgeClass:
-		ids := make([]ent.Value, 0, len(m.removedclass))
-		for id := range m.removedclass {
-			ids = append(ids, id)
-		}
-		return ids
-	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *MatchMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.clearedstudent {
 		edges = append(edges, match.EdgeStudent)
 	}
@@ -2900,6 +3568,9 @@ func (m *MatchMutation) ClearedEdges() []string {
 	}
 	if m.clearedclass {
 		edges = append(edges, match.EdgeClass)
+	}
+	if m.clearedclass_cancel_request {
+		edges = append(edges, match.EdgeClassCancelRequest)
 	}
 	return edges
 }
@@ -2914,6 +3585,8 @@ func (m *MatchMutation) EdgeCleared(name string) bool {
 		return m.clearedcourse
 	case match.EdgeClass:
 		return m.clearedclass
+	case match.EdgeClassCancelRequest:
+		return m.clearedclass_cancel_request
 	}
 	return false
 }
@@ -2924,6 +3597,15 @@ func (m *MatchMutation) ClearEdge(name string) error {
 	switch name {
 	case match.EdgeStudent:
 		m.ClearStudent()
+		return nil
+	case match.EdgeCourse:
+		m.ClearCourse()
+		return nil
+	case match.EdgeClass:
+		m.ClearClass()
+		return nil
+	case match.EdgeClassCancelRequest:
+		m.ClearClassCancelRequest()
 		return nil
 	}
 	return fmt.Errorf("unknown Match unique edge %s", name)
@@ -2941,6 +3623,9 @@ func (m *MatchMutation) ResetEdge(name string) error {
 		return nil
 	case match.EdgeClass:
 		m.ResetClass()
+		return nil
+	case match.EdgeClassCancelRequest:
+		m.ResetClassCancelRequest()
 		return nil
 	}
 	return fmt.Errorf("unknown Match edge %s", name)
@@ -7482,37 +8167,40 @@ func (m *TutorMutation) ResetEdge(name string) error {
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op                     Op
-	typ                    string
-	id                     *uuid.UUID
-	username               *string
-	password               *string
-	email                  *string
-	first_name             *string
-	last_name              *string
-	address                *string
-	phone                  *string
-	birth_date             *time.Time
-	gender                 *string
-	profile_picture_URL    *string
-	role                   *user.Role
-	clearedFields          map[string]struct{}
-	student                *uuid.UUID
-	clearedstudent         bool
-	tutor                  *uuid.UUID
-	clearedtutor           bool
-	issue_report           map[uuid.UUID]struct{}
-	removedissue_report    map[uuid.UUID]struct{}
-	clearedissue_report    bool
-	payment                map[uuid.UUID]struct{}
-	removedpayment         map[uuid.UUID]struct{}
-	clearedpayment         bool
-	payment_history        map[uuid.UUID]struct{}
-	removedpayment_history map[uuid.UUID]struct{}
-	clearedpayment_history bool
-	done                   bool
-	oldValue               func(context.Context) (*User, error)
-	predicates             []predicate.User
+	op                          Op
+	typ                         string
+	id                          *uuid.UUID
+	username                    *string
+	password                    *string
+	email                       *string
+	first_name                  *string
+	last_name                   *string
+	address                     *string
+	phone                       *string
+	birth_date                  *time.Time
+	gender                      *string
+	profile_picture_URL         *string
+	role                        *user.Role
+	clearedFields               map[string]struct{}
+	student                     *uuid.UUID
+	clearedstudent              bool
+	tutor                       *uuid.UUID
+	clearedtutor                bool
+	issue_report                map[uuid.UUID]struct{}
+	removedissue_report         map[uuid.UUID]struct{}
+	clearedissue_report         bool
+	payment                     map[uuid.UUID]struct{}
+	removedpayment              map[uuid.UUID]struct{}
+	clearedpayment              bool
+	payment_history             map[uuid.UUID]struct{}
+	removedpayment_history      map[uuid.UUID]struct{}
+	clearedpayment_history      bool
+	class_cancel_request        map[uuid.UUID]struct{}
+	removedclass_cancel_request map[uuid.UUID]struct{}
+	clearedclass_cancel_request bool
+	done                        bool
+	oldValue                    func(context.Context) (*User, error)
+	predicates                  []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -8268,6 +8956,60 @@ func (m *UserMutation) ResetPaymentHistory() {
 	m.removedpayment_history = nil
 }
 
+// AddClassCancelRequestIDs adds the "class_cancel_request" edge to the ClassCancelRequest entity by ids.
+func (m *UserMutation) AddClassCancelRequestIDs(ids ...uuid.UUID) {
+	if m.class_cancel_request == nil {
+		m.class_cancel_request = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.class_cancel_request[ids[i]] = struct{}{}
+	}
+}
+
+// ClearClassCancelRequest clears the "class_cancel_request" edge to the ClassCancelRequest entity.
+func (m *UserMutation) ClearClassCancelRequest() {
+	m.clearedclass_cancel_request = true
+}
+
+// ClassCancelRequestCleared reports if the "class_cancel_request" edge to the ClassCancelRequest entity was cleared.
+func (m *UserMutation) ClassCancelRequestCleared() bool {
+	return m.clearedclass_cancel_request
+}
+
+// RemoveClassCancelRequestIDs removes the "class_cancel_request" edge to the ClassCancelRequest entity by IDs.
+func (m *UserMutation) RemoveClassCancelRequestIDs(ids ...uuid.UUID) {
+	if m.removedclass_cancel_request == nil {
+		m.removedclass_cancel_request = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.class_cancel_request, ids[i])
+		m.removedclass_cancel_request[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedClassCancelRequest returns the removed IDs of the "class_cancel_request" edge to the ClassCancelRequest entity.
+func (m *UserMutation) RemovedClassCancelRequestIDs() (ids []uuid.UUID) {
+	for id := range m.removedclass_cancel_request {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ClassCancelRequestIDs returns the "class_cancel_request" edge IDs in the mutation.
+func (m *UserMutation) ClassCancelRequestIDs() (ids []uuid.UUID) {
+	for id := range m.class_cancel_request {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetClassCancelRequest resets all changes to the "class_cancel_request" edge.
+func (m *UserMutation) ResetClassCancelRequest() {
+	m.class_cancel_request = nil
+	m.clearedclass_cancel_request = false
+	m.removedclass_cancel_request = nil
+}
+
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -8580,7 +9322,7 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 6)
 	if m.student != nil {
 		edges = append(edges, user.EdgeStudent)
 	}
@@ -8595,6 +9337,9 @@ func (m *UserMutation) AddedEdges() []string {
 	}
 	if m.payment_history != nil {
 		edges = append(edges, user.EdgePaymentHistory)
+	}
+	if m.class_cancel_request != nil {
+		edges = append(edges, user.EdgeClassCancelRequest)
 	}
 	return edges
 }
@@ -8629,13 +9374,19 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeClassCancelRequest:
+		ids := make([]ent.Value, 0, len(m.class_cancel_request))
+		for id := range m.class_cancel_request {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 6)
 	if m.removedissue_report != nil {
 		edges = append(edges, user.EdgeIssueReport)
 	}
@@ -8644,6 +9395,9 @@ func (m *UserMutation) RemovedEdges() []string {
 	}
 	if m.removedpayment_history != nil {
 		edges = append(edges, user.EdgePaymentHistory)
+	}
+	if m.removedclass_cancel_request != nil {
+		edges = append(edges, user.EdgeClassCancelRequest)
 	}
 	return edges
 }
@@ -8670,13 +9424,19 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeClassCancelRequest:
+		ids := make([]ent.Value, 0, len(m.removedclass_cancel_request))
+		for id := range m.removedclass_cancel_request {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 6)
 	if m.clearedstudent {
 		edges = append(edges, user.EdgeStudent)
 	}
@@ -8691,6 +9451,9 @@ func (m *UserMutation) ClearedEdges() []string {
 	}
 	if m.clearedpayment_history {
 		edges = append(edges, user.EdgePaymentHistory)
+	}
+	if m.clearedclass_cancel_request {
+		edges = append(edges, user.EdgeClassCancelRequest)
 	}
 	return edges
 }
@@ -8709,6 +9472,8 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 		return m.clearedpayment
 	case user.EdgePaymentHistory:
 		return m.clearedpayment_history
+	case user.EdgeClassCancelRequest:
+		return m.clearedclass_cancel_request
 	}
 	return false
 }
@@ -8745,6 +9510,9 @@ func (m *UserMutation) ResetEdge(name string) error {
 		return nil
 	case user.EdgePaymentHistory:
 		m.ResetPaymentHistory()
+		return nil
+	case user.EdgeClassCancelRequest:
+		m.ResetClassCancelRequest()
 		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)

@@ -3,7 +3,10 @@
 package ent
 
 import (
+	"time"
+
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/classcancelrequest"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
@@ -33,6 +36,24 @@ func init() {
 	classDescID := classFields[0].Descriptor()
 	// class.DefaultID holds the default value on creation for the id field.
 	class.DefaultID = classDescID.Default.(func() uuid.UUID)
+	classcancelrequestFields := schema.ClassCancelRequest{}.Fields()
+	_ = classcancelrequestFields
+	// classcancelrequestDescTitle is the schema descriptor for title field.
+	classcancelrequestDescTitle := classcancelrequestFields[1].Descriptor()
+	// classcancelrequest.TitleValidator is a validator for the "title" field. It is called by the builders before save.
+	classcancelrequest.TitleValidator = classcancelrequestDescTitle.Validators[0].(func(string) error)
+	// classcancelrequestDescReportDate is the schema descriptor for report_date field.
+	classcancelrequestDescReportDate := classcancelrequestFields[2].Descriptor()
+	// classcancelrequest.DefaultReportDate holds the default value on creation for the report_date field.
+	classcancelrequest.DefaultReportDate = classcancelrequestDescReportDate.Default.(func() time.Time)
+	// classcancelrequestDescDescription is the schema descriptor for description field.
+	classcancelrequestDescDescription := classcancelrequestFields[4].Descriptor()
+	// classcancelrequest.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	classcancelrequest.DescriptionValidator = classcancelrequestDescDescription.Validators[0].(func(string) error)
+	// classcancelrequestDescID is the schema descriptor for id field.
+	classcancelrequestDescID := classcancelrequestFields[0].Descriptor()
+	// classcancelrequest.DefaultID holds the default value on creation for the id field.
+	classcancelrequest.DefaultID = classcancelrequestDescID.Default.(func() uuid.UUID)
 	courseFields := schema.Course{}.Fields()
 	_ = courseFields
 	// courseDescTitle is the schema descriptor for title field.

@@ -31,8 +31,8 @@ func InsertMatch(client *ent.Client, ctx context.Context, class []*ent.Class, co
 func CreateMatch(client *ent.Client, class *ent.Class, course *ent.Course, student *ent.Student) *ent.MatchCreate {
 	match := client.Match.
 		Create().
-		AddClasIDs(class.ID).
-		AddCourseIDs(course.ID).
+		SetClassID(class.ID).
+		SetCourseID(course.ID).
 		SetStudentID(student.ID)
 
 	return match

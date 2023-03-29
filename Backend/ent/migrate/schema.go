@@ -14,7 +14,7 @@ var (
 		{Name: "review_avaliable", Type: field.TypeBool, Default: true},
 		{Name: "total_hour", Type: field.TypeInt},
 		{Name: "success_hour", Type: field.TypeInt},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"ongoing", "completed", "cancelling", "rejected", "cancelled"}},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"ongoing", "completed", "cancelled"}},
 		{Name: "payment_history_class", Type: field.TypeUUID},
 		{Name: "schedule_class", Type: field.TypeUUID},
 	}
@@ -34,6 +34,37 @@ var (
 				Symbol:     "classes_schedules_class",
 				Columns:    []*schema.Column{ClassesColumns[6]},
 				RefColumns: []*schema.Column{SchedulesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// ClassCancelRequestsColumns holds the columns for the "class_cancel_requests" table.
+	ClassCancelRequestsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "title", Type: field.TypeString},
+		{Name: "report_date", Type: field.TypeTime},
+		{Name: "img_url", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"pending", "approved", "rejected"}},
+		{Name: "match_class_cancel_request", Type: field.TypeUUID, Unique: true},
+		{Name: "user_class_cancel_request", Type: field.TypeUUID},
+	}
+	// ClassCancelRequestsTable holds the schema information for the "class_cancel_requests" table.
+	ClassCancelRequestsTable = &schema.Table{
+		Name:       "class_cancel_requests",
+		Columns:    ClassCancelRequestsColumns,
+		PrimaryKey: []*schema.Column{ClassCancelRequestsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "class_cancel_requests_matches_class_cancel_request",
+				Columns:    []*schema.Column{ClassCancelRequestsColumns[6]},
+				RefColumns: []*schema.Column{MatchesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "class_cancel_requests_users_class_cancel_request",
+				Columns:    []*schema.Column{ClassCancelRequestsColumns[7]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -98,6 +129,8 @@ var (
 	// MatchesColumns holds the columns for the "matches" table.
 	MatchesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "class_match", Type: field.TypeUUID},
+		{Name: "course_match", Type: field.TypeUUID},
 		{Name: "student_match", Type: field.TypeUUID},
 	}
 	// MatchesTable holds the schema information for the "matches" table.
@@ -107,8 +140,20 @@ var (
 		PrimaryKey: []*schema.Column{MatchesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "matches_students_match",
+				Symbol:     "matches_classes_match",
 				Columns:    []*schema.Column{MatchesColumns[1]},
+				RefColumns: []*schema.Column{ClassesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "matches_courses_match",
+				Columns:    []*schema.Column{MatchesColumns[2]},
+				RefColumns: []*schema.Column{CoursesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "matches_students_match",
+				Columns:    []*schema.Column{MatchesColumns[3]},
 				RefColumns: []*schema.Column{StudentsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -277,31 +322,6 @@ var (
 			},
 		},
 	}
-	// ClassMatchColumns holds the columns for the "class_match" table.
-	ClassMatchColumns = []*schema.Column{
-		{Name: "class_id", Type: field.TypeUUID},
-		{Name: "match_id", Type: field.TypeUUID},
-	}
-	// ClassMatchTable holds the schema information for the "class_match" table.
-	ClassMatchTable = &schema.Table{
-		Name:       "class_match",
-		Columns:    ClassMatchColumns,
-		PrimaryKey: []*schema.Column{ClassMatchColumns[0], ClassMatchColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "class_match_class_id",
-				Columns:    []*schema.Column{ClassMatchColumns[0]},
-				RefColumns: []*schema.Column{ClassesColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "class_match_match_id",
-				Columns:    []*schema.Column{ClassMatchColumns[1]},
-				RefColumns: []*schema.Column{MatchesColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
 	// CourseReviewCourseColumns holds the columns for the "course_review_course" table.
 	CourseReviewCourseColumns = []*schema.Column{
 		{Name: "course_id", Type: field.TypeUUID},
@@ -323,31 +343,6 @@ var (
 				Symbol:     "course_review_course_review_course_id",
 				Columns:    []*schema.Column{CourseReviewCourseColumns[1]},
 				RefColumns: []*schema.Column{ReviewCoursesColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
-	// CourseMatchColumns holds the columns for the "course_match" table.
-	CourseMatchColumns = []*schema.Column{
-		{Name: "course_id", Type: field.TypeUUID},
-		{Name: "match_id", Type: field.TypeUUID},
-	}
-	// CourseMatchTable holds the schema information for the "course_match" table.
-	CourseMatchTable = &schema.Table{
-		Name:       "course_match",
-		Columns:    CourseMatchColumns,
-		PrimaryKey: []*schema.Column{CourseMatchColumns[0], CourseMatchColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "course_match_course_id",
-				Columns:    []*schema.Column{CourseMatchColumns[0]},
-				RefColumns: []*schema.Column{CoursesColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "course_match_match_id",
-				Columns:    []*schema.Column{CourseMatchColumns[1]},
-				RefColumns: []*schema.Column{MatchesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
@@ -430,6 +425,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		ClassesTable,
+		ClassCancelRequestsTable,
 		CoursesTable,
 		IssueReportsTable,
 		MatchesTable,
@@ -441,9 +437,7 @@ var (
 		StudentsTable,
 		TutorsTable,
 		UsersTable,
-		ClassMatchTable,
 		CourseReviewCourseTable,
-		CourseMatchTable,
 		StudentReviewCourseTable,
 		StudentReviewTutorTable,
 		TutorReviewTutorTable,
@@ -453,22 +447,22 @@ var (
 func init() {
 	ClassesTable.ForeignKeys[0].RefTable = PaymentHistoriesTable
 	ClassesTable.ForeignKeys[1].RefTable = SchedulesTable
+	ClassCancelRequestsTable.ForeignKeys[0].RefTable = MatchesTable
+	ClassCancelRequestsTable.ForeignKeys[1].RefTable = UsersTable
 	CoursesTable.ForeignKeys[0].RefTable = TutorsTable
 	IssueReportsTable.ForeignKeys[0].RefTable = TutorsTable
 	IssueReportsTable.ForeignKeys[1].RefTable = UsersTable
-	MatchesTable.ForeignKeys[0].RefTable = StudentsTable
+	MatchesTable.ForeignKeys[0].RefTable = ClassesTable
+	MatchesTable.ForeignKeys[1].RefTable = CoursesTable
+	MatchesTable.ForeignKeys[2].RefTable = StudentsTable
 	PaymentsTable.ForeignKeys[0].RefTable = UsersTable
 	PaymentHistoriesTable.ForeignKeys[0].RefTable = PaymentsTable
 	PaymentHistoriesTable.ForeignKeys[1].RefTable = UsersTable
 	StudentsTable.ForeignKeys[0].RefTable = UsersTable
 	TutorsTable.ForeignKeys[0].RefTable = SchedulesTable
 	TutorsTable.ForeignKeys[1].RefTable = UsersTable
-	ClassMatchTable.ForeignKeys[0].RefTable = ClassesTable
-	ClassMatchTable.ForeignKeys[1].RefTable = MatchesTable
 	CourseReviewCourseTable.ForeignKeys[0].RefTable = CoursesTable
 	CourseReviewCourseTable.ForeignKeys[1].RefTable = ReviewCoursesTable
-	CourseMatchTable.ForeignKeys[0].RefTable = CoursesTable
-	CourseMatchTable.ForeignKeys[1].RefTable = MatchesTable
 	StudentReviewCourseTable.ForeignKeys[0].RefTable = StudentsTable
 	StudentReviewCourseTable.ForeignKeys[1].RefTable = ReviewCoursesTable
 	StudentReviewTutorTable.ForeignKeys[0].RefTable = StudentsTable

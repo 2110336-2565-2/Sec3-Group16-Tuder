@@ -9,6 +9,9 @@ import (
 // Class is the predicate function for class builders.
 type Class func(*sql.Selector)
 
+// ClassCancelRequest is the predicate function for classcancelrequest builders.
+type ClassCancelRequest func(*sql.Selector)
+
 // Course is the predicate function for course builders.
 type Course func(*sql.Selector)
 

@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/classcancelrequest"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
@@ -48,34 +49,45 @@ func (mc *MatchCreate) SetStudent(s *Student) *MatchCreate {
 	return mc.SetStudentID(s.ID)
 }
 
-// AddCourseIDs adds the "course" edge to the Course entity by IDs.
-func (mc *MatchCreate) AddCourseIDs(ids ...uuid.UUID) *MatchCreate {
-	mc.mutation.AddCourseIDs(ids...)
+// SetCourseID sets the "course" edge to the Course entity by ID.
+func (mc *MatchCreate) SetCourseID(id uuid.UUID) *MatchCreate {
+	mc.mutation.SetCourseID(id)
 	return mc
 }
 
-// AddCourse adds the "course" edges to the Course entity.
-func (mc *MatchCreate) AddCourse(c ...*Course) *MatchCreate {
-	ids := make([]uuid.UUID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return mc.AddCourseIDs(ids...)
+// SetCourse sets the "course" edge to the Course entity.
+func (mc *MatchCreate) SetCourse(c *Course) *MatchCreate {
+	return mc.SetCourseID(c.ID)
 }
 
-// AddClasIDs adds the "class" edge to the Class entity by IDs.
-func (mc *MatchCreate) AddClasIDs(ids ...uuid.UUID) *MatchCreate {
-	mc.mutation.AddClasIDs(ids...)
+// SetClassID sets the "class" edge to the Class entity by ID.
+func (mc *MatchCreate) SetClassID(id uuid.UUID) *MatchCreate {
+	mc.mutation.SetClassID(id)
 	return mc
 }
 
-// AddClass adds the "class" edges to the Class entity.
-func (mc *MatchCreate) AddClass(c ...*Class) *MatchCreate {
-	ids := make([]uuid.UUID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// SetClass sets the "class" edge to the Class entity.
+func (mc *MatchCreate) SetClass(c *Class) *MatchCreate {
+	return mc.SetClassID(c.ID)
+}
+
+// SetClassCancelRequestID sets the "class_cancel_request" edge to the ClassCancelRequest entity by ID.
+func (mc *MatchCreate) SetClassCancelRequestID(id uuid.UUID) *MatchCreate {
+	mc.mutation.SetClassCancelRequestID(id)
+	return mc
+}
+
+// SetNillableClassCancelRequestID sets the "class_cancel_request" edge to the ClassCancelRequest entity by ID if the given value is not nil.
+func (mc *MatchCreate) SetNillableClassCancelRequestID(id *uuid.UUID) *MatchCreate {
+	if id != nil {
+		mc = mc.SetClassCancelRequestID(*id)
 	}
-	return mc.AddClasIDs(ids...)
+	return mc
+}
+
+// SetClassCancelRequest sets the "class_cancel_request" edge to the ClassCancelRequest entity.
+func (mc *MatchCreate) SetClassCancelRequest(c *ClassCancelRequest) *MatchCreate {
+	return mc.SetClassCancelRequestID(c.ID)
 }
 
 // Mutation returns the MatchMutation object of the builder.
@@ -124,10 +136,10 @@ func (mc *MatchCreate) check() error {
 	if _, ok := mc.mutation.StudentID(); !ok {
 		return &ValidationError{Name: "student", err: errors.New(`ent: missing required edge "Match.student"`)}
 	}
-	if len(mc.mutation.CourseIDs()) == 0 {
+	if _, ok := mc.mutation.CourseID(); !ok {
 		return &ValidationError{Name: "course", err: errors.New(`ent: missing required edge "Match.course"`)}
 	}
-	if len(mc.mutation.ClassIDs()) == 0 {
+	if _, ok := mc.mutation.ClassID(); !ok {
 		return &ValidationError{Name: "class", err: errors.New(`ent: missing required edge "Match.class"`)}
 	}
 	return nil
@@ -187,10 +199,10 @@ func (mc *MatchCreate) createSpec() (*Match, *sqlgraph.CreateSpec) {
 	}
 	if nodes := mc.mutation.CourseIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   match.CourseTable,
-			Columns: match.CoursePrimaryKey,
+			Columns: []string{match.CourseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -202,19 +214,40 @@ func (mc *MatchCreate) createSpec() (*Match, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.course_match = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := mc.mutation.ClassIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   match.ClassTable,
-			Columns: match.ClassPrimaryKey,
+			Columns: []string{match.ClassColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: class.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.class_match = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := mc.mutation.ClassCancelRequestIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   match.ClassCancelRequestTable,
+			Columns: []string{match.ClassCancelRequestColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: classcancelrequest.FieldID,
 				},
 			},
 		}

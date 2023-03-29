@@ -3,6 +3,7 @@ package datas
 import (
 	"context"
 	"fmt"
+
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 )
 
@@ -35,7 +36,10 @@ func InsertData(client *ent.Client) {
 	class := InsertClass(client, ctx, schedule, ph)
 
 	// Insert match
-	InsertMatch(client, ctx, class, course, student)
+	match := InsertMatch(client, ctx, class, course, student)
+
+	// Insert cancel request
+	InsertClassCancelRequest(client, ctx, user, match)
 
 	fmt.Print("\n\t::::::::: Data inserted! :::::::::\n")
 

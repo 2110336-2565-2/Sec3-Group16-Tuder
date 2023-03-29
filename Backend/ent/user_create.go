@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/classcancelrequest"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
@@ -195,6 +196,21 @@ func (uc *UserCreate) AddPaymentHistory(p ...*PaymentHistory) *UserCreate {
 		ids[i] = p[i].ID
 	}
 	return uc.AddPaymentHistoryIDs(ids...)
+}
+
+// AddClassCancelRequestIDs adds the "class_cancel_request" edge to the ClassCancelRequest entity by IDs.
+func (uc *UserCreate) AddClassCancelRequestIDs(ids ...uuid.UUID) *UserCreate {
+	uc.mutation.AddClassCancelRequestIDs(ids...)
+	return uc
+}
+
+// AddClassCancelRequest adds the "class_cancel_request" edges to the ClassCancelRequest entity.
+func (uc *UserCreate) AddClassCancelRequest(c ...*ClassCancelRequest) *UserCreate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uc.AddClassCancelRequestIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -481,6 +497,25 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: paymenthistory.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.ClassCancelRequestIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ClassCancelRequestTable,
+			Columns: []string{user.ClassCancelRequestColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: classcancelrequest.FieldID,
 				},
 			},
 		}

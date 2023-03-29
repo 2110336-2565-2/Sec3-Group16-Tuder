@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// Class is the client for interacting with the Class builders.
 	Class *ClassClient
+	// ClassCancelRequest is the client for interacting with the ClassCancelRequest builders.
+	ClassCancelRequest *ClassCancelRequestClient
 	// Course is the client for interacting with the Course builders.
 	Course *CourseClient
 	// IssueReport is the client for interacting with the IssueReport builders.
@@ -168,6 +170,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Class = NewClassClient(tx.config)
+	tx.ClassCancelRequest = NewClassCancelRequestClient(tx.config)
 	tx.Course = NewCourseClient(tx.config)
 	tx.IssueReport = NewIssueReportClient(tx.config)
 	tx.Match = NewMatchClient(tx.config)

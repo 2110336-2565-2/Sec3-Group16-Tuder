@@ -12,7 +12,7 @@ type ControllerClass interface {
 	GetCancellingClasses(echo.Context) error
 	CancelClass(c echo.Context) error
 	AuditClassCancellation(c echo.Context) error
-	AcknowledgeClassCancellation(c echo.Context) error
+	// AcknowledgeClassCancellation(c echo.Context) error
 }
 
 type controllerClass struct {
@@ -109,34 +109,34 @@ func (cC *controllerClass) AuditClassCancellation(c echo.Context) error {
 
 }
 
-func (cC *controllerClass) AcknowledgeClassCancellation(c echo.Context) error {
+// func (cC *controllerClass) AcknowledgeClassCancellation(c echo.Context) error {
 	
-	ackSchema := &schemas.SchemaUserAcknowledge{}
-	if err := c.Bind(ackSchema); err != nil {
-		c.JSON(http.StatusBadRequest, schemas.SchemaResponses{
-			Success: false,
-			Message: "invalid request",
-			Data:    err.Error(),
-		})
-	}
+// 	ackSchema := &schemas.SchemaUserAcknowledge{}
+// 	if err := c.Bind(ackSchema); err != nil {
+// 		c.JSON(http.StatusBadRequest, schemas.SchemaResponses{
+// 			Success: false,
+// 			Message: "invalid request",
+// 			Data:    err.Error(),
+// 		})
+// 	}
 
 
 
-	err := cC.service.AcknowledgeClassCancellation(ackSchema)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, schemas.SchemaResponses{
-			Success: false,
-			Message: err.Error(),
-			Data:    nil,
-		})
-		return err
-	}
+// 	err := cC.service.AcknowledgeClassCancellation(ackSchema)
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, schemas.SchemaResponses{
+// 			Success: false,
+// 			Message: err.Error(),
+// 			Data:    nil,
+// 		})
+// 		return err
+// 	}
 
-	c.JSON(http.StatusOK, schemas.SchemaResponses{
-		Success: true,
-		Message: "Class cancellation has been acknowledged",
-		Data:    nil,
-	})
-	return nil
+// 	c.JSON(http.StatusOK, schemas.SchemaResponses{
+// 		Success: true,
+// 		Message: "Class cancellation has been acknowledged",
+// 		Data:    nil,
+// 	})
+// 	return nil
 
-}
+// }

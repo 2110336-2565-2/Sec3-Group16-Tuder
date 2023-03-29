@@ -21,6 +21,18 @@ func (f ClassFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ClassMutation", m)
 }
 
+// The ClassCancelRequestFunc type is an adapter to allow the use of ordinary
+// function as ClassCancelRequest mutator.
+type ClassCancelRequestFunc func(context.Context, *ent.ClassCancelRequestMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ClassCancelRequestFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ClassCancelRequestMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ClassCancelRequestMutation", m)
+}
+
 // The CourseFunc type is an adapter to allow the use of ordinary
 // function as Course mutator.
 type CourseFunc func(context.Context, *ent.CourseMutation) (ent.Value, error)

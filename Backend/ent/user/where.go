@@ -896,6 +896,33 @@ func HasPaymentHistoryWith(preds ...predicate.PaymentHistory) predicate.User {
 	})
 }
 
+// HasClassCancelRequest applies the HasEdge predicate on the "class_cancel_request" edge.
+func HasClassCancelRequest() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ClassCancelRequestTable, ClassCancelRequestColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasClassCancelRequestWith applies the HasEdge predicate on the "class_cancel_request" edge with a given conditions (other predicates).
+func HasClassCancelRequestWith(preds ...predicate.ClassCancelRequest) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ClassCancelRequestInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ClassCancelRequestTable, ClassCancelRequestColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.User) predicate.User {
 	return predicate.User(func(s *sql.Selector) {

@@ -17,6 +17,8 @@ const (
 	EdgeCourse = "course"
 	// EdgeClass holds the string denoting the class edge name in mutations.
 	EdgeClass = "class"
+	// EdgeClassCancelRequest holds the string denoting the class_cancel_request edge name in mutations.
+	EdgeClassCancelRequest = "class_cancel_request"
 	// Table holds the table name of the match in the database.
 	Table = "matches"
 	// StudentTable is the table that holds the student relation/edge.
@@ -26,16 +28,27 @@ const (
 	StudentInverseTable = "students"
 	// StudentColumn is the table column denoting the student relation/edge.
 	StudentColumn = "student_match"
-	// CourseTable is the table that holds the course relation/edge. The primary key declared below.
-	CourseTable = "course_match"
+	// CourseTable is the table that holds the course relation/edge.
+	CourseTable = "matches"
 	// CourseInverseTable is the table name for the Course entity.
 	// It exists in this package in order to avoid circular dependency with the "course" package.
 	CourseInverseTable = "courses"
-	// ClassTable is the table that holds the class relation/edge. The primary key declared below.
-	ClassTable = "class_match"
+	// CourseColumn is the table column denoting the course relation/edge.
+	CourseColumn = "course_match"
+	// ClassTable is the table that holds the class relation/edge.
+	ClassTable = "matches"
 	// ClassInverseTable is the table name for the Class entity.
 	// It exists in this package in order to avoid circular dependency with the "class" package.
 	ClassInverseTable = "classes"
+	// ClassColumn is the table column denoting the class relation/edge.
+	ClassColumn = "class_match"
+	// ClassCancelRequestTable is the table that holds the class_cancel_request relation/edge.
+	ClassCancelRequestTable = "class_cancel_requests"
+	// ClassCancelRequestInverseTable is the table name for the ClassCancelRequest entity.
+	// It exists in this package in order to avoid circular dependency with the "classcancelrequest" package.
+	ClassCancelRequestInverseTable = "class_cancel_requests"
+	// ClassCancelRequestColumn is the table column denoting the class_cancel_request relation/edge.
+	ClassCancelRequestColumn = "match_class_cancel_request"
 )
 
 // Columns holds all SQL columns for match fields.
@@ -46,17 +59,10 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "matches"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
+	"class_match",
+	"course_match",
 	"student_match",
 }
-
-var (
-	// CoursePrimaryKey and CourseColumn2 are the table columns denoting the
-	// primary key for the course relation (M2M).
-	CoursePrimaryKey = []string{"course_id", "match_id"}
-	// ClassPrimaryKey and ClassColumn2 are the table columns denoting the
-	// primary key for the class relation (M2M).
-	ClassPrimaryKey = []string{"class_id", "match_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {

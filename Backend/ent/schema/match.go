@@ -35,9 +35,13 @@ func (Match) Edges() []ent.Edge {
 			Required(),
 		edge.From("course", Course.Type).
 			Ref("match").
+			Unique().
 			Required(),
 		edge.From("class", Class.Type).
 			Ref("match").
+			Unique().
 			Required(),
+		edge.To("class_cancel_request", ClassCancelRequest.Type).
+			Unique(),
 	}
 }

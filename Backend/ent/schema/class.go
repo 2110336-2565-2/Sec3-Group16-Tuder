@@ -21,7 +21,7 @@ func (Class) Fields() []ent.Field {
 		field.Bool("review_avaliable").Default(true),
 		field.Int("total_hour"),
 		field.Int("success_hour"),
-		field.Enum("status").Values("ongoing", "completed", "cancelling", "rejected", "cancelled"),
+		field.Enum("status").Values("ongoing", "completed", "cancelled"),
 	}
 }
 
