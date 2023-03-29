@@ -35,7 +35,6 @@ func (Tutor) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("issue_report", IssueReport.Type),
 		edge.To("course", Course.Type),
-		edge.To("review_tutor", ReviewTutor.Type),
 		edge.From("user", User.Type).
 			Ref("tutor").
 			Unique().

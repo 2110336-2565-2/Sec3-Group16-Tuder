@@ -29,19 +29,19 @@ const (
 	FieldLevel = "level"
 	// FieldCoursePictureURL holds the string denoting the course_picture_url field in the database.
 	FieldCoursePictureURL = "course_picture_url"
-	// EdgeReviewCourse holds the string denoting the review_course edge name in mutations.
-	EdgeReviewCourse = "review_course"
+	// EdgeReview holds the string denoting the review edge name in mutations.
+	EdgeReview = "review"
 	// EdgeMatch holds the string denoting the match edge name in mutations.
 	EdgeMatch = "match"
 	// EdgeTutor holds the string denoting the tutor edge name in mutations.
 	EdgeTutor = "tutor"
 	// Table holds the table name of the course in the database.
 	Table = "courses"
-	// ReviewCourseTable is the table that holds the review_course relation/edge. The primary key declared below.
-	ReviewCourseTable = "course_review_course"
-	// ReviewCourseInverseTable is the table name for the ReviewCourse entity.
-	// It exists in this package in order to avoid circular dependency with the "reviewcourse" package.
-	ReviewCourseInverseTable = "review_courses"
+	// ReviewTable is the table that holds the review relation/edge. The primary key declared below.
+	ReviewTable = "course_review"
+	// ReviewInverseTable is the table name for the Review entity.
+	// It exists in this package in order to avoid circular dependency with the "review" package.
+	ReviewInverseTable = "reviews"
 	// MatchTable is the table that holds the match relation/edge. The primary key declared below.
 	MatchTable = "course_match"
 	// MatchInverseTable is the table name for the Match entity.
@@ -76,9 +76,9 @@ var ForeignKeys = []string{
 }
 
 var (
-	// ReviewCoursePrimaryKey and ReviewCourseColumn2 are the table columns denoting the
-	// primary key for the review_course relation (M2M).
-	ReviewCoursePrimaryKey = []string{"course_id", "review_course_id"}
+	// ReviewPrimaryKey and ReviewColumn2 are the table columns denoting the
+	// primary key for the review relation (M2M).
+	ReviewPrimaryKey = []string{"course_id", "review_id"}
 	// MatchPrimaryKey and MatchColumn2 are the table columns denoting the
 	// primary key for the match relation (M2M).
 	MatchPrimaryKey = []string{"course_id", "match_id"}

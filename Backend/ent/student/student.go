@@ -13,10 +13,8 @@ const (
 	FieldID = "id"
 	// EdgeMatch holds the string denoting the match edge name in mutations.
 	EdgeMatch = "match"
-	// EdgeReviewCourse holds the string denoting the review_course edge name in mutations.
-	EdgeReviewCourse = "review_course"
-	// EdgeReviewTutor holds the string denoting the review_tutor edge name in mutations.
-	EdgeReviewTutor = "review_tutor"
+	// EdgeReview holds the string denoting the review edge name in mutations.
+	EdgeReview = "review"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
 	// Table holds the table name of the student in the database.
@@ -28,16 +26,11 @@ const (
 	MatchInverseTable = "matches"
 	// MatchColumn is the table column denoting the match relation/edge.
 	MatchColumn = "student_match"
-	// ReviewCourseTable is the table that holds the review_course relation/edge. The primary key declared below.
-	ReviewCourseTable = "student_review_course"
-	// ReviewCourseInverseTable is the table name for the ReviewCourse entity.
-	// It exists in this package in order to avoid circular dependency with the "reviewcourse" package.
-	ReviewCourseInverseTable = "review_courses"
-	// ReviewTutorTable is the table that holds the review_tutor relation/edge. The primary key declared below.
-	ReviewTutorTable = "student_review_tutor"
-	// ReviewTutorInverseTable is the table name for the ReviewTutor entity.
-	// It exists in this package in order to avoid circular dependency with the "reviewtutor" package.
-	ReviewTutorInverseTable = "review_tutors"
+	// ReviewTable is the table that holds the review relation/edge. The primary key declared below.
+	ReviewTable = "student_review"
+	// ReviewInverseTable is the table name for the Review entity.
+	// It exists in this package in order to avoid circular dependency with the "review" package.
+	ReviewInverseTable = "reviews"
 	// UserTable is the table that holds the user relation/edge.
 	UserTable = "students"
 	// UserInverseTable is the table name for the User entity.
@@ -59,12 +52,9 @@ var ForeignKeys = []string{
 }
 
 var (
-	// ReviewCoursePrimaryKey and ReviewCourseColumn2 are the table columns denoting the
-	// primary key for the review_course relation (M2M).
-	ReviewCoursePrimaryKey = []string{"student_id", "review_course_id"}
-	// ReviewTutorPrimaryKey and ReviewTutorColumn2 are the table columns denoting the
-	// primary key for the review_tutor relation (M2M).
-	ReviewTutorPrimaryKey = []string{"student_id", "review_tutor_id"}
+	// ReviewPrimaryKey and ReviewColumn2 are the table columns denoting the
+	// primary key for the review relation (M2M).
+	ReviewPrimaryKey = []string{"student_id", "review_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).

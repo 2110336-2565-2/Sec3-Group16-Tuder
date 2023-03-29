@@ -338,33 +338,6 @@ func HasCourseWith(preds ...predicate.Course) predicate.Tutor {
 	})
 }
 
-// HasReviewTutor applies the HasEdge predicate on the "review_tutor" edge.
-func HasReviewTutor() predicate.Tutor {
-	return predicate.Tutor(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ReviewTutorTable, ReviewTutorPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasReviewTutorWith applies the HasEdge predicate on the "review_tutor" edge with a given conditions (other predicates).
-func HasReviewTutorWith(preds ...predicate.ReviewTutor) predicate.Tutor {
-	return predicate.Tutor(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(ReviewTutorInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ReviewTutorTable, ReviewTutorPrimaryKey...),
-		)
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasUser applies the HasEdge predicate on the "user" edge.
 func HasUser() predicate.Tutor {
 	return predicate.Tutor(func(s *sql.Selector) {

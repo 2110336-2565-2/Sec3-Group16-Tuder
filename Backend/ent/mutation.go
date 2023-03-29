@@ -16,8 +16,7 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewtutor"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/review"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
@@ -43,8 +42,7 @@ const (
 	TypeMatch          = "Match"
 	TypePayment        = "Payment"
 	TypePaymentHistory = "PaymentHistory"
-	TypeReviewCourse   = "ReviewCourse"
-	TypeReviewTutor    = "ReviewTutor"
+	TypeReview         = "Review"
 	TypeSchedule       = "Schedule"
 	TypeStudent        = "Student"
 	TypeTutor          = "Tutor"
@@ -828,31 +826,31 @@ func (m *ClassMutation) ResetEdge(name string) error {
 // CourseMutation represents an operation that mutates the Course nodes in the graph.
 type CourseMutation struct {
 	config
-	op                   Op
-	typ                  string
-	id                   *uuid.UUID
-	title                *string
-	subject              *string
-	topic                *string
-	estimated_time       *int
-	addestimated_time    *int
-	description          *string
-	price_per_hour       *int
-	addprice_per_hour    *int
-	level                *course.Level
-	course_picture_url   *string
-	clearedFields        map[string]struct{}
-	review_course        map[int]struct{}
-	removedreview_course map[int]struct{}
-	clearedreview_course bool
-	match                map[uuid.UUID]struct{}
-	removedmatch         map[uuid.UUID]struct{}
-	clearedmatch         bool
-	tutor                *uuid.UUID
-	clearedtutor         bool
-	done                 bool
-	oldValue             func(context.Context) (*Course, error)
-	predicates           []predicate.Course
+	op                 Op
+	typ                string
+	id                 *uuid.UUID
+	title              *string
+	subject            *string
+	topic              *string
+	estimated_time     *int
+	addestimated_time  *int
+	description        *string
+	price_per_hour     *int
+	addprice_per_hour  *int
+	level              *course.Level
+	course_picture_url *string
+	clearedFields      map[string]struct{}
+	review             map[int]struct{}
+	removedreview      map[int]struct{}
+	clearedreview      bool
+	match              map[uuid.UUID]struct{}
+	removedmatch       map[uuid.UUID]struct{}
+	clearedmatch       bool
+	tutor              *uuid.UUID
+	clearedtutor       bool
+	done               bool
+	oldValue           func(context.Context) (*Course, error)
+	predicates         []predicate.Course
 }
 
 var _ ent.Mutation = (*CourseMutation)(nil)
@@ -1313,58 +1311,58 @@ func (m *CourseMutation) ResetCoursePictureURL() {
 	delete(m.clearedFields, course.FieldCoursePictureURL)
 }
 
-// AddReviewCourseIDs adds the "review_course" edge to the ReviewCourse entity by ids.
-func (m *CourseMutation) AddReviewCourseIDs(ids ...int) {
-	if m.review_course == nil {
-		m.review_course = make(map[int]struct{})
+// AddReviewIDs adds the "review" edge to the Review entity by ids.
+func (m *CourseMutation) AddReviewIDs(ids ...int) {
+	if m.review == nil {
+		m.review = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.review_course[ids[i]] = struct{}{}
+		m.review[ids[i]] = struct{}{}
 	}
 }
 
-// ClearReviewCourse clears the "review_course" edge to the ReviewCourse entity.
-func (m *CourseMutation) ClearReviewCourse() {
-	m.clearedreview_course = true
+// ClearReview clears the "review" edge to the Review entity.
+func (m *CourseMutation) ClearReview() {
+	m.clearedreview = true
 }
 
-// ReviewCourseCleared reports if the "review_course" edge to the ReviewCourse entity was cleared.
-func (m *CourseMutation) ReviewCourseCleared() bool {
-	return m.clearedreview_course
+// ReviewCleared reports if the "review" edge to the Review entity was cleared.
+func (m *CourseMutation) ReviewCleared() bool {
+	return m.clearedreview
 }
 
-// RemoveReviewCourseIDs removes the "review_course" edge to the ReviewCourse entity by IDs.
-func (m *CourseMutation) RemoveReviewCourseIDs(ids ...int) {
-	if m.removedreview_course == nil {
-		m.removedreview_course = make(map[int]struct{})
+// RemoveReviewIDs removes the "review" edge to the Review entity by IDs.
+func (m *CourseMutation) RemoveReviewIDs(ids ...int) {
+	if m.removedreview == nil {
+		m.removedreview = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.review_course, ids[i])
-		m.removedreview_course[ids[i]] = struct{}{}
+		delete(m.review, ids[i])
+		m.removedreview[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedReviewCourse returns the removed IDs of the "review_course" edge to the ReviewCourse entity.
-func (m *CourseMutation) RemovedReviewCourseIDs() (ids []int) {
-	for id := range m.removedreview_course {
+// RemovedReview returns the removed IDs of the "review" edge to the Review entity.
+func (m *CourseMutation) RemovedReviewIDs() (ids []int) {
+	for id := range m.removedreview {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ReviewCourseIDs returns the "review_course" edge IDs in the mutation.
-func (m *CourseMutation) ReviewCourseIDs() (ids []int) {
-	for id := range m.review_course {
+// ReviewIDs returns the "review" edge IDs in the mutation.
+func (m *CourseMutation) ReviewIDs() (ids []int) {
+	for id := range m.review {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetReviewCourse resets all changes to the "review_course" edge.
-func (m *CourseMutation) ResetReviewCourse() {
-	m.review_course = nil
-	m.clearedreview_course = false
-	m.removedreview_course = nil
+// ResetReview resets all changes to the "review" edge.
+func (m *CourseMutation) ResetReview() {
+	m.review = nil
+	m.clearedreview = false
+	m.removedreview = nil
 }
 
 // AddMatchIDs adds the "match" edge to the Match entity by ids.
@@ -1755,8 +1753,8 @@ func (m *CourseMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CourseMutation) AddedEdges() []string {
 	edges := make([]string, 0, 3)
-	if m.review_course != nil {
-		edges = append(edges, course.EdgeReviewCourse)
+	if m.review != nil {
+		edges = append(edges, course.EdgeReview)
 	}
 	if m.match != nil {
 		edges = append(edges, course.EdgeMatch)
@@ -1771,9 +1769,9 @@ func (m *CourseMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *CourseMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case course.EdgeReviewCourse:
-		ids := make([]ent.Value, 0, len(m.review_course))
-		for id := range m.review_course {
+	case course.EdgeReview:
+		ids := make([]ent.Value, 0, len(m.review))
+		for id := range m.review {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1794,8 +1792,8 @@ func (m *CourseMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CourseMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 3)
-	if m.removedreview_course != nil {
-		edges = append(edges, course.EdgeReviewCourse)
+	if m.removedreview != nil {
+		edges = append(edges, course.EdgeReview)
 	}
 	if m.removedmatch != nil {
 		edges = append(edges, course.EdgeMatch)
@@ -1807,9 +1805,9 @@ func (m *CourseMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *CourseMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case course.EdgeReviewCourse:
-		ids := make([]ent.Value, 0, len(m.removedreview_course))
-		for id := range m.removedreview_course {
+	case course.EdgeReview:
+		ids := make([]ent.Value, 0, len(m.removedreview))
+		for id := range m.removedreview {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1826,8 +1824,8 @@ func (m *CourseMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CourseMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 3)
-	if m.clearedreview_course {
-		edges = append(edges, course.EdgeReviewCourse)
+	if m.clearedreview {
+		edges = append(edges, course.EdgeReview)
 	}
 	if m.clearedmatch {
 		edges = append(edges, course.EdgeMatch)
@@ -1842,8 +1840,8 @@ func (m *CourseMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *CourseMutation) EdgeCleared(name string) bool {
 	switch name {
-	case course.EdgeReviewCourse:
-		return m.clearedreview_course
+	case course.EdgeReview:
+		return m.clearedreview
 	case course.EdgeMatch:
 		return m.clearedmatch
 	case course.EdgeTutor:
@@ -1867,8 +1865,8 @@ func (m *CourseMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *CourseMutation) ResetEdge(name string) error {
 	switch name {
-	case course.EdgeReviewCourse:
-		m.ResetReviewCourse()
+	case course.EdgeReview:
+		m.ResetReview()
 		return nil
 	case course.EdgeMatch:
 		m.ResetMatch()
@@ -3933,8 +3931,8 @@ func (m *PaymentHistoryMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown PaymentHistory edge %s", name)
 }
 
-// ReviewCourseMutation represents an operation that mutates the ReviewCourse nodes in the graph.
-type ReviewCourseMutation struct {
+// ReviewMutation represents an operation that mutates the Review nodes in the graph.
+type ReviewMutation struct {
 	config
 	op             Op
 	typ            string
@@ -3942,6 +3940,7 @@ type ReviewCourseMutation struct {
 	score          *float32
 	addscore       *float32
 	review_msg     *string
+	review_time_at *time.Time
 	clearedFields  map[string]struct{}
 	course         map[uuid.UUID]struct{}
 	removedcourse  map[uuid.UUID]struct{}
@@ -3950,21 +3949,21 @@ type ReviewCourseMutation struct {
 	removedstudent map[uuid.UUID]struct{}
 	clearedstudent bool
 	done           bool
-	oldValue       func(context.Context) (*ReviewCourse, error)
-	predicates     []predicate.ReviewCourse
+	oldValue       func(context.Context) (*Review, error)
+	predicates     []predicate.Review
 }
 
-var _ ent.Mutation = (*ReviewCourseMutation)(nil)
+var _ ent.Mutation = (*ReviewMutation)(nil)
 
-// reviewcourseOption allows management of the mutation configuration using functional options.
-type reviewcourseOption func(*ReviewCourseMutation)
+// reviewOption allows management of the mutation configuration using functional options.
+type reviewOption func(*ReviewMutation)
 
-// newReviewCourseMutation creates new mutation for the ReviewCourse entity.
-func newReviewCourseMutation(c config, op Op, opts ...reviewcourseOption) *ReviewCourseMutation {
-	m := &ReviewCourseMutation{
+// newReviewMutation creates new mutation for the Review entity.
+func newReviewMutation(c config, op Op, opts ...reviewOption) *ReviewMutation {
+	m := &ReviewMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeReviewCourse,
+		typ:           TypeReview,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -3973,20 +3972,20 @@ func newReviewCourseMutation(c config, op Op, opts ...reviewcourseOption) *Revie
 	return m
 }
 
-// withReviewCourseID sets the ID field of the mutation.
-func withReviewCourseID(id int) reviewcourseOption {
-	return func(m *ReviewCourseMutation) {
+// withReviewID sets the ID field of the mutation.
+func withReviewID(id int) reviewOption {
+	return func(m *ReviewMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *ReviewCourse
+			value *Review
 		)
-		m.oldValue = func(ctx context.Context) (*ReviewCourse, error) {
+		m.oldValue = func(ctx context.Context) (*Review, error) {
 			once.Do(func() {
 				if m.done {
 					err = errors.New("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().ReviewCourse.Get(ctx, id)
+					value, err = m.Client().Review.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -3995,10 +3994,10 @@ func withReviewCourseID(id int) reviewcourseOption {
 	}
 }
 
-// withReviewCourse sets the old ReviewCourse of the mutation.
-func withReviewCourse(node *ReviewCourse) reviewcourseOption {
-	return func(m *ReviewCourseMutation) {
-		m.oldValue = func(context.Context) (*ReviewCourse, error) {
+// withReview sets the old Review of the mutation.
+func withReview(node *Review) reviewOption {
+	return func(m *ReviewMutation) {
+		m.oldValue = func(context.Context) (*Review, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -4007,7 +4006,7 @@ func withReviewCourse(node *ReviewCourse) reviewcourseOption {
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m ReviewCourseMutation) Client() *Client {
+func (m ReviewMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -4015,7 +4014,7 @@ func (m ReviewCourseMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m ReviewCourseMutation) Tx() (*Tx, error) {
+func (m ReviewMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, errors.New("ent: mutation is not running in a transaction")
 	}
@@ -4026,7 +4025,7 @@ func (m ReviewCourseMutation) Tx() (*Tx, error) {
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *ReviewCourseMutation) ID() (id int, exists bool) {
+func (m *ReviewMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -4037,7 +4036,7 @@ func (m *ReviewCourseMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *ReviewCourseMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *ReviewMutation) IDs(ctx context.Context) ([]int, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
@@ -4046,20 +4045,20 @@ func (m *ReviewCourseMutation) IDs(ctx context.Context) ([]int, error) {
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().ReviewCourse.Query().Where(m.predicates...).IDs(ctx)
+		return m.Client().Review.Query().Where(m.predicates...).IDs(ctx)
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
 }
 
 // SetScore sets the "score" field.
-func (m *ReviewCourseMutation) SetScore(f float32) {
+func (m *ReviewMutation) SetScore(f float32) {
 	m.score = &f
 	m.addscore = nil
 }
 
 // Score returns the value of the "score" field in the mutation.
-func (m *ReviewCourseMutation) Score() (r float32, exists bool) {
+func (m *ReviewMutation) Score() (r float32, exists bool) {
 	v := m.score
 	if v == nil {
 		return
@@ -4067,10 +4066,10 @@ func (m *ReviewCourseMutation) Score() (r float32, exists bool) {
 	return *v, true
 }
 
-// OldScore returns the old "score" field's value of the ReviewCourse entity.
-// If the ReviewCourse object wasn't provided to the builder, the object is fetched from the database.
+// OldScore returns the old "score" field's value of the Review entity.
+// If the Review object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ReviewCourseMutation) OldScore(ctx context.Context) (v *float32, err error) {
+func (m *ReviewMutation) OldScore(ctx context.Context) (v *float32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldScore is only allowed on UpdateOne operations")
 	}
@@ -4085,7 +4084,7 @@ func (m *ReviewCourseMutation) OldScore(ctx context.Context) (v *float32, err er
 }
 
 // AddScore adds f to the "score" field.
-func (m *ReviewCourseMutation) AddScore(f float32) {
+func (m *ReviewMutation) AddScore(f float32) {
 	if m.addscore != nil {
 		*m.addscore += f
 	} else {
@@ -4094,7 +4093,7 @@ func (m *ReviewCourseMutation) AddScore(f float32) {
 }
 
 // AddedScore returns the value that was added to the "score" field in this mutation.
-func (m *ReviewCourseMutation) AddedScore() (r float32, exists bool) {
+func (m *ReviewMutation) AddedScore() (r float32, exists bool) {
 	v := m.addscore
 	if v == nil {
 		return
@@ -4103,32 +4102,32 @@ func (m *ReviewCourseMutation) AddedScore() (r float32, exists bool) {
 }
 
 // ClearScore clears the value of the "score" field.
-func (m *ReviewCourseMutation) ClearScore() {
+func (m *ReviewMutation) ClearScore() {
 	m.score = nil
 	m.addscore = nil
-	m.clearedFields[reviewcourse.FieldScore] = struct{}{}
+	m.clearedFields[review.FieldScore] = struct{}{}
 }
 
 // ScoreCleared returns if the "score" field was cleared in this mutation.
-func (m *ReviewCourseMutation) ScoreCleared() bool {
-	_, ok := m.clearedFields[reviewcourse.FieldScore]
+func (m *ReviewMutation) ScoreCleared() bool {
+	_, ok := m.clearedFields[review.FieldScore]
 	return ok
 }
 
 // ResetScore resets all changes to the "score" field.
-func (m *ReviewCourseMutation) ResetScore() {
+func (m *ReviewMutation) ResetScore() {
 	m.score = nil
 	m.addscore = nil
-	delete(m.clearedFields, reviewcourse.FieldScore)
+	delete(m.clearedFields, review.FieldScore)
 }
 
 // SetReviewMsg sets the "review_msg" field.
-func (m *ReviewCourseMutation) SetReviewMsg(s string) {
+func (m *ReviewMutation) SetReviewMsg(s string) {
 	m.review_msg = &s
 }
 
 // ReviewMsg returns the value of the "review_msg" field in the mutation.
-func (m *ReviewCourseMutation) ReviewMsg() (r string, exists bool) {
+func (m *ReviewMutation) ReviewMsg() (r string, exists bool) {
 	v := m.review_msg
 	if v == nil {
 		return
@@ -4136,10 +4135,10 @@ func (m *ReviewCourseMutation) ReviewMsg() (r string, exists bool) {
 	return *v, true
 }
 
-// OldReviewMsg returns the old "review_msg" field's value of the ReviewCourse entity.
-// If the ReviewCourse object wasn't provided to the builder, the object is fetched from the database.
+// OldReviewMsg returns the old "review_msg" field's value of the Review entity.
+// If the Review object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ReviewCourseMutation) OldReviewMsg(ctx context.Context) (v *string, err error) {
+func (m *ReviewMutation) OldReviewMsg(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldReviewMsg is only allowed on UpdateOne operations")
 	}
@@ -4154,25 +4153,61 @@ func (m *ReviewCourseMutation) OldReviewMsg(ctx context.Context) (v *string, err
 }
 
 // ClearReviewMsg clears the value of the "review_msg" field.
-func (m *ReviewCourseMutation) ClearReviewMsg() {
+func (m *ReviewMutation) ClearReviewMsg() {
 	m.review_msg = nil
-	m.clearedFields[reviewcourse.FieldReviewMsg] = struct{}{}
+	m.clearedFields[review.FieldReviewMsg] = struct{}{}
 }
 
 // ReviewMsgCleared returns if the "review_msg" field was cleared in this mutation.
-func (m *ReviewCourseMutation) ReviewMsgCleared() bool {
-	_, ok := m.clearedFields[reviewcourse.FieldReviewMsg]
+func (m *ReviewMutation) ReviewMsgCleared() bool {
+	_, ok := m.clearedFields[review.FieldReviewMsg]
 	return ok
 }
 
 // ResetReviewMsg resets all changes to the "review_msg" field.
-func (m *ReviewCourseMutation) ResetReviewMsg() {
+func (m *ReviewMutation) ResetReviewMsg() {
 	m.review_msg = nil
-	delete(m.clearedFields, reviewcourse.FieldReviewMsg)
+	delete(m.clearedFields, review.FieldReviewMsg)
+}
+
+// SetReviewTimeAt sets the "review_time_at" field.
+func (m *ReviewMutation) SetReviewTimeAt(t time.Time) {
+	m.review_time_at = &t
+}
+
+// ReviewTimeAt returns the value of the "review_time_at" field in the mutation.
+func (m *ReviewMutation) ReviewTimeAt() (r time.Time, exists bool) {
+	v := m.review_time_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldReviewTimeAt returns the old "review_time_at" field's value of the Review entity.
+// If the Review object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReviewMutation) OldReviewTimeAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldReviewTimeAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldReviewTimeAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldReviewTimeAt: %w", err)
+	}
+	return oldValue.ReviewTimeAt, nil
+}
+
+// ResetReviewTimeAt resets all changes to the "review_time_at" field.
+func (m *ReviewMutation) ResetReviewTimeAt() {
+	m.review_time_at = nil
 }
 
 // AddCourseIDs adds the "course" edge to the Course entity by ids.
-func (m *ReviewCourseMutation) AddCourseIDs(ids ...uuid.UUID) {
+func (m *ReviewMutation) AddCourseIDs(ids ...uuid.UUID) {
 	if m.course == nil {
 		m.course = make(map[uuid.UUID]struct{})
 	}
@@ -4182,17 +4217,17 @@ func (m *ReviewCourseMutation) AddCourseIDs(ids ...uuid.UUID) {
 }
 
 // ClearCourse clears the "course" edge to the Course entity.
-func (m *ReviewCourseMutation) ClearCourse() {
+func (m *ReviewMutation) ClearCourse() {
 	m.clearedcourse = true
 }
 
 // CourseCleared reports if the "course" edge to the Course entity was cleared.
-func (m *ReviewCourseMutation) CourseCleared() bool {
+func (m *ReviewMutation) CourseCleared() bool {
 	return m.clearedcourse
 }
 
 // RemoveCourseIDs removes the "course" edge to the Course entity by IDs.
-func (m *ReviewCourseMutation) RemoveCourseIDs(ids ...uuid.UUID) {
+func (m *ReviewMutation) RemoveCourseIDs(ids ...uuid.UUID) {
 	if m.removedcourse == nil {
 		m.removedcourse = make(map[uuid.UUID]struct{})
 	}
@@ -4203,7 +4238,7 @@ func (m *ReviewCourseMutation) RemoveCourseIDs(ids ...uuid.UUID) {
 }
 
 // RemovedCourse returns the removed IDs of the "course" edge to the Course entity.
-func (m *ReviewCourseMutation) RemovedCourseIDs() (ids []uuid.UUID) {
+func (m *ReviewMutation) RemovedCourseIDs() (ids []uuid.UUID) {
 	for id := range m.removedcourse {
 		ids = append(ids, id)
 	}
@@ -4211,7 +4246,7 @@ func (m *ReviewCourseMutation) RemovedCourseIDs() (ids []uuid.UUID) {
 }
 
 // CourseIDs returns the "course" edge IDs in the mutation.
-func (m *ReviewCourseMutation) CourseIDs() (ids []uuid.UUID) {
+func (m *ReviewMutation) CourseIDs() (ids []uuid.UUID) {
 	for id := range m.course {
 		ids = append(ids, id)
 	}
@@ -4219,14 +4254,14 @@ func (m *ReviewCourseMutation) CourseIDs() (ids []uuid.UUID) {
 }
 
 // ResetCourse resets all changes to the "course" edge.
-func (m *ReviewCourseMutation) ResetCourse() {
+func (m *ReviewMutation) ResetCourse() {
 	m.course = nil
 	m.clearedcourse = false
 	m.removedcourse = nil
 }
 
 // AddStudentIDs adds the "student" edge to the Student entity by ids.
-func (m *ReviewCourseMutation) AddStudentIDs(ids ...uuid.UUID) {
+func (m *ReviewMutation) AddStudentIDs(ids ...uuid.UUID) {
 	if m.student == nil {
 		m.student = make(map[uuid.UUID]struct{})
 	}
@@ -4236,17 +4271,17 @@ func (m *ReviewCourseMutation) AddStudentIDs(ids ...uuid.UUID) {
 }
 
 // ClearStudent clears the "student" edge to the Student entity.
-func (m *ReviewCourseMutation) ClearStudent() {
+func (m *ReviewMutation) ClearStudent() {
 	m.clearedstudent = true
 }
 
 // StudentCleared reports if the "student" edge to the Student entity was cleared.
-func (m *ReviewCourseMutation) StudentCleared() bool {
+func (m *ReviewMutation) StudentCleared() bool {
 	return m.clearedstudent
 }
 
 // RemoveStudentIDs removes the "student" edge to the Student entity by IDs.
-func (m *ReviewCourseMutation) RemoveStudentIDs(ids ...uuid.UUID) {
+func (m *ReviewMutation) RemoveStudentIDs(ids ...uuid.UUID) {
 	if m.removedstudent == nil {
 		m.removedstudent = make(map[uuid.UUID]struct{})
 	}
@@ -4257,7 +4292,7 @@ func (m *ReviewCourseMutation) RemoveStudentIDs(ids ...uuid.UUID) {
 }
 
 // RemovedStudent returns the removed IDs of the "student" edge to the Student entity.
-func (m *ReviewCourseMutation) RemovedStudentIDs() (ids []uuid.UUID) {
+func (m *ReviewMutation) RemovedStudentIDs() (ids []uuid.UUID) {
 	for id := range m.removedstudent {
 		ids = append(ids, id)
 	}
@@ -4265,7 +4300,7 @@ func (m *ReviewCourseMutation) RemovedStudentIDs() (ids []uuid.UUID) {
 }
 
 // StudentIDs returns the "student" edge IDs in the mutation.
-func (m *ReviewCourseMutation) StudentIDs() (ids []uuid.UUID) {
+func (m *ReviewMutation) StudentIDs() (ids []uuid.UUID) {
 	for id := range m.student {
 		ids = append(ids, id)
 	}
@@ -4273,21 +4308,21 @@ func (m *ReviewCourseMutation) StudentIDs() (ids []uuid.UUID) {
 }
 
 // ResetStudent resets all changes to the "student" edge.
-func (m *ReviewCourseMutation) ResetStudent() {
+func (m *ReviewMutation) ResetStudent() {
 	m.student = nil
 	m.clearedstudent = false
 	m.removedstudent = nil
 }
 
-// Where appends a list predicates to the ReviewCourseMutation builder.
-func (m *ReviewCourseMutation) Where(ps ...predicate.ReviewCourse) {
+// Where appends a list predicates to the ReviewMutation builder.
+func (m *ReviewMutation) Where(ps ...predicate.Review) {
 	m.predicates = append(m.predicates, ps...)
 }
 
-// WhereP appends storage-level predicates to the ReviewCourseMutation builder. Using this method,
+// WhereP appends storage-level predicates to the ReviewMutation builder. Using this method,
 // users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *ReviewCourseMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.ReviewCourse, len(ps))
+func (m *ReviewMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Review, len(ps))
 	for i := range ps {
 		p[i] = ps[i]
 	}
@@ -4295,30 +4330,33 @@ func (m *ReviewCourseMutation) WhereP(ps ...func(*sql.Selector)) {
 }
 
 // Op returns the operation name.
-func (m *ReviewCourseMutation) Op() Op {
+func (m *ReviewMutation) Op() Op {
 	return m.op
 }
 
 // SetOp allows setting the mutation operation.
-func (m *ReviewCourseMutation) SetOp(op Op) {
+func (m *ReviewMutation) SetOp(op Op) {
 	m.op = op
 }
 
-// Type returns the node type of this mutation (ReviewCourse).
-func (m *ReviewCourseMutation) Type() string {
+// Type returns the node type of this mutation (Review).
+func (m *ReviewMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during this mutation. Note that in
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
-func (m *ReviewCourseMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+func (m *ReviewMutation) Fields() []string {
+	fields := make([]string, 0, 3)
 	if m.score != nil {
-		fields = append(fields, reviewcourse.FieldScore)
+		fields = append(fields, review.FieldScore)
 	}
 	if m.review_msg != nil {
-		fields = append(fields, reviewcourse.FieldReviewMsg)
+		fields = append(fields, review.FieldReviewMsg)
+	}
+	if m.review_time_at != nil {
+		fields = append(fields, review.FieldReviewTimeAt)
 	}
 	return fields
 }
@@ -4326,12 +4364,14 @@ func (m *ReviewCourseMutation) Fields() []string {
 // Field returns the value of a field with the given name. The second boolean
 // return value indicates that this field was not set, or was not defined in the
 // schema.
-func (m *ReviewCourseMutation) Field(name string) (ent.Value, bool) {
+func (m *ReviewMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case reviewcourse.FieldScore:
+	case review.FieldScore:
 		return m.Score()
-	case reviewcourse.FieldReviewMsg:
+	case review.FieldReviewMsg:
 		return m.ReviewMsg()
+	case review.FieldReviewTimeAt:
+		return m.ReviewTimeAt()
 	}
 	return nil, false
 }
@@ -4339,45 +4379,54 @@ func (m *ReviewCourseMutation) Field(name string) (ent.Value, bool) {
 // OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
-func (m *ReviewCourseMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+func (m *ReviewMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case reviewcourse.FieldScore:
+	case review.FieldScore:
 		return m.OldScore(ctx)
-	case reviewcourse.FieldReviewMsg:
+	case review.FieldReviewMsg:
 		return m.OldReviewMsg(ctx)
+	case review.FieldReviewTimeAt:
+		return m.OldReviewTimeAt(ctx)
 	}
-	return nil, fmt.Errorf("unknown ReviewCourse field %s", name)
+	return nil, fmt.Errorf("unknown Review field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *ReviewCourseMutation) SetField(name string, value ent.Value) error {
+func (m *ReviewMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case reviewcourse.FieldScore:
+	case review.FieldScore:
 		v, ok := value.(float32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetScore(v)
 		return nil
-	case reviewcourse.FieldReviewMsg:
+	case review.FieldReviewMsg:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetReviewMsg(v)
 		return nil
+	case review.FieldReviewTimeAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetReviewTimeAt(v)
+		return nil
 	}
-	return fmt.Errorf("unknown ReviewCourse field %s", name)
+	return fmt.Errorf("unknown Review field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
-func (m *ReviewCourseMutation) AddedFields() []string {
+func (m *ReviewMutation) AddedFields() []string {
 	var fields []string
 	if m.addscore != nil {
-		fields = append(fields, reviewcourse.FieldScore)
+		fields = append(fields, review.FieldScore)
 	}
 	return fields
 }
@@ -4385,9 +4434,9 @@ func (m *ReviewCourseMutation) AddedFields() []string {
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
-func (m *ReviewCourseMutation) AddedField(name string) (ent.Value, bool) {
+func (m *ReviewMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case reviewcourse.FieldScore:
+	case review.FieldScore:
 		return m.AddedScore()
 	}
 	return nil, false
@@ -4396,9 +4445,9 @@ func (m *ReviewCourseMutation) AddedField(name string) (ent.Value, bool) {
 // AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *ReviewCourseMutation) AddField(name string, value ent.Value) error {
+func (m *ReviewMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case reviewcourse.FieldScore:
+	case review.FieldScore:
 		v, ok := value.(float32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
@@ -4406,80 +4455,83 @@ func (m *ReviewCourseMutation) AddField(name string, value ent.Value) error {
 		m.AddScore(v)
 		return nil
 	}
-	return fmt.Errorf("unknown ReviewCourse numeric field %s", name)
+	return fmt.Errorf("unknown Review numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
-func (m *ReviewCourseMutation) ClearedFields() []string {
+func (m *ReviewMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(reviewcourse.FieldScore) {
-		fields = append(fields, reviewcourse.FieldScore)
+	if m.FieldCleared(review.FieldScore) {
+		fields = append(fields, review.FieldScore)
 	}
-	if m.FieldCleared(reviewcourse.FieldReviewMsg) {
-		fields = append(fields, reviewcourse.FieldReviewMsg)
+	if m.FieldCleared(review.FieldReviewMsg) {
+		fields = append(fields, review.FieldReviewMsg)
 	}
 	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
-func (m *ReviewCourseMutation) FieldCleared(name string) bool {
+func (m *ReviewMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *ReviewCourseMutation) ClearField(name string) error {
+func (m *ReviewMutation) ClearField(name string) error {
 	switch name {
-	case reviewcourse.FieldScore:
+	case review.FieldScore:
 		m.ClearScore()
 		return nil
-	case reviewcourse.FieldReviewMsg:
+	case review.FieldReviewMsg:
 		m.ClearReviewMsg()
 		return nil
 	}
-	return fmt.Errorf("unknown ReviewCourse nullable field %s", name)
+	return fmt.Errorf("unknown Review nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
-func (m *ReviewCourseMutation) ResetField(name string) error {
+func (m *ReviewMutation) ResetField(name string) error {
 	switch name {
-	case reviewcourse.FieldScore:
+	case review.FieldScore:
 		m.ResetScore()
 		return nil
-	case reviewcourse.FieldReviewMsg:
+	case review.FieldReviewMsg:
 		m.ResetReviewMsg()
 		return nil
+	case review.FieldReviewTimeAt:
+		m.ResetReviewTimeAt()
+		return nil
 	}
-	return fmt.Errorf("unknown ReviewCourse field %s", name)
+	return fmt.Errorf("unknown Review field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
-func (m *ReviewCourseMutation) AddedEdges() []string {
+func (m *ReviewMutation) AddedEdges() []string {
 	edges := make([]string, 0, 2)
 	if m.course != nil {
-		edges = append(edges, reviewcourse.EdgeCourse)
+		edges = append(edges, review.EdgeCourse)
 	}
 	if m.student != nil {
-		edges = append(edges, reviewcourse.EdgeStudent)
+		edges = append(edges, review.EdgeStudent)
 	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
-func (m *ReviewCourseMutation) AddedIDs(name string) []ent.Value {
+func (m *ReviewMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case reviewcourse.EdgeCourse:
+	case review.EdgeCourse:
 		ids := make([]ent.Value, 0, len(m.course))
 		for id := range m.course {
 			ids = append(ids, id)
 		}
 		return ids
-	case reviewcourse.EdgeStudent:
+	case review.EdgeStudent:
 		ids := make([]ent.Value, 0, len(m.student))
 		for id := range m.student {
 			ids = append(ids, id)
@@ -4490,28 +4542,28 @@ func (m *ReviewCourseMutation) AddedIDs(name string) []ent.Value {
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
-func (m *ReviewCourseMutation) RemovedEdges() []string {
+func (m *ReviewMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 2)
 	if m.removedcourse != nil {
-		edges = append(edges, reviewcourse.EdgeCourse)
+		edges = append(edges, review.EdgeCourse)
 	}
 	if m.removedstudent != nil {
-		edges = append(edges, reviewcourse.EdgeStudent)
+		edges = append(edges, review.EdgeStudent)
 	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
-func (m *ReviewCourseMutation) RemovedIDs(name string) []ent.Value {
+func (m *ReviewMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case reviewcourse.EdgeCourse:
+	case review.EdgeCourse:
 		ids := make([]ent.Value, 0, len(m.removedcourse))
 		for id := range m.removedcourse {
 			ids = append(ids, id)
 		}
 		return ids
-	case reviewcourse.EdgeStudent:
+	case review.EdgeStudent:
 		ids := make([]ent.Value, 0, len(m.removedstudent))
 		for id := range m.removedstudent {
 			ids = append(ids, id)
@@ -4522,24 +4574,24 @@ func (m *ReviewCourseMutation) RemovedIDs(name string) []ent.Value {
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *ReviewCourseMutation) ClearedEdges() []string {
+func (m *ReviewMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 2)
 	if m.clearedcourse {
-		edges = append(edges, reviewcourse.EdgeCourse)
+		edges = append(edges, review.EdgeCourse)
 	}
 	if m.clearedstudent {
-		edges = append(edges, reviewcourse.EdgeStudent)
+		edges = append(edges, review.EdgeStudent)
 	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
-func (m *ReviewCourseMutation) EdgeCleared(name string) bool {
+func (m *ReviewMutation) EdgeCleared(name string) bool {
 	switch name {
-	case reviewcourse.EdgeCourse:
+	case review.EdgeCourse:
 		return m.clearedcourse
-	case reviewcourse.EdgeStudent:
+	case review.EdgeStudent:
 		return m.clearedstudent
 	}
 	return false
@@ -4547,658 +4599,24 @@ func (m *ReviewCourseMutation) EdgeCleared(name string) bool {
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
-func (m *ReviewCourseMutation) ClearEdge(name string) error {
+func (m *ReviewMutation) ClearEdge(name string) error {
 	switch name {
 	}
-	return fmt.Errorf("unknown ReviewCourse unique edge %s", name)
+	return fmt.Errorf("unknown Review unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
-func (m *ReviewCourseMutation) ResetEdge(name string) error {
+func (m *ReviewMutation) ResetEdge(name string) error {
 	switch name {
-	case reviewcourse.EdgeCourse:
+	case review.EdgeCourse:
 		m.ResetCourse()
 		return nil
-	case reviewcourse.EdgeStudent:
+	case review.EdgeStudent:
 		m.ResetStudent()
 		return nil
 	}
-	return fmt.Errorf("unknown ReviewCourse edge %s", name)
-}
-
-// ReviewTutorMutation represents an operation that mutates the ReviewTutor nodes in the graph.
-type ReviewTutorMutation struct {
-	config
-	op             Op
-	typ            string
-	id             *int
-	score          *float32
-	addscore       *float32
-	review_msg     *string
-	clearedFields  map[string]struct{}
-	tutor          map[uuid.UUID]struct{}
-	removedtutor   map[uuid.UUID]struct{}
-	clearedtutor   bool
-	student        map[uuid.UUID]struct{}
-	removedstudent map[uuid.UUID]struct{}
-	clearedstudent bool
-	done           bool
-	oldValue       func(context.Context) (*ReviewTutor, error)
-	predicates     []predicate.ReviewTutor
-}
-
-var _ ent.Mutation = (*ReviewTutorMutation)(nil)
-
-// reviewtutorOption allows management of the mutation configuration using functional options.
-type reviewtutorOption func(*ReviewTutorMutation)
-
-// newReviewTutorMutation creates new mutation for the ReviewTutor entity.
-func newReviewTutorMutation(c config, op Op, opts ...reviewtutorOption) *ReviewTutorMutation {
-	m := &ReviewTutorMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeReviewTutor,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withReviewTutorID sets the ID field of the mutation.
-func withReviewTutorID(id int) reviewtutorOption {
-	return func(m *ReviewTutorMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *ReviewTutor
-		)
-		m.oldValue = func(ctx context.Context) (*ReviewTutor, error) {
-			once.Do(func() {
-				if m.done {
-					err = errors.New("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().ReviewTutor.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withReviewTutor sets the old ReviewTutor of the mutation.
-func withReviewTutor(node *ReviewTutor) reviewtutorOption {
-	return func(m *ReviewTutorMutation) {
-		m.oldValue = func(context.Context) (*ReviewTutor, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m ReviewTutorMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m ReviewTutorMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, errors.New("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *ReviewTutorMutation) ID() (id int, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
-// That means, if the mutation is applied within a transaction with an isolation level such
-// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
-// or updated by the mutation.
-func (m *ReviewTutorMutation) IDs(ctx context.Context) ([]int, error) {
-	switch {
-	case m.op.Is(OpUpdateOne | OpDeleteOne):
-		id, exists := m.ID()
-		if exists {
-			return []int{id}, nil
-		}
-		fallthrough
-	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().ReviewTutor.Query().Where(m.predicates...).IDs(ctx)
-	default:
-		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
-	}
-}
-
-// SetScore sets the "score" field.
-func (m *ReviewTutorMutation) SetScore(f float32) {
-	m.score = &f
-	m.addscore = nil
-}
-
-// Score returns the value of the "score" field in the mutation.
-func (m *ReviewTutorMutation) Score() (r float32, exists bool) {
-	v := m.score
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldScore returns the old "score" field's value of the ReviewTutor entity.
-// If the ReviewTutor object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ReviewTutorMutation) OldScore(ctx context.Context) (v *float32, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldScore is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldScore requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldScore: %w", err)
-	}
-	return oldValue.Score, nil
-}
-
-// AddScore adds f to the "score" field.
-func (m *ReviewTutorMutation) AddScore(f float32) {
-	if m.addscore != nil {
-		*m.addscore += f
-	} else {
-		m.addscore = &f
-	}
-}
-
-// AddedScore returns the value that was added to the "score" field in this mutation.
-func (m *ReviewTutorMutation) AddedScore() (r float32, exists bool) {
-	v := m.addscore
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearScore clears the value of the "score" field.
-func (m *ReviewTutorMutation) ClearScore() {
-	m.score = nil
-	m.addscore = nil
-	m.clearedFields[reviewtutor.FieldScore] = struct{}{}
-}
-
-// ScoreCleared returns if the "score" field was cleared in this mutation.
-func (m *ReviewTutorMutation) ScoreCleared() bool {
-	_, ok := m.clearedFields[reviewtutor.FieldScore]
-	return ok
-}
-
-// ResetScore resets all changes to the "score" field.
-func (m *ReviewTutorMutation) ResetScore() {
-	m.score = nil
-	m.addscore = nil
-	delete(m.clearedFields, reviewtutor.FieldScore)
-}
-
-// SetReviewMsg sets the "review_msg" field.
-func (m *ReviewTutorMutation) SetReviewMsg(s string) {
-	m.review_msg = &s
-}
-
-// ReviewMsg returns the value of the "review_msg" field in the mutation.
-func (m *ReviewTutorMutation) ReviewMsg() (r string, exists bool) {
-	v := m.review_msg
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldReviewMsg returns the old "review_msg" field's value of the ReviewTutor entity.
-// If the ReviewTutor object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ReviewTutorMutation) OldReviewMsg(ctx context.Context) (v *string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldReviewMsg is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldReviewMsg requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldReviewMsg: %w", err)
-	}
-	return oldValue.ReviewMsg, nil
-}
-
-// ClearReviewMsg clears the value of the "review_msg" field.
-func (m *ReviewTutorMutation) ClearReviewMsg() {
-	m.review_msg = nil
-	m.clearedFields[reviewtutor.FieldReviewMsg] = struct{}{}
-}
-
-// ReviewMsgCleared returns if the "review_msg" field was cleared in this mutation.
-func (m *ReviewTutorMutation) ReviewMsgCleared() bool {
-	_, ok := m.clearedFields[reviewtutor.FieldReviewMsg]
-	return ok
-}
-
-// ResetReviewMsg resets all changes to the "review_msg" field.
-func (m *ReviewTutorMutation) ResetReviewMsg() {
-	m.review_msg = nil
-	delete(m.clearedFields, reviewtutor.FieldReviewMsg)
-}
-
-// AddTutorIDs adds the "tutor" edge to the Tutor entity by ids.
-func (m *ReviewTutorMutation) AddTutorIDs(ids ...uuid.UUID) {
-	if m.tutor == nil {
-		m.tutor = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		m.tutor[ids[i]] = struct{}{}
-	}
-}
-
-// ClearTutor clears the "tutor" edge to the Tutor entity.
-func (m *ReviewTutorMutation) ClearTutor() {
-	m.clearedtutor = true
-}
-
-// TutorCleared reports if the "tutor" edge to the Tutor entity was cleared.
-func (m *ReviewTutorMutation) TutorCleared() bool {
-	return m.clearedtutor
-}
-
-// RemoveTutorIDs removes the "tutor" edge to the Tutor entity by IDs.
-func (m *ReviewTutorMutation) RemoveTutorIDs(ids ...uuid.UUID) {
-	if m.removedtutor == nil {
-		m.removedtutor = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		delete(m.tutor, ids[i])
-		m.removedtutor[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedTutor returns the removed IDs of the "tutor" edge to the Tutor entity.
-func (m *ReviewTutorMutation) RemovedTutorIDs() (ids []uuid.UUID) {
-	for id := range m.removedtutor {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// TutorIDs returns the "tutor" edge IDs in the mutation.
-func (m *ReviewTutorMutation) TutorIDs() (ids []uuid.UUID) {
-	for id := range m.tutor {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetTutor resets all changes to the "tutor" edge.
-func (m *ReviewTutorMutation) ResetTutor() {
-	m.tutor = nil
-	m.clearedtutor = false
-	m.removedtutor = nil
-}
-
-// AddStudentIDs adds the "student" edge to the Student entity by ids.
-func (m *ReviewTutorMutation) AddStudentIDs(ids ...uuid.UUID) {
-	if m.student == nil {
-		m.student = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		m.student[ids[i]] = struct{}{}
-	}
-}
-
-// ClearStudent clears the "student" edge to the Student entity.
-func (m *ReviewTutorMutation) ClearStudent() {
-	m.clearedstudent = true
-}
-
-// StudentCleared reports if the "student" edge to the Student entity was cleared.
-func (m *ReviewTutorMutation) StudentCleared() bool {
-	return m.clearedstudent
-}
-
-// RemoveStudentIDs removes the "student" edge to the Student entity by IDs.
-func (m *ReviewTutorMutation) RemoveStudentIDs(ids ...uuid.UUID) {
-	if m.removedstudent == nil {
-		m.removedstudent = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		delete(m.student, ids[i])
-		m.removedstudent[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedStudent returns the removed IDs of the "student" edge to the Student entity.
-func (m *ReviewTutorMutation) RemovedStudentIDs() (ids []uuid.UUID) {
-	for id := range m.removedstudent {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// StudentIDs returns the "student" edge IDs in the mutation.
-func (m *ReviewTutorMutation) StudentIDs() (ids []uuid.UUID) {
-	for id := range m.student {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetStudent resets all changes to the "student" edge.
-func (m *ReviewTutorMutation) ResetStudent() {
-	m.student = nil
-	m.clearedstudent = false
-	m.removedstudent = nil
-}
-
-// Where appends a list predicates to the ReviewTutorMutation builder.
-func (m *ReviewTutorMutation) Where(ps ...predicate.ReviewTutor) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// WhereP appends storage-level predicates to the ReviewTutorMutation builder. Using this method,
-// users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *ReviewTutorMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.ReviewTutor, len(ps))
-	for i := range ps {
-		p[i] = ps[i]
-	}
-	m.Where(p...)
-}
-
-// Op returns the operation name.
-func (m *ReviewTutorMutation) Op() Op {
-	return m.op
-}
-
-// SetOp allows setting the mutation operation.
-func (m *ReviewTutorMutation) SetOp(op Op) {
-	m.op = op
-}
-
-// Type returns the node type of this mutation (ReviewTutor).
-func (m *ReviewTutorMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *ReviewTutorMutation) Fields() []string {
-	fields := make([]string, 0, 2)
-	if m.score != nil {
-		fields = append(fields, reviewtutor.FieldScore)
-	}
-	if m.review_msg != nil {
-		fields = append(fields, reviewtutor.FieldReviewMsg)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *ReviewTutorMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case reviewtutor.FieldScore:
-		return m.Score()
-	case reviewtutor.FieldReviewMsg:
-		return m.ReviewMsg()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *ReviewTutorMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case reviewtutor.FieldScore:
-		return m.OldScore(ctx)
-	case reviewtutor.FieldReviewMsg:
-		return m.OldReviewMsg(ctx)
-	}
-	return nil, fmt.Errorf("unknown ReviewTutor field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *ReviewTutorMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case reviewtutor.FieldScore:
-		v, ok := value.(float32)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetScore(v)
-		return nil
-	case reviewtutor.FieldReviewMsg:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetReviewMsg(v)
-		return nil
-	}
-	return fmt.Errorf("unknown ReviewTutor field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *ReviewTutorMutation) AddedFields() []string {
-	var fields []string
-	if m.addscore != nil {
-		fields = append(fields, reviewtutor.FieldScore)
-	}
-	return fields
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *ReviewTutorMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case reviewtutor.FieldScore:
-		return m.AddedScore()
-	}
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *ReviewTutorMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	case reviewtutor.FieldScore:
-		v, ok := value.(float32)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddScore(v)
-		return nil
-	}
-	return fmt.Errorf("unknown ReviewTutor numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *ReviewTutorMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(reviewtutor.FieldScore) {
-		fields = append(fields, reviewtutor.FieldScore)
-	}
-	if m.FieldCleared(reviewtutor.FieldReviewMsg) {
-		fields = append(fields, reviewtutor.FieldReviewMsg)
-	}
-	return fields
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *ReviewTutorMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *ReviewTutorMutation) ClearField(name string) error {
-	switch name {
-	case reviewtutor.FieldScore:
-		m.ClearScore()
-		return nil
-	case reviewtutor.FieldReviewMsg:
-		m.ClearReviewMsg()
-		return nil
-	}
-	return fmt.Errorf("unknown ReviewTutor nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *ReviewTutorMutation) ResetField(name string) error {
-	switch name {
-	case reviewtutor.FieldScore:
-		m.ResetScore()
-		return nil
-	case reviewtutor.FieldReviewMsg:
-		m.ResetReviewMsg()
-		return nil
-	}
-	return fmt.Errorf("unknown ReviewTutor field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *ReviewTutorMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.tutor != nil {
-		edges = append(edges, reviewtutor.EdgeTutor)
-	}
-	if m.student != nil {
-		edges = append(edges, reviewtutor.EdgeStudent)
-	}
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *ReviewTutorMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case reviewtutor.EdgeTutor:
-		ids := make([]ent.Value, 0, len(m.tutor))
-		for id := range m.tutor {
-			ids = append(ids, id)
-		}
-		return ids
-	case reviewtutor.EdgeStudent:
-		ids := make([]ent.Value, 0, len(m.student))
-		for id := range m.student {
-			ids = append(ids, id)
-		}
-		return ids
-	}
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *ReviewTutorMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.removedtutor != nil {
-		edges = append(edges, reviewtutor.EdgeTutor)
-	}
-	if m.removedstudent != nil {
-		edges = append(edges, reviewtutor.EdgeStudent)
-	}
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *ReviewTutorMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case reviewtutor.EdgeTutor:
-		ids := make([]ent.Value, 0, len(m.removedtutor))
-		for id := range m.removedtutor {
-			ids = append(ids, id)
-		}
-		return ids
-	case reviewtutor.EdgeStudent:
-		ids := make([]ent.Value, 0, len(m.removedstudent))
-		for id := range m.removedstudent {
-			ids = append(ids, id)
-		}
-		return ids
-	}
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *ReviewTutorMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.clearedtutor {
-		edges = append(edges, reviewtutor.EdgeTutor)
-	}
-	if m.clearedstudent {
-		edges = append(edges, reviewtutor.EdgeStudent)
-	}
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *ReviewTutorMutation) EdgeCleared(name string) bool {
-	switch name {
-	case reviewtutor.EdgeTutor:
-		return m.clearedtutor
-	case reviewtutor.EdgeStudent:
-		return m.clearedstudent
-	}
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *ReviewTutorMutation) ClearEdge(name string) error {
-	switch name {
-	}
-	return fmt.Errorf("unknown ReviewTutor unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *ReviewTutorMutation) ResetEdge(name string) error {
-	switch name {
-	case reviewtutor.EdgeTutor:
-		m.ResetTutor()
-		return nil
-	case reviewtutor.EdgeStudent:
-		m.ResetStudent()
-		return nil
-	}
-	return fmt.Errorf("unknown ReviewTutor edge %s", name)
+	return fmt.Errorf("unknown Review edge %s", name)
 }
 
 // ScheduleMutation represents an operation that mutates the Schedule nodes in the graph.
@@ -6036,24 +5454,21 @@ func (m *ScheduleMutation) ResetEdge(name string) error {
 // StudentMutation represents an operation that mutates the Student nodes in the graph.
 type StudentMutation struct {
 	config
-	op                   Op
-	typ                  string
-	id                   *uuid.UUID
-	clearedFields        map[string]struct{}
-	match                map[uuid.UUID]struct{}
-	removedmatch         map[uuid.UUID]struct{}
-	clearedmatch         bool
-	review_course        map[int]struct{}
-	removedreview_course map[int]struct{}
-	clearedreview_course bool
-	review_tutor         map[int]struct{}
-	removedreview_tutor  map[int]struct{}
-	clearedreview_tutor  bool
-	user                 *uuid.UUID
-	cleareduser          bool
-	done                 bool
-	oldValue             func(context.Context) (*Student, error)
-	predicates           []predicate.Student
+	op            Op
+	typ           string
+	id            *uuid.UUID
+	clearedFields map[string]struct{}
+	match         map[uuid.UUID]struct{}
+	removedmatch  map[uuid.UUID]struct{}
+	clearedmatch  bool
+	review        map[int]struct{}
+	removedreview map[int]struct{}
+	clearedreview bool
+	user          *uuid.UUID
+	cleareduser   bool
+	done          bool
+	oldValue      func(context.Context) (*Student, error)
+	predicates    []predicate.Student
 }
 
 var _ ent.Mutation = (*StudentMutation)(nil)
@@ -6214,112 +5629,58 @@ func (m *StudentMutation) ResetMatch() {
 	m.removedmatch = nil
 }
 
-// AddReviewCourseIDs adds the "review_course" edge to the ReviewCourse entity by ids.
-func (m *StudentMutation) AddReviewCourseIDs(ids ...int) {
-	if m.review_course == nil {
-		m.review_course = make(map[int]struct{})
+// AddReviewIDs adds the "review" edge to the Review entity by ids.
+func (m *StudentMutation) AddReviewIDs(ids ...int) {
+	if m.review == nil {
+		m.review = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.review_course[ids[i]] = struct{}{}
+		m.review[ids[i]] = struct{}{}
 	}
 }
 
-// ClearReviewCourse clears the "review_course" edge to the ReviewCourse entity.
-func (m *StudentMutation) ClearReviewCourse() {
-	m.clearedreview_course = true
+// ClearReview clears the "review" edge to the Review entity.
+func (m *StudentMutation) ClearReview() {
+	m.clearedreview = true
 }
 
-// ReviewCourseCleared reports if the "review_course" edge to the ReviewCourse entity was cleared.
-func (m *StudentMutation) ReviewCourseCleared() bool {
-	return m.clearedreview_course
+// ReviewCleared reports if the "review" edge to the Review entity was cleared.
+func (m *StudentMutation) ReviewCleared() bool {
+	return m.clearedreview
 }
 
-// RemoveReviewCourseIDs removes the "review_course" edge to the ReviewCourse entity by IDs.
-func (m *StudentMutation) RemoveReviewCourseIDs(ids ...int) {
-	if m.removedreview_course == nil {
-		m.removedreview_course = make(map[int]struct{})
+// RemoveReviewIDs removes the "review" edge to the Review entity by IDs.
+func (m *StudentMutation) RemoveReviewIDs(ids ...int) {
+	if m.removedreview == nil {
+		m.removedreview = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.review_course, ids[i])
-		m.removedreview_course[ids[i]] = struct{}{}
+		delete(m.review, ids[i])
+		m.removedreview[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedReviewCourse returns the removed IDs of the "review_course" edge to the ReviewCourse entity.
-func (m *StudentMutation) RemovedReviewCourseIDs() (ids []int) {
-	for id := range m.removedreview_course {
+// RemovedReview returns the removed IDs of the "review" edge to the Review entity.
+func (m *StudentMutation) RemovedReviewIDs() (ids []int) {
+	for id := range m.removedreview {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ReviewCourseIDs returns the "review_course" edge IDs in the mutation.
-func (m *StudentMutation) ReviewCourseIDs() (ids []int) {
-	for id := range m.review_course {
+// ReviewIDs returns the "review" edge IDs in the mutation.
+func (m *StudentMutation) ReviewIDs() (ids []int) {
+	for id := range m.review {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetReviewCourse resets all changes to the "review_course" edge.
-func (m *StudentMutation) ResetReviewCourse() {
-	m.review_course = nil
-	m.clearedreview_course = false
-	m.removedreview_course = nil
-}
-
-// AddReviewTutorIDs adds the "review_tutor" edge to the ReviewTutor entity by ids.
-func (m *StudentMutation) AddReviewTutorIDs(ids ...int) {
-	if m.review_tutor == nil {
-		m.review_tutor = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.review_tutor[ids[i]] = struct{}{}
-	}
-}
-
-// ClearReviewTutor clears the "review_tutor" edge to the ReviewTutor entity.
-func (m *StudentMutation) ClearReviewTutor() {
-	m.clearedreview_tutor = true
-}
-
-// ReviewTutorCleared reports if the "review_tutor" edge to the ReviewTutor entity was cleared.
-func (m *StudentMutation) ReviewTutorCleared() bool {
-	return m.clearedreview_tutor
-}
-
-// RemoveReviewTutorIDs removes the "review_tutor" edge to the ReviewTutor entity by IDs.
-func (m *StudentMutation) RemoveReviewTutorIDs(ids ...int) {
-	if m.removedreview_tutor == nil {
-		m.removedreview_tutor = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.review_tutor, ids[i])
-		m.removedreview_tutor[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedReviewTutor returns the removed IDs of the "review_tutor" edge to the ReviewTutor entity.
-func (m *StudentMutation) RemovedReviewTutorIDs() (ids []int) {
-	for id := range m.removedreview_tutor {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ReviewTutorIDs returns the "review_tutor" edge IDs in the mutation.
-func (m *StudentMutation) ReviewTutorIDs() (ids []int) {
-	for id := range m.review_tutor {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetReviewTutor resets all changes to the "review_tutor" edge.
-func (m *StudentMutation) ResetReviewTutor() {
-	m.review_tutor = nil
-	m.clearedreview_tutor = false
-	m.removedreview_tutor = nil
+// ResetReview resets all changes to the "review" edge.
+func (m *StudentMutation) ResetReview() {
+	m.review = nil
+	m.clearedreview = false
+	m.removedreview = nil
 }
 
 // SetUserID sets the "user" edge to the User entity by id.
@@ -6469,15 +5830,12 @@ func (m *StudentMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *StudentMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 3)
 	if m.match != nil {
 		edges = append(edges, student.EdgeMatch)
 	}
-	if m.review_course != nil {
-		edges = append(edges, student.EdgeReviewCourse)
-	}
-	if m.review_tutor != nil {
-		edges = append(edges, student.EdgeReviewTutor)
+	if m.review != nil {
+		edges = append(edges, student.EdgeReview)
 	}
 	if m.user != nil {
 		edges = append(edges, student.EdgeUser)
@@ -6495,15 +5853,9 @@ func (m *StudentMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case student.EdgeReviewCourse:
-		ids := make([]ent.Value, 0, len(m.review_course))
-		for id := range m.review_course {
-			ids = append(ids, id)
-		}
-		return ids
-	case student.EdgeReviewTutor:
-		ids := make([]ent.Value, 0, len(m.review_tutor))
-		for id := range m.review_tutor {
+	case student.EdgeReview:
+		ids := make([]ent.Value, 0, len(m.review))
+		for id := range m.review {
 			ids = append(ids, id)
 		}
 		return ids
@@ -6517,15 +5869,12 @@ func (m *StudentMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *StudentMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 3)
 	if m.removedmatch != nil {
 		edges = append(edges, student.EdgeMatch)
 	}
-	if m.removedreview_course != nil {
-		edges = append(edges, student.EdgeReviewCourse)
-	}
-	if m.removedreview_tutor != nil {
-		edges = append(edges, student.EdgeReviewTutor)
+	if m.removedreview != nil {
+		edges = append(edges, student.EdgeReview)
 	}
 	return edges
 }
@@ -6540,15 +5889,9 @@ func (m *StudentMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case student.EdgeReviewCourse:
-		ids := make([]ent.Value, 0, len(m.removedreview_course))
-		for id := range m.removedreview_course {
-			ids = append(ids, id)
-		}
-		return ids
-	case student.EdgeReviewTutor:
-		ids := make([]ent.Value, 0, len(m.removedreview_tutor))
-		for id := range m.removedreview_tutor {
+	case student.EdgeReview:
+		ids := make([]ent.Value, 0, len(m.removedreview))
+		for id := range m.removedreview {
 			ids = append(ids, id)
 		}
 		return ids
@@ -6558,15 +5901,12 @@ func (m *StudentMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *StudentMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 3)
 	if m.clearedmatch {
 		edges = append(edges, student.EdgeMatch)
 	}
-	if m.clearedreview_course {
-		edges = append(edges, student.EdgeReviewCourse)
-	}
-	if m.clearedreview_tutor {
-		edges = append(edges, student.EdgeReviewTutor)
+	if m.clearedreview {
+		edges = append(edges, student.EdgeReview)
 	}
 	if m.cleareduser {
 		edges = append(edges, student.EdgeUser)
@@ -6580,10 +5920,8 @@ func (m *StudentMutation) EdgeCleared(name string) bool {
 	switch name {
 	case student.EdgeMatch:
 		return m.clearedmatch
-	case student.EdgeReviewCourse:
-		return m.clearedreview_course
-	case student.EdgeReviewTutor:
-		return m.clearedreview_tutor
+	case student.EdgeReview:
+		return m.clearedreview
 	case student.EdgeUser:
 		return m.cleareduser
 	}
@@ -6608,11 +5946,8 @@ func (m *StudentMutation) ResetEdge(name string) error {
 	case student.EdgeMatch:
 		m.ResetMatch()
 		return nil
-	case student.EdgeReviewCourse:
-		m.ResetReviewCourse()
-		return nil
-	case student.EdgeReviewTutor:
-		m.ResetReviewTutor()
+	case student.EdgeReview:
+		m.ResetReview()
 		return nil
 	case student.EdgeUser:
 		m.ResetUser()
@@ -6637,9 +5972,6 @@ type TutorMutation struct {
 	course              map[uuid.UUID]struct{}
 	removedcourse       map[uuid.UUID]struct{}
 	clearedcourse       bool
-	review_tutor        map[int]struct{}
-	removedreview_tutor map[int]struct{}
-	clearedreview_tutor bool
 	user                *uuid.UUID
 	cleareduser         bool
 	schedule            *uuid.UUID
@@ -6995,60 +6327,6 @@ func (m *TutorMutation) ResetCourse() {
 	m.removedcourse = nil
 }
 
-// AddReviewTutorIDs adds the "review_tutor" edge to the ReviewTutor entity by ids.
-func (m *TutorMutation) AddReviewTutorIDs(ids ...int) {
-	if m.review_tutor == nil {
-		m.review_tutor = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.review_tutor[ids[i]] = struct{}{}
-	}
-}
-
-// ClearReviewTutor clears the "review_tutor" edge to the ReviewTutor entity.
-func (m *TutorMutation) ClearReviewTutor() {
-	m.clearedreview_tutor = true
-}
-
-// ReviewTutorCleared reports if the "review_tutor" edge to the ReviewTutor entity was cleared.
-func (m *TutorMutation) ReviewTutorCleared() bool {
-	return m.clearedreview_tutor
-}
-
-// RemoveReviewTutorIDs removes the "review_tutor" edge to the ReviewTutor entity by IDs.
-func (m *TutorMutation) RemoveReviewTutorIDs(ids ...int) {
-	if m.removedreview_tutor == nil {
-		m.removedreview_tutor = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.review_tutor, ids[i])
-		m.removedreview_tutor[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedReviewTutor returns the removed IDs of the "review_tutor" edge to the ReviewTutor entity.
-func (m *TutorMutation) RemovedReviewTutorIDs() (ids []int) {
-	for id := range m.removedreview_tutor {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ReviewTutorIDs returns the "review_tutor" edge IDs in the mutation.
-func (m *TutorMutation) ReviewTutorIDs() (ids []int) {
-	for id := range m.review_tutor {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetReviewTutor resets all changes to the "review_tutor" edge.
-func (m *TutorMutation) ResetReviewTutor() {
-	m.review_tutor = nil
-	m.clearedreview_tutor = false
-	m.removedreview_tutor = nil
-}
-
 // SetUserID sets the "user" edge to the User entity by id.
 func (m *TutorMutation) SetUserID(id uuid.UUID) {
 	m.user = &id
@@ -7309,15 +6587,12 @@ func (m *TutorMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *TutorMutation) AddedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 4)
 	if m.issue_report != nil {
 		edges = append(edges, tutor.EdgeIssueReport)
 	}
 	if m.course != nil {
 		edges = append(edges, tutor.EdgeCourse)
-	}
-	if m.review_tutor != nil {
-		edges = append(edges, tutor.EdgeReviewTutor)
 	}
 	if m.user != nil {
 		edges = append(edges, tutor.EdgeUser)
@@ -7344,12 +6619,6 @@ func (m *TutorMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case tutor.EdgeReviewTutor:
-		ids := make([]ent.Value, 0, len(m.review_tutor))
-		for id := range m.review_tutor {
-			ids = append(ids, id)
-		}
-		return ids
 	case tutor.EdgeUser:
 		if id := m.user; id != nil {
 			return []ent.Value{*id}
@@ -7364,15 +6633,12 @@ func (m *TutorMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *TutorMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 4)
 	if m.removedissue_report != nil {
 		edges = append(edges, tutor.EdgeIssueReport)
 	}
 	if m.removedcourse != nil {
 		edges = append(edges, tutor.EdgeCourse)
-	}
-	if m.removedreview_tutor != nil {
-		edges = append(edges, tutor.EdgeReviewTutor)
 	}
 	return edges
 }
@@ -7393,27 +6659,18 @@ func (m *TutorMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case tutor.EdgeReviewTutor:
-		ids := make([]ent.Value, 0, len(m.removedreview_tutor))
-		for id := range m.removedreview_tutor {
-			ids = append(ids, id)
-		}
-		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *TutorMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 4)
 	if m.clearedissue_report {
 		edges = append(edges, tutor.EdgeIssueReport)
 	}
 	if m.clearedcourse {
 		edges = append(edges, tutor.EdgeCourse)
-	}
-	if m.clearedreview_tutor {
-		edges = append(edges, tutor.EdgeReviewTutor)
 	}
 	if m.cleareduser {
 		edges = append(edges, tutor.EdgeUser)
@@ -7432,8 +6689,6 @@ func (m *TutorMutation) EdgeCleared(name string) bool {
 		return m.clearedissue_report
 	case tutor.EdgeCourse:
 		return m.clearedcourse
-	case tutor.EdgeReviewTutor:
-		return m.clearedreview_tutor
 	case tutor.EdgeUser:
 		return m.cleareduser
 	case tutor.EdgeSchedule:
@@ -7465,9 +6720,6 @@ func (m *TutorMutation) ResetEdge(name string) error {
 		return nil
 	case tutor.EdgeCourse:
 		m.ResetCourse()
-		return nil
-	case tutor.EdgeReviewTutor:
-		m.ResetReviewTutor()
 		return nil
 	case tutor.EdgeUser:
 		m.ResetUser()

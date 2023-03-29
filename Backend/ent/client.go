@@ -17,8 +17,7 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewtutor"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/review"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
@@ -46,10 +45,8 @@ type Client struct {
 	Payment *PaymentClient
 	// PaymentHistory is the client for interacting with the PaymentHistory builders.
 	PaymentHistory *PaymentHistoryClient
-	// ReviewCourse is the client for interacting with the ReviewCourse builders.
-	ReviewCourse *ReviewCourseClient
-	// ReviewTutor is the client for interacting with the ReviewTutor builders.
-	ReviewTutor *ReviewTutorClient
+	// Review is the client for interacting with the Review builders.
+	Review *ReviewClient
 	// Schedule is the client for interacting with the Schedule builders.
 	Schedule *ScheduleClient
 	// Student is the client for interacting with the Student builders.
@@ -77,8 +74,7 @@ func (c *Client) init() {
 	c.Match = NewMatchClient(c.config)
 	c.Payment = NewPaymentClient(c.config)
 	c.PaymentHistory = NewPaymentHistoryClient(c.config)
-	c.ReviewCourse = NewReviewCourseClient(c.config)
-	c.ReviewTutor = NewReviewTutorClient(c.config)
+	c.Review = NewReviewClient(c.config)
 	c.Schedule = NewScheduleClient(c.config)
 	c.Student = NewStudentClient(c.config)
 	c.Tutor = NewTutorClient(c.config)
@@ -122,8 +118,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Match:          NewMatchClient(cfg),
 		Payment:        NewPaymentClient(cfg),
 		PaymentHistory: NewPaymentHistoryClient(cfg),
-		ReviewCourse:   NewReviewCourseClient(cfg),
-		ReviewTutor:    NewReviewTutorClient(cfg),
+		Review:         NewReviewClient(cfg),
 		Schedule:       NewScheduleClient(cfg),
 		Student:        NewStudentClient(cfg),
 		Tutor:          NewTutorClient(cfg),
@@ -153,8 +148,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Match:          NewMatchClient(cfg),
 		Payment:        NewPaymentClient(cfg),
 		PaymentHistory: NewPaymentHistoryClient(cfg),
-		ReviewCourse:   NewReviewCourseClient(cfg),
-		ReviewTutor:    NewReviewTutorClient(cfg),
+		Review:         NewReviewClient(cfg),
 		Schedule:       NewScheduleClient(cfg),
 		Student:        NewStudentClient(cfg),
 		Tutor:          NewTutorClient(cfg),
@@ -193,8 +187,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Match.Use(hooks...)
 	c.Payment.Use(hooks...)
 	c.PaymentHistory.Use(hooks...)
-	c.ReviewCourse.Use(hooks...)
-	c.ReviewTutor.Use(hooks...)
+	c.Review.Use(hooks...)
 	c.Schedule.Use(hooks...)
 	c.Student.Use(hooks...)
 	c.Tutor.Use(hooks...)
@@ -210,8 +203,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Match.Intercept(interceptors...)
 	c.Payment.Intercept(interceptors...)
 	c.PaymentHistory.Intercept(interceptors...)
-	c.ReviewCourse.Intercept(interceptors...)
-	c.ReviewTutor.Intercept(interceptors...)
+	c.Review.Intercept(interceptors...)
 	c.Schedule.Intercept(interceptors...)
 	c.Student.Intercept(interceptors...)
 	c.Tutor.Intercept(interceptors...)
@@ -233,10 +225,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Payment.mutate(ctx, m)
 	case *PaymentHistoryMutation:
 		return c.PaymentHistory.mutate(ctx, m)
-	case *ReviewCourseMutation:
-		return c.ReviewCourse.mutate(ctx, m)
-	case *ReviewTutorMutation:
-		return c.ReviewTutor.mutate(ctx, m)
+	case *ReviewMutation:
+		return c.Review.mutate(ctx, m)
 	case *ScheduleMutation:
 		return c.Schedule.mutate(ctx, m)
 	case *StudentMutation:
@@ -509,15 +499,15 @@ func (c *CourseClient) GetX(ctx context.Context, id uuid.UUID) *Course {
 	return obj
 }
 
-// QueryReviewCourse queries the review_course edge of a Course.
-func (c *CourseClient) QueryReviewCourse(co *Course) *ReviewCourseQuery {
-	query := (&ReviewCourseClient{config: c.config}).Query()
+// QueryReview queries the review edge of a Course.
+func (c *CourseClient) QueryReview(co *Course) *ReviewQuery {
+	query := (&ReviewClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := co.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(course.Table, course.FieldID, id),
-			sqlgraph.To(reviewcourse.Table, reviewcourse.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, course.ReviewCourseTable, course.ReviewCoursePrimaryKey...),
+			sqlgraph.To(review.Table, review.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, course.ReviewTable, course.ReviewPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
 		return fromV, nil
@@ -1198,92 +1188,92 @@ func (c *PaymentHistoryClient) mutate(ctx context.Context, m *PaymentHistoryMuta
 	}
 }
 
-// ReviewCourseClient is a client for the ReviewCourse schema.
-type ReviewCourseClient struct {
+// ReviewClient is a client for the Review schema.
+type ReviewClient struct {
 	config
 }
 
-// NewReviewCourseClient returns a client for the ReviewCourse from the given config.
-func NewReviewCourseClient(c config) *ReviewCourseClient {
-	return &ReviewCourseClient{config: c}
+// NewReviewClient returns a client for the Review from the given config.
+func NewReviewClient(c config) *ReviewClient {
+	return &ReviewClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `reviewcourse.Hooks(f(g(h())))`.
-func (c *ReviewCourseClient) Use(hooks ...Hook) {
-	c.hooks.ReviewCourse = append(c.hooks.ReviewCourse, hooks...)
+// A call to `Use(f, g, h)` equals to `review.Hooks(f(g(h())))`.
+func (c *ReviewClient) Use(hooks ...Hook) {
+	c.hooks.Review = append(c.hooks.Review, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `reviewcourse.Intercept(f(g(h())))`.
-func (c *ReviewCourseClient) Intercept(interceptors ...Interceptor) {
-	c.inters.ReviewCourse = append(c.inters.ReviewCourse, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `review.Intercept(f(g(h())))`.
+func (c *ReviewClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Review = append(c.inters.Review, interceptors...)
 }
 
-// Create returns a builder for creating a ReviewCourse entity.
-func (c *ReviewCourseClient) Create() *ReviewCourseCreate {
-	mutation := newReviewCourseMutation(c.config, OpCreate)
-	return &ReviewCourseCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a Review entity.
+func (c *ReviewClient) Create() *ReviewCreate {
+	mutation := newReviewMutation(c.config, OpCreate)
+	return &ReviewCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of ReviewCourse entities.
-func (c *ReviewCourseClient) CreateBulk(builders ...*ReviewCourseCreate) *ReviewCourseCreateBulk {
-	return &ReviewCourseCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of Review entities.
+func (c *ReviewClient) CreateBulk(builders ...*ReviewCreate) *ReviewCreateBulk {
+	return &ReviewCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for ReviewCourse.
-func (c *ReviewCourseClient) Update() *ReviewCourseUpdate {
-	mutation := newReviewCourseMutation(c.config, OpUpdate)
-	return &ReviewCourseUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for Review.
+func (c *ReviewClient) Update() *ReviewUpdate {
+	mutation := newReviewMutation(c.config, OpUpdate)
+	return &ReviewUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *ReviewCourseClient) UpdateOne(rc *ReviewCourse) *ReviewCourseUpdateOne {
-	mutation := newReviewCourseMutation(c.config, OpUpdateOne, withReviewCourse(rc))
-	return &ReviewCourseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *ReviewClient) UpdateOne(r *Review) *ReviewUpdateOne {
+	mutation := newReviewMutation(c.config, OpUpdateOne, withReview(r))
+	return &ReviewUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ReviewCourseClient) UpdateOneID(id int) *ReviewCourseUpdateOne {
-	mutation := newReviewCourseMutation(c.config, OpUpdateOne, withReviewCourseID(id))
-	return &ReviewCourseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *ReviewClient) UpdateOneID(id int) *ReviewUpdateOne {
+	mutation := newReviewMutation(c.config, OpUpdateOne, withReviewID(id))
+	return &ReviewUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for ReviewCourse.
-func (c *ReviewCourseClient) Delete() *ReviewCourseDelete {
-	mutation := newReviewCourseMutation(c.config, OpDelete)
-	return &ReviewCourseDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for Review.
+func (c *ReviewClient) Delete() *ReviewDelete {
+	mutation := newReviewMutation(c.config, OpDelete)
+	return &ReviewDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *ReviewCourseClient) DeleteOne(rc *ReviewCourse) *ReviewCourseDeleteOne {
-	return c.DeleteOneID(rc.ID)
+func (c *ReviewClient) DeleteOne(r *Review) *ReviewDeleteOne {
+	return c.DeleteOneID(r.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ReviewCourseClient) DeleteOneID(id int) *ReviewCourseDeleteOne {
-	builder := c.Delete().Where(reviewcourse.ID(id))
+func (c *ReviewClient) DeleteOneID(id int) *ReviewDeleteOne {
+	builder := c.Delete().Where(review.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &ReviewCourseDeleteOne{builder}
+	return &ReviewDeleteOne{builder}
 }
 
-// Query returns a query builder for ReviewCourse.
-func (c *ReviewCourseClient) Query() *ReviewCourseQuery {
-	return &ReviewCourseQuery{
+// Query returns a query builder for Review.
+func (c *ReviewClient) Query() *ReviewQuery {
+	return &ReviewQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeReviewCourse},
+		ctx:    &QueryContext{Type: TypeReview},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a ReviewCourse entity by its id.
-func (c *ReviewCourseClient) Get(ctx context.Context, id int) (*ReviewCourse, error) {
-	return c.Query().Where(reviewcourse.ID(id)).Only(ctx)
+// Get returns a Review entity by its id.
+func (c *ReviewClient) Get(ctx context.Context, id int) (*Review, error) {
+	return c.Query().Where(review.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ReviewCourseClient) GetX(ctx context.Context, id int) *ReviewCourse {
+func (c *ReviewClient) GetX(ctx context.Context, id int) *Review {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1291,210 +1281,60 @@ func (c *ReviewCourseClient) GetX(ctx context.Context, id int) *ReviewCourse {
 	return obj
 }
 
-// QueryCourse queries the course edge of a ReviewCourse.
-func (c *ReviewCourseClient) QueryCourse(rc *ReviewCourse) *CourseQuery {
+// QueryCourse queries the course edge of a Review.
+func (c *ReviewClient) QueryCourse(r *Review) *CourseQuery {
 	query := (&CourseClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := rc.ID
+		id := r.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(reviewcourse.Table, reviewcourse.FieldID, id),
+			sqlgraph.From(review.Table, review.FieldID, id),
 			sqlgraph.To(course.Table, course.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, reviewcourse.CourseTable, reviewcourse.CoursePrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, review.CourseTable, review.CoursePrimaryKey...),
 		)
-		fromV = sqlgraph.Neighbors(rc.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
-// QueryStudent queries the student edge of a ReviewCourse.
-func (c *ReviewCourseClient) QueryStudent(rc *ReviewCourse) *StudentQuery {
+// QueryStudent queries the student edge of a Review.
+func (c *ReviewClient) QueryStudent(r *Review) *StudentQuery {
 	query := (&StudentClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := rc.ID
+		id := r.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(reviewcourse.Table, reviewcourse.FieldID, id),
+			sqlgraph.From(review.Table, review.FieldID, id),
 			sqlgraph.To(student.Table, student.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, reviewcourse.StudentTable, reviewcourse.StudentPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, review.StudentTable, review.StudentPrimaryKey...),
 		)
-		fromV = sqlgraph.Neighbors(rc.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // Hooks returns the client hooks.
-func (c *ReviewCourseClient) Hooks() []Hook {
-	return c.hooks.ReviewCourse
+func (c *ReviewClient) Hooks() []Hook {
+	return c.hooks.Review
 }
 
 // Interceptors returns the client interceptors.
-func (c *ReviewCourseClient) Interceptors() []Interceptor {
-	return c.inters.ReviewCourse
+func (c *ReviewClient) Interceptors() []Interceptor {
+	return c.inters.Review
 }
 
-func (c *ReviewCourseClient) mutate(ctx context.Context, m *ReviewCourseMutation) (Value, error) {
+func (c *ReviewClient) mutate(ctx context.Context, m *ReviewMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&ReviewCourseCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ReviewCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&ReviewCourseUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ReviewUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&ReviewCourseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ReviewUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&ReviewCourseDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&ReviewDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown ReviewCourse mutation op: %q", m.Op())
-	}
-}
-
-// ReviewTutorClient is a client for the ReviewTutor schema.
-type ReviewTutorClient struct {
-	config
-}
-
-// NewReviewTutorClient returns a client for the ReviewTutor from the given config.
-func NewReviewTutorClient(c config) *ReviewTutorClient {
-	return &ReviewTutorClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `reviewtutor.Hooks(f(g(h())))`.
-func (c *ReviewTutorClient) Use(hooks ...Hook) {
-	c.hooks.ReviewTutor = append(c.hooks.ReviewTutor, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `reviewtutor.Intercept(f(g(h())))`.
-func (c *ReviewTutorClient) Intercept(interceptors ...Interceptor) {
-	c.inters.ReviewTutor = append(c.inters.ReviewTutor, interceptors...)
-}
-
-// Create returns a builder for creating a ReviewTutor entity.
-func (c *ReviewTutorClient) Create() *ReviewTutorCreate {
-	mutation := newReviewTutorMutation(c.config, OpCreate)
-	return &ReviewTutorCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of ReviewTutor entities.
-func (c *ReviewTutorClient) CreateBulk(builders ...*ReviewTutorCreate) *ReviewTutorCreateBulk {
-	return &ReviewTutorCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for ReviewTutor.
-func (c *ReviewTutorClient) Update() *ReviewTutorUpdate {
-	mutation := newReviewTutorMutation(c.config, OpUpdate)
-	return &ReviewTutorUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *ReviewTutorClient) UpdateOne(rt *ReviewTutor) *ReviewTutorUpdateOne {
-	mutation := newReviewTutorMutation(c.config, OpUpdateOne, withReviewTutor(rt))
-	return &ReviewTutorUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *ReviewTutorClient) UpdateOneID(id int) *ReviewTutorUpdateOne {
-	mutation := newReviewTutorMutation(c.config, OpUpdateOne, withReviewTutorID(id))
-	return &ReviewTutorUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for ReviewTutor.
-func (c *ReviewTutorClient) Delete() *ReviewTutorDelete {
-	mutation := newReviewTutorMutation(c.config, OpDelete)
-	return &ReviewTutorDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *ReviewTutorClient) DeleteOne(rt *ReviewTutor) *ReviewTutorDeleteOne {
-	return c.DeleteOneID(rt.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ReviewTutorClient) DeleteOneID(id int) *ReviewTutorDeleteOne {
-	builder := c.Delete().Where(reviewtutor.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &ReviewTutorDeleteOne{builder}
-}
-
-// Query returns a query builder for ReviewTutor.
-func (c *ReviewTutorClient) Query() *ReviewTutorQuery {
-	return &ReviewTutorQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeReviewTutor},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a ReviewTutor entity by its id.
-func (c *ReviewTutorClient) Get(ctx context.Context, id int) (*ReviewTutor, error) {
-	return c.Query().Where(reviewtutor.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *ReviewTutorClient) GetX(ctx context.Context, id int) *ReviewTutor {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryTutor queries the tutor edge of a ReviewTutor.
-func (c *ReviewTutorClient) QueryTutor(rt *ReviewTutor) *TutorQuery {
-	query := (&TutorClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := rt.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(reviewtutor.Table, reviewtutor.FieldID, id),
-			sqlgraph.To(tutor.Table, tutor.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, reviewtutor.TutorTable, reviewtutor.TutorPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(rt.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryStudent queries the student edge of a ReviewTutor.
-func (c *ReviewTutorClient) QueryStudent(rt *ReviewTutor) *StudentQuery {
-	query := (&StudentClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := rt.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(reviewtutor.Table, reviewtutor.FieldID, id),
-			sqlgraph.To(student.Table, student.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, reviewtutor.StudentTable, reviewtutor.StudentPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(rt.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *ReviewTutorClient) Hooks() []Hook {
-	return c.hooks.ReviewTutor
-}
-
-// Interceptors returns the client interceptors.
-func (c *ReviewTutorClient) Interceptors() []Interceptor {
-	return c.inters.ReviewTutor
-}
-
-func (c *ReviewTutorClient) mutate(ctx context.Context, m *ReviewTutorMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&ReviewTutorCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&ReviewTutorUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&ReviewTutorUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&ReviewTutorDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown ReviewTutor mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown Review mutation op: %q", m.Op())
 	}
 }
 
@@ -1757,31 +1597,15 @@ func (c *StudentClient) QueryMatch(s *Student) *MatchQuery {
 	return query
 }
 
-// QueryReviewCourse queries the review_course edge of a Student.
-func (c *StudentClient) QueryReviewCourse(s *Student) *ReviewCourseQuery {
-	query := (&ReviewCourseClient{config: c.config}).Query()
+// QueryReview queries the review edge of a Student.
+func (c *StudentClient) QueryReview(s *Student) *ReviewQuery {
+	query := (&ReviewClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := s.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(student.Table, student.FieldID, id),
-			sqlgraph.To(reviewcourse.Table, reviewcourse.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, student.ReviewCourseTable, student.ReviewCoursePrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryReviewTutor queries the review_tutor edge of a Student.
-func (c *StudentClient) QueryReviewTutor(s *Student) *ReviewTutorQuery {
-	query := (&ReviewTutorClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := s.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(student.Table, student.FieldID, id),
-			sqlgraph.To(reviewtutor.Table, reviewtutor.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, student.ReviewTutorTable, student.ReviewTutorPrimaryKey...),
+			sqlgraph.To(review.Table, review.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, student.ReviewTable, student.ReviewPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil
@@ -1948,22 +1772,6 @@ func (c *TutorClient) QueryCourse(t *Tutor) *CourseQuery {
 			sqlgraph.From(tutor.Table, tutor.FieldID, id),
 			sqlgraph.To(course.Table, course.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, tutor.CourseTable, tutor.CourseColumn),
-		)
-		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryReviewTutor queries the review_tutor edge of a Tutor.
-func (c *TutorClient) QueryReviewTutor(t *Tutor) *ReviewTutorQuery {
-	query := (&ReviewTutorClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := t.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(tutor.Table, tutor.FieldID, id),
-			sqlgraph.To(reviewtutor.Table, reviewtutor.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, tutor.ReviewTutorTable, tutor.ReviewTutorPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil

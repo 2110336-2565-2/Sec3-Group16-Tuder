@@ -32,8 +32,7 @@ func (Student) Edges() []ent.Edge {
 		// edge.To("issue_report", IssueReport.Type),
 		edge.To("match", Match.Type),
 		// edge.To("class", Class.Type),
-		edge.To("review_course", ReviewCourse.Type),
-		edge.To("review_tutor", ReviewTutor.Type),
+		edge.To("review", Review.Type),
 		edge.From("user", User.Type).
 			Ref("student").
 			Unique().

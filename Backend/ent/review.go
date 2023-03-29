@@ -5,13 +5,14 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/review"
 )
 
-// ReviewCourse is the model entity for the ReviewCourse schema.
-type ReviewCourse struct {
+// Review is the model entity for the Review schema.
+type Review struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
@@ -19,13 +20,15 @@ type ReviewCourse struct {
 	Score *float32 `json:"score,omitempty"`
 	// ReviewMsg holds the value of the "review_msg" field.
 	ReviewMsg *string `json:"review_msg,omitempty"`
+	// ReviewTimeAt holds the value of the "review_time_at" field.
+	ReviewTimeAt time.Time `json:"review_time_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the ReviewCourseQuery when eager-loading is set.
-	Edges ReviewCourseEdges `json:"edges"`
+	// The values are being populated by the ReviewQuery when eager-loading is set.
+	Edges ReviewEdges `json:"edges"`
 }
 
-// ReviewCourseEdges holds the relations/edges for other nodes in the graph.
-type ReviewCourseEdges struct {
+// ReviewEdges holds the relations/edges for other nodes in the graph.
+type ReviewEdges struct {
 	// Course holds the value of the course edge.
 	Course []*Course `json:"course,omitempty"`
 	// Student holds the value of the student edge.
@@ -37,7 +40,7 @@ type ReviewCourseEdges struct {
 
 // CourseOrErr returns the Course value or an error if the edge
 // was not loaded in eager-loading.
-func (e ReviewCourseEdges) CourseOrErr() ([]*Course, error) {
+func (e ReviewEdges) CourseOrErr() ([]*Course, error) {
 	if e.loadedTypes[0] {
 		return e.Course, nil
 	}
@@ -46,7 +49,7 @@ func (e ReviewCourseEdges) CourseOrErr() ([]*Course, error) {
 
 // StudentOrErr returns the Student value or an error if the edge
 // was not loaded in eager-loading.
-func (e ReviewCourseEdges) StudentOrErr() ([]*Student, error) {
+func (e ReviewEdges) StudentOrErr() ([]*Student, error) {
 	if e.loadedTypes[1] {
 		return e.Student, nil
 	}
@@ -54,101 +57,112 @@ func (e ReviewCourseEdges) StudentOrErr() ([]*Student, error) {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*ReviewCourse) scanValues(columns []string) ([]any, error) {
+func (*Review) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case reviewcourse.FieldScore:
+		case review.FieldScore:
 			values[i] = new(sql.NullFloat64)
-		case reviewcourse.FieldID:
+		case review.FieldID:
 			values[i] = new(sql.NullInt64)
-		case reviewcourse.FieldReviewMsg:
+		case review.FieldReviewMsg:
 			values[i] = new(sql.NullString)
+		case review.FieldReviewTimeAt:
+			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type ReviewCourse", columns[i])
+			return nil, fmt.Errorf("unexpected column %q for type Review", columns[i])
 		}
 	}
 	return values, nil
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the ReviewCourse fields.
-func (rc *ReviewCourse) assignValues(columns []string, values []any) error {
+// to the Review fields.
+func (r *Review) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case reviewcourse.FieldID:
+		case review.FieldID:
 			value, ok := values[i].(*sql.NullInt64)
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			rc.ID = int(value.Int64)
-		case reviewcourse.FieldScore:
+			r.ID = int(value.Int64)
+		case review.FieldScore:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field score", values[i])
 			} else if value.Valid {
-				rc.Score = new(float32)
-				*rc.Score = float32(value.Float64)
+				r.Score = new(float32)
+				*r.Score = float32(value.Float64)
 			}
-		case reviewcourse.FieldReviewMsg:
+		case review.FieldReviewMsg:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field review_msg", values[i])
 			} else if value.Valid {
-				rc.ReviewMsg = new(string)
-				*rc.ReviewMsg = value.String
+				r.ReviewMsg = new(string)
+				*r.ReviewMsg = value.String
+			}
+		case review.FieldReviewTimeAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field review_time_at", values[i])
+			} else if value.Valid {
+				r.ReviewTimeAt = value.Time
 			}
 		}
 	}
 	return nil
 }
 
-// QueryCourse queries the "course" edge of the ReviewCourse entity.
-func (rc *ReviewCourse) QueryCourse() *CourseQuery {
-	return NewReviewCourseClient(rc.config).QueryCourse(rc)
+// QueryCourse queries the "course" edge of the Review entity.
+func (r *Review) QueryCourse() *CourseQuery {
+	return NewReviewClient(r.config).QueryCourse(r)
 }
 
-// QueryStudent queries the "student" edge of the ReviewCourse entity.
-func (rc *ReviewCourse) QueryStudent() *StudentQuery {
-	return NewReviewCourseClient(rc.config).QueryStudent(rc)
+// QueryStudent queries the "student" edge of the Review entity.
+func (r *Review) QueryStudent() *StudentQuery {
+	return NewReviewClient(r.config).QueryStudent(r)
 }
 
-// Update returns a builder for updating this ReviewCourse.
-// Note that you need to call ReviewCourse.Unwrap() before calling this method if this ReviewCourse
+// Update returns a builder for updating this Review.
+// Note that you need to call Review.Unwrap() before calling this method if this Review
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (rc *ReviewCourse) Update() *ReviewCourseUpdateOne {
-	return NewReviewCourseClient(rc.config).UpdateOne(rc)
+func (r *Review) Update() *ReviewUpdateOne {
+	return NewReviewClient(r.config).UpdateOne(r)
 }
 
-// Unwrap unwraps the ReviewCourse entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the Review entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (rc *ReviewCourse) Unwrap() *ReviewCourse {
-	_tx, ok := rc.config.driver.(*txDriver)
+func (r *Review) Unwrap() *Review {
+	_tx, ok := r.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: ReviewCourse is not a transactional entity")
+		panic("ent: Review is not a transactional entity")
 	}
-	rc.config.driver = _tx.drv
-	return rc
+	r.config.driver = _tx.drv
+	return r
 }
 
 // String implements the fmt.Stringer.
-func (rc *ReviewCourse) String() string {
+func (r *Review) String() string {
 	var builder strings.Builder
-	builder.WriteString("ReviewCourse(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", rc.ID))
-	if v := rc.Score; v != nil {
+	builder.WriteString("Review(")
+	builder.WriteString(fmt.Sprintf("id=%v, ", r.ID))
+	if v := r.Score; v != nil {
 		builder.WriteString("score=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
-	if v := rc.ReviewMsg; v != nil {
+	if v := r.ReviewMsg; v != nil {
 		builder.WriteString("review_msg=")
 		builder.WriteString(*v)
 	}
+	builder.WriteString(", ")
+	builder.WriteString("review_time_at=")
+	builder.WriteString(r.ReviewTimeAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }
 
-// ReviewCourses is a parsable slice of ReviewCourse.
-type ReviewCourses []*ReviewCourse
+// Reviews is a parsable slice of Review.
+type Reviews []*Review
