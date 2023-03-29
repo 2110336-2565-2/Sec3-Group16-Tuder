@@ -17,6 +17,7 @@ import ErrorPage from './pages/ErrorPage';
 import ChangePassword from './pages/ChangePassword';
 import EnterNewPassword from './pages/EnterNewPassword';
 import CancelRequestList from './pages/CancelRequestList';
+import UserCancelRequest from './pages/UserCancelRequest';
 import { QueryClientProvider, QueryClient } from 'react-query';
 
 Modal.setAppElement(document.getElementById('root'))
@@ -73,6 +74,10 @@ const router = createBrowserRouter([
       {
         path: "cancel-request-list",
         element: <CancelRequestList />,
+      },
+      {
+        path: "user-cancel-request",
+        element: <UserCancelRequest />,
       }
     ]
   }
