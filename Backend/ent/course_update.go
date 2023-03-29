@@ -137,14 +137,14 @@ func (cu *CourseUpdate) AddReviewCourse(r ...*ReviewCourse) *CourseUpdate {
 }
 
 // AddMatchIDs adds the "match" edge to the Match entity by IDs.
-func (cu *CourseUpdate) AddMatchIDs(ids ...int) *CourseUpdate {
+func (cu *CourseUpdate) AddMatchIDs(ids ...uuid.UUID) *CourseUpdate {
 	cu.mutation.AddMatchIDs(ids...)
 	return cu
 }
 
 // AddMatch adds the "match" edges to the Match entity.
 func (cu *CourseUpdate) AddMatch(m ...*Match) *CourseUpdate {
-	ids := make([]int, len(m))
+	ids := make([]uuid.UUID, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
@@ -195,14 +195,14 @@ func (cu *CourseUpdate) ClearMatch() *CourseUpdate {
 }
 
 // RemoveMatchIDs removes the "match" edge to Match entities by IDs.
-func (cu *CourseUpdate) RemoveMatchIDs(ids ...int) *CourseUpdate {
+func (cu *CourseUpdate) RemoveMatchIDs(ids ...uuid.UUID) *CourseUpdate {
 	cu.mutation.RemoveMatchIDs(ids...)
 	return cu
 }
 
 // RemoveMatch removes "match" edges to Match entities.
 func (cu *CourseUpdate) RemoveMatch(m ...*Match) *CourseUpdate {
-	ids := make([]int, len(m))
+	ids := make([]uuid.UUID, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
@@ -391,7 +391,7 @@ func (cu *CourseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: match.FieldID,
 				},
 			},
@@ -407,7 +407,7 @@ func (cu *CourseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: match.FieldID,
 				},
 			},
@@ -426,7 +426,7 @@ func (cu *CourseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: match.FieldID,
 				},
 			},
@@ -597,14 +597,14 @@ func (cuo *CourseUpdateOne) AddReviewCourse(r ...*ReviewCourse) *CourseUpdateOne
 }
 
 // AddMatchIDs adds the "match" edge to the Match entity by IDs.
-func (cuo *CourseUpdateOne) AddMatchIDs(ids ...int) *CourseUpdateOne {
+func (cuo *CourseUpdateOne) AddMatchIDs(ids ...uuid.UUID) *CourseUpdateOne {
 	cuo.mutation.AddMatchIDs(ids...)
 	return cuo
 }
 
 // AddMatch adds the "match" edges to the Match entity.
 func (cuo *CourseUpdateOne) AddMatch(m ...*Match) *CourseUpdateOne {
-	ids := make([]int, len(m))
+	ids := make([]uuid.UUID, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
@@ -655,14 +655,14 @@ func (cuo *CourseUpdateOne) ClearMatch() *CourseUpdateOne {
 }
 
 // RemoveMatchIDs removes the "match" edge to Match entities by IDs.
-func (cuo *CourseUpdateOne) RemoveMatchIDs(ids ...int) *CourseUpdateOne {
+func (cuo *CourseUpdateOne) RemoveMatchIDs(ids ...uuid.UUID) *CourseUpdateOne {
 	cuo.mutation.RemoveMatchIDs(ids...)
 	return cuo
 }
 
 // RemoveMatch removes "match" edges to Match entities.
 func (cuo *CourseUpdateOne) RemoveMatch(m ...*Match) *CourseUpdateOne {
-	ids := make([]int, len(m))
+	ids := make([]uuid.UUID, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
@@ -881,7 +881,7 @@ func (cuo *CourseUpdateOne) sqlSave(ctx context.Context) (_node *Course, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: match.FieldID,
 				},
 			},
@@ -897,7 +897,7 @@ func (cuo *CourseUpdateOne) sqlSave(ctx context.Context) (_node *Course, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: match.FieldID,
 				},
 			},
@@ -916,7 +916,7 @@ func (cuo *CourseUpdateOne) sqlSave(ctx context.Context) (_node *Course, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: match.FieldID,
 				},
 			},

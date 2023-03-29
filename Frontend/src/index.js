@@ -12,9 +12,11 @@ import Report from './pages/Report';
 import ForgetPassword from './pages/ForgetPassword';
 import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
+import Review from './pages/Review';
 import ErrorPage from './pages/ErrorPage';
 import ChangePassword from './pages/ChangePassword';
 import EnterNewPassword from './pages/EnterNewPassword';
+import CancelRequestList from './pages/CancelRequestList';
 import { QueryClientProvider, QueryClient } from 'react-query';
 
 Modal.setAppElement(document.getElementById('root'))
@@ -49,12 +51,16 @@ const router = createBrowserRouter([
         element: <ForgetPassword />,
       },
       {
-        path: "profile",
+        path: "/profile",
         element: <Profile />,
       },
       {
-        path: "edit-profile",
+        path: "/edit-profile",
         element: <EditProfile />,
+      },
+      {
+        path: "/review/:id",
+        element: <Review />,
       },
       {
         path: "/change-password",
@@ -63,16 +69,20 @@ const router = createBrowserRouter([
       {
         path: "enter-new-password",
         element: <EnterNewPassword />,
+      },
+      {
+        path: "cancel-request-list",
+        element: <CancelRequestList />,
       }
     ]
   }
 ])
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
+  <>
     <QueryClientProvider client={queryClient}>
     <RouterProvider router={router} />
     </QueryClientProvider>
-  </React.StrictMode>
+  </>
 );
 

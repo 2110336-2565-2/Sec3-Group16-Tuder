@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 	"log"
 	"os"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/migrate"
+
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/datas"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/middlewares"
 	routes "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/routes"
@@ -34,6 +36,11 @@ func main() {
 	db_name := os.Getenv("DB_NAME")
 	db_port := os.Getenv("DB_PORT")
 
+	// for dev mode, Drop all table
+	if os.Getenv("MODE") == "dev" {
+		utils.NukeDB()
+	}
+
 	client, err := ent.Open("postgres", "host="+host+" port="+db_port+" user="+db_user+" dbname="+db_name+" password="+db_pass+" sslmode=disable")
 	if err != nil {
 		log.Fatalf("failed opening connection to postgres: %v", err)
@@ -42,7 +49,6 @@ func main() {
 	defer client.Close()
 
 	if err := client.Schema.Create(context.Background(),
-
 		migrate.WithGlobalUniqueID(true),
 		migrate.WithDropIndex(true),
 		migrate.WithDropColumn(true),
@@ -50,11 +56,13 @@ func main() {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
-	// test must reset db as always
-	datas.InsertData(client)
+	// test data for development
+	if os.Getenv("MODE") == "dev" {
+		datas.InsertData(client)
+	}
 
-	routes.InitRoutes(client, e)
 	e.Use(middlewares.CorsMiddleware)
+	routes.InitRoutes(client, e)
 	e.Logger.Fatal(e.Start(port))
 
 }

@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -39,14 +38,20 @@ func (cc *ClassCreate) SetNillableReviewAvaliable(b *bool) *ClassCreate {
 }
 
 // SetTotalHour sets the "total_hour" field.
-func (cc *ClassCreate) SetTotalHour(t time.Time) *ClassCreate {
-	cc.mutation.SetTotalHour(t)
+func (cc *ClassCreate) SetTotalHour(i int) *ClassCreate {
+	cc.mutation.SetTotalHour(i)
 	return cc
 }
 
 // SetSuccessHour sets the "success_hour" field.
-func (cc *ClassCreate) SetSuccessHour(t time.Time) *ClassCreate {
-	cc.mutation.SetSuccessHour(t)
+func (cc *ClassCreate) SetSuccessHour(i int) *ClassCreate {
+	cc.mutation.SetSuccessHour(i)
+	return cc
+}
+
+// SetStatus sets the "status" field.
+func (cc *ClassCreate) SetStatus(c class.Status) *ClassCreate {
+	cc.mutation.SetStatus(c)
 	return cc
 }
 
@@ -65,14 +70,14 @@ func (cc *ClassCreate) SetNillableID(u *uuid.UUID) *ClassCreate {
 }
 
 // AddMatchIDs adds the "match" edge to the Match entity by IDs.
-func (cc *ClassCreate) AddMatchIDs(ids ...int) *ClassCreate {
+func (cc *ClassCreate) AddMatchIDs(ids ...uuid.UUID) *ClassCreate {
 	cc.mutation.AddMatchIDs(ids...)
 	return cc
 }
 
 // AddMatch adds the "match" edges to the Match entity.
 func (cc *ClassCreate) AddMatch(m ...*Match) *ClassCreate {
-	ids := make([]int, len(m))
+	ids := make([]uuid.UUID, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
@@ -157,6 +162,14 @@ func (cc *ClassCreate) check() error {
 	if _, ok := cc.mutation.SuccessHour(); !ok {
 		return &ValidationError{Name: "success_hour", err: errors.New(`ent: missing required field "Class.success_hour"`)}
 	}
+	if _, ok := cc.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Class.status"`)}
+	}
+	if v, ok := cc.mutation.Status(); ok {
+		if err := class.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Class.status": %w`, err)}
+		}
+	}
 	if _, ok := cc.mutation.ScheduleID(); !ok {
 		return &ValidationError{Name: "schedule", err: errors.New(`ent: missing required edge "Class.schedule"`)}
 	}
@@ -203,12 +216,16 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 		_node.ReviewAvaliable = value
 	}
 	if value, ok := cc.mutation.TotalHour(); ok {
-		_spec.SetField(class.FieldTotalHour, field.TypeTime, value)
+		_spec.SetField(class.FieldTotalHour, field.TypeInt, value)
 		_node.TotalHour = value
 	}
 	if value, ok := cc.mutation.SuccessHour(); ok {
-		_spec.SetField(class.FieldSuccessHour, field.TypeTime, value)
+		_spec.SetField(class.FieldSuccessHour, field.TypeInt, value)
 		_node.SuccessHour = value
+	}
+	if value, ok := cc.mutation.Status(); ok {
+		_spec.SetField(class.FieldStatus, field.TypeEnum, value)
+		_node.Status = value
 	}
 	if nodes := cc.mutation.MatchIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -219,7 +236,7 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: match.FieldID,
 				},
 			},

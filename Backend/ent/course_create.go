@@ -117,14 +117,14 @@ func (cc *CourseCreate) AddReviewCourse(r ...*ReviewCourse) *CourseCreate {
 }
 
 // AddMatchIDs adds the "match" edge to the Match entity by IDs.
-func (cc *CourseCreate) AddMatchIDs(ids ...int) *CourseCreate {
+func (cc *CourseCreate) AddMatchIDs(ids ...uuid.UUID) *CourseCreate {
 	cc.mutation.AddMatchIDs(ids...)
 	return cc
 }
 
 // AddMatch adds the "match" edges to the Match entity.
 func (cc *CourseCreate) AddMatch(m ...*Match) *CourseCreate {
-	ids := make([]int, len(m))
+	ids := make([]uuid.UUID, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
@@ -331,7 +331,7 @@ func (cc *CourseCreate) createSpec() (*Course, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: match.FieldID,
 				},
 			},

@@ -10,7 +10,7 @@ export default async function signUpHandler(signUpData , navigate){
             console.log(res);
             if( res.success === true){
                 
-                navigate('/signIn')
+                navigate('/sign-in')
             }
             
 
