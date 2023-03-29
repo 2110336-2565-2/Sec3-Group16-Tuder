@@ -70,10 +70,10 @@ var (
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "title", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString},
+		{Name: "contact", Type: field.TypeString, Default: "No contact"},
 		{Name: "report_date", Type: field.TypeTime},
-		{Name: "status", Type: field.TypeString},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"ongoing", "completed", "rejected"}, Default: "ongoing"},
 		{Name: "tutor_issue_report", Type: field.TypeUUID, Nullable: true},
-		{Name: "user_issue_report", Type: field.TypeUUID},
 	}
 	// IssueReportsTable holds the schema information for the "issue_reports" table.
 	IssueReportsTable = &schema.Table{
@@ -83,15 +83,9 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "issue_reports_tutors_issue_report",
-				Columns:    []*schema.Column{IssueReportsColumns[5]},
+				Columns:    []*schema.Column{IssueReportsColumns[6]},
 				RefColumns: []*schema.Column{TutorsColumns[0]},
 				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "issue_reports_users_issue_report",
-				Columns:    []*schema.Column{IssueReportsColumns[6]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.NoAction,
 			},
 		},
 	}
@@ -455,7 +449,6 @@ func init() {
 	ClassesTable.ForeignKeys[1].RefTable = SchedulesTable
 	CoursesTable.ForeignKeys[0].RefTable = TutorsTable
 	IssueReportsTable.ForeignKeys[0].RefTable = TutorsTable
-	IssueReportsTable.ForeignKeys[1].RefTable = UsersTable
 	MatchesTable.ForeignKeys[0].RefTable = StudentsTable
 	PaymentsTable.ForeignKeys[0].RefTable = UsersTable
 	PaymentHistoriesTable.ForeignKeys[0].RefTable = PaymentsTable

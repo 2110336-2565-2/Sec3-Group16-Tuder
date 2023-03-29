@@ -815,33 +815,6 @@ func HasTutorWith(preds ...predicate.Tutor) predicate.User {
 	})
 }
 
-// HasIssueReport applies the HasEdge predicate on the "issue_report" edge.
-func HasIssueReport() predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, IssueReportTable, IssueReportColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasIssueReportWith applies the HasEdge predicate on the "issue_report" edge with a given conditions (other predicates).
-func HasIssueReportWith(preds ...predicate.IssueReport) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(IssueReportInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, IssueReportTable, IssueReportColumn),
-		)
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasPayment applies the HasEdge predicate on the "payment" edge.
 func HasPayment() predicate.User {
 	return predicate.User(func(s *sql.Selector) {

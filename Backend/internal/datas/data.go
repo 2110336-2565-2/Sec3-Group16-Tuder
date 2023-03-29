@@ -42,6 +42,9 @@ func InsertData(client *ent.Client) {
 	// Insert match
 	InsertMatch(client, ctx, class, course, student)
 
+	// Insert issue report
+	InsertIssueReport(client, ctx)
+
 	fmt.Print("\n\t::::::::: Data inserted! :::::::::\n")
 
 }

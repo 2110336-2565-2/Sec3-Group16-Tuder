@@ -675,22 +675,6 @@ func (c *IssueReportClient) GetX(ctx context.Context, id uuid.UUID) *IssueReport
 	return obj
 }
 
-// QueryUser queries the user edge of a IssueReport.
-func (c *IssueReportClient) QueryUser(ir *IssueReport) *UserQuery {
-	query := (&UserClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ir.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(issuereport.Table, issuereport.FieldID, id),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, issuereport.UserTable, issuereport.UserColumn),
-		)
-		fromV = sqlgraph.Neighbors(ir.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // Hooks returns the client hooks.
 func (c *IssueReportClient) Hooks() []Hook {
 	return c.hooks.IssueReport
@@ -2146,22 +2130,6 @@ func (c *UserClient) QueryTutor(u *User) *TutorQuery {
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(tutor.Table, tutor.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, user.TutorTable, user.TutorColumn),
-		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryIssueReport queries the issue_report edge of a User.
-func (c *UserClient) QueryIssueReport(u *User) *IssueReportQuery {
-	query := (&IssueReportClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(issuereport.Table, issuereport.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.IssueReportTable, user.IssueReportColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil

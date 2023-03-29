@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
@@ -30,7 +29,6 @@ type UserQuery struct {
 	predicates         []predicate.User
 	withStudent        *StudentQuery
 	withTutor          *TutorQuery
-	withIssueReport    *IssueReportQuery
 	withPayment        *PaymentQuery
 	withPaymentHistory *PaymentHistoryQuery
 	// intermediate query (i.e. traversal path).
@@ -106,28 +104,6 @@ func (uq *UserQuery) QueryTutor() *TutorQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(tutor.Table, tutor.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, user.TutorTable, user.TutorColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryIssueReport chains the current query on the "issue_report" edge.
-func (uq *UserQuery) QueryIssueReport() *IssueReportQuery {
-	query := (&IssueReportClient{config: uq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := uq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(issuereport.Table, issuereport.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.IssueReportTable, user.IssueReportColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -373,7 +349,6 @@ func (uq *UserQuery) Clone() *UserQuery {
 		predicates:         append([]predicate.User{}, uq.predicates...),
 		withStudent:        uq.withStudent.Clone(),
 		withTutor:          uq.withTutor.Clone(),
-		withIssueReport:    uq.withIssueReport.Clone(),
 		withPayment:        uq.withPayment.Clone(),
 		withPaymentHistory: uq.withPaymentHistory.Clone(),
 		// clone intermediate query.
@@ -401,17 +376,6 @@ func (uq *UserQuery) WithTutor(opts ...func(*TutorQuery)) *UserQuery {
 		opt(query)
 	}
 	uq.withTutor = query
-	return uq
-}
-
-// WithIssueReport tells the query-builder to eager-load the nodes that are connected to
-// the "issue_report" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithIssueReport(opts ...func(*IssueReportQuery)) *UserQuery {
-	query := (&IssueReportClient{config: uq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	uq.withIssueReport = query
 	return uq
 }
 
@@ -515,10 +479,9 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	var (
 		nodes       = []*User{}
 		_spec       = uq.querySpec()
-		loadedTypes = [5]bool{
+		loadedTypes = [4]bool{
 			uq.withStudent != nil,
 			uq.withTutor != nil,
-			uq.withIssueReport != nil,
 			uq.withPayment != nil,
 			uq.withPaymentHistory != nil,
 		}
@@ -550,13 +513,6 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	if query := uq.withTutor; query != nil {
 		if err := uq.loadTutor(ctx, query, nodes, nil,
 			func(n *User, e *Tutor) { n.Edges.Tutor = e }); err != nil {
-			return nil, err
-		}
-	}
-	if query := uq.withIssueReport; query != nil {
-		if err := uq.loadIssueReport(ctx, query, nodes,
-			func(n *User) { n.Edges.IssueReport = []*IssueReport{} },
-			func(n *User, e *IssueReport) { n.Edges.IssueReport = append(n.Edges.IssueReport, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -628,37 +584,6 @@ func (uq *UserQuery) loadTutor(ctx context.Context, query *TutorQuery, nodes []*
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "user_tutor" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (uq *UserQuery) loadIssueReport(ctx context.Context, query *IssueReportQuery, nodes []*User, init func(*User), assign func(*User, *IssueReport)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[uuid.UUID]*User)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	query.Where(predicate.IssueReport(func(s *sql.Selector) {
-		s.Where(sql.InValues(user.IssueReportColumn, fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.user_issue_report
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "user_issue_report" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "user_issue_report" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

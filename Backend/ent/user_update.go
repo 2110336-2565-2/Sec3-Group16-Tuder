@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
@@ -152,21 +151,6 @@ func (uu *UserUpdate) SetTutor(t *Tutor) *UserUpdate {
 	return uu.SetTutorID(t.ID)
 }
 
-// AddIssueReportIDs adds the "issue_report" edge to the IssueReport entity by IDs.
-func (uu *UserUpdate) AddIssueReportIDs(ids ...uuid.UUID) *UserUpdate {
-	uu.mutation.AddIssueReportIDs(ids...)
-	return uu
-}
-
-// AddIssueReport adds the "issue_report" edges to the IssueReport entity.
-func (uu *UserUpdate) AddIssueReport(i ...*IssueReport) *UserUpdate {
-	ids := make([]uuid.UUID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return uu.AddIssueReportIDs(ids...)
-}
-
 // AddPaymentIDs adds the "payment" edge to the Payment entity by IDs.
 func (uu *UserUpdate) AddPaymentIDs(ids ...uuid.UUID) *UserUpdate {
 	uu.mutation.AddPaymentIDs(ids...)
@@ -212,27 +196,6 @@ func (uu *UserUpdate) ClearStudent() *UserUpdate {
 func (uu *UserUpdate) ClearTutor() *UserUpdate {
 	uu.mutation.ClearTutor()
 	return uu
-}
-
-// ClearIssueReport clears all "issue_report" edges to the IssueReport entity.
-func (uu *UserUpdate) ClearIssueReport() *UserUpdate {
-	uu.mutation.ClearIssueReport()
-	return uu
-}
-
-// RemoveIssueReportIDs removes the "issue_report" edge to IssueReport entities by IDs.
-func (uu *UserUpdate) RemoveIssueReportIDs(ids ...uuid.UUID) *UserUpdate {
-	uu.mutation.RemoveIssueReportIDs(ids...)
-	return uu
-}
-
-// RemoveIssueReport removes "issue_report" edges to IssueReport entities.
-func (uu *UserUpdate) RemoveIssueReport(i ...*IssueReport) *UserUpdate {
-	ids := make([]uuid.UUID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return uu.RemoveIssueReportIDs(ids...)
 }
 
 // ClearPayment clears all "payment" edges to the Payment entity.
@@ -464,60 +427,6 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: tutor.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if uu.mutation.IssueReportCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.IssueReportTable,
-			Columns: []string{user.IssueReportColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: issuereport.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uu.mutation.RemovedIssueReportIDs(); len(nodes) > 0 && !uu.mutation.IssueReportCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.IssueReportTable,
-			Columns: []string{user.IssueReportColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: issuereport.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uu.mutation.IssueReportIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.IssueReportTable,
-			Columns: []string{user.IssueReportColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: issuereport.FieldID,
 				},
 			},
 		}
@@ -772,21 +681,6 @@ func (uuo *UserUpdateOne) SetTutor(t *Tutor) *UserUpdateOne {
 	return uuo.SetTutorID(t.ID)
 }
 
-// AddIssueReportIDs adds the "issue_report" edge to the IssueReport entity by IDs.
-func (uuo *UserUpdateOne) AddIssueReportIDs(ids ...uuid.UUID) *UserUpdateOne {
-	uuo.mutation.AddIssueReportIDs(ids...)
-	return uuo
-}
-
-// AddIssueReport adds the "issue_report" edges to the IssueReport entity.
-func (uuo *UserUpdateOne) AddIssueReport(i ...*IssueReport) *UserUpdateOne {
-	ids := make([]uuid.UUID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return uuo.AddIssueReportIDs(ids...)
-}
-
 // AddPaymentIDs adds the "payment" edge to the Payment entity by IDs.
 func (uuo *UserUpdateOne) AddPaymentIDs(ids ...uuid.UUID) *UserUpdateOne {
 	uuo.mutation.AddPaymentIDs(ids...)
@@ -832,27 +726,6 @@ func (uuo *UserUpdateOne) ClearStudent() *UserUpdateOne {
 func (uuo *UserUpdateOne) ClearTutor() *UserUpdateOne {
 	uuo.mutation.ClearTutor()
 	return uuo
-}
-
-// ClearIssueReport clears all "issue_report" edges to the IssueReport entity.
-func (uuo *UserUpdateOne) ClearIssueReport() *UserUpdateOne {
-	uuo.mutation.ClearIssueReport()
-	return uuo
-}
-
-// RemoveIssueReportIDs removes the "issue_report" edge to IssueReport entities by IDs.
-func (uuo *UserUpdateOne) RemoveIssueReportIDs(ids ...uuid.UUID) *UserUpdateOne {
-	uuo.mutation.RemoveIssueReportIDs(ids...)
-	return uuo
-}
-
-// RemoveIssueReport removes "issue_report" edges to IssueReport entities.
-func (uuo *UserUpdateOne) RemoveIssueReport(i ...*IssueReport) *UserUpdateOne {
-	ids := make([]uuid.UUID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return uuo.RemoveIssueReportIDs(ids...)
 }
 
 // ClearPayment clears all "payment" edges to the Payment entity.
@@ -1114,60 +987,6 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: tutor.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if uuo.mutation.IssueReportCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.IssueReportTable,
-			Columns: []string{user.IssueReportColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: issuereport.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uuo.mutation.RemovedIssueReportIDs(); len(nodes) > 0 && !uuo.mutation.IssueReportCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.IssueReportTable,
-			Columns: []string{user.IssueReportColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: issuereport.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uuo.mutation.IssueReportIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.IssueReportTable,
-			Columns: []string{user.IssueReportColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: issuereport.FieldID,
 				},
 			},
 		}
