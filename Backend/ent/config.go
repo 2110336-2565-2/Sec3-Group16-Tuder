@@ -33,8 +33,7 @@ type (
 		Match          []ent.Hook
 		Payment        []ent.Hook
 		PaymentHistory []ent.Hook
-		ReviewCourse   []ent.Hook
-		ReviewTutor    []ent.Hook
+		Review         []ent.Hook
 		Schedule       []ent.Hook
 		Student        []ent.Hook
 		Tutor          []ent.Hook
@@ -47,8 +46,7 @@ type (
 		Match          []ent.Interceptor
 		Payment        []ent.Interceptor
 		PaymentHistory []ent.Interceptor
-		ReviewCourse   []ent.Interceptor
-		ReviewTutor    []ent.Interceptor
+		Review         []ent.Interceptor
 		Schedule       []ent.Interceptor
 		Student        []ent.Interceptor
 		Tutor          []ent.Interceptor

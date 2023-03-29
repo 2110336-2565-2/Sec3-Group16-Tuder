@@ -160,29 +160,18 @@ var (
 			},
 		},
 	}
-	// ReviewCoursesColumns holds the columns for the "review_courses" table.
-	ReviewCoursesColumns = []*schema.Column{
+	// ReviewsColumns holds the columns for the "reviews" table.
+	ReviewsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "score", Type: field.TypeFloat32, Nullable: true},
 		{Name: "review_msg", Type: field.TypeString, Nullable: true},
+		{Name: "review_time_at", Type: field.TypeTime},
 	}
-	// ReviewCoursesTable holds the schema information for the "review_courses" table.
-	ReviewCoursesTable = &schema.Table{
-		Name:       "review_courses",
-		Columns:    ReviewCoursesColumns,
-		PrimaryKey: []*schema.Column{ReviewCoursesColumns[0]},
-	}
-	// ReviewTutorsColumns holds the columns for the "review_tutors" table.
-	ReviewTutorsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "score", Type: field.TypeFloat32, Nullable: true},
-		{Name: "review_msg", Type: field.TypeString, Nullable: true},
-	}
-	// ReviewTutorsTable holds the schema information for the "review_tutors" table.
-	ReviewTutorsTable = &schema.Table{
-		Name:       "review_tutors",
-		Columns:    ReviewTutorsColumns,
-		PrimaryKey: []*schema.Column{ReviewTutorsColumns[0]},
+	// ReviewsTable holds the schema information for the "reviews" table.
+	ReviewsTable = &schema.Table{
+		Name:       "reviews",
+		Columns:    ReviewsColumns,
+		PrimaryKey: []*schema.Column{ReviewsColumns[0]},
 	}
 	// SchedulesColumns holds the columns for the "schedules" table.
 	SchedulesColumns = []*schema.Column{
@@ -302,27 +291,27 @@ var (
 			},
 		},
 	}
-	// CourseReviewCourseColumns holds the columns for the "course_review_course" table.
-	CourseReviewCourseColumns = []*schema.Column{
+	// CourseReviewColumns holds the columns for the "course_review" table.
+	CourseReviewColumns = []*schema.Column{
 		{Name: "course_id", Type: field.TypeUUID},
-		{Name: "review_course_id", Type: field.TypeInt},
+		{Name: "review_id", Type: field.TypeInt},
 	}
-	// CourseReviewCourseTable holds the schema information for the "course_review_course" table.
-	CourseReviewCourseTable = &schema.Table{
-		Name:       "course_review_course",
-		Columns:    CourseReviewCourseColumns,
-		PrimaryKey: []*schema.Column{CourseReviewCourseColumns[0], CourseReviewCourseColumns[1]},
+	// CourseReviewTable holds the schema information for the "course_review" table.
+	CourseReviewTable = &schema.Table{
+		Name:       "course_review",
+		Columns:    CourseReviewColumns,
+		PrimaryKey: []*schema.Column{CourseReviewColumns[0], CourseReviewColumns[1]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "course_review_course_course_id",
-				Columns:    []*schema.Column{CourseReviewCourseColumns[0]},
+				Symbol:     "course_review_course_id",
+				Columns:    []*schema.Column{CourseReviewColumns[0]},
 				RefColumns: []*schema.Column{CoursesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
-				Symbol:     "course_review_course_review_course_id",
-				Columns:    []*schema.Column{CourseReviewCourseColumns[1]},
-				RefColumns: []*schema.Column{ReviewCoursesColumns[0]},
+				Symbol:     "course_review_review_id",
+				Columns:    []*schema.Column{CourseReviewColumns[1]},
+				RefColumns: []*schema.Column{ReviewsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
@@ -352,77 +341,27 @@ var (
 			},
 		},
 	}
-	// StudentReviewCourseColumns holds the columns for the "student_review_course" table.
-	StudentReviewCourseColumns = []*schema.Column{
+	// StudentReviewColumns holds the columns for the "student_review" table.
+	StudentReviewColumns = []*schema.Column{
 		{Name: "student_id", Type: field.TypeUUID},
-		{Name: "review_course_id", Type: field.TypeInt},
+		{Name: "review_id", Type: field.TypeInt},
 	}
-	// StudentReviewCourseTable holds the schema information for the "student_review_course" table.
-	StudentReviewCourseTable = &schema.Table{
-		Name:       "student_review_course",
-		Columns:    StudentReviewCourseColumns,
-		PrimaryKey: []*schema.Column{StudentReviewCourseColumns[0], StudentReviewCourseColumns[1]},
+	// StudentReviewTable holds the schema information for the "student_review" table.
+	StudentReviewTable = &schema.Table{
+		Name:       "student_review",
+		Columns:    StudentReviewColumns,
+		PrimaryKey: []*schema.Column{StudentReviewColumns[0], StudentReviewColumns[1]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "student_review_course_student_id",
-				Columns:    []*schema.Column{StudentReviewCourseColumns[0]},
+				Symbol:     "student_review_student_id",
+				Columns:    []*schema.Column{StudentReviewColumns[0]},
 				RefColumns: []*schema.Column{StudentsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
-				Symbol:     "student_review_course_review_course_id",
-				Columns:    []*schema.Column{StudentReviewCourseColumns[1]},
-				RefColumns: []*schema.Column{ReviewCoursesColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
-	// StudentReviewTutorColumns holds the columns for the "student_review_tutor" table.
-	StudentReviewTutorColumns = []*schema.Column{
-		{Name: "student_id", Type: field.TypeUUID},
-		{Name: "review_tutor_id", Type: field.TypeInt},
-	}
-	// StudentReviewTutorTable holds the schema information for the "student_review_tutor" table.
-	StudentReviewTutorTable = &schema.Table{
-		Name:       "student_review_tutor",
-		Columns:    StudentReviewTutorColumns,
-		PrimaryKey: []*schema.Column{StudentReviewTutorColumns[0], StudentReviewTutorColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "student_review_tutor_student_id",
-				Columns:    []*schema.Column{StudentReviewTutorColumns[0]},
-				RefColumns: []*schema.Column{StudentsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "student_review_tutor_review_tutor_id",
-				Columns:    []*schema.Column{StudentReviewTutorColumns[1]},
-				RefColumns: []*schema.Column{ReviewTutorsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
-	// TutorReviewTutorColumns holds the columns for the "tutor_review_tutor" table.
-	TutorReviewTutorColumns = []*schema.Column{
-		{Name: "tutor_id", Type: field.TypeUUID},
-		{Name: "review_tutor_id", Type: field.TypeInt},
-	}
-	// TutorReviewTutorTable holds the schema information for the "tutor_review_tutor" table.
-	TutorReviewTutorTable = &schema.Table{
-		Name:       "tutor_review_tutor",
-		Columns:    TutorReviewTutorColumns,
-		PrimaryKey: []*schema.Column{TutorReviewTutorColumns[0], TutorReviewTutorColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "tutor_review_tutor_tutor_id",
-				Columns:    []*schema.Column{TutorReviewTutorColumns[0]},
-				RefColumns: []*schema.Column{TutorsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "tutor_review_tutor_review_tutor_id",
-				Columns:    []*schema.Column{TutorReviewTutorColumns[1]},
-				RefColumns: []*schema.Column{ReviewTutorsColumns[0]},
+				Symbol:     "student_review_review_id",
+				Columns:    []*schema.Column{StudentReviewColumns[1]},
+				RefColumns: []*schema.Column{ReviewsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
@@ -435,18 +374,15 @@ var (
 		MatchesTable,
 		PaymentsTable,
 		PaymentHistoriesTable,
-		ReviewCoursesTable,
-		ReviewTutorsTable,
+		ReviewsTable,
 		SchedulesTable,
 		StudentsTable,
 		TutorsTable,
 		UsersTable,
 		ClassMatchTable,
-		CourseReviewCourseTable,
+		CourseReviewTable,
 		CourseMatchTable,
-		StudentReviewCourseTable,
-		StudentReviewTutorTable,
-		TutorReviewTutorTable,
+		StudentReviewTable,
 	}
 )
 
@@ -465,14 +401,10 @@ func init() {
 	TutorsTable.ForeignKeys[1].RefTable = UsersTable
 	ClassMatchTable.ForeignKeys[0].RefTable = ClassesTable
 	ClassMatchTable.ForeignKeys[1].RefTable = MatchesTable
-	CourseReviewCourseTable.ForeignKeys[0].RefTable = CoursesTable
-	CourseReviewCourseTable.ForeignKeys[1].RefTable = ReviewCoursesTable
+	CourseReviewTable.ForeignKeys[0].RefTable = CoursesTable
+	CourseReviewTable.ForeignKeys[1].RefTable = ReviewsTable
 	CourseMatchTable.ForeignKeys[0].RefTable = CoursesTable
 	CourseMatchTable.ForeignKeys[1].RefTable = MatchesTable
-	StudentReviewCourseTable.ForeignKeys[0].RefTable = StudentsTable
-	StudentReviewCourseTable.ForeignKeys[1].RefTable = ReviewCoursesTable
-	StudentReviewTutorTable.ForeignKeys[0].RefTable = StudentsTable
-	StudentReviewTutorTable.ForeignKeys[1].RefTable = ReviewTutorsTable
-	TutorReviewTutorTable.ForeignKeys[0].RefTable = TutorsTable
-	TutorReviewTutorTable.ForeignKeys[1].RefTable = ReviewTutorsTable
+	StudentReviewTable.ForeignKeys[0].RefTable = StudentsTable
+	StudentReviewTable.ForeignKeys[1].RefTable = ReviewsTable
 }

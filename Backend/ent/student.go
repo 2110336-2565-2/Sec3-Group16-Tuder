@@ -27,15 +27,13 @@ type Student struct {
 type StudentEdges struct {
 	// Match holds the value of the match edge.
 	Match []*Match `json:"match,omitempty"`
-	// ReviewCourse holds the value of the review_course edge.
-	ReviewCourse []*ReviewCourse `json:"review_course,omitempty"`
-	// ReviewTutor holds the value of the review_tutor edge.
-	ReviewTutor []*ReviewTutor `json:"review_tutor,omitempty"`
+	// Review holds the value of the review edge.
+	Review []*Review `json:"review,omitempty"`
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [3]bool
 }
 
 // MatchOrErr returns the Match value or an error if the edge
@@ -47,28 +45,19 @@ func (e StudentEdges) MatchOrErr() ([]*Match, error) {
 	return nil, &NotLoadedError{edge: "match"}
 }
 
-// ReviewCourseOrErr returns the ReviewCourse value or an error if the edge
+// ReviewOrErr returns the Review value or an error if the edge
 // was not loaded in eager-loading.
-func (e StudentEdges) ReviewCourseOrErr() ([]*ReviewCourse, error) {
+func (e StudentEdges) ReviewOrErr() ([]*Review, error) {
 	if e.loadedTypes[1] {
-		return e.ReviewCourse, nil
+		return e.Review, nil
 	}
-	return nil, &NotLoadedError{edge: "review_course"}
-}
-
-// ReviewTutorOrErr returns the ReviewTutor value or an error if the edge
-// was not loaded in eager-loading.
-func (e StudentEdges) ReviewTutorOrErr() ([]*ReviewTutor, error) {
-	if e.loadedTypes[2] {
-		return e.ReviewTutor, nil
-	}
-	return nil, &NotLoadedError{edge: "review_tutor"}
+	return nil, &NotLoadedError{edge: "review"}
 }
 
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e StudentEdges) UserOrErr() (*User, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[2] {
 		if e.User == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: user.Label}
@@ -125,14 +114,9 @@ func (s *Student) QueryMatch() *MatchQuery {
 	return NewStudentClient(s.config).QueryMatch(s)
 }
 
-// QueryReviewCourse queries the "review_course" edge of the Student entity.
-func (s *Student) QueryReviewCourse() *ReviewCourseQuery {
-	return NewStudentClient(s.config).QueryReviewCourse(s)
-}
-
-// QueryReviewTutor queries the "review_tutor" edge of the Student entity.
-func (s *Student) QueryReviewTutor() *ReviewTutorQuery {
-	return NewStudentClient(s.config).QueryReviewTutor(s)
+// QueryReview queries the "review" edge of the Student entity.
+func (s *Student) QueryReview() *ReviewQuery {
+	return NewStudentClient(s.config).QueryReview(s)
 }
 
 // QueryUser queries the "user" edge of the Student entity.
