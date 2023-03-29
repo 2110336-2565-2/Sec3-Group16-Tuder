@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 	"log"
 	"os"
 
@@ -34,6 +35,11 @@ func main() {
 	db_pass := os.Getenv("DB_PASSWORD")
 	db_name := os.Getenv("DB_NAME")
 	db_port := os.Getenv("DB_PORT")
+
+	// for dev mode, Drop all table
+	if os.Getenv("MODE") == "dev" {
+		utils.NukeDB()
+	}
 
 	client, err := ent.Open("postgres", "host="+host+" port="+db_port+" user="+db_user+" dbname="+db_name+" password="+db_pass+" sslmode=disable")
 	if err != nil {
