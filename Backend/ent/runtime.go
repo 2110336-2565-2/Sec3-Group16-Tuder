@@ -3,14 +3,15 @@
 package ent
 
 import (
+	"time"
+
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewtutor"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/review"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schema"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
@@ -95,24 +96,16 @@ func init() {
 	paymenthistoryDescID := paymenthistoryFields[0].Descriptor()
 	// paymenthistory.DefaultID holds the default value on creation for the id field.
 	paymenthistory.DefaultID = paymenthistoryDescID.Default.(func() uuid.UUID)
-	reviewcourseMixin := schema.ReviewCourse{}.Mixin()
-	reviewcourseMixinFields0 := reviewcourseMixin[0].Fields()
-	_ = reviewcourseMixinFields0
-	reviewcourseFields := schema.ReviewCourse{}.Fields()
-	_ = reviewcourseFields
-	// reviewcourseDescScore is the schema descriptor for score field.
-	reviewcourseDescScore := reviewcourseMixinFields0[0].Descriptor()
-	// reviewcourse.ScoreValidator is a validator for the "score" field. It is called by the builders before save.
-	reviewcourse.ScoreValidator = reviewcourseDescScore.Validators[0].(func(float32) error)
-	reviewtutorMixin := schema.ReviewTutor{}.Mixin()
-	reviewtutorMixinFields0 := reviewtutorMixin[0].Fields()
-	_ = reviewtutorMixinFields0
-	reviewtutorFields := schema.ReviewTutor{}.Fields()
-	_ = reviewtutorFields
-	// reviewtutorDescScore is the schema descriptor for score field.
-	reviewtutorDescScore := reviewtutorMixinFields0[0].Descriptor()
-	// reviewtutor.ScoreValidator is a validator for the "score" field. It is called by the builders before save.
-	reviewtutor.ScoreValidator = reviewtutorDescScore.Validators[0].(func(float32) error)
+	reviewFields := schema.Review{}.Fields()
+	_ = reviewFields
+	// reviewDescScore is the schema descriptor for score field.
+	reviewDescScore := reviewFields[0].Descriptor()
+	// review.ScoreValidator is a validator for the "score" field. It is called by the builders before save.
+	review.ScoreValidator = reviewDescScore.Validators[0].(func(float32) error)
+	// reviewDescReviewTimeAt is the schema descriptor for review_time_at field.
+	reviewDescReviewTimeAt := reviewFields[2].Descriptor()
+	// review.DefaultReviewTimeAt holds the default value on creation for the review_time_at field.
+	review.DefaultReviewTimeAt = reviewDescReviewTimeAt.Default.(func() time.Time)
 	scheduleFields := schema.Schedule{}.Fields()
 	_ = scheduleFields
 	// scheduleDescID is the schema descriptor for id field.

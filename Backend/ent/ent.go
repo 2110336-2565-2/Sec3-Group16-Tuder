@@ -17,8 +17,7 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewtutor"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/review"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
@@ -56,8 +55,7 @@ func columnChecker(table string) func(string) error {
 		match.Table:          match.ValidColumn,
 		payment.Table:        payment.ValidColumn,
 		paymenthistory.Table: paymenthistory.ValidColumn,
-		reviewcourse.Table:   reviewcourse.ValidColumn,
-		reviewtutor.Table:    reviewtutor.ValidColumn,
+		review.Table:         review.ValidColumn,
 		schedule.Table:       schedule.ValidColumn,
 		student.Table:        student.ValidColumn,
 		tutor.Table:          tutor.ValidColumn,
