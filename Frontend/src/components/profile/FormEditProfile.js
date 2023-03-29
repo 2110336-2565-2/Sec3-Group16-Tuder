@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { FormP } from "./ProfileStyle";
+import { convertFrontendSchedulesToBackend } from "../../utils/profile/scheduleConverter";
 import { studentFields, tutorFields } from "../../datas/Profile.role";
 import { updateStudent, updateTutor } from "../../handlers/profile/updateUser";
 import FileUploader from "../global/FileUploader";
@@ -43,6 +44,9 @@ export default function FormEditProfile({ user }) {
     // Convert some fields format to match the database
     if (e.target.name === "birthdate") {
       value = new Date(e.target.value).toISOString();
+    } else if (e.target.name === "schedule") {
+      console.log("e.target.value: ", e.target.value)
+      value = convertFrontendSchedulesToBackend(e.target.value);
     }
     setFormData({
       ...formData,
@@ -129,7 +133,7 @@ export default function FormEditProfile({ user }) {
                 label={field.label}
                 id={field.id}
                 name={field.name}
-                value={formData[field.name]}
+                value={formData["raw_schedule"]}
                 onChange={handleChange}
                 width={field.width}
               />

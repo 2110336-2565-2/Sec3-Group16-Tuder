@@ -33,16 +33,16 @@ export default function TimeSelector({
   ];
 
   const [availableTime, setAvailableTime] = useState(() => {
-    // Convert the schedules from the backend to the frontend format
-    // const convertedSchedules = convertBackendSchedulesToFrontend(value);
-
     const initialAvailableTime = days.map((day) => ({
       day: day.value,
       timeSlot: [],
     }));
 
+    // Convert the schedules from the backend to the frontend format
+    const convertedSchedules = value?convertBackendSchedulesToFrontend(value):initialAvailableTime;
+
     const updatedAvailableTime = initialAvailableTime.map((day) => {
-      const daySchedule = value.find((schedule) => schedule.day === day.day);
+      const daySchedule = convertedSchedules.find((schedule) => schedule.day === day.day);
 
       return daySchedule ? daySchedule : day;
     });

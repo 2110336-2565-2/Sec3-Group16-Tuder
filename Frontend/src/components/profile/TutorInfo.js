@@ -20,7 +20,7 @@ export default function TutorInfo({user}){
         </InfoWrapper>
         <InfoWrapper>
           <InfoTitle>Birth Date</InfoTitle>
-          <InfoContent>{user.birthdate}</InfoContent>
+          <InfoContent>{user.birthdate?user.birthdate.split("T")[0]:""}</InfoContent>
         </InfoWrapper>
         <InfoWrapper>
           <InfoTitle>Citizen ID</InfoTitle>
