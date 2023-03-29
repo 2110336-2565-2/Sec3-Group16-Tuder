@@ -125,7 +125,7 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 		UpdateOne(user).
 		SetFirstName(sr.Firstname).
 		SetLastName(sr.Lastname).
-		SetEmail(sr.Email)
+		SetEmail(sr.Email).
 		SetPhone(sr.Phone).
 		SetAddress(sr.Address).
 		SetBirthDate(sr.Birthdate).

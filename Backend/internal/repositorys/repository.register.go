@@ -102,12 +102,12 @@ func (r repositoryRegister) RegisterUser(sr *schemas.SchemaRegister) (*ent.User,
 			SetDay5(AllDayAvailable).
 			SetDay6(AllDayAvailable).
 			Save(r.ctx)
-
+		 
 		_, err = txc.Tutor.
 			Create().
 			SetUser(newUser).
 			SetDescription(sr.Description).
-			SetOmiseBankToken(sr.OmiseBankToken).
+			SetOmiseBankToken("").
 			SetCitizenID(sr.CitizenID).
 			SetSchedule(schedule).
 			Save(r.ctx)
