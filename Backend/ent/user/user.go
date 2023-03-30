@@ -39,8 +39,6 @@ const (
 	EdgeStudent = "student"
 	// EdgeTutor holds the string denoting the tutor edge name in mutations.
 	EdgeTutor = "tutor"
-	// EdgeIssueReport holds the string denoting the issue_report edge name in mutations.
-	EdgeIssueReport = "issue_report"
 	// EdgePayment holds the string denoting the payment edge name in mutations.
 	EdgePayment = "payment"
 	// EdgePaymentHistory holds the string denoting the payment_history edge name in mutations.
@@ -63,13 +61,6 @@ const (
 	TutorInverseTable = "tutors"
 	// TutorColumn is the table column denoting the tutor relation/edge.
 	TutorColumn = "user_tutor"
-	// IssueReportTable is the table that holds the issue_report relation/edge.
-	IssueReportTable = "issue_reports"
-	// IssueReportInverseTable is the table name for the IssueReport entity.
-	// It exists in this package in order to avoid circular dependency with the "issuereport" package.
-	IssueReportInverseTable = "issue_reports"
-	// IssueReportColumn is the table column denoting the issue_report relation/edge.
-	IssueReportColumn = "user_issue_report"
 	// PaymentTable is the table that holds the payment relation/edge.
 	PaymentTable = "payments"
 	// PaymentInverseTable is the table name for the Payment entity.

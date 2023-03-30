@@ -153,21 +153,6 @@ func (uc *UserCreate) SetTutor(t *Tutor) *UserCreate {
 	return uc.SetTutorID(t.ID)
 }
 
-// AddIssueReportIDs adds the "issue_report" edge to the IssueReport entity by IDs.
-func (uc *UserCreate) AddIssueReportIDs(ids ...uuid.UUID) *UserCreate {
-	uc.mutation.AddIssueReportIDs(ids...)
-	return uc
-}
-
-// AddIssueReport adds the "issue_report" edges to the IssueReport entity.
-func (uc *UserCreate) AddIssueReport(i ...*IssueReport) *UserCreate {
-	ids := make([]uuid.UUID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return uc.AddIssueReportIDs(ids...)
-}
-
 // AddPaymentIDs adds the "payment" edge to the Payment entity by IDs.
 func (uc *UserCreate) AddPaymentIDs(ids ...uuid.UUID) *UserCreate {
 	uc.mutation.AddPaymentIDs(ids...)
@@ -440,25 +425,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: tutor.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := uc.mutation.IssueReportIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.IssueReportTable,
-			Columns: []string{user.IssueReportColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: issuereport.FieldID,
 				},
 			},
 		}

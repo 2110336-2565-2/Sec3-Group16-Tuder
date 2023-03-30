@@ -2564,11 +2564,10 @@ type IssueReportMutation struct {
 	id            *uuid.UUID
 	title         *string
 	description   *string
+	contact       *string
 	report_date   *time.Time
-	status        *string
+	status        *issuereport.Status
 	clearedFields map[string]struct{}
-	user          *uuid.UUID
-	cleareduser   bool
 	done          bool
 	oldValue      func(context.Context) (*IssueReport, error)
 	predicates    []predicate.IssueReport
@@ -2750,6 +2749,42 @@ func (m *IssueReportMutation) ResetDescription() {
 	m.description = nil
 }
 
+// SetContact sets the "contact" field.
+func (m *IssueReportMutation) SetContact(s string) {
+	m.contact = &s
+}
+
+// Contact returns the value of the "contact" field in the mutation.
+func (m *IssueReportMutation) Contact() (r string, exists bool) {
+	v := m.contact
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContact returns the old "contact" field's value of the IssueReport entity.
+// If the IssueReport object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IssueReportMutation) OldContact(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContact is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContact requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContact: %w", err)
+	}
+	return oldValue.Contact, nil
+}
+
+// ResetContact resets all changes to the "contact" field.
+func (m *IssueReportMutation) ResetContact() {
+	m.contact = nil
+}
+
 // SetReportDate sets the "report_date" field.
 func (m *IssueReportMutation) SetReportDate(t time.Time) {
 	m.report_date = &t
@@ -2787,12 +2822,12 @@ func (m *IssueReportMutation) ResetReportDate() {
 }
 
 // SetStatus sets the "status" field.
-func (m *IssueReportMutation) SetStatus(s string) {
-	m.status = &s
+func (m *IssueReportMutation) SetStatus(i issuereport.Status) {
+	m.status = &i
 }
 
 // Status returns the value of the "status" field in the mutation.
-func (m *IssueReportMutation) Status() (r string, exists bool) {
+func (m *IssueReportMutation) Status() (r issuereport.Status, exists bool) {
 	v := m.status
 	if v == nil {
 		return
@@ -2803,7 +2838,7 @@ func (m *IssueReportMutation) Status() (r string, exists bool) {
 // OldStatus returns the old "status" field's value of the IssueReport entity.
 // If the IssueReport object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IssueReportMutation) OldStatus(ctx context.Context) (v string, err error) {
+func (m *IssueReportMutation) OldStatus(ctx context.Context) (v issuereport.Status, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
 	}
@@ -2820,45 +2855,6 @@ func (m *IssueReportMutation) OldStatus(ctx context.Context) (v string, err erro
 // ResetStatus resets all changes to the "status" field.
 func (m *IssueReportMutation) ResetStatus() {
 	m.status = nil
-}
-
-// SetUserID sets the "user" edge to the User entity by id.
-func (m *IssueReportMutation) SetUserID(id uuid.UUID) {
-	m.user = &id
-}
-
-// ClearUser clears the "user" edge to the User entity.
-func (m *IssueReportMutation) ClearUser() {
-	m.cleareduser = true
-}
-
-// UserCleared reports if the "user" edge to the User entity was cleared.
-func (m *IssueReportMutation) UserCleared() bool {
-	return m.cleareduser
-}
-
-// UserID returns the "user" edge ID in the mutation.
-func (m *IssueReportMutation) UserID() (id uuid.UUID, exists bool) {
-	if m.user != nil {
-		return *m.user, true
-	}
-	return
-}
-
-// UserIDs returns the "user" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// UserID instead. It exists only for internal usage by the builders.
-func (m *IssueReportMutation) UserIDs() (ids []uuid.UUID) {
-	if id := m.user; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetUser resets all changes to the "user" edge.
-func (m *IssueReportMutation) ResetUser() {
-	m.user = nil
-	m.cleareduser = false
 }
 
 // Where appends a list predicates to the IssueReportMutation builder.
@@ -2895,12 +2891,15 @@ func (m *IssueReportMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *IssueReportMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.title != nil {
 		fields = append(fields, issuereport.FieldTitle)
 	}
 	if m.description != nil {
 		fields = append(fields, issuereport.FieldDescription)
+	}
+	if m.contact != nil {
+		fields = append(fields, issuereport.FieldContact)
 	}
 	if m.report_date != nil {
 		fields = append(fields, issuereport.FieldReportDate)
@@ -2920,6 +2919,8 @@ func (m *IssueReportMutation) Field(name string) (ent.Value, bool) {
 		return m.Title()
 	case issuereport.FieldDescription:
 		return m.Description()
+	case issuereport.FieldContact:
+		return m.Contact()
 	case issuereport.FieldReportDate:
 		return m.ReportDate()
 	case issuereport.FieldStatus:
@@ -2937,6 +2938,8 @@ func (m *IssueReportMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldTitle(ctx)
 	case issuereport.FieldDescription:
 		return m.OldDescription(ctx)
+	case issuereport.FieldContact:
+		return m.OldContact(ctx)
 	case issuereport.FieldReportDate:
 		return m.OldReportDate(ctx)
 	case issuereport.FieldStatus:
@@ -2964,6 +2967,13 @@ func (m *IssueReportMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDescription(v)
 		return nil
+	case issuereport.FieldContact:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContact(v)
+		return nil
 	case issuereport.FieldReportDate:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -2972,7 +2982,7 @@ func (m *IssueReportMutation) SetField(name string, value ent.Value) error {
 		m.SetReportDate(v)
 		return nil
 	case issuereport.FieldStatus:
-		v, ok := value.(string)
+		v, ok := value.(issuereport.Status)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3033,6 +3043,9 @@ func (m *IssueReportMutation) ResetField(name string) error {
 	case issuereport.FieldDescription:
 		m.ResetDescription()
 		return nil
+	case issuereport.FieldContact:
+		m.ResetContact()
+		return nil
 	case issuereport.FieldReportDate:
 		m.ResetReportDate()
 		return nil
@@ -3045,28 +3058,19 @@ func (m *IssueReportMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *IssueReportMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.user != nil {
-		edges = append(edges, issuereport.EdgeUser)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *IssueReportMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case issuereport.EdgeUser:
-		if id := m.user; id != nil {
-			return []ent.Value{*id}
-		}
-	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *IssueReportMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 0)
 	return edges
 }
 
@@ -3078,42 +3082,25 @@ func (m *IssueReportMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *IssueReportMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.cleareduser {
-		edges = append(edges, issuereport.EdgeUser)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *IssueReportMutation) EdgeCleared(name string) bool {
-	switch name {
-	case issuereport.EdgeUser:
-		return m.cleareduser
-	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *IssueReportMutation) ClearEdge(name string) error {
-	switch name {
-	case issuereport.EdgeUser:
-		m.ClearUser()
-		return nil
-	}
 	return fmt.Errorf("unknown IssueReport unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *IssueReportMutation) ResetEdge(name string) error {
-	switch name {
-	case issuereport.EdgeUser:
-		m.ResetUser()
-		return nil
-	}
 	return fmt.Errorf("unknown IssueReport edge %s", name)
 }
 
@@ -8794,60 +8781,6 @@ func (m *UserMutation) ResetTutor() {
 	m.clearedtutor = false
 }
 
-// AddIssueReportIDs adds the "issue_report" edge to the IssueReport entity by ids.
-func (m *UserMutation) AddIssueReportIDs(ids ...uuid.UUID) {
-	if m.issue_report == nil {
-		m.issue_report = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		m.issue_report[ids[i]] = struct{}{}
-	}
-}
-
-// ClearIssueReport clears the "issue_report" edge to the IssueReport entity.
-func (m *UserMutation) ClearIssueReport() {
-	m.clearedissue_report = true
-}
-
-// IssueReportCleared reports if the "issue_report" edge to the IssueReport entity was cleared.
-func (m *UserMutation) IssueReportCleared() bool {
-	return m.clearedissue_report
-}
-
-// RemoveIssueReportIDs removes the "issue_report" edge to the IssueReport entity by IDs.
-func (m *UserMutation) RemoveIssueReportIDs(ids ...uuid.UUID) {
-	if m.removedissue_report == nil {
-		m.removedissue_report = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		delete(m.issue_report, ids[i])
-		m.removedissue_report[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedIssueReport returns the removed IDs of the "issue_report" edge to the IssueReport entity.
-func (m *UserMutation) RemovedIssueReportIDs() (ids []uuid.UUID) {
-	for id := range m.removedissue_report {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// IssueReportIDs returns the "issue_report" edge IDs in the mutation.
-func (m *UserMutation) IssueReportIDs() (ids []uuid.UUID) {
-	for id := range m.issue_report {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetIssueReport resets all changes to the "issue_report" edge.
-func (m *UserMutation) ResetIssueReport() {
-	m.issue_report = nil
-	m.clearedissue_report = false
-	m.removedissue_report = nil
-}
-
 // AddPaymentIDs adds the "payment" edge to the Payment entity by ids.
 func (m *UserMutation) AddPaymentIDs(ids ...uuid.UUID) {
 	if m.payment == nil {
@@ -9329,9 +9262,6 @@ func (m *UserMutation) AddedEdges() []string {
 	if m.tutor != nil {
 		edges = append(edges, user.EdgeTutor)
 	}
-	if m.issue_report != nil {
-		edges = append(edges, user.EdgeIssueReport)
-	}
 	if m.payment != nil {
 		edges = append(edges, user.EdgePayment)
 	}
@@ -9356,12 +9286,6 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 		if id := m.tutor; id != nil {
 			return []ent.Value{*id}
 		}
-	case user.EdgeIssueReport:
-		ids := make([]ent.Value, 0, len(m.issue_report))
-		for id := range m.issue_report {
-			ids = append(ids, id)
-		}
-		return ids
 	case user.EdgePayment:
 		ids := make([]ent.Value, 0, len(m.payment))
 		for id := range m.payment {
@@ -9406,12 +9330,6 @@ func (m *UserMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case user.EdgeIssueReport:
-		ids := make([]ent.Value, 0, len(m.removedissue_report))
-		for id := range m.removedissue_report {
-			ids = append(ids, id)
-		}
-		return ids
 	case user.EdgePayment:
 		ids := make([]ent.Value, 0, len(m.removedpayment))
 		for id := range m.removedpayment {
@@ -9443,9 +9361,6 @@ func (m *UserMutation) ClearedEdges() []string {
 	if m.clearedtutor {
 		edges = append(edges, user.EdgeTutor)
 	}
-	if m.clearedissue_report {
-		edges = append(edges, user.EdgeIssueReport)
-	}
 	if m.clearedpayment {
 		edges = append(edges, user.EdgePayment)
 	}
@@ -9466,8 +9381,6 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 		return m.clearedstudent
 	case user.EdgeTutor:
 		return m.clearedtutor
-	case user.EdgeIssueReport:
-		return m.clearedissue_report
 	case user.EdgePayment:
 		return m.clearedpayment
 	case user.EdgePaymentHistory:
@@ -9501,9 +9414,6 @@ func (m *UserMutation) ResetEdge(name string) error {
 		return nil
 	case user.EdgeTutor:
 		m.ResetTutor()
-		return nil
-	case user.EdgeIssueReport:
-		m.ResetIssueReport()
 		return nil
 	case user.EdgePayment:
 		m.ResetPayment()

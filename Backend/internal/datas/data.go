@@ -41,6 +41,9 @@ func InsertData(client *ent.Client) {
 	// Insert cancel request
 	InsertClassCancelRequest(client, ctx, user, match)
 
+	// Insert issue report
+	InsertIssueReport(client, ctx)
+
 	fmt.Print("\n\t::::::::: Data inserted! :::::::::\n")
 
 }

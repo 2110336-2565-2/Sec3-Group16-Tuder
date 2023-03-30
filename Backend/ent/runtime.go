@@ -90,10 +90,10 @@ func init() {
 	issuereportDescDescription := issuereportFields[2].Descriptor()
 	// issuereport.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	issuereport.DescriptionValidator = issuereportDescDescription.Validators[0].(func(string) error)
-	// issuereportDescStatus is the schema descriptor for status field.
-	issuereportDescStatus := issuereportFields[4].Descriptor()
-	// issuereport.StatusValidator is a validator for the "status" field. It is called by the builders before save.
-	issuereport.StatusValidator = issuereportDescStatus.Validators[0].(func(string) error)
+	// issuereportDescContact is the schema descriptor for contact field.
+	issuereportDescContact := issuereportFields[3].Descriptor()
+	// issuereport.DefaultContact holds the default value on creation for the contact field.
+	issuereport.DefaultContact = issuereportDescContact.Default.(string)
 	// issuereportDescID is the schema descriptor for id field.
 	issuereportDescID := issuereportFields[0].Descriptor()
 	// issuereport.DefaultID holds the default value on creation for the id field.

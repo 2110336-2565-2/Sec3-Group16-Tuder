@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
 	"github.com/google/uuid"
 )
@@ -66,14 +65,14 @@ func Description(v string) predicate.IssueReport {
 	return predicate.IssueReport(sql.FieldEQ(FieldDescription, v))
 }
 
+// Contact applies equality check predicate on the "contact" field. It's identical to ContactEQ.
+func Contact(v string) predicate.IssueReport {
+	return predicate.IssueReport(sql.FieldEQ(FieldContact, v))
+}
+
 // ReportDate applies equality check predicate on the "report_date" field. It's identical to ReportDateEQ.
 func ReportDate(v time.Time) predicate.IssueReport {
 	return predicate.IssueReport(sql.FieldEQ(FieldReportDate, v))
-}
-
-// Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
-func Status(v string) predicate.IssueReport {
-	return predicate.IssueReport(sql.FieldEQ(FieldStatus, v))
 }
 
 // TitleEQ applies the EQ predicate on the "title" field.
@@ -206,6 +205,71 @@ func DescriptionContainsFold(v string) predicate.IssueReport {
 	return predicate.IssueReport(sql.FieldContainsFold(FieldDescription, v))
 }
 
+// ContactEQ applies the EQ predicate on the "contact" field.
+func ContactEQ(v string) predicate.IssueReport {
+	return predicate.IssueReport(sql.FieldEQ(FieldContact, v))
+}
+
+// ContactNEQ applies the NEQ predicate on the "contact" field.
+func ContactNEQ(v string) predicate.IssueReport {
+	return predicate.IssueReport(sql.FieldNEQ(FieldContact, v))
+}
+
+// ContactIn applies the In predicate on the "contact" field.
+func ContactIn(vs ...string) predicate.IssueReport {
+	return predicate.IssueReport(sql.FieldIn(FieldContact, vs...))
+}
+
+// ContactNotIn applies the NotIn predicate on the "contact" field.
+func ContactNotIn(vs ...string) predicate.IssueReport {
+	return predicate.IssueReport(sql.FieldNotIn(FieldContact, vs...))
+}
+
+// ContactGT applies the GT predicate on the "contact" field.
+func ContactGT(v string) predicate.IssueReport {
+	return predicate.IssueReport(sql.FieldGT(FieldContact, v))
+}
+
+// ContactGTE applies the GTE predicate on the "contact" field.
+func ContactGTE(v string) predicate.IssueReport {
+	return predicate.IssueReport(sql.FieldGTE(FieldContact, v))
+}
+
+// ContactLT applies the LT predicate on the "contact" field.
+func ContactLT(v string) predicate.IssueReport {
+	return predicate.IssueReport(sql.FieldLT(FieldContact, v))
+}
+
+// ContactLTE applies the LTE predicate on the "contact" field.
+func ContactLTE(v string) predicate.IssueReport {
+	return predicate.IssueReport(sql.FieldLTE(FieldContact, v))
+}
+
+// ContactContains applies the Contains predicate on the "contact" field.
+func ContactContains(v string) predicate.IssueReport {
+	return predicate.IssueReport(sql.FieldContains(FieldContact, v))
+}
+
+// ContactHasPrefix applies the HasPrefix predicate on the "contact" field.
+func ContactHasPrefix(v string) predicate.IssueReport {
+	return predicate.IssueReport(sql.FieldHasPrefix(FieldContact, v))
+}
+
+// ContactHasSuffix applies the HasSuffix predicate on the "contact" field.
+func ContactHasSuffix(v string) predicate.IssueReport {
+	return predicate.IssueReport(sql.FieldHasSuffix(FieldContact, v))
+}
+
+// ContactEqualFold applies the EqualFold predicate on the "contact" field.
+func ContactEqualFold(v string) predicate.IssueReport {
+	return predicate.IssueReport(sql.FieldEqualFold(FieldContact, v))
+}
+
+// ContactContainsFold applies the ContainsFold predicate on the "contact" field.
+func ContactContainsFold(v string) predicate.IssueReport {
+	return predicate.IssueReport(sql.FieldContainsFold(FieldContact, v))
+}
+
 // ReportDateEQ applies the EQ predicate on the "report_date" field.
 func ReportDateEQ(v time.Time) predicate.IssueReport {
 	return predicate.IssueReport(sql.FieldEQ(FieldReportDate, v))
@@ -247,95 +311,23 @@ func ReportDateLTE(v time.Time) predicate.IssueReport {
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.
-func StatusEQ(v string) predicate.IssueReport {
+func StatusEQ(v Status) predicate.IssueReport {
 	return predicate.IssueReport(sql.FieldEQ(FieldStatus, v))
 }
 
 // StatusNEQ applies the NEQ predicate on the "status" field.
-func StatusNEQ(v string) predicate.IssueReport {
+func StatusNEQ(v Status) predicate.IssueReport {
 	return predicate.IssueReport(sql.FieldNEQ(FieldStatus, v))
 }
 
 // StatusIn applies the In predicate on the "status" field.
-func StatusIn(vs ...string) predicate.IssueReport {
+func StatusIn(vs ...Status) predicate.IssueReport {
 	return predicate.IssueReport(sql.FieldIn(FieldStatus, vs...))
 }
 
 // StatusNotIn applies the NotIn predicate on the "status" field.
-func StatusNotIn(vs ...string) predicate.IssueReport {
+func StatusNotIn(vs ...Status) predicate.IssueReport {
 	return predicate.IssueReport(sql.FieldNotIn(FieldStatus, vs...))
-}
-
-// StatusGT applies the GT predicate on the "status" field.
-func StatusGT(v string) predicate.IssueReport {
-	return predicate.IssueReport(sql.FieldGT(FieldStatus, v))
-}
-
-// StatusGTE applies the GTE predicate on the "status" field.
-func StatusGTE(v string) predicate.IssueReport {
-	return predicate.IssueReport(sql.FieldGTE(FieldStatus, v))
-}
-
-// StatusLT applies the LT predicate on the "status" field.
-func StatusLT(v string) predicate.IssueReport {
-	return predicate.IssueReport(sql.FieldLT(FieldStatus, v))
-}
-
-// StatusLTE applies the LTE predicate on the "status" field.
-func StatusLTE(v string) predicate.IssueReport {
-	return predicate.IssueReport(sql.FieldLTE(FieldStatus, v))
-}
-
-// StatusContains applies the Contains predicate on the "status" field.
-func StatusContains(v string) predicate.IssueReport {
-	return predicate.IssueReport(sql.FieldContains(FieldStatus, v))
-}
-
-// StatusHasPrefix applies the HasPrefix predicate on the "status" field.
-func StatusHasPrefix(v string) predicate.IssueReport {
-	return predicate.IssueReport(sql.FieldHasPrefix(FieldStatus, v))
-}
-
-// StatusHasSuffix applies the HasSuffix predicate on the "status" field.
-func StatusHasSuffix(v string) predicate.IssueReport {
-	return predicate.IssueReport(sql.FieldHasSuffix(FieldStatus, v))
-}
-
-// StatusEqualFold applies the EqualFold predicate on the "status" field.
-func StatusEqualFold(v string) predicate.IssueReport {
-	return predicate.IssueReport(sql.FieldEqualFold(FieldStatus, v))
-}
-
-// StatusContainsFold applies the ContainsFold predicate on the "status" field.
-func StatusContainsFold(v string) predicate.IssueReport {
-	return predicate.IssueReport(sql.FieldContainsFold(FieldStatus, v))
-}
-
-// HasUser applies the HasEdge predicate on the "user" edge.
-func HasUser() predicate.IssueReport {
-	return predicate.IssueReport(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasUserWith applies the HasEdge predicate on the "user" edge with a given conditions (other predicates).
-func HasUserWith(preds ...predicate.User) predicate.IssueReport {
-	return predicate.IssueReport(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(UserInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
-		)
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
 }
 
 // And groups predicates with the AND operator between them.
