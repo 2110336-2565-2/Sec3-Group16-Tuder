@@ -3,6 +3,6 @@ const signupContent = {
                 ['Address'], ['Contact Number'], ['Gender', 'Birth Date']]
 };
 export const tutorSpecificContent = {
-    contents: [['Citizen ID']]
+    contents: [['Citizen ID'],['Description']]
 };
 export default signupContent;
