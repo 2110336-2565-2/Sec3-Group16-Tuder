@@ -1,82 +1,21 @@
 import React from "react";
 import styled from "styled-components"
-import { submitApprovmentHandler, submitRejectionHandler } from "../handlers/cancellingClassHandler";
+import { submitAudditing } from "../handlers/cancellingRequestHandler";
 import {toast} from 'react-hot-toast';
+import { Timezone, DateFormat } from '../datas/DateFormat.js';
+
 
 
 
 
 export default function CancelRequest(props){
 
-    // const submitApprove = (classId) => {
-
-    //     // confirmation before submit
-    //     if(!window.confirm("Are you sure to approve this request?")){
-    //         return;
-    //     }
-
-    //     submitApprovmentHandler(classId).then((res) => {
-    //         if(res.data.success){
-    //             toast.success("Approve Successfully");
-    //             //delete component
-    //             props.removeItem(classId);
-                
-                
-    //         }
-    //     }).catch((err) => {
-    //         console.log(err);
-    //         toast.error("Approve Failed");
-            
-    //     }
-    //     )
-    // }
-
-    // const submitReject = (classId) => {
-
-    //     // confirmation before submit
-        
-    //     if(!window.confirm("Are you sure to reject this request?")){
-    //         return;
-    //     }
-
-    //     submitRejectionHandler(classId).then((res) => {
-    //         if(res.data.success){
-    //             toast.success("Rejected Successfully",{iconTheme: {primary: '#DAA520', secondary: '#fff'}});
-    //             //delete component
-    //             props.removeItem(classId);
-                
-    //         }
-    //     }).catch((err) => {
-    //         console.log(err);
-    //         toast.error("Reject Failed");
-    //     }
-    //     )
-    // }
-
-
-    // var button = () => {
-    //     if (props.type !== "Topic") {
-    //         return (
-    //             <>
-    //                     <ApproveButton onClick={(e) => submitApprove(props.classId)}>Approve</ApproveButton>
-    //                     <RejectButton onClick={(e) => submitReject(props.classId)}>Reject</RejectButton>
-    //                 </>
-    //         )
-    //     } else {
-    //         return (
-    //             <>
-    //             <ApproveButton type="Topic">Approve</ApproveButton>
-    //             <RejectButton type="Topic">Reject</RejectButton>
-
-    //             </>
-    //         )
-    //     }
-    // }
 
     return(
         <Request>
             <ClassSection>
                 <ClassImg src={props.img} alt="classImg"/>
+                
 
                 <ClassInfoSection>
 
@@ -85,11 +24,7 @@ export default function CancelRequest(props){
                         &nbsp;
                         {props.title}
                     </ClassInfo>
-                    <ClassInfo>
-                        <InfoTitle>Course:</InfoTitle>
-                        &nbsp;
-                        {props.course}
-                    </ClassInfo>
+                    
                     <ClassInfo>
                         <InfoTitle>Reporter:</InfoTitle>
                         &nbsp;
@@ -98,7 +33,7 @@ export default function CancelRequest(props){
                     <ClassInfo>
                         <InfoTitle>Report Date:</InfoTitle>
                         &nbsp;
-                        {props.report_date}
+                        {(new Date(props.report_date)).toLocaleString(Timezone, DateFormat)}
                     </ClassInfo>
                     <ClassInfo>
                         <InfoTitle>Status:</InfoTitle>
@@ -111,16 +46,25 @@ export default function CancelRequest(props){
     )
 }
 
+// color be changed depends on the status
 
 const Request = styled.div`
     display: flex;
     flex-direction: row;
     justify-content: left;
     background-color: #EB7B42;
+
     width: 1000px;
     height: 167px;
     gap: 20px;
     padding: 10px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #DAA520;
+    }
+
+
     
 `
 
@@ -140,7 +84,7 @@ const ClassInfoSection = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: left;
-    gap: 10%;
+    gap: 30px;
     margin-top: 15px;
     margin-right: 10px;
     margin-left: 10px;

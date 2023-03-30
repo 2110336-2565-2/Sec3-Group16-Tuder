@@ -69,19 +69,19 @@ const router = createBrowserRouter([
         element: <ChangePassword />,
       },
       {
-        path: "enter-new-password",
+        path: "/enter-new-password",
         element: <EnterNewPassword />,
       },
       {
-        path: "cancel-request-list",
-        element: <CancelRequestList />,
-      },
-      {
-        path: "user-cancel-request",
+        path: "/user-cancel-request/:id",
         element: <UserCancelRequest />,
       },
       {
-        path: "cancel-request-detail",
+        path: "/cancel-request-list",
+        element: <CancelRequestList />,
+      },
+      {
+        path: "/cancel-request-detail/:id",
         element: <CancelRequestDetail />,
       }
     ]

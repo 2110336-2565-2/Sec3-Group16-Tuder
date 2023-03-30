@@ -5,10 +5,12 @@ import (
 
 	schemas "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 	services "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/services"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
 type ControllerCancelRequest interface {
+	GetCancellingRequest(echo.Context) error
 	GetCancellingRequests(echo.Context) error
 	CancelRequest(c echo.Context) error
 	AuditRequest(c echo.Context) error
@@ -23,6 +25,35 @@ func NewControllerCancelRequest(s services.ServiceCancelRequest) ControllerCance
 	return &controllerCancelRequest{
 		service: s,
 	}
+}
+
+func (cC *controllerCancelRequest) GetCancellingRequest(c echo.Context) error {
+	id, err := uuid.Parse(c.Param("id"))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, schemas.SchemaErrorResponse{
+			Success: false,
+			Message: err.Error(),
+			Error:   err,
+		})
+		return err
+	}
+
+	CancelRequest, err := cC.service.GetCancellingRequest(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, schemas.SchemaErrorResponse{
+			Success: false,
+			Message: err.Error(),
+			Error:   err,
+		})
+		return err
+	}
+	c.JSON(http.StatusOK, schemas.SchemaResponses{
+		Success: true,
+		Message: "Get request successfully",
+		Data:    CancelRequest,
+	})
+	return nil
 }
 
 func (cC *controllerCancelRequest) GetCancellingRequests(c echo.Context) error {

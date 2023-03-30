@@ -3,9 +3,11 @@ package services
 import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	schemas "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
+	"github.com/google/uuid"
 )
 
 type ServiceCancelRequest interface {
+	GetCancellingRequest(id uuid.UUID) (*schemas.SchemaCancelRequestDetail, error)
 	GetCancellingRequests() ([]*schemas.SchemaCancelRequestDetail, error)
 	CancelRequest(sc *schemas.SchemaCancelRequest) error
 	AuditRequest(sc *schemas.SchemaCancelRequestApprove) error
@@ -20,6 +22,14 @@ func NewServiceCancelRequest(repo repositorys.RepositoryCancelRequest) ServiceCa
 	return &serviceCancelRequest{
 		repo: repo,
 	}
+}
+
+func (s *serviceCancelRequest) GetCancellingRequest(id uuid.UUID) (*schemas.SchemaCancelRequestDetail, error) {
+	cr, err := s.repo.GetCancellingRequest(id)
+	if err != nil {
+		return nil, err
+	}
+	return cr, nil
 }
 
 func (s *serviceCancelRequest) GetCancellingRequests() ([]*schemas.SchemaCancelRequestDetail, error) {

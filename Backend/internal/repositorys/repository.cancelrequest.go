@@ -10,11 +10,13 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/cancelrequest"
 	match "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	user "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
+	"github.com/google/uuid"
 
 	schemas "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 )
 
 type RepositoryCancelRequest interface {
+	GetCancellingRequest(id uuid.UUID) (*schemas.SchemaCancelRequestDetail, error)
 	GetCancellingRequests() ([]*schemas.SchemaCancelRequestDetail, error)
 	CancelRequest(sc *schemas.SchemaCancelRequest) (*ent.CancelRequest, error)
 	AuditRequest(sc *schemas.SchemaCancelRequestApprove) error
@@ -33,6 +35,32 @@ func NewRepositoryCancelRequest(c *ent.Client) RepositoryCancelRequest {
 	}
 }
 
+func (r *repositoryCancelRequest) GetCancellingRequest(id uuid.UUID) (*schemas.SchemaCancelRequestDetail, error) {
+
+	ccr, err := r.client.CancelRequest.
+		Query().
+		Where(cancelrequest.IDEQ(id)).
+		WithMatch().
+		WithUser().
+		Only(r.ctx)
+	if err != nil {
+		return nil, fmt.Errorf("querying match cancel request: %w", err)
+	}
+
+	cancelRequest := &schemas.SchemaCancelRequestDetail{
+		CancelRequestID: ccr.ID,
+		Title:           ccr.Title,
+		MatchID:         ccr.Edges.Match.ID,
+		Reporter:        ccr.Edges.User.FirstName + " " + ccr.Edges.User.LastName,
+		ReportDate:      ccr.ReportDate,
+		ImgURL:          ccr.ImgURL,
+		Description:     ccr.Description,
+		Status:          ccr.Status,
+	}
+
+	return cancelRequest, nil
+}
+
 func (r *repositoryCancelRequest) GetCancellingRequests() ([]*schemas.SchemaCancelRequestDetail, error) {
 
 	ccr, err := r.client.CancelRequest.
@@ -48,6 +76,7 @@ func (r *repositoryCancelRequest) GetCancellingRequests() ([]*schemas.SchemaCanc
 	for _, c := range ccr {
 		cancelRequests = append(cancelRequests, &schemas.SchemaCancelRequestDetail{
 			CancelRequestID: c.ID,
+			Title:           c.Title,
 			MatchID:         c.Edges.Match.ID,
 			Reporter:        c.Edges.User.FirstName + " " + c.Edges.User.LastName,
 			ReportDate:      c.ReportDate,

@@ -17,26 +17,32 @@ func InitCancelRequestRoutes(client *ent.Client, e *echo.Group) {
 	controllerCancelRequest := controller.NewControllerCancelRequest(serviceCancelRequest)
 	mid := middlewares.NewAuthMiddleware(os.Getenv("JWT_SECRET"))
 
-	// get cancelling CancelRequestes
-	getCancellingCancelRequestesRoute := e.Group("/cancelling-requests")
-	getCancellingCancelRequestesRoute.Use(mid.JWT())
-	getCancellingCancelRequestesRoute.Use(mid.AdminMiddleware)
-	getCancellingCancelRequestesRoute.GET("", controllerCancelRequest.GetCancellingRequests)
+	// get cancelling Request by id
+	getCancellingRequestRoute := e.Group("/cancelling-request/:id")
+	getCancellingRequestRoute.Use(mid.JWT())
+	getCancellingRequestRoute.Use(mid.AdminMiddleware)
+	getCancellingRequestRoute.GET("", controllerCancelRequest.GetCancellingRequest)
 
-	// admin approve or reject CancelRequest cancellation
-	auditCancelRequestCancellationRoute := e.Group("/audit-request")
-	auditCancelRequestCancellationRoute.Use(mid.JWT())
-	auditCancelRequestCancellationRoute.Use(mid.AdminMiddleware)
-	auditCancelRequestCancellationRoute.POST("", controllerCancelRequest.AuditRequest)
+	// get cancelling requests
+	getCancellingRequestsRoute := e.Group("/cancelling-requests")
+	getCancellingRequestsRoute.Use(mid.JWT())
+	getCancellingRequestsRoute.Use(mid.AdminMiddleware)
+	getCancellingRequestsRoute.GET("", controllerCancelRequest.GetCancellingRequests)
 
-	// // user acknowledge CancelRequest rejected cancellation result
+	// admin approve or reject request
+	auditMatchCancellationRoute := e.Group("/audit-request")
+	auditMatchCancellationRoute.Use(mid.JWT())
+	auditMatchCancellationRoute.Use(mid.AdminMiddleware)
+	auditMatchCancellationRoute.POST("", controllerCancelRequest.AuditRequest)
+
+	// // user acknowledge request rejected cancellation result
 	// acknowledgeCancelRequestCancellationRoute := e.Group("/acknowledge-CancelRequest-cancellation")
 	// acknowledgeCancelRequestCancellationRoute.Use(mid.JWT())
 	// acknowledgeCancelRequestCancellationRoute.POST("", controllerCancelRequest.AcknowledgeCancelRequestCancellation)
 
-	// cancel CancelRequest
-	cancelCancelRequestRoute := e.Group("/cancel-request")
-	cancelCancelRequestRoute.Use(mid.JWT())
-	cancelCancelRequestRoute.POST("", controllerCancelRequest.CancelRequest)
+	// cancel request
+	cancelRequestRoute := e.Group("/cancel-request")
+	cancelRequestRoute.Use(mid.JWT())
+	cancelRequestRoute.POST("", controllerCancelRequest.CancelRequest)
 
 }
