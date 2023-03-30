@@ -194,7 +194,7 @@ var (
 	}
 	// ReviewsColumns holds the columns for the "reviews" table.
 	ReviewsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "score", Type: field.TypeFloat32, Nullable: true},
 		{Name: "review_msg", Type: field.TypeString, Nullable: true},
 		{Name: "review_time_at", Type: field.TypeTime},
@@ -301,7 +301,7 @@ var (
 	// CourseReviewColumns holds the columns for the "course_review" table.
 	CourseReviewColumns = []*schema.Column{
 		{Name: "course_id", Type: field.TypeUUID},
-		{Name: "review_id", Type: field.TypeInt},
+		{Name: "review_id", Type: field.TypeUUID},
 	}
 	// CourseReviewTable holds the schema information for the "course_review" table.
 	CourseReviewTable = &schema.Table{
@@ -326,7 +326,7 @@ var (
 	// StudentReviewColumns holds the columns for the "student_review" table.
 	StudentReviewColumns = []*schema.Column{
 		{Name: "student_id", Type: field.TypeUUID},
-		{Name: "review_id", Type: field.TypeInt},
+		{Name: "review_id", Type: field.TypeUUID},
 	}
 	// StudentReviewTable holds the schema information for the "student_review" table.
 	StudentReviewTable = &schema.Table{

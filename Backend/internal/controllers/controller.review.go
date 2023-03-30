@@ -34,6 +34,7 @@ func (r controllerReview) ReviewCourse(c echo.Context) (err error) {
 			Message: err.Error(),
 			Error:   err,
 		})
+		return err
 	}
 	c.JSON(http.StatusOK, schema.SchemaResponses{
 		Success: true,

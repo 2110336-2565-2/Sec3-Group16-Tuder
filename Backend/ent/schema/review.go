@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 
 	"time"
 )
@@ -17,7 +18,9 @@ type Review struct {
 
 func (Review) Fields() []ent.Field {
 	return []ent.Field{
-		field.Float32("score").Positive().Nillable().Optional(),
+		field.UUID("id", uuid.UUID{}).
+			Default(uuid.New).Unique().StorageKey("id").Immutable(),
+		field.Float32("score").Range(0.0, 5.0).Nillable().Optional(),
 		field.String("review_msg").Optional().Nillable(),
 		field.Time("review_time_at").Default(time.Now).Immutable(),
 	}

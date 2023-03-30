@@ -510,7 +510,7 @@ func (sq *StudentQuery) loadMatch(ctx context.Context, query *MatchQuery, nodes 
 func (sq *StudentQuery) loadReview(ctx context.Context, query *ReviewQuery, nodes []*Student, init func(*Student), assign func(*Student, *Review)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[uuid.UUID]*Student)
-	nids := make(map[int]map[*Student]struct{})
+	nids := make(map[uuid.UUID]map[*Student]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
 		byID[node.ID] = node
@@ -543,7 +543,7 @@ func (sq *StudentQuery) loadReview(ctx context.Context, query *ReviewQuery, node
 			}
 			spec.Assign = func(columns []string, values []any) error {
 				outValue := *values[0].(*uuid.UUID)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
+				inValue := *values[1].(*uuid.UUID)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*Student]struct{}{byID[outValue]: {}}
 					return assign(columns[1:], values[1:])

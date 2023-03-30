@@ -47,14 +47,14 @@ func (su *StudentUpdate) AddMatch(m ...*Match) *StudentUpdate {
 }
 
 // AddReviewIDs adds the "review" edge to the Review entity by IDs.
-func (su *StudentUpdate) AddReviewIDs(ids ...int) *StudentUpdate {
+func (su *StudentUpdate) AddReviewIDs(ids ...uuid.UUID) *StudentUpdate {
 	su.mutation.AddReviewIDs(ids...)
 	return su
 }
 
 // AddReview adds the "review" edges to the Review entity.
 func (su *StudentUpdate) AddReview(r ...*Review) *StudentUpdate {
-	ids := make([]int, len(r))
+	ids := make([]uuid.UUID, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -105,14 +105,14 @@ func (su *StudentUpdate) ClearReview() *StudentUpdate {
 }
 
 // RemoveReviewIDs removes the "review" edge to Review entities by IDs.
-func (su *StudentUpdate) RemoveReviewIDs(ids ...int) *StudentUpdate {
+func (su *StudentUpdate) RemoveReviewIDs(ids ...uuid.UUID) *StudentUpdate {
 	su.mutation.RemoveReviewIDs(ids...)
 	return su
 }
 
 // RemoveReview removes "review" edges to Review entities.
 func (su *StudentUpdate) RemoveReview(r ...*Review) *StudentUpdate {
-	ids := make([]int, len(r))
+	ids := make([]uuid.UUID, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -235,7 +235,7 @@ func (su *StudentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: review.FieldID,
 				},
 			},
@@ -251,7 +251,7 @@ func (su *StudentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: review.FieldID,
 				},
 			},
@@ -270,7 +270,7 @@ func (su *StudentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: review.FieldID,
 				},
 			},
@@ -351,14 +351,14 @@ func (suo *StudentUpdateOne) AddMatch(m ...*Match) *StudentUpdateOne {
 }
 
 // AddReviewIDs adds the "review" edge to the Review entity by IDs.
-func (suo *StudentUpdateOne) AddReviewIDs(ids ...int) *StudentUpdateOne {
+func (suo *StudentUpdateOne) AddReviewIDs(ids ...uuid.UUID) *StudentUpdateOne {
 	suo.mutation.AddReviewIDs(ids...)
 	return suo
 }
 
 // AddReview adds the "review" edges to the Review entity.
 func (suo *StudentUpdateOne) AddReview(r ...*Review) *StudentUpdateOne {
-	ids := make([]int, len(r))
+	ids := make([]uuid.UUID, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -409,14 +409,14 @@ func (suo *StudentUpdateOne) ClearReview() *StudentUpdateOne {
 }
 
 // RemoveReviewIDs removes the "review" edge to Review entities by IDs.
-func (suo *StudentUpdateOne) RemoveReviewIDs(ids ...int) *StudentUpdateOne {
+func (suo *StudentUpdateOne) RemoveReviewIDs(ids ...uuid.UUID) *StudentUpdateOne {
 	suo.mutation.RemoveReviewIDs(ids...)
 	return suo
 }
 
 // RemoveReview removes "review" edges to Review entities.
 func (suo *StudentUpdateOne) RemoveReview(r ...*Review) *StudentUpdateOne {
-	ids := make([]int, len(r))
+	ids := make([]uuid.UUID, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -569,7 +569,7 @@ func (suo *StudentUpdateOne) sqlSave(ctx context.Context) (_node *Student, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: review.FieldID,
 				},
 			},
@@ -585,7 +585,7 @@ func (suo *StudentUpdateOne) sqlSave(ctx context.Context) (_node *Student, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: review.FieldID,
 				},
 			},
@@ -604,7 +604,7 @@ func (suo *StudentUpdateOne) sqlSave(ctx context.Context) (_node *Student, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: review.FieldID,
 				},
 			},

@@ -1249,8 +1249,8 @@ type CourseMutation struct {
 	level              *course.Level
 	course_picture_url *string
 	clearedFields      map[string]struct{}
-	review             map[int]struct{}
-	removedreview      map[int]struct{}
+	review             map[uuid.UUID]struct{}
+	removedreview      map[uuid.UUID]struct{}
 	clearedreview      bool
 	match              map[uuid.UUID]struct{}
 	removedmatch       map[uuid.UUID]struct{}
@@ -1721,9 +1721,9 @@ func (m *CourseMutation) ResetCoursePictureURL() {
 }
 
 // AddReviewIDs adds the "review" edge to the Review entity by ids.
-func (m *CourseMutation) AddReviewIDs(ids ...int) {
+func (m *CourseMutation) AddReviewIDs(ids ...uuid.UUID) {
 	if m.review == nil {
-		m.review = make(map[int]struct{})
+		m.review = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.review[ids[i]] = struct{}{}
@@ -1741,9 +1741,9 @@ func (m *CourseMutation) ReviewCleared() bool {
 }
 
 // RemoveReviewIDs removes the "review" edge to the Review entity by IDs.
-func (m *CourseMutation) RemoveReviewIDs(ids ...int) {
+func (m *CourseMutation) RemoveReviewIDs(ids ...uuid.UUID) {
 	if m.removedreview == nil {
-		m.removedreview = make(map[int]struct{})
+		m.removedreview = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.review, ids[i])
@@ -1752,7 +1752,7 @@ func (m *CourseMutation) RemoveReviewIDs(ids ...int) {
 }
 
 // RemovedReview returns the removed IDs of the "review" edge to the Review entity.
-func (m *CourseMutation) RemovedReviewIDs() (ids []int) {
+func (m *CourseMutation) RemovedReviewIDs() (ids []uuid.UUID) {
 	for id := range m.removedreview {
 		ids = append(ids, id)
 	}
@@ -1760,7 +1760,7 @@ func (m *CourseMutation) RemovedReviewIDs() (ids []int) {
 }
 
 // ReviewIDs returns the "review" edge IDs in the mutation.
-func (m *CourseMutation) ReviewIDs() (ids []int) {
+func (m *CourseMutation) ReviewIDs() (ids []uuid.UUID) {
 	for id := range m.review {
 		ids = append(ids, id)
 	}
@@ -4427,7 +4427,7 @@ type ReviewMutation struct {
 	config
 	op             Op
 	typ            string
-	id             *int
+	id             *uuid.UUID
 	score          *float32
 	addscore       *float32
 	review_msg     *string
@@ -4464,7 +4464,7 @@ func newReviewMutation(c config, op Op, opts ...reviewOption) *ReviewMutation {
 }
 
 // withReviewID sets the ID field of the mutation.
-func withReviewID(id int) reviewOption {
+func withReviewID(id uuid.UUID) reviewOption {
 	return func(m *ReviewMutation) {
 		var (
 			err   error
@@ -4514,9 +4514,15 @@ func (m ReviewMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Review entities.
+func (m *ReviewMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *ReviewMutation) ID() (id int, exists bool) {
+func (m *ReviewMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -4527,12 +4533,12 @@ func (m *ReviewMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *ReviewMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *ReviewMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []int{id}, nil
+			return []uuid.UUID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -5902,8 +5908,8 @@ type StudentMutation struct {
 	match         map[uuid.UUID]struct{}
 	removedmatch  map[uuid.UUID]struct{}
 	clearedmatch  bool
-	review        map[int]struct{}
-	removedreview map[int]struct{}
+	review        map[uuid.UUID]struct{}
+	removedreview map[uuid.UUID]struct{}
 	clearedreview bool
 	user          *uuid.UUID
 	cleareduser   bool
@@ -6071,9 +6077,9 @@ func (m *StudentMutation) ResetMatch() {
 }
 
 // AddReviewIDs adds the "review" edge to the Review entity by ids.
-func (m *StudentMutation) AddReviewIDs(ids ...int) {
+func (m *StudentMutation) AddReviewIDs(ids ...uuid.UUID) {
 	if m.review == nil {
-		m.review = make(map[int]struct{})
+		m.review = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.review[ids[i]] = struct{}{}
@@ -6091,9 +6097,9 @@ func (m *StudentMutation) ReviewCleared() bool {
 }
 
 // RemoveReviewIDs removes the "review" edge to the Review entity by IDs.
-func (m *StudentMutation) RemoveReviewIDs(ids ...int) {
+func (m *StudentMutation) RemoveReviewIDs(ids ...uuid.UUID) {
 	if m.removedreview == nil {
-		m.removedreview = make(map[int]struct{})
+		m.removedreview = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.review, ids[i])
@@ -6102,7 +6108,7 @@ func (m *StudentMutation) RemoveReviewIDs(ids ...int) {
 }
 
 // RemovedReview returns the removed IDs of the "review" edge to the Review entity.
-func (m *StudentMutation) RemovedReviewIDs() (ids []int) {
+func (m *StudentMutation) RemovedReviewIDs() (ids []uuid.UUID) {
 	for id := range m.removedreview {
 		ids = append(ids, id)
 	}
@@ -6110,7 +6116,7 @@ func (m *StudentMutation) RemovedReviewIDs() (ids []int) {
 }
 
 // ReviewIDs returns the "review" edge IDs in the mutation.
-func (m *StudentMutation) ReviewIDs() (ids []int) {
+func (m *StudentMutation) ReviewIDs() (ids []uuid.UUID) {
 	for id := range m.review {
 		ids = append(ids, id)
 	}

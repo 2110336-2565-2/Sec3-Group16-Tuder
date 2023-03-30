@@ -118,13 +118,17 @@ func init() {
 	reviewFields := schema.Review{}.Fields()
 	_ = reviewFields
 	// reviewDescScore is the schema descriptor for score field.
-	reviewDescScore := reviewFields[0].Descriptor()
+	reviewDescScore := reviewFields[1].Descriptor()
 	// review.ScoreValidator is a validator for the "score" field. It is called by the builders before save.
 	review.ScoreValidator = reviewDescScore.Validators[0].(func(float32) error)
 	// reviewDescReviewTimeAt is the schema descriptor for review_time_at field.
-	reviewDescReviewTimeAt := reviewFields[2].Descriptor()
+	reviewDescReviewTimeAt := reviewFields[3].Descriptor()
 	// review.DefaultReviewTimeAt holds the default value on creation for the review_time_at field.
 	review.DefaultReviewTimeAt = reviewDescReviewTimeAt.Default.(func() time.Time)
+	// reviewDescID is the schema descriptor for id field.
+	reviewDescID := reviewFields[0].Descriptor()
+	// review.DefaultID holds the default value on creation for the id field.
+	review.DefaultID = reviewDescID.Default.(func() uuid.UUID)
 	scheduleFields := schema.Schedule{}.Fields()
 	_ = scheduleFields
 	// scheduleDescID is the schema descriptor for id field.

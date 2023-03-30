@@ -22,6 +22,10 @@ func NewServiceReview(r repository.RepositoryReview) *serviceReview {
 
 func (s serviceReview) ReviewCourseService(r *schemas.SchemaCreateReview) (*schemas.SchemaCreateReviewResponse, error) {
 	fmt.Println(r)
+	// 1. check if the rating is valid (between 0, 5)
+	if r.Rating < 0 || r.Rating > 5 {
+		return nil, fmt.Errorf("invalid Rating")
+	}
 	review, err := s.repository.CreateReview(r)
 	if err != nil {
 		return nil, err

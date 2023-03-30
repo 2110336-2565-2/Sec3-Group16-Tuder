@@ -15,6 +15,5 @@ func InitRoutes(c *ent.Client, e *echo.Echo) {
 	InitChangePasswordRoutes(c, v1)
 	InitIssueReportRoutes(c, v1)
 	InitCancelRequestRoutes(c, v1)
-	InitClassRoutes(c, v1)
 	InitReviewRoutes(c, v1)
 }

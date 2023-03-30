@@ -28,10 +28,7 @@ func NewRepositoryReview(c *ent.Client) RepositoryReview {
 }
 
 func (r repositoryReview) CreateReview(sR *schema.SchemaCreateReview) (*ent.Review, error) {
-	// 1. check if the rating is valid (between 0, 5)
-	if sR.Rating < 0 || sR.Rating > 5 {
-		return nil, fmt.Errorf("invalid Rating")
-	}
+
 	//create translation
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
@@ -42,11 +39,13 @@ func (r repositoryReview) CreateReview(sR *schema.SchemaCreateReview) (*ent.Revi
 	tcx := tx.Client()
 
 	// begin sql query
-	// 2. checking if a student has a match that mapped to the course
+	// 1. checking if a student has a match that mapped to the course
 	student, err := tcx.Student.Query().
 		Where(entStudent.IDEQ(sR.StudentId)).
 		WithMatch(func(query *ent.MatchQuery) {
-			query.Where(match.HasCourseWith(course.IDEQ(sR.CourseId))).WithCourse()
+			query.Where(match.HasCourseWith(course.IDEQ(sR.CourseId))).
+				WithCourse().
+				Only(r.ctx)
 		}).Only(r.ctx)
 	if len(student.Edges.Match) <= 0 {
 		if rerr := tx.Rollback(); rerr != nil {
@@ -56,7 +55,7 @@ func (r repositoryReview) CreateReview(sR *schema.SchemaCreateReview) (*ent.Revi
 	}
 
 	// if all criterion passed, create a review
-	c := student.Edges.Match[0].Edges.Course[0]
+	c := student.Edges.Match[0].Edges.Course
 	review, err := tcx.Review.Create().
 		SetReviewMsg(sR.ReviewMessage).
 		SetScore(sR.Rating).
