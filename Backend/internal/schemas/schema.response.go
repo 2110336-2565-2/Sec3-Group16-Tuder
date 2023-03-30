@@ -30,3 +30,9 @@ type CourseSearchResponse struct {
 	Message string                `json:"message"`
 	Data    []*CourseSearchResult `json:"result"`
 }
+
+type SchemaReportResponse struct {
+	Success bool                 `json:"success"`
+	Message string               `json:"message"`
+	Data    []*SchemaIssueReport `json:"result"`
+}

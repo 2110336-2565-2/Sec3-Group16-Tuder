@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewtutor"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
@@ -101,21 +100,6 @@ func (tc *TutorCreate) AddCourse(c ...*Course) *TutorCreate {
 		ids[i] = c[i].ID
 	}
 	return tc.AddCourseIDs(ids...)
-}
-
-// AddReviewTutorIDs adds the "review_tutor" edge to the ReviewTutor entity by IDs.
-func (tc *TutorCreate) AddReviewTutorIDs(ids ...int) *TutorCreate {
-	tc.mutation.AddReviewTutorIDs(ids...)
-	return tc
-}
-
-// AddReviewTutor adds the "review_tutor" edges to the ReviewTutor entity.
-func (tc *TutorCreate) AddReviewTutor(r ...*ReviewTutor) *TutorCreate {
-	ids := make([]int, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
-	}
-	return tc.AddReviewTutorIDs(ids...)
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
@@ -282,25 +266,6 @@ func (tc *TutorCreate) createSpec() (*Tutor, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := tc.mutation.ReviewTutorIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   tutor.ReviewTutorTable,
-			Columns: tutor.ReviewTutorPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: reviewtutor.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
 	if nodes := tc.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
@@ -323,7 +288,7 @@ func (tc *TutorCreate) createSpec() (*Tutor, *sqlgraph.CreateSpec) {
 	}
 	if nodes := tc.mutation.ScheduleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   tutor.ScheduleTable,
 			Columns: []string{tutor.ScheduleColumn},

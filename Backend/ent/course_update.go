@@ -13,7 +13,7 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/review"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/google/uuid"
 )
@@ -121,19 +121,19 @@ func (cu *CourseUpdate) ClearCoursePictureURL() *CourseUpdate {
 	return cu
 }
 
-// AddReviewCourseIDs adds the "review_course" edge to the ReviewCourse entity by IDs.
-func (cu *CourseUpdate) AddReviewCourseIDs(ids ...int) *CourseUpdate {
-	cu.mutation.AddReviewCourseIDs(ids...)
+// AddReviewIDs adds the "review" edge to the Review entity by IDs.
+func (cu *CourseUpdate) AddReviewIDs(ids ...int) *CourseUpdate {
+	cu.mutation.AddReviewIDs(ids...)
 	return cu
 }
 
-// AddReviewCourse adds the "review_course" edges to the ReviewCourse entity.
-func (cu *CourseUpdate) AddReviewCourse(r ...*ReviewCourse) *CourseUpdate {
+// AddReview adds the "review" edges to the Review entity.
+func (cu *CourseUpdate) AddReview(r ...*Review) *CourseUpdate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return cu.AddReviewCourseIDs(ids...)
+	return cu.AddReviewIDs(ids...)
 }
 
 // AddMatchIDs adds the "match" edge to the Match entity by IDs.
@@ -167,25 +167,25 @@ func (cu *CourseUpdate) Mutation() *CourseMutation {
 	return cu.mutation
 }
 
-// ClearReviewCourse clears all "review_course" edges to the ReviewCourse entity.
-func (cu *CourseUpdate) ClearReviewCourse() *CourseUpdate {
-	cu.mutation.ClearReviewCourse()
+// ClearReview clears all "review" edges to the Review entity.
+func (cu *CourseUpdate) ClearReview() *CourseUpdate {
+	cu.mutation.ClearReview()
 	return cu
 }
 
-// RemoveReviewCourseIDs removes the "review_course" edge to ReviewCourse entities by IDs.
-func (cu *CourseUpdate) RemoveReviewCourseIDs(ids ...int) *CourseUpdate {
-	cu.mutation.RemoveReviewCourseIDs(ids...)
+// RemoveReviewIDs removes the "review" edge to Review entities by IDs.
+func (cu *CourseUpdate) RemoveReviewIDs(ids ...int) *CourseUpdate {
+	cu.mutation.RemoveReviewIDs(ids...)
 	return cu
 }
 
-// RemoveReviewCourse removes "review_course" edges to ReviewCourse entities.
-func (cu *CourseUpdate) RemoveReviewCourse(r ...*ReviewCourse) *CourseUpdate {
+// RemoveReview removes "review" edges to Review entities.
+func (cu *CourseUpdate) RemoveReview(r ...*Review) *CourseUpdate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return cu.RemoveReviewCourseIDs(ids...)
+	return cu.RemoveReviewIDs(ids...)
 }
 
 // ClearMatch clears all "match" edges to the Match entity.
@@ -328,33 +328,33 @@ func (cu *CourseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if cu.mutation.CoursePictureURLCleared() {
 		_spec.ClearField(course.FieldCoursePictureURL, field.TypeString)
 	}
-	if cu.mutation.ReviewCourseCleared() {
+	if cu.mutation.ReviewCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   course.ReviewCourseTable,
-			Columns: course.ReviewCoursePrimaryKey,
+			Table:   course.ReviewTable,
+			Columns: course.ReviewPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: reviewcourse.FieldID,
+					Column: review.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.RemovedReviewCourseIDs(); len(nodes) > 0 && !cu.mutation.ReviewCourseCleared() {
+	if nodes := cu.mutation.RemovedReviewIDs(); len(nodes) > 0 && !cu.mutation.ReviewCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   course.ReviewCourseTable,
-			Columns: course.ReviewCoursePrimaryKey,
+			Table:   course.ReviewTable,
+			Columns: course.ReviewPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: reviewcourse.FieldID,
+					Column: review.FieldID,
 				},
 			},
 		}
@@ -363,17 +363,17 @@ func (cu *CourseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.ReviewCourseIDs(); len(nodes) > 0 {
+	if nodes := cu.mutation.ReviewIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   course.ReviewCourseTable,
-			Columns: course.ReviewCoursePrimaryKey,
+			Table:   course.ReviewTable,
+			Columns: course.ReviewPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: reviewcourse.FieldID,
+					Column: review.FieldID,
 				},
 			},
 		}
@@ -384,10 +384,10 @@ func (cu *CourseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if cu.mutation.MatchCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   course.MatchTable,
-			Columns: course.MatchPrimaryKey,
+			Columns: []string{course.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -400,10 +400,10 @@ func (cu *CourseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := cu.mutation.RemovedMatchIDs(); len(nodes) > 0 && !cu.mutation.MatchCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   course.MatchTable,
-			Columns: course.MatchPrimaryKey,
+			Columns: []string{course.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -419,10 +419,10 @@ func (cu *CourseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := cu.mutation.MatchIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   course.MatchTable,
-			Columns: course.MatchPrimaryKey,
+			Columns: []string{course.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -581,19 +581,19 @@ func (cuo *CourseUpdateOne) ClearCoursePictureURL() *CourseUpdateOne {
 	return cuo
 }
 
-// AddReviewCourseIDs adds the "review_course" edge to the ReviewCourse entity by IDs.
-func (cuo *CourseUpdateOne) AddReviewCourseIDs(ids ...int) *CourseUpdateOne {
-	cuo.mutation.AddReviewCourseIDs(ids...)
+// AddReviewIDs adds the "review" edge to the Review entity by IDs.
+func (cuo *CourseUpdateOne) AddReviewIDs(ids ...int) *CourseUpdateOne {
+	cuo.mutation.AddReviewIDs(ids...)
 	return cuo
 }
 
-// AddReviewCourse adds the "review_course" edges to the ReviewCourse entity.
-func (cuo *CourseUpdateOne) AddReviewCourse(r ...*ReviewCourse) *CourseUpdateOne {
+// AddReview adds the "review" edges to the Review entity.
+func (cuo *CourseUpdateOne) AddReview(r ...*Review) *CourseUpdateOne {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return cuo.AddReviewCourseIDs(ids...)
+	return cuo.AddReviewIDs(ids...)
 }
 
 // AddMatchIDs adds the "match" edge to the Match entity by IDs.
@@ -627,25 +627,25 @@ func (cuo *CourseUpdateOne) Mutation() *CourseMutation {
 	return cuo.mutation
 }
 
-// ClearReviewCourse clears all "review_course" edges to the ReviewCourse entity.
-func (cuo *CourseUpdateOne) ClearReviewCourse() *CourseUpdateOne {
-	cuo.mutation.ClearReviewCourse()
+// ClearReview clears all "review" edges to the Review entity.
+func (cuo *CourseUpdateOne) ClearReview() *CourseUpdateOne {
+	cuo.mutation.ClearReview()
 	return cuo
 }
 
-// RemoveReviewCourseIDs removes the "review_course" edge to ReviewCourse entities by IDs.
-func (cuo *CourseUpdateOne) RemoveReviewCourseIDs(ids ...int) *CourseUpdateOne {
-	cuo.mutation.RemoveReviewCourseIDs(ids...)
+// RemoveReviewIDs removes the "review" edge to Review entities by IDs.
+func (cuo *CourseUpdateOne) RemoveReviewIDs(ids ...int) *CourseUpdateOne {
+	cuo.mutation.RemoveReviewIDs(ids...)
 	return cuo
 }
 
-// RemoveReviewCourse removes "review_course" edges to ReviewCourse entities.
-func (cuo *CourseUpdateOne) RemoveReviewCourse(r ...*ReviewCourse) *CourseUpdateOne {
+// RemoveReview removes "review" edges to Review entities.
+func (cuo *CourseUpdateOne) RemoveReview(r ...*Review) *CourseUpdateOne {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return cuo.RemoveReviewCourseIDs(ids...)
+	return cuo.RemoveReviewIDs(ids...)
 }
 
 // ClearMatch clears all "match" edges to the Match entity.
@@ -818,33 +818,33 @@ func (cuo *CourseUpdateOne) sqlSave(ctx context.Context) (_node *Course, err err
 	if cuo.mutation.CoursePictureURLCleared() {
 		_spec.ClearField(course.FieldCoursePictureURL, field.TypeString)
 	}
-	if cuo.mutation.ReviewCourseCleared() {
+	if cuo.mutation.ReviewCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   course.ReviewCourseTable,
-			Columns: course.ReviewCoursePrimaryKey,
+			Table:   course.ReviewTable,
+			Columns: course.ReviewPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: reviewcourse.FieldID,
+					Column: review.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.RemovedReviewCourseIDs(); len(nodes) > 0 && !cuo.mutation.ReviewCourseCleared() {
+	if nodes := cuo.mutation.RemovedReviewIDs(); len(nodes) > 0 && !cuo.mutation.ReviewCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   course.ReviewCourseTable,
-			Columns: course.ReviewCoursePrimaryKey,
+			Table:   course.ReviewTable,
+			Columns: course.ReviewPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: reviewcourse.FieldID,
+					Column: review.FieldID,
 				},
 			},
 		}
@@ -853,17 +853,17 @@ func (cuo *CourseUpdateOne) sqlSave(ctx context.Context) (_node *Course, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.ReviewCourseIDs(); len(nodes) > 0 {
+	if nodes := cuo.mutation.ReviewIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   course.ReviewCourseTable,
-			Columns: course.ReviewCoursePrimaryKey,
+			Table:   course.ReviewTable,
+			Columns: course.ReviewPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: reviewcourse.FieldID,
+					Column: review.FieldID,
 				},
 			},
 		}
@@ -874,10 +874,10 @@ func (cuo *CourseUpdateOne) sqlSave(ctx context.Context) (_node *Course, err err
 	}
 	if cuo.mutation.MatchCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   course.MatchTable,
-			Columns: course.MatchPrimaryKey,
+			Columns: []string{course.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -890,10 +890,10 @@ func (cuo *CourseUpdateOne) sqlSave(ctx context.Context) (_node *Course, err err
 	}
 	if nodes := cuo.mutation.RemovedMatchIDs(); len(nodes) > 0 && !cuo.mutation.MatchCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   course.MatchTable,
-			Columns: course.MatchPrimaryKey,
+			Columns: []string{course.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -909,10 +909,10 @@ func (cuo *CourseUpdateOne) sqlSave(ctx context.Context) (_node *Course, err err
 	}
 	if nodes := cuo.mutation.MatchIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   course.MatchTable,
-			Columns: course.MatchPrimaryKey,
+			Columns: []string{course.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
