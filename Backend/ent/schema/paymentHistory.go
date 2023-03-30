@@ -28,7 +28,7 @@ func (PaymentHistory) Fields() []ent.Field {
 
 func (PaymentHistory) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("class", Class.Type),
+		// edge.To("class", Class.Type),
 		edge.From("user", User.Type).
 			Ref("payment_history").
 			Unique().

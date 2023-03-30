@@ -13,6 +13,6 @@ func InitRoutes(c *ent.Client, e *echo.Echo) {
 	InitStudentRoutes(c, v1)
 	InitCourseRoutes(c, v1)
 	InitChangePasswordRoutes(c, v1)
-	InitClassRoutes(c, v1)
 	InitIssueReportRoutes(c, v1)
+	InitCancelRequestRoutes(c, v1)
 }

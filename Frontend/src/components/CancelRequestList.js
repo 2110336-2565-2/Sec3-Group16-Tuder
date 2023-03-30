@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import {useQuery} from 'react-query';
-import { fetchCancellingClassHandler } from '../handlers/cancellingClassHandler';
+import { fetchCancellingRequestsHandler } from '../handlers/cancellingRequestHandler';
 import { useDataContext } from '../pages/CancelRequestList';
 import CancelRequest from '../components/CancelRequest';
 import React from 'react';
@@ -14,7 +14,7 @@ export default function CancelRequestList(){
     const { isLoading, error} = useQuery(
         'cancellingClass',() =>
         {
-            fetchCancellingClassHandler().then((res) => {
+            fetchCancellingRequestsHandler().then((res) => {
                 
                 if(res.data.success){
                     if(res.data.data !== null)
@@ -22,8 +22,6 @@ export default function CancelRequestList(){
                 }
             }).catch((err) => {
                 console.log(err);
-                alert("Unauthorized, please login again");
-                window.location.href = "/sign-in";
             }
             )
         },
@@ -48,27 +46,18 @@ export default function CancelRequestList(){
         return <div>Empty</div>
     }
 
-    const removeItem = (classId) => {
-        setData(data.filter(item => item.classId !== classId));
-    }
-    
-
     return (
         <Container>
             <h1>Class Cancellation Requests</h1>
-            <RequestListPage>
-                
+            <RequestListPage>     
                     <RequestListcontent>
                         {data.map(item => (
-                            <div onClick={(e) =>navigate('/cancel-request-detail')}>
-
-                            <CancelRequest  title="big hee" img="/images/index.png" course="hee" reporter="Name of hee" report_date="Today" status="ongoing"/>
+                            <div key={item.cancelRequestId} onClick={(e) =>navigate('/cancel-request-detail/'+item.cancelRequestId)}>
+                            <CancelRequest key={item.cancelRequestId} title={item.title} img="/images/index.png" reporter={item.reporter} report_date={item.report_date} status={item.status}/>
                             </div>
                         ))}
                         
                     </RequestListcontent>
-
-                
             </RequestListPage>
         </Container>
     )
@@ -77,20 +66,18 @@ export default function CancelRequestList(){
 const Container = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 20px;
     justify-content: center;
     align-items: center;
-    padding: 20px;
-    margin-top: 20px;
+    padding: 10px;
+    margin-top: 5px;
     margin-bottom: 20px;
 `
 
 const RequestListPage = styled.div`
     display: flex;
     flex-direction: row;
-    gap: 20px;
     justify-content: center;
-    padding: 20px;
+    padding: 5%;
     
 `
 
@@ -98,7 +85,6 @@ const RequestListcontent = styled.div`
     display: flex;
     flex-direction: column;
     gap: 20px;
-    
 `
 
 

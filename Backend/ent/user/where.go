@@ -869,24 +869,24 @@ func HasPaymentHistoryWith(preds ...predicate.PaymentHistory) predicate.User {
 	})
 }
 
-// HasClassCancelRequest applies the HasEdge predicate on the "class_cancel_request" edge.
-func HasClassCancelRequest() predicate.User {
+// HasCancelRequest applies the HasEdge predicate on the "cancel_request" edge.
+func HasCancelRequest() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ClassCancelRequestTable, ClassCancelRequestColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, CancelRequestTable, CancelRequestColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasClassCancelRequestWith applies the HasEdge predicate on the "class_cancel_request" edge with a given conditions (other predicates).
-func HasClassCancelRequestWith(preds ...predicate.ClassCancelRequest) predicate.User {
+// HasCancelRequestWith applies the HasEdge predicate on the "cancel_request" edge with a given conditions (other predicates).
+func HasCancelRequestWith(preds ...predicate.CancelRequest) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(ClassCancelRequestInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ClassCancelRequestTable, ClassCancelRequestColumn),
+			sqlgraph.To(CancelRequestInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, CancelRequestTable, CancelRequestColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

@@ -12,8 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewtutor"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/review"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
@@ -47,34 +46,19 @@ func (su *StudentUpdate) AddMatch(m ...*Match) *StudentUpdate {
 	return su.AddMatchIDs(ids...)
 }
 
-// AddReviewCourseIDs adds the "review_course" edge to the ReviewCourse entity by IDs.
-func (su *StudentUpdate) AddReviewCourseIDs(ids ...int) *StudentUpdate {
-	su.mutation.AddReviewCourseIDs(ids...)
+// AddReviewIDs adds the "review" edge to the Review entity by IDs.
+func (su *StudentUpdate) AddReviewIDs(ids ...int) *StudentUpdate {
+	su.mutation.AddReviewIDs(ids...)
 	return su
 }
 
-// AddReviewCourse adds the "review_course" edges to the ReviewCourse entity.
-func (su *StudentUpdate) AddReviewCourse(r ...*ReviewCourse) *StudentUpdate {
+// AddReview adds the "review" edges to the Review entity.
+func (su *StudentUpdate) AddReview(r ...*Review) *StudentUpdate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return su.AddReviewCourseIDs(ids...)
-}
-
-// AddReviewTutorIDs adds the "review_tutor" edge to the ReviewTutor entity by IDs.
-func (su *StudentUpdate) AddReviewTutorIDs(ids ...int) *StudentUpdate {
-	su.mutation.AddReviewTutorIDs(ids...)
-	return su
-}
-
-// AddReviewTutor adds the "review_tutor" edges to the ReviewTutor entity.
-func (su *StudentUpdate) AddReviewTutor(r ...*ReviewTutor) *StudentUpdate {
-	ids := make([]int, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
-	}
-	return su.AddReviewTutorIDs(ids...)
+	return su.AddReviewIDs(ids...)
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
@@ -114,46 +98,25 @@ func (su *StudentUpdate) RemoveMatch(m ...*Match) *StudentUpdate {
 	return su.RemoveMatchIDs(ids...)
 }
 
-// ClearReviewCourse clears all "review_course" edges to the ReviewCourse entity.
-func (su *StudentUpdate) ClearReviewCourse() *StudentUpdate {
-	su.mutation.ClearReviewCourse()
+// ClearReview clears all "review" edges to the Review entity.
+func (su *StudentUpdate) ClearReview() *StudentUpdate {
+	su.mutation.ClearReview()
 	return su
 }
 
-// RemoveReviewCourseIDs removes the "review_course" edge to ReviewCourse entities by IDs.
-func (su *StudentUpdate) RemoveReviewCourseIDs(ids ...int) *StudentUpdate {
-	su.mutation.RemoveReviewCourseIDs(ids...)
+// RemoveReviewIDs removes the "review" edge to Review entities by IDs.
+func (su *StudentUpdate) RemoveReviewIDs(ids ...int) *StudentUpdate {
+	su.mutation.RemoveReviewIDs(ids...)
 	return su
 }
 
-// RemoveReviewCourse removes "review_course" edges to ReviewCourse entities.
-func (su *StudentUpdate) RemoveReviewCourse(r ...*ReviewCourse) *StudentUpdate {
+// RemoveReview removes "review" edges to Review entities.
+func (su *StudentUpdate) RemoveReview(r ...*Review) *StudentUpdate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return su.RemoveReviewCourseIDs(ids...)
-}
-
-// ClearReviewTutor clears all "review_tutor" edges to the ReviewTutor entity.
-func (su *StudentUpdate) ClearReviewTutor() *StudentUpdate {
-	su.mutation.ClearReviewTutor()
-	return su
-}
-
-// RemoveReviewTutorIDs removes the "review_tutor" edge to ReviewTutor entities by IDs.
-func (su *StudentUpdate) RemoveReviewTutorIDs(ids ...int) *StudentUpdate {
-	su.mutation.RemoveReviewTutorIDs(ids...)
-	return su
-}
-
-// RemoveReviewTutor removes "review_tutor" edges to ReviewTutor entities.
-func (su *StudentUpdate) RemoveReviewTutor(r ...*ReviewTutor) *StudentUpdate {
-	ids := make([]int, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
-	}
-	return su.RemoveReviewTutorIDs(ids...)
+	return su.RemoveReviewIDs(ids...)
 }
 
 // ClearUser clears the "user" edge to the User entity.
@@ -263,33 +226,33 @@ func (su *StudentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if su.mutation.ReviewCourseCleared() {
+	if su.mutation.ReviewCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   student.ReviewCourseTable,
-			Columns: student.ReviewCoursePrimaryKey,
+			Table:   student.ReviewTable,
+			Columns: student.ReviewPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: reviewcourse.FieldID,
+					Column: review.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := su.mutation.RemovedReviewCourseIDs(); len(nodes) > 0 && !su.mutation.ReviewCourseCleared() {
+	if nodes := su.mutation.RemovedReviewIDs(); len(nodes) > 0 && !su.mutation.ReviewCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   student.ReviewCourseTable,
-			Columns: student.ReviewCoursePrimaryKey,
+			Table:   student.ReviewTable,
+			Columns: student.ReviewPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: reviewcourse.FieldID,
+					Column: review.FieldID,
 				},
 			},
 		}
@@ -298,71 +261,17 @@ func (su *StudentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := su.mutation.ReviewCourseIDs(); len(nodes) > 0 {
+	if nodes := su.mutation.ReviewIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   student.ReviewCourseTable,
-			Columns: student.ReviewCoursePrimaryKey,
+			Table:   student.ReviewTable,
+			Columns: student.ReviewPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: reviewcourse.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if su.mutation.ReviewTutorCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   student.ReviewTutorTable,
-			Columns: student.ReviewTutorPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: reviewtutor.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := su.mutation.RemovedReviewTutorIDs(); len(nodes) > 0 && !su.mutation.ReviewTutorCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   student.ReviewTutorTable,
-			Columns: student.ReviewTutorPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: reviewtutor.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := su.mutation.ReviewTutorIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   student.ReviewTutorTable,
-			Columns: student.ReviewTutorPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: reviewtutor.FieldID,
+					Column: review.FieldID,
 				},
 			},
 		}
@@ -441,34 +350,19 @@ func (suo *StudentUpdateOne) AddMatch(m ...*Match) *StudentUpdateOne {
 	return suo.AddMatchIDs(ids...)
 }
 
-// AddReviewCourseIDs adds the "review_course" edge to the ReviewCourse entity by IDs.
-func (suo *StudentUpdateOne) AddReviewCourseIDs(ids ...int) *StudentUpdateOne {
-	suo.mutation.AddReviewCourseIDs(ids...)
+// AddReviewIDs adds the "review" edge to the Review entity by IDs.
+func (suo *StudentUpdateOne) AddReviewIDs(ids ...int) *StudentUpdateOne {
+	suo.mutation.AddReviewIDs(ids...)
 	return suo
 }
 
-// AddReviewCourse adds the "review_course" edges to the ReviewCourse entity.
-func (suo *StudentUpdateOne) AddReviewCourse(r ...*ReviewCourse) *StudentUpdateOne {
+// AddReview adds the "review" edges to the Review entity.
+func (suo *StudentUpdateOne) AddReview(r ...*Review) *StudentUpdateOne {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return suo.AddReviewCourseIDs(ids...)
-}
-
-// AddReviewTutorIDs adds the "review_tutor" edge to the ReviewTutor entity by IDs.
-func (suo *StudentUpdateOne) AddReviewTutorIDs(ids ...int) *StudentUpdateOne {
-	suo.mutation.AddReviewTutorIDs(ids...)
-	return suo
-}
-
-// AddReviewTutor adds the "review_tutor" edges to the ReviewTutor entity.
-func (suo *StudentUpdateOne) AddReviewTutor(r ...*ReviewTutor) *StudentUpdateOne {
-	ids := make([]int, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
-	}
-	return suo.AddReviewTutorIDs(ids...)
+	return suo.AddReviewIDs(ids...)
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
@@ -508,46 +402,25 @@ func (suo *StudentUpdateOne) RemoveMatch(m ...*Match) *StudentUpdateOne {
 	return suo.RemoveMatchIDs(ids...)
 }
 
-// ClearReviewCourse clears all "review_course" edges to the ReviewCourse entity.
-func (suo *StudentUpdateOne) ClearReviewCourse() *StudentUpdateOne {
-	suo.mutation.ClearReviewCourse()
+// ClearReview clears all "review" edges to the Review entity.
+func (suo *StudentUpdateOne) ClearReview() *StudentUpdateOne {
+	suo.mutation.ClearReview()
 	return suo
 }
 
-// RemoveReviewCourseIDs removes the "review_course" edge to ReviewCourse entities by IDs.
-func (suo *StudentUpdateOne) RemoveReviewCourseIDs(ids ...int) *StudentUpdateOne {
-	suo.mutation.RemoveReviewCourseIDs(ids...)
+// RemoveReviewIDs removes the "review" edge to Review entities by IDs.
+func (suo *StudentUpdateOne) RemoveReviewIDs(ids ...int) *StudentUpdateOne {
+	suo.mutation.RemoveReviewIDs(ids...)
 	return suo
 }
 
-// RemoveReviewCourse removes "review_course" edges to ReviewCourse entities.
-func (suo *StudentUpdateOne) RemoveReviewCourse(r ...*ReviewCourse) *StudentUpdateOne {
+// RemoveReview removes "review" edges to Review entities.
+func (suo *StudentUpdateOne) RemoveReview(r ...*Review) *StudentUpdateOne {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return suo.RemoveReviewCourseIDs(ids...)
-}
-
-// ClearReviewTutor clears all "review_tutor" edges to the ReviewTutor entity.
-func (suo *StudentUpdateOne) ClearReviewTutor() *StudentUpdateOne {
-	suo.mutation.ClearReviewTutor()
-	return suo
-}
-
-// RemoveReviewTutorIDs removes the "review_tutor" edge to ReviewTutor entities by IDs.
-func (suo *StudentUpdateOne) RemoveReviewTutorIDs(ids ...int) *StudentUpdateOne {
-	suo.mutation.RemoveReviewTutorIDs(ids...)
-	return suo
-}
-
-// RemoveReviewTutor removes "review_tutor" edges to ReviewTutor entities.
-func (suo *StudentUpdateOne) RemoveReviewTutor(r ...*ReviewTutor) *StudentUpdateOne {
-	ids := make([]int, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
-	}
-	return suo.RemoveReviewTutorIDs(ids...)
+	return suo.RemoveReviewIDs(ids...)
 }
 
 // ClearUser clears the "user" edge to the User entity.
@@ -687,33 +560,33 @@ func (suo *StudentUpdateOne) sqlSave(ctx context.Context) (_node *Student, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if suo.mutation.ReviewCourseCleared() {
+	if suo.mutation.ReviewCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   student.ReviewCourseTable,
-			Columns: student.ReviewCoursePrimaryKey,
+			Table:   student.ReviewTable,
+			Columns: student.ReviewPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: reviewcourse.FieldID,
+					Column: review.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := suo.mutation.RemovedReviewCourseIDs(); len(nodes) > 0 && !suo.mutation.ReviewCourseCleared() {
+	if nodes := suo.mutation.RemovedReviewIDs(); len(nodes) > 0 && !suo.mutation.ReviewCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   student.ReviewCourseTable,
-			Columns: student.ReviewCoursePrimaryKey,
+			Table:   student.ReviewTable,
+			Columns: student.ReviewPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: reviewcourse.FieldID,
+					Column: review.FieldID,
 				},
 			},
 		}
@@ -722,71 +595,17 @@ func (suo *StudentUpdateOne) sqlSave(ctx context.Context) (_node *Student, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := suo.mutation.ReviewCourseIDs(); len(nodes) > 0 {
+	if nodes := suo.mutation.ReviewIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   student.ReviewCourseTable,
-			Columns: student.ReviewCoursePrimaryKey,
+			Table:   student.ReviewTable,
+			Columns: student.ReviewPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: reviewcourse.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if suo.mutation.ReviewTutorCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   student.ReviewTutorTable,
-			Columns: student.ReviewTutorPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: reviewtutor.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := suo.mutation.RemovedReviewTutorIDs(); len(nodes) > 0 && !suo.mutation.ReviewTutorCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   student.ReviewTutorTable,
-			Columns: student.ReviewTutorPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: reviewtutor.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := suo.mutation.ReviewTutorIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   student.ReviewTutorTable,
-			Columns: student.ReviewTutorPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: reviewtutor.FieldID,
+					Column: review.FieldID,
 				},
 			},
 		}

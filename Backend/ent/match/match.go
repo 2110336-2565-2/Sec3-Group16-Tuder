@@ -3,6 +3,8 @@
 package match
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -11,14 +13,18 @@ const (
 	Label = "match"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldMatchCreatedAt holds the string denoting the match_created_at field in the database.
+	FieldMatchCreatedAt = "match_created_at"
 	// EdgeStudent holds the string denoting the student edge name in mutations.
 	EdgeStudent = "student"
 	// EdgeCourse holds the string denoting the course edge name in mutations.
 	EdgeCourse = "course"
-	// EdgeClass holds the string denoting the class edge name in mutations.
-	EdgeClass = "class"
-	// EdgeClassCancelRequest holds the string denoting the class_cancel_request edge name in mutations.
-	EdgeClassCancelRequest = "class_cancel_request"
+	// EdgeAppointment holds the string denoting the appointment edge name in mutations.
+	EdgeAppointment = "appointment"
+	// EdgeSchedule holds the string denoting the schedule edge name in mutations.
+	EdgeSchedule = "schedule"
+	// EdgeCancelRequest holds the string denoting the cancel_request edge name in mutations.
+	EdgeCancelRequest = "cancel_request"
 	// Table holds the table name of the match in the database.
 	Table = "matches"
 	// StudentTable is the table that holds the student relation/edge.
@@ -35,32 +41,40 @@ const (
 	CourseInverseTable = "courses"
 	// CourseColumn is the table column denoting the course relation/edge.
 	CourseColumn = "course_match"
-	// ClassTable is the table that holds the class relation/edge.
-	ClassTable = "matches"
-	// ClassInverseTable is the table name for the Class entity.
-	// It exists in this package in order to avoid circular dependency with the "class" package.
-	ClassInverseTable = "classes"
-	// ClassColumn is the table column denoting the class relation/edge.
-	ClassColumn = "class_match"
-	// ClassCancelRequestTable is the table that holds the class_cancel_request relation/edge.
-	ClassCancelRequestTable = "class_cancel_requests"
-	// ClassCancelRequestInverseTable is the table name for the ClassCancelRequest entity.
-	// It exists in this package in order to avoid circular dependency with the "classcancelrequest" package.
-	ClassCancelRequestInverseTable = "class_cancel_requests"
-	// ClassCancelRequestColumn is the table column denoting the class_cancel_request relation/edge.
-	ClassCancelRequestColumn = "match_class_cancel_request"
+	// AppointmentTable is the table that holds the appointment relation/edge.
+	AppointmentTable = "appointments"
+	// AppointmentInverseTable is the table name for the Appointment entity.
+	// It exists in this package in order to avoid circular dependency with the "appointment" package.
+	AppointmentInverseTable = "appointments"
+	// AppointmentColumn is the table column denoting the appointment relation/edge.
+	AppointmentColumn = "appointment_match"
+	// ScheduleTable is the table that holds the schedule relation/edge.
+	ScheduleTable = "matches"
+	// ScheduleInverseTable is the table name for the Schedule entity.
+	// It exists in this package in order to avoid circular dependency with the "schedule" package.
+	ScheduleInverseTable = "schedules"
+	// ScheduleColumn is the table column denoting the schedule relation/edge.
+	ScheduleColumn = "schedule_match"
+	// CancelRequestTable is the table that holds the cancel_request relation/edge.
+	CancelRequestTable = "cancel_requests"
+	// CancelRequestInverseTable is the table name for the CancelRequest entity.
+	// It exists in this package in order to avoid circular dependency with the "cancelrequest" package.
+	CancelRequestInverseTable = "cancel_requests"
+	// CancelRequestColumn is the table column denoting the cancel_request relation/edge.
+	CancelRequestColumn = "cancel_request_match"
 )
 
 // Columns holds all SQL columns for match fields.
 var Columns = []string{
 	FieldID,
+	FieldMatchCreatedAt,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "matches"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"class_match",
 	"course_match",
+	"schedule_match",
 	"student_match",
 }
 
@@ -80,6 +94,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultMatchCreatedAt holds the default value on creation for the "match_created_at" field.
+	DefaultMatchCreatedAt func() time.Time
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )

@@ -11,7 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/classcancelrequest"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/cancelrequest"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
@@ -182,19 +183,19 @@ func (uu *UserUpdate) AddPaymentHistory(p ...*PaymentHistory) *UserUpdate {
 	return uu.AddPaymentHistoryIDs(ids...)
 }
 
-// AddClassCancelRequestIDs adds the "class_cancel_request" edge to the ClassCancelRequest entity by IDs.
-func (uu *UserUpdate) AddClassCancelRequestIDs(ids ...uuid.UUID) *UserUpdate {
-	uu.mutation.AddClassCancelRequestIDs(ids...)
+// AddCancelRequestIDs adds the "cancel_request" edge to the CancelRequest entity by IDs.
+func (uu *UserUpdate) AddCancelRequestIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.AddCancelRequestIDs(ids...)
 	return uu
 }
 
-// AddClassCancelRequest adds the "class_cancel_request" edges to the ClassCancelRequest entity.
-func (uu *UserUpdate) AddClassCancelRequest(c ...*ClassCancelRequest) *UserUpdate {
+// AddCancelRequest adds the "cancel_request" edges to the CancelRequest entity.
+func (uu *UserUpdate) AddCancelRequest(c ...*CancelRequest) *UserUpdate {
 	ids := make([]uuid.UUID, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
-	return uu.AddClassCancelRequestIDs(ids...)
+	return uu.AddCancelRequestIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -256,25 +257,25 @@ func (uu *UserUpdate) RemovePaymentHistory(p ...*PaymentHistory) *UserUpdate {
 	return uu.RemovePaymentHistoryIDs(ids...)
 }
 
-// ClearClassCancelRequest clears all "class_cancel_request" edges to the ClassCancelRequest entity.
-func (uu *UserUpdate) ClearClassCancelRequest() *UserUpdate {
-	uu.mutation.ClearClassCancelRequest()
+// ClearCancelRequest clears all "cancel_request" edges to the CancelRequest entity.
+func (uu *UserUpdate) ClearCancelRequest() *UserUpdate {
+	uu.mutation.ClearCancelRequest()
 	return uu
 }
 
-// RemoveClassCancelRequestIDs removes the "class_cancel_request" edge to ClassCancelRequest entities by IDs.
-func (uu *UserUpdate) RemoveClassCancelRequestIDs(ids ...uuid.UUID) *UserUpdate {
-	uu.mutation.RemoveClassCancelRequestIDs(ids...)
+// RemoveCancelRequestIDs removes the "cancel_request" edge to CancelRequest entities by IDs.
+func (uu *UserUpdate) RemoveCancelRequestIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.RemoveCancelRequestIDs(ids...)
 	return uu
 }
 
-// RemoveClassCancelRequest removes "class_cancel_request" edges to ClassCancelRequest entities.
-func (uu *UserUpdate) RemoveClassCancelRequest(c ...*ClassCancelRequest) *UserUpdate {
+// RemoveCancelRequest removes "cancel_request" edges to CancelRequest entities.
+func (uu *UserUpdate) RemoveCancelRequest(c ...*CancelRequest) *UserUpdate {
 	ids := make([]uuid.UUID, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
-	return uu.RemoveClassCancelRequestIDs(ids...)
+	return uu.RemoveCancelRequestIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -580,33 +581,33 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uu.mutation.ClassCancelRequestCleared() {
+	if uu.mutation.CancelRequestCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.ClassCancelRequestTable,
-			Columns: []string{user.ClassCancelRequestColumn},
+			Table:   user.CancelRequestTable,
+			Columns: []string{user.CancelRequestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: classcancelrequest.FieldID,
+					Column: cancelrequest.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RemovedClassCancelRequestIDs(); len(nodes) > 0 && !uu.mutation.ClassCancelRequestCleared() {
+	if nodes := uu.mutation.RemovedCancelRequestIDs(); len(nodes) > 0 && !uu.mutation.CancelRequestCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.ClassCancelRequestTable,
-			Columns: []string{user.ClassCancelRequestColumn},
+			Table:   user.CancelRequestTable,
+			Columns: []string{user.CancelRequestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: classcancelrequest.FieldID,
+					Column: cancelrequest.FieldID,
 				},
 			},
 		}
@@ -615,17 +616,17 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.ClassCancelRequestIDs(); len(nodes) > 0 {
+	if nodes := uu.mutation.CancelRequestIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.ClassCancelRequestTable,
-			Columns: []string{user.ClassCancelRequestColumn},
+			Table:   user.CancelRequestTable,
+			Columns: []string{user.CancelRequestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: classcancelrequest.FieldID,
+					Column: cancelrequest.FieldID,
 				},
 			},
 		}
@@ -802,19 +803,19 @@ func (uuo *UserUpdateOne) AddPaymentHistory(p ...*PaymentHistory) *UserUpdateOne
 	return uuo.AddPaymentHistoryIDs(ids...)
 }
 
-// AddClassCancelRequestIDs adds the "class_cancel_request" edge to the ClassCancelRequest entity by IDs.
-func (uuo *UserUpdateOne) AddClassCancelRequestIDs(ids ...uuid.UUID) *UserUpdateOne {
-	uuo.mutation.AddClassCancelRequestIDs(ids...)
+// AddCancelRequestIDs adds the "cancel_request" edge to the CancelRequest entity by IDs.
+func (uuo *UserUpdateOne) AddCancelRequestIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.AddCancelRequestIDs(ids...)
 	return uuo
 }
 
-// AddClassCancelRequest adds the "class_cancel_request" edges to the ClassCancelRequest entity.
-func (uuo *UserUpdateOne) AddClassCancelRequest(c ...*ClassCancelRequest) *UserUpdateOne {
+// AddCancelRequest adds the "cancel_request" edges to the CancelRequest entity.
+func (uuo *UserUpdateOne) AddCancelRequest(c ...*CancelRequest) *UserUpdateOne {
 	ids := make([]uuid.UUID, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
-	return uuo.AddClassCancelRequestIDs(ids...)
+	return uuo.AddCancelRequestIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -876,25 +877,25 @@ func (uuo *UserUpdateOne) RemovePaymentHistory(p ...*PaymentHistory) *UserUpdate
 	return uuo.RemovePaymentHistoryIDs(ids...)
 }
 
-// ClearClassCancelRequest clears all "class_cancel_request" edges to the ClassCancelRequest entity.
-func (uuo *UserUpdateOne) ClearClassCancelRequest() *UserUpdateOne {
-	uuo.mutation.ClearClassCancelRequest()
+// ClearCancelRequest clears all "cancel_request" edges to the CancelRequest entity.
+func (uuo *UserUpdateOne) ClearCancelRequest() *UserUpdateOne {
+	uuo.mutation.ClearCancelRequest()
 	return uuo
 }
 
-// RemoveClassCancelRequestIDs removes the "class_cancel_request" edge to ClassCancelRequest entities by IDs.
-func (uuo *UserUpdateOne) RemoveClassCancelRequestIDs(ids ...uuid.UUID) *UserUpdateOne {
-	uuo.mutation.RemoveClassCancelRequestIDs(ids...)
+// RemoveCancelRequestIDs removes the "cancel_request" edge to CancelRequest entities by IDs.
+func (uuo *UserUpdateOne) RemoveCancelRequestIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.RemoveCancelRequestIDs(ids...)
 	return uuo
 }
 
-// RemoveClassCancelRequest removes "class_cancel_request" edges to ClassCancelRequest entities.
-func (uuo *UserUpdateOne) RemoveClassCancelRequest(c ...*ClassCancelRequest) *UserUpdateOne {
+// RemoveCancelRequest removes "cancel_request" edges to CancelRequest entities.
+func (uuo *UserUpdateOne) RemoveCancelRequest(c ...*CancelRequest) *UserUpdateOne {
 	ids := make([]uuid.UUID, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
-	return uuo.RemoveClassCancelRequestIDs(ids...)
+	return uuo.RemoveCancelRequestIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -1230,33 +1231,33 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uuo.mutation.ClassCancelRequestCleared() {
+	if uuo.mutation.CancelRequestCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.ClassCancelRequestTable,
-			Columns: []string{user.ClassCancelRequestColumn},
+			Table:   user.CancelRequestTable,
+			Columns: []string{user.CancelRequestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: classcancelrequest.FieldID,
+					Column: cancelrequest.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RemovedClassCancelRequestIDs(); len(nodes) > 0 && !uuo.mutation.ClassCancelRequestCleared() {
+	if nodes := uuo.mutation.RemovedCancelRequestIDs(); len(nodes) > 0 && !uuo.mutation.CancelRequestCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.ClassCancelRequestTable,
-			Columns: []string{user.ClassCancelRequestColumn},
+			Table:   user.CancelRequestTable,
+			Columns: []string{user.CancelRequestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: classcancelrequest.FieldID,
+					Column: cancelrequest.FieldID,
 				},
 			},
 		}
@@ -1265,17 +1266,17 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.ClassCancelRequestIDs(); len(nodes) > 0 {
+	if nodes := uuo.mutation.CancelRequestIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.ClassCancelRequestTable,
-			Columns: []string{user.ClassCancelRequestColumn},
+			Table:   user.CancelRequestTable,
+			Columns: []string{user.CancelRequestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: classcancelrequest.FieldID,
+					Column: cancelrequest.FieldID,
 				},
 			},
 		}

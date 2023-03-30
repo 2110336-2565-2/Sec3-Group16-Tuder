@@ -12,10 +12,10 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
-	// Class is the client for interacting with the Class builders.
-	Class *ClassClient
-	// ClassCancelRequest is the client for interacting with the ClassCancelRequest builders.
-	ClassCancelRequest *ClassCancelRequestClient
+	// Appointment is the client for interacting with the Appointment builders.
+	Appointment *AppointmentClient
+	// CancelRequest is the client for interacting with the CancelRequest builders.
+	CancelRequest *CancelRequestClient
 	// Course is the client for interacting with the Course builders.
 	Course *CourseClient
 	// IssueReport is the client for interacting with the IssueReport builders.
@@ -26,10 +26,8 @@ type Tx struct {
 	Payment *PaymentClient
 	// PaymentHistory is the client for interacting with the PaymentHistory builders.
 	PaymentHistory *PaymentHistoryClient
-	// ReviewCourse is the client for interacting with the ReviewCourse builders.
-	ReviewCourse *ReviewCourseClient
-	// ReviewTutor is the client for interacting with the ReviewTutor builders.
-	ReviewTutor *ReviewTutorClient
+	// Review is the client for interacting with the Review builders.
+	Review *ReviewClient
 	// Schedule is the client for interacting with the Schedule builders.
 	Schedule *ScheduleClient
 	// Student is the client for interacting with the Student builders.
@@ -169,15 +167,14 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
-	tx.Class = NewClassClient(tx.config)
-	tx.ClassCancelRequest = NewClassCancelRequestClient(tx.config)
+	tx.Appointment = NewAppointmentClient(tx.config)
+	tx.CancelRequest = NewCancelRequestClient(tx.config)
 	tx.Course = NewCourseClient(tx.config)
 	tx.IssueReport = NewIssueReportClient(tx.config)
 	tx.Match = NewMatchClient(tx.config)
 	tx.Payment = NewPaymentClient(tx.config)
 	tx.PaymentHistory = NewPaymentHistoryClient(tx.config)
-	tx.ReviewCourse = NewReviewCourseClient(tx.config)
-	tx.ReviewTutor = NewReviewTutorClient(tx.config)
+	tx.Review = NewReviewClient(tx.config)
 	tx.Schedule = NewScheduleClient(tx.config)
 	tx.Student = NewStudentClient(tx.config)
 	tx.Tutor = NewTutorClient(tx.config)
@@ -191,7 +188,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Class.QueryXXX(), the query will be executed
+// applies a query, for example: Appointment.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.
