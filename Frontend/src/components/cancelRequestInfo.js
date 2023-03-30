@@ -21,7 +21,7 @@ export default function CancelRequestInfo(props){
             approve: (e.target.value) === "true"
         }
 
-        console.log(data)
+        
 
         submitAudittingHandler(data).then((res) => {
             if(res.data.success){
@@ -34,6 +34,20 @@ export default function CancelRequestInfo(props){
         }).catch((err) => {
             console.log(err);
         })
+    }
+
+    var submitButton = null;
+    if (props.status !== "approved" && props.status !== "rejected") {
+        submitButton = (
+            <RightButtonSection>
+                <RejectButton value="false" onClick={handleSubmit}>
+                    Reject
+                </RejectButton>
+                <ApproveButton value="true" onClick={handleSubmit}>
+                    Approve
+                </ApproveButton>    
+        </RightButtonSection>
+        )
     }
 
 
@@ -73,9 +87,8 @@ export default function CancelRequestInfo(props){
                                     Back
                                 </BackButton>
                             </LeftButtonSection>
-                            <RightButtonSection>
-                                
-                            </RightButtonSection>
+                            {submitButton}
+                           
                         </ButtonSection>
                         
                     </ReportInfoSection>

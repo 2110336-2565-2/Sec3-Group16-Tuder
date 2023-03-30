@@ -373,7 +373,6 @@ func init() {
 	CancelRequestsTable.ForeignKeys[1].RefTable = UsersTable
 	CoursesTable.ForeignKeys[0].RefTable = TutorsTable
 	IssueReportsTable.ForeignKeys[0].RefTable = TutorsTable
-	IssueReportsTable.ForeignKeys[1].RefTable = UsersTable
 	MatchesTable.ForeignKeys[0].RefTable = CoursesTable
 	MatchesTable.ForeignKeys[1].RefTable = SchedulesTable
 	MatchesTable.ForeignKeys[2].RefTable = StudentsTable

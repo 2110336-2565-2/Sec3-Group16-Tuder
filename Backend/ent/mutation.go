@@ -7194,9 +7194,6 @@ type UserMutation struct {
 	clearedstudent         bool
 	tutor                  *uuid.UUID
 	clearedtutor           bool
-	issue_report           map[uuid.UUID]struct{}
-	removedissue_report    map[uuid.UUID]struct{}
-	clearedissue_report    bool
 	payment                map[uuid.UUID]struct{}
 	removedpayment         map[uuid.UUID]struct{}
 	clearedpayment         bool
@@ -8276,7 +8273,7 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 5)
 	if m.student != nil {
 		edges = append(edges, user.EdgeStudent)
 	}
@@ -8331,10 +8328,7 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 6)
-	if m.removedissue_report != nil {
-		edges = append(edges, user.EdgeIssueReport)
-	}
+	edges := make([]string, 0, 5)
 	if m.removedpayment != nil {
 		edges = append(edges, user.EdgePayment)
 	}
@@ -8375,7 +8369,7 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 5)
 	if m.clearedstudent {
 		edges = append(edges, user.EdgeStudent)
 	}

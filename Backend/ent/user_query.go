@@ -12,7 +12,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/cancelrequest"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
@@ -31,7 +30,6 @@ type UserQuery struct {
 	predicates         []predicate.User
 	withStudent        *StudentQuery
 	withTutor          *TutorQuery
-	withIssueReport    *IssueReportQuery
 	withPayment        *PaymentQuery
 	withPaymentHistory *PaymentHistoryQuery
 	withCancelRequest  *CancelRequestQuery
@@ -375,7 +373,6 @@ func (uq *UserQuery) Clone() *UserQuery {
 		predicates:         append([]predicate.User{}, uq.predicates...),
 		withStudent:        uq.withStudent.Clone(),
 		withTutor:          uq.withTutor.Clone(),
-		withIssueReport:    uq.withIssueReport.Clone(),
 		withPayment:        uq.withPayment.Clone(),
 		withPaymentHistory: uq.withPaymentHistory.Clone(),
 		withCancelRequest:  uq.withCancelRequest.Clone(),
@@ -518,7 +515,7 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	var (
 		nodes       = []*User{}
 		_spec       = uq.querySpec()
-		loadedTypes = [6]bool{
+		loadedTypes = [5]bool{
 			uq.withStudent != nil,
 			uq.withTutor != nil,
 			uq.withPayment != nil,

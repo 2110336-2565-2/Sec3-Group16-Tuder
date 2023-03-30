@@ -60,7 +60,7 @@ type UserEdges struct {
 	CancelRequest []*CancelRequest `json:"cancel_request,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [6]bool
+	loadedTypes [5]bool
 }
 
 // StudentOrErr returns the Student value or an error if the edge
@@ -110,7 +110,7 @@ func (e UserEdges) PaymentHistoryOrErr() ([]*PaymentHistory, error) {
 // CancelRequestOrErr returns the CancelRequest value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) CancelRequestOrErr() ([]*CancelRequest, error) {
-	if e.loadedTypes[5] {
+	if e.loadedTypes[4] {
 		return e.CancelRequest, nil
 	}
 	return nil, &NotLoadedError{edge: "cancel_request"}
