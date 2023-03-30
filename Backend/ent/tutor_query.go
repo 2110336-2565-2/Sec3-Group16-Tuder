@@ -148,7 +148,7 @@ func (tq *TutorQuery) QuerySchedule() *ScheduleQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(tutor.Table, tutor.FieldID, selector),
 			sqlgraph.To(schedule.Table, schedule.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, tutor.ScheduleTable, tutor.ScheduleColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, tutor.ScheduleTable, tutor.ScheduleColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
 		return fromU, nil

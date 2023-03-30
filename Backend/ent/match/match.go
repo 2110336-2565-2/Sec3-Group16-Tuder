@@ -3,6 +3,8 @@
 package match
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -11,12 +13,18 @@ const (
 	Label = "match"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldMatchCreatedAt holds the string denoting the match_created_at field in the database.
+	FieldMatchCreatedAt = "match_created_at"
 	// EdgeStudent holds the string denoting the student edge name in mutations.
 	EdgeStudent = "student"
 	// EdgeCourse holds the string denoting the course edge name in mutations.
 	EdgeCourse = "course"
-	// EdgeClass holds the string denoting the class edge name in mutations.
-	EdgeClass = "class"
+	// EdgeAppointment holds the string denoting the appointment edge name in mutations.
+	EdgeAppointment = "appointment"
+	// EdgeSchedule holds the string denoting the schedule edge name in mutations.
+	EdgeSchedule = "schedule"
+	// EdgeCancelRequest holds the string denoting the cancel_request edge name in mutations.
+	EdgeCancelRequest = "cancel_request"
 	// Table holds the table name of the match in the database.
 	Table = "matches"
 	// StudentTable is the table that holds the student relation/edge.
@@ -26,37 +34,49 @@ const (
 	StudentInverseTable = "students"
 	// StudentColumn is the table column denoting the student relation/edge.
 	StudentColumn = "student_match"
-	// CourseTable is the table that holds the course relation/edge. The primary key declared below.
-	CourseTable = "course_match"
+	// CourseTable is the table that holds the course relation/edge.
+	CourseTable = "matches"
 	// CourseInverseTable is the table name for the Course entity.
 	// It exists in this package in order to avoid circular dependency with the "course" package.
 	CourseInverseTable = "courses"
-	// ClassTable is the table that holds the class relation/edge. The primary key declared below.
-	ClassTable = "class_match"
-	// ClassInverseTable is the table name for the Class entity.
-	// It exists in this package in order to avoid circular dependency with the "class" package.
-	ClassInverseTable = "classes"
+	// CourseColumn is the table column denoting the course relation/edge.
+	CourseColumn = "course_match"
+	// AppointmentTable is the table that holds the appointment relation/edge.
+	AppointmentTable = "appointments"
+	// AppointmentInverseTable is the table name for the Appointment entity.
+	// It exists in this package in order to avoid circular dependency with the "appointment" package.
+	AppointmentInverseTable = "appointments"
+	// AppointmentColumn is the table column denoting the appointment relation/edge.
+	AppointmentColumn = "appointment_match"
+	// ScheduleTable is the table that holds the schedule relation/edge.
+	ScheduleTable = "matches"
+	// ScheduleInverseTable is the table name for the Schedule entity.
+	// It exists in this package in order to avoid circular dependency with the "schedule" package.
+	ScheduleInverseTable = "schedules"
+	// ScheduleColumn is the table column denoting the schedule relation/edge.
+	ScheduleColumn = "schedule_match"
+	// CancelRequestTable is the table that holds the cancel_request relation/edge.
+	CancelRequestTable = "cancel_requests"
+	// CancelRequestInverseTable is the table name for the CancelRequest entity.
+	// It exists in this package in order to avoid circular dependency with the "cancelrequest" package.
+	CancelRequestInverseTable = "cancel_requests"
+	// CancelRequestColumn is the table column denoting the cancel_request relation/edge.
+	CancelRequestColumn = "cancel_request_match"
 )
 
 // Columns holds all SQL columns for match fields.
 var Columns = []string{
 	FieldID,
+	FieldMatchCreatedAt,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "matches"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
+	"course_match",
+	"schedule_match",
 	"student_match",
 }
-
-var (
-	// CoursePrimaryKey and CourseColumn2 are the table columns denoting the
-	// primary key for the course relation (M2M).
-	CoursePrimaryKey = []string{"course_id", "match_id"}
-	// ClassPrimaryKey and ClassColumn2 are the table columns denoting the
-	// primary key for the class relation (M2M).
-	ClassPrimaryKey = []string{"class_id", "match_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -74,6 +94,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultMatchCreatedAt holds the default value on creation for the "match_created_at" field.
+	DefaultMatchCreatedAt func() time.Time
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )

@@ -17,6 +17,37 @@ func NewControllerCourse(service service.ServiceCourse) *controllerCourse {
 	return &controllerCourse{service: service}
 }
 
+func (cR *controllerCourse) SearchContent(c echo.Context) (err error) {
+
+	var searchContent *schema.CourseSearch
+
+	if err := c.Bind(&searchContent); err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaResponses{
+			Success: false,
+			Message: "invalid request payload",
+			Data:    err.Error(),
+		})
+		return err
+	}
+
+	Course_search_result, err := cR.service.CourseSearchService(searchContent)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaResponses{
+			Success: false,
+			Message: err.Error(),
+			Data:    nil,
+		})
+		return err
+	}
+
+	c.JSON(http.StatusOK, schema.CourseSearchResponse{
+		Success: true,
+		Message: "Search successfully",
+		Data:    Course_search_result,
+	})
+	return
+}
+
 func (cR *controllerCourse) GetCourseByCourseID(c echo.Context) (err error) {
 	id, _ := uuid.Parse(c.Param("id"))
 	uR := &schema.SchemaGetCourse{
@@ -41,21 +72,23 @@ func (cR *controllerCourse) GetCourseByCourseID(c echo.Context) (err error) {
 }
 
 func (cR *controllerCourse) GetCourses(c echo.Context) (err error) {
-	courses, err := cR.service.GetCourses()
+	Course_search_result, err := cR.service.GetCourses()
+
 	if err != nil {
-		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+		c.JSON(http.StatusBadRequest, schema.SchemaResponses{
 			Success: false,
 			Message: err.Error(),
-			Error:   err,
+			Data:    nil,
 		})
-		return
+		return err
 	}
-	c.JSON(http.StatusOK, schema.SchemaResponses{
+
+	c.JSON(http.StatusOK, schema.CourseSearchResponse{
 		Success: true,
-		Message: "Get courses successfully",
-		Data:    courses,
+		Message: "Search successfully",
+		Data:    Course_search_result,
 	})
-	return nil
+	return
 }
 
 func (cR *controllerCourse) CreateCourse(c echo.Context) (err error) {

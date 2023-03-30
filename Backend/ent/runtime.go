@@ -5,7 +5,8 @@ package ent
 import (
 	"time"
 
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/appointment"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/cancelrequest"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
@@ -24,16 +25,30 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	classFields := schema.Class{}.Fields()
-	_ = classFields
-	// classDescReviewAvaliable is the schema descriptor for review_avaliable field.
-	classDescReviewAvaliable := classFields[1].Descriptor()
-	// class.DefaultReviewAvaliable holds the default value on creation for the review_avaliable field.
-	class.DefaultReviewAvaliable = classDescReviewAvaliable.Default.(bool)
-	// classDescID is the schema descriptor for id field.
-	classDescID := classFields[0].Descriptor()
-	// class.DefaultID holds the default value on creation for the id field.
-	class.DefaultID = classDescID.Default.(func() uuid.UUID)
+	appointmentFields := schema.Appointment{}.Fields()
+	_ = appointmentFields
+	// appointmentDescID is the schema descriptor for id field.
+	appointmentDescID := appointmentFields[0].Descriptor()
+	// appointment.DefaultID holds the default value on creation for the id field.
+	appointment.DefaultID = appointmentDescID.Default.(func() uuid.UUID)
+	cancelrequestFields := schema.CancelRequest{}.Fields()
+	_ = cancelrequestFields
+	// cancelrequestDescTitle is the schema descriptor for title field.
+	cancelrequestDescTitle := cancelrequestFields[1].Descriptor()
+	// cancelrequest.TitleValidator is a validator for the "title" field. It is called by the builders before save.
+	cancelrequest.TitleValidator = cancelrequestDescTitle.Validators[0].(func(string) error)
+	// cancelrequestDescReportDate is the schema descriptor for report_date field.
+	cancelrequestDescReportDate := cancelrequestFields[2].Descriptor()
+	// cancelrequest.DefaultReportDate holds the default value on creation for the report_date field.
+	cancelrequest.DefaultReportDate = cancelrequestDescReportDate.Default.(func() time.Time)
+	// cancelrequestDescDescription is the schema descriptor for description field.
+	cancelrequestDescDescription := cancelrequestFields[4].Descriptor()
+	// cancelrequest.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	cancelrequest.DescriptionValidator = cancelrequestDescDescription.Validators[0].(func(string) error)
+	// cancelrequestDescID is the schema descriptor for id field.
+	cancelrequestDescID := cancelrequestFields[0].Descriptor()
+	// cancelrequest.DefaultID holds the default value on creation for the id field.
+	cancelrequest.DefaultID = cancelrequestDescID.Default.(func() uuid.UUID)
 	courseFields := schema.Course{}.Fields()
 	_ = courseFields
 	// courseDescTitle is the schema descriptor for title field.
@@ -70,16 +85,20 @@ func init() {
 	issuereportDescDescription := issuereportFields[2].Descriptor()
 	// issuereport.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	issuereport.DescriptionValidator = issuereportDescDescription.Validators[0].(func(string) error)
-	// issuereportDescStatus is the schema descriptor for status field.
-	issuereportDescStatus := issuereportFields[4].Descriptor()
-	// issuereport.StatusValidator is a validator for the "status" field. It is called by the builders before save.
-	issuereport.StatusValidator = issuereportDescStatus.Validators[0].(func(string) error)
+	// issuereportDescContact is the schema descriptor for contact field.
+	issuereportDescContact := issuereportFields[3].Descriptor()
+	// issuereport.DefaultContact holds the default value on creation for the contact field.
+	issuereport.DefaultContact = issuereportDescContact.Default.(string)
 	// issuereportDescID is the schema descriptor for id field.
 	issuereportDescID := issuereportFields[0].Descriptor()
 	// issuereport.DefaultID holds the default value on creation for the id field.
 	issuereport.DefaultID = issuereportDescID.Default.(func() uuid.UUID)
 	matchFields := schema.Match{}.Fields()
 	_ = matchFields
+	// matchDescMatchCreatedAt is the schema descriptor for match_created_at field.
+	matchDescMatchCreatedAt := matchFields[1].Descriptor()
+	// match.DefaultMatchCreatedAt holds the default value on creation for the match_created_at field.
+	match.DefaultMatchCreatedAt = matchDescMatchCreatedAt.Default.(func() time.Time)
 	// matchDescID is the schema descriptor for id field.
 	matchDescID := matchFields[0].Descriptor()
 	// match.DefaultID holds the default value on creation for the id field.

@@ -404,7 +404,7 @@ func (tu *TutorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if tu.mutation.ScheduleCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   tutor.ScheduleTable,
 			Columns: []string{tutor.ScheduleColumn},
@@ -420,7 +420,7 @@ func (tu *TutorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := tu.mutation.ScheduleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   tutor.ScheduleTable,
 			Columns: []string{tutor.ScheduleColumn},
@@ -859,7 +859,7 @@ func (tuo *TutorUpdateOne) sqlSave(ctx context.Context) (_node *Tutor, err error
 	}
 	if tuo.mutation.ScheduleCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   tutor.ScheduleTable,
 			Columns: []string{tutor.ScheduleColumn},
@@ -875,7 +875,7 @@ func (tuo *TutorUpdateOne) sqlSave(ctx context.Context) (_node *Tutor, err error
 	}
 	if nodes := tuo.mutation.ScheduleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   tutor.ScheduleTable,
 			Columns: []string{tutor.ScheduleColumn},

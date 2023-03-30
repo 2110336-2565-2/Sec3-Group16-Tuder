@@ -3,8 +3,13 @@ import {verify} from "../utils/jwtGet";
 
 export function IsTutor({children}) {
     const [role, handleRole] = useDataContext();
+    if(!verify()){
+        alert("credit expired, please login again")
+        window.location.href = "/sign-in";
+        return
+    }
 
-    if(verify() && role.role === "tutor"){
+    if( role.role === "tutor"){
         return children;
     }else{
         alert("Unauthorized Access, Please Login again")
@@ -16,7 +21,13 @@ export function IsTutor({children}) {
 export function IsStudent({children}) {
     const [role, handleRole] = useDataContext();
 
-    if(verify() && role.role === "student"){
+    if(!verify()){
+        alert("credit expired, please login again")
+        window.location.href = "/sign-in";
+        return
+    }
+
+    if( role.role === "student"){
         return children;
     }else{
         alert("Unauthorized Access, Please Login again")
@@ -28,7 +39,12 @@ export function IsStudent({children}) {
 export function IsAdmin({children}) {
     const [role, handleRole] = useDataContext();
 
-    if(verify() && role.role === "admin"){
+    if(!verify()){
+        alert("credit expired, please login again")
+        window.location.href = "/sign-in";
+        return
+    }
+    if(role.role === "admin"){
         return children;
     }else{
         alert("Unauthorized Access, Please Login again")
@@ -40,9 +56,11 @@ export function IsAdmin({children}) {
 export function IsGuest({children}) {
     const [role, handleRole] = useDataContext();
     
+
     if( role.role === "guest"){
         return children;
     }else{
+
         window.location.href = "/";
         return
     }
@@ -51,7 +69,13 @@ export function IsGuest({children}) {
 export function IsUser({children}) {
     const [role, handleRole] = useDataContext();
 
-    if(verify() && (role.role === "student" || role.role === "tutor")){
+    if(!verify()){
+        alert("credit expired, please login again")
+        window.location.href = "/sign-in";
+        return
+    }
+
+    if( (role.role === "student" || role.role === "tutor")){
         return children;
     }else{
         alert("Please Login to access this page")

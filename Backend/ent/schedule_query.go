@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
@@ -26,7 +26,7 @@ type ScheduleQuery struct {
 	inters     []Interceptor
 	predicates []predicate.Schedule
 	withTutor  *TutorQuery
-	withClass  *ClassQuery
+	withMatch  *MatchQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -77,7 +77,7 @@ func (sq *ScheduleQuery) QueryTutor() *TutorQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(schedule.Table, schedule.FieldID, selector),
 			sqlgraph.To(tutor.Table, tutor.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, schedule.TutorTable, schedule.TutorColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, schedule.TutorTable, schedule.TutorColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -85,9 +85,9 @@ func (sq *ScheduleQuery) QueryTutor() *TutorQuery {
 	return query
 }
 
-// QueryClass chains the current query on the "class" edge.
-func (sq *ScheduleQuery) QueryClass() *ClassQuery {
-	query := (&ClassClient{config: sq.config}).Query()
+// QueryMatch chains the current query on the "match" edge.
+func (sq *ScheduleQuery) QueryMatch() *MatchQuery {
+	query := (&MatchClient{config: sq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := sq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -98,8 +98,8 @@ func (sq *ScheduleQuery) QueryClass() *ClassQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(schedule.Table, schedule.FieldID, selector),
-			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, schedule.ClassTable, schedule.ClassColumn),
+			sqlgraph.To(match.Table, match.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, schedule.MatchTable, schedule.MatchColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -300,7 +300,7 @@ func (sq *ScheduleQuery) Clone() *ScheduleQuery {
 		inters:     append([]Interceptor{}, sq.inters...),
 		predicates: append([]predicate.Schedule{}, sq.predicates...),
 		withTutor:  sq.withTutor.Clone(),
-		withClass:  sq.withClass.Clone(),
+		withMatch:  sq.withMatch.Clone(),
 		// clone intermediate query.
 		sql:  sq.sql.Clone(),
 		path: sq.path,
@@ -318,14 +318,14 @@ func (sq *ScheduleQuery) WithTutor(opts ...func(*TutorQuery)) *ScheduleQuery {
 	return sq
 }
 
-// WithClass tells the query-builder to eager-load the nodes that are connected to
-// the "class" edge. The optional arguments are used to configure the query builder of the edge.
-func (sq *ScheduleQuery) WithClass(opts ...func(*ClassQuery)) *ScheduleQuery {
-	query := (&ClassClient{config: sq.config}).Query()
+// WithMatch tells the query-builder to eager-load the nodes that are connected to
+// the "match" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *ScheduleQuery) WithMatch(opts ...func(*MatchQuery)) *ScheduleQuery {
+	query := (&MatchClient{config: sq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	sq.withClass = query
+	sq.withMatch = query
 	return sq
 }
 
@@ -409,7 +409,7 @@ func (sq *ScheduleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Sch
 		_spec       = sq.querySpec()
 		loadedTypes = [2]bool{
 			sq.withTutor != nil,
-			sq.withClass != nil,
+			sq.withMatch != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -431,16 +431,14 @@ func (sq *ScheduleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Sch
 		return nodes, nil
 	}
 	if query := sq.withTutor; query != nil {
-		if err := sq.loadTutor(ctx, query, nodes,
-			func(n *Schedule) { n.Edges.Tutor = []*Tutor{} },
-			func(n *Schedule, e *Tutor) { n.Edges.Tutor = append(n.Edges.Tutor, e) }); err != nil {
+		if err := sq.loadTutor(ctx, query, nodes, nil,
+			func(n *Schedule, e *Tutor) { n.Edges.Tutor = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := sq.withClass; query != nil {
-		if err := sq.loadClass(ctx, query, nodes,
-			func(n *Schedule) { n.Edges.Class = []*Class{} },
-			func(n *Schedule, e *Class) { n.Edges.Class = append(n.Edges.Class, e) }); err != nil {
+	if query := sq.withMatch; query != nil {
+		if err := sq.loadMatch(ctx, query, nodes, nil,
+			func(n *Schedule, e *Match) { n.Edges.Match = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -453,9 +451,6 @@ func (sq *ScheduleQuery) loadTutor(ctx context.Context, query *TutorQuery, nodes
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
 	}
 	query.withFKs = true
 	query.Where(predicate.Tutor(func(s *sql.Selector) {
@@ -478,32 +473,29 @@ func (sq *ScheduleQuery) loadTutor(ctx context.Context, query *TutorQuery, nodes
 	}
 	return nil
 }
-func (sq *ScheduleQuery) loadClass(ctx context.Context, query *ClassQuery, nodes []*Schedule, init func(*Schedule), assign func(*Schedule, *Class)) error {
+func (sq *ScheduleQuery) loadMatch(ctx context.Context, query *MatchQuery, nodes []*Schedule, init func(*Schedule), assign func(*Schedule, *Match)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[uuid.UUID]*Schedule)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
 	}
 	query.withFKs = true
-	query.Where(predicate.Class(func(s *sql.Selector) {
-		s.Where(sql.InValues(schedule.ClassColumn, fks...))
+	query.Where(predicate.Match(func(s *sql.Selector) {
+		s.Where(sql.InValues(schedule.MatchColumn, fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.schedule_class
+		fk := n.schedule_match
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "schedule_class" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "schedule_match" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "schedule_class" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "schedule_match" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

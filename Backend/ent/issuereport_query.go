@@ -12,7 +12,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
 )
 
@@ -23,7 +22,6 @@ type IssueReportQuery struct {
 	order      []OrderFunc
 	inters     []Interceptor
 	predicates []predicate.IssueReport
-	withUser   *UserQuery
 	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -59,28 +57,6 @@ func (irq *IssueReportQuery) Unique(unique bool) *IssueReportQuery {
 func (irq *IssueReportQuery) Order(o ...OrderFunc) *IssueReportQuery {
 	irq.order = append(irq.order, o...)
 	return irq
-}
-
-// QueryUser chains the current query on the "user" edge.
-func (irq *IssueReportQuery) QueryUser() *UserQuery {
-	query := (&UserClient{config: irq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := irq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := irq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(issuereport.Table, issuereport.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, issuereport.UserTable, issuereport.UserColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(irq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // First returns the first IssueReport entity from the query.
@@ -275,22 +251,10 @@ func (irq *IssueReportQuery) Clone() *IssueReportQuery {
 		order:      append([]OrderFunc{}, irq.order...),
 		inters:     append([]Interceptor{}, irq.inters...),
 		predicates: append([]predicate.IssueReport{}, irq.predicates...),
-		withUser:   irq.withUser.Clone(),
 		// clone intermediate query.
 		sql:  irq.sql.Clone(),
 		path: irq.path,
 	}
-}
-
-// WithUser tells the query-builder to eager-load the nodes that are connected to
-// the "user" edge. The optional arguments are used to configure the query builder of the edge.
-func (irq *IssueReportQuery) WithUser(opts ...func(*UserQuery)) *IssueReportQuery {
-	query := (&UserClient{config: irq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	irq.withUser = query
-	return irq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -369,16 +333,10 @@ func (irq *IssueReportQuery) prepareQuery(ctx context.Context) error {
 
 func (irq *IssueReportQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*IssueReport, error) {
 	var (
-		nodes       = []*IssueReport{}
-		withFKs     = irq.withFKs
-		_spec       = irq.querySpec()
-		loadedTypes = [1]bool{
-			irq.withUser != nil,
-		}
+		nodes   = []*IssueReport{}
+		withFKs = irq.withFKs
+		_spec   = irq.querySpec()
 	)
-	if irq.withUser != nil {
-		withFKs = true
-	}
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, issuereport.ForeignKeys...)
 	}
@@ -388,7 +346,6 @@ func (irq *IssueReportQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &IssueReport{config: irq.config}
 		nodes = append(nodes, node)
-		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -400,46 +357,7 @@ func (irq *IssueReportQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := irq.withUser; query != nil {
-		if err := irq.loadUser(ctx, query, nodes, nil,
-			func(n *IssueReport, e *User) { n.Edges.User = e }); err != nil {
-			return nil, err
-		}
-	}
 	return nodes, nil
-}
-
-func (irq *IssueReportQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*IssueReport, init func(*IssueReport), assign func(*IssueReport, *User)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*IssueReport)
-	for i := range nodes {
-		if nodes[i].user_issue_report == nil {
-			continue
-		}
-		fk := *nodes[i].user_issue_report
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(user.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "user_issue_report" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
 }
 
 func (irq *IssueReportQuery) sqlCount(ctx context.Context) (int, error) {
