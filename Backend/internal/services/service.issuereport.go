@@ -12,6 +12,9 @@ type ServiceIssueReport interface {
 	GetIssueReports() ([]*schemas.SchemaIssueReport, error)
 	CreateIssueReport(sr *schemas.SchemaCreateIssueReport) (*schemas.SchemaIssueReport, error)
 	PackToSchema(issueReports []*ent.IssueReport) []*schemas.SchemaIssueReport
+	UpdateIssueReport(sr *schemas.SchemaUpdateIssueReport) (*schemas.SchemaIssueReport, error)
+	UpdateIssueReportStatus(sr *schemas.SchemaUpdateIssueReportStatus) (*schemas.SchemaIssueReport, error)
+	DeleteIssueReport(sr *schemas.SchemaDeleteIssueReport) error
 }
 
 type serviceIssueReport struct {
@@ -26,11 +29,12 @@ func (s *serviceIssueReport) PackToSchema(issueReports []*ent.IssueReport) []*sc
 	var issueReportResponses []*schemas.SchemaIssueReport
 	for _, issue := range issueReports {
 		issueReportResponses = append(issueReportResponses, &schemas.SchemaIssueReport{
-			IssueReport_id: issue.ID,
-			Title:          issue.Title,
-			Description:    issue.Description,
-			ReportDate:     issue.ReportDate,
-			Contact:        issue.Contact,
+			ID:          issue.ID,
+			Title:       issue.Title,
+			Description: issue.Description,
+			ReportDate:  issue.ReportDate,
+			Contact:     issue.Contact,
+			Status:      string(issue.Status),
 		})
 	}
 	return issueReportResponses
@@ -46,65 +50,58 @@ func (s *serviceIssueReport) GetIssueReports() ([]*schemas.SchemaIssueReport, er
 	return IssueReportResponses, nil
 }
 
-// func (s *serviceCourse) GetCourseByID(sr *schemas.SchemaGetCourse) (*schemas.SchemaCourse, error) {
-// 	course, err := s.repository.GetCourseByID(sr)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	courseResponse := &schemas.SchemaCourse{
-// 		ID:                 course.ID,
-// 		Tutor_id:           course.Edges.Tutor.ID,
-// 		Title:              course.Title,
-// 		Description:        course.Description,
-// 		Subject:            course.Subject,
-// 		Topic:              course.Topic,
-// 		Estimate_time:      course.EstimatedTime,
-// 		Price_per_hour:     course.PricePerHour,
-// 		Course_picture_url: *course.CoursePictureURL,
-// 		Level:              course.Level.String(),
-// 	}
-// 	return courseResponse, nil
-// }
-
 func (s *serviceIssueReport) CreateIssueReport(sr *schemas.SchemaCreateIssueReport) (*schemas.SchemaIssueReport, error) {
 	issueReport, err := s.repository.CreateIssueReport(sr)
 	if err != nil {
 		return nil, err
 	}
 	issueReportResponses := &schemas.SchemaIssueReport{
-		IssueReport_id: issueReport.ID,
-		Title:          issueReport.Title,
-		Description:    issueReport.Description,
-		ReportDate:     issueReport.ReportDate,
-		Contact:        issueReport.Contact,
+		ID:          issueReport.ID,
+		Title:       issueReport.Title,
+		Description: issueReport.Description,
+		ReportDate:  issueReport.ReportDate,
+		Contact:     issueReport.Contact,
+		Status:      issueReport.Status.String(),
 	}
 	return issueReportResponses, nil
 }
 
-// func (s *serviceCourse) UpdateCourse(sr *schemas.SchemaUpdateCourse) (*schemas.SchemaCourse, error) {
-// 	course, err := s.repository.UpdateCourse(sr)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	courseResponse := &schemas.SchemaCourse{
-// 		ID:                 course.ID,
-// 		Tutor_id:           course.Edges.Tutor.ID,
-// 		Title:              course.Title,
-// 		Description:        course.Description,
-// 		Subject:            course.Subject,
-// 		Topic:              course.Topic,
-// 		Estimate_time:      course.EstimatedTime,
-// 		Price_per_hour:     course.PricePerHour,
-// 		Course_picture_url: *course.CoursePictureURL,
-// 		Level:              course.Level.String(),
-// 	}
-// 	return courseResponse, nil
-// }
+func (s *serviceIssueReport) UpdateIssueReport(sr *schemas.SchemaUpdateIssueReport) (*schemas.SchemaIssueReport, error) {
+	issueReport, err := s.repository.UpdateIssueReport(sr)
+	if err != nil {
+		return nil, err
+	}
+	issueReportResponse := &schemas.SchemaIssueReport{
+		ID:          issueReport.ID,
+		Title:       issueReport.Title,
+		Description: issueReport.Description,
+		Contact:     issueReport.Contact,
+		ReportDate:  issueReport.ReportDate,
+		Status:      issueReport.Status.String(),
+	}
+	return issueReportResponse, nil
+}
 
-// func (s *serviceCourse) DeleteCourse(sr *schemas.SchemaDeleteCourse) error {
-// 	err := s.repository.DeleteCourse(sr)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return nil
-// }
+func (s *serviceIssueReport) UpdateIssueReportStatus(sr *schemas.SchemaUpdateIssueReportStatus) (*schemas.SchemaIssueReport, error) {
+	issueReport, err := s.repository.UpdateIssueReportStatus(sr)
+	if err != nil {
+		return nil, err
+	}
+	issueReportResponse := &schemas.SchemaIssueReport{
+		ID:          issueReport.ID,
+		Title:       issueReport.Title,
+		Description: issueReport.Description,
+		Contact:     issueReport.Contact,
+		ReportDate:  issueReport.ReportDate,
+		Status:      issueReport.Status.String(),
+	}
+	return issueReportResponse, nil
+}
+
+func (s *serviceIssueReport) DeleteIssueReport(sr *schemas.SchemaDeleteIssueReport) error {
+	err := s.repository.DeleteIssueReport(sr)
+	if err != nil {
+		return err
+	}
+	return nil
+}
