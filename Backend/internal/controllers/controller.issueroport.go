@@ -6,7 +6,7 @@ import (
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 	service "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/services"
 
-	// "github.com/google/uuid"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
@@ -17,29 +17,6 @@ type controllerIssueReport struct {
 func NewControllerIssueReport(service service.ServiceIssueReport) *controllerIssueReport {
 	return &controllerIssueReport{service: service}
 }
-
-// func (cR *controllerCourse) GetCourseByCourseID(c echo.Context) (err error) {
-// 	id, _ := uuid.Parse(c.Param("id"))
-// 	uR := &schema.SchemaGetCourse{
-// 		ID: id,
-// 	}
-
-// 	course, err := cR.service.GetCourseByID(uR)
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
-// 			Success: false,
-// 			Message: err.Error(),
-// 			Error:   err,
-// 		})
-// 		return
-// 	}
-// 	c.JSON(http.StatusOK, schema.SchemaResponses{
-// 		Success: true,
-// 		Message: "Get course successfully",
-// 		Data:    course,
-// 	})
-// 	return nil
-// }
 
 func (cR *controllerIssueReport) GetIssueReports(c echo.Context) (err error) {
 	issueReportResult, err := cR.service.GetIssueReports()
@@ -89,63 +66,97 @@ func (cR *controllerIssueReport) CreateIssueReport(c echo.Context) (err error) {
 	return nil
 }
 
-// func (cR *controllerCourse) UpdateCourse(c echo.Context) (err error) {
-// 	id, _ := uuid.Parse(c.Param("id"))
-// 	uR := &schema.SchemaUpdateCourse{
-// 		ID: id,
-// 	}
-// 	if err = c.Bind(uR); err != nil {
-// 		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
-// 			Success: false,
-// 			Message: "invalid request payload",
-// 			Error:   err,
-// 		})
-// 		return
-// 	}
+func (cR *controllerIssueReport) UpdateIssueReport(c echo.Context) (err error) {
+	id, _ := uuid.Parse(c.Param("id"))
+	uR := &schema.SchemaUpdateIssueReport{
+		ID: id,
+	}
+	if err = c.Bind(uR); err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: "invalid request payload",
+			Error:   err,
+		})
+		return
+	}
 
-// 	course, err := cR.service.UpdateCourse(uR)
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
-// 			Success: false,
-// 			Message: err.Error(),
-// 			Error:   err,
-// 		})
-// 		return
-// 	}
-// 	c.JSON(http.StatusOK, schema.SchemaResponses{
-// 		Success: true,
-// 		Message: "Update course successfully",
-// 		Data:    course,
-// 	})
-// 	return nil
-// }
+	issueReport, err := cR.service.UpdateIssueReport(uR)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: err.Error(),
+			Error:   err,
+		})
+		return
+	}
+	c.JSON(http.StatusOK, schema.SchemaResponses{
+		Success: true,
+		Message: "Update issue report successfully",
+		Data:    issueReport,
+	})
+	return nil
+}
 
-// func (cR *controllerCourse) DeleteCourse(c echo.Context) (err error) {
-// 	id, _ := uuid.Parse(c.Param("id"))
-// 	uR := &schema.SchemaDeleteCourse{
-// 		ID: id,
-// 	}
-// 	if err = c.Bind(uR); err != nil {
-// 		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
-// 			Success: false,
-// 			Message: "invalid request payload",
-// 			Error:   err,
-// 		})
-// 		return
-// 	}
+func (cR *controllerIssueReport) UpdateIssueReportStatus(c echo.Context) (err error) {
+	id, _ := uuid.Parse(c.Param("id"))
+	// fmt.Println(id)
+	uR := &schema.SchemaUpdateIssueReportStatus{
+		ID: id,
+	}
+	if err = c.Bind(uR); err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: "invalid request payload",
+			Error:   err,
+		})
+		return
+	}
 
-// 	err = cR.service.DeleteCourse(uR)
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
-// 			Success: false,
-// 			Message: err.Error(),
-// 			Error:   err,
-// 		})
-// 		return
-// 	}
-// 	c.JSON(http.StatusOK, schema.SchemaResponses{
-// 		Success: true,
-// 		Message: "Delete course successfully",
-// 	})
-// 	return nil
-// }
+	issueReport, err := cR.service.UpdateIssueReportStatus(uR)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: err.Error(),
+			Error:   err,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, schema.SchemaResponses{
+		Success: true,
+		Message: "Update issue report status successfully",
+		Data:    issueReport,
+	})
+	return nil
+}
+
+func (cR *controllerIssueReport) DeleteIssueReport(c echo.Context) (err error) {
+	id, _ := uuid.Parse(c.Param("id"))
+	// fmt.Println(id)
+	uR := &schema.SchemaDeleteIssueReport{
+		ID: id,
+	}
+	if err = c.Bind(uR); err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: "invalid request payload",
+			Error:   err,
+		})
+		return
+	}
+
+	err = cR.service.DeleteIssueReport(uR)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: err.Error(),
+			Error:   err,
+		})
+		return
+	}
+	c.JSON(http.StatusOK, schema.SchemaResponses{
+		Success: true,
+		Message: "Delete issue report successfully",
+	})
+	return nil
+}

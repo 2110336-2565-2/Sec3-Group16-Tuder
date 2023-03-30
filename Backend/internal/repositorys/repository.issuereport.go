@@ -6,12 +6,16 @@ import (
 	"fmt"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 )
 
 type RepositoryIssueReport interface {
 	CreateIssueReport(sr *schema.SchemaCreateIssueReport) (*ent.IssueReport, error)
 	GetIssueReports() ([]*ent.IssueReport, error)
+	UpdateIssueReport(sr *schema.SchemaUpdateIssueReport) (*ent.IssueReport, error)
+	UpdateIssueReportStatus(sr *schema.SchemaUpdateIssueReportStatus) (*ent.IssueReport, error)
+	DeleteIssueReport(sr *schema.SchemaDeleteIssueReport) error
 }
 
 type repositoryIssueReport struct {
@@ -41,17 +45,7 @@ func (r *repositoryIssueReport) CreateIssueReport(sr *schema.SchemaCreateIssueRe
 	if err != nil {
 		return nil, fmt.Errorf("starting a transaction: %w", err)
 	}
-	// wrap the client with the transaction
 	txc := tx.Client()
-	// issueReport, err := txc.IssueReport.Query().Where(entIssueReport.IDEQ(sr.IssueReport_id)).Only(r.ctx)
-
-	// if err != nil {
-	// 	if rerr := tx.Rollback(); rerr != nil {
-	// 		err = fmt.Errorf("%w: %v", err, rerr)
-	// 	}
-	// 	return nil, fmt.Errorf("getting tutor: %w", err)
-	// }
-	// create a new course
 	contact := "No contact"
 	if sr.Contact != "" {
 		contact = sr.Contact
@@ -67,66 +61,78 @@ func (r *repositoryIssueReport) CreateIssueReport(sr *schema.SchemaCreateIssueRe
 		if rerr := tx.Rollback(); rerr != nil {
 			err = fmt.Errorf("%w: %v", err, rerr)
 		}
-		return nil, fmt.Errorf("creating course: %w", err)
+		return nil, fmt.Errorf("creating issue report: %w", err)
 	}
 	return issueReport, tx.Commit()
 }
 
-// func (r *repositoryCourse) UpdateCourse(sr *schema.SchemaUpdateCourse) (*ent.Course, error) {
-// 	// create a transaction
-// 	tx, err := r.client.Tx(r.ctx)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("starting a transaction: %w", err)
-// 	}
-// 	// wrap the client with the transaction
-// 	txc := tx.Client()
-// 	tutor, err := txc.Tutor.Query().Where(entTutor.IDEQ(sr.Tutor_id)).Only(r.ctx)
+func (r *repositoryIssueReport) UpdateIssueReport(sr *schema.SchemaUpdateIssueReport) (*ent.IssueReport, error) {
+	// create a transaction
+	tx, err := r.client.Tx(r.ctx)
+	if err != nil {
+		return nil, fmt.Errorf("starting a transaction: %w", err)
+	}
+	txc := tx.Client()
+	contact := "No contact"
+	if sr.Contact != "" {
+		contact = sr.Contact
+	}
 
-// 	if err != nil {
-// 		if rerr := tx.Rollback(); rerr != nil {
-// 			err = fmt.Errorf("%w: %v", err, rerr)
-// 		}
-// 		return nil, fmt.Errorf("getting tutor: %w", err)
-// 	}
+	issueReport, err := txc.IssueReport.UpdateOneID(sr.ID).
+		SetTitle(sr.Title).
+		SetDescription(sr.Description).
+		SetContact(contact).
+		SetReportDate(sr.ReportDate).
+		SetStatus(issuereport.Status(sr.Status)).
+		Save(r.ctx)
 
-// 	// update a course
-// 	course, err := txc.Course.UpdateOneID(sr.ID).
-// 		SetCoursePictureURL(sr.Course_picture_url).
-// 		SetSubject(sr.Subject).
-// 		SetDescription(sr.Description).
-// 		SetPricePerHour(sr.Price_per_hour).
-// 		SetTutorID(sr.Tutor_id).
-// 		SetLevel(entCourse.Level(sr.Level)).
-// 		SetTitle(sr.Title).
-// 		SetTopic(sr.Topic).
-// 		SetEstimatedTime(sr.Estimate_time).
-// 		Save(r.ctx)
-// 	course.Edges.Tutor = tutor
-// 	if err != nil {
-// 		if rerr := tx.Rollback(); rerr != nil {
-// 			err = fmt.Errorf("%w: %v", err, rerr)
-// 		}
-// 		return nil, fmt.Errorf("updating course: %w", err)
-// 	}
-// 	return course, tx.Commit()
-// }
+	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+		return nil, fmt.Errorf("updating issue report: %w", err)
+	}
+	return issueReport, tx.Commit()
+}
 
-// func (r *repositoryCourse) DeleteCourse(sr *schema.SchemaDeleteCourse) error {
-// 	// create a transaction
-// 	tx, err := r.client.Tx(r.ctx)
-// 	if err != nil {
-// 		return fmt.Errorf("starting a transaction: %w", err)
-// 	}
-// 	// wrap the client with the transaction
-// 	txc := tx.Client()
+func (r *repositoryIssueReport) UpdateIssueReportStatus(sr *schema.SchemaUpdateIssueReportStatus) (*ent.IssueReport, error) {
+	// create a transaction
+	tx, err := r.client.Tx(r.ctx)
+	if err != nil {
+		return nil, fmt.Errorf("starting a transaction: %w", err)
+	}
+	txc := tx.Client()
 
-// 	// delete a course
-// 	err = txc.Course.DeleteOneID(sr.ID).Exec(r.ctx)
-// 	if err != nil {
-// 		if rerr := tx.Rollback(); rerr != nil {
-// 			err = fmt.Errorf("%w: %v", err, rerr)
-// 		}
-// 		return fmt.Errorf("deleting course: %w", err)
-// 	}
-// 	return tx.Commit()
-// }
+	issueReport, err := txc.IssueReport.UpdateOneID(sr.ID).
+		SetStatus(issuereport.Status(sr.Status)).
+		Save(r.ctx)
+
+	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+		return nil, fmt.Errorf("updating issue report status: %w", err)
+	}
+	return issueReport, tx.Commit()
+}
+
+func (r *repositoryIssueReport) DeleteIssueReport(sr *schema.SchemaDeleteIssueReport) error {
+	// create a transaction
+	tx, err := r.client.Tx(r.ctx)
+	if err != nil {
+		return fmt.Errorf("starting a transaction: %w", err)
+	}
+	// wrap the client with the transaction
+	txc := tx.Client()
+
+	// delete a course
+	err = txc.IssueReport.DeleteOneID(sr.ID).Exec(r.ctx)
+	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			fmt.Println("No issue report with this id")
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+		return fmt.Errorf("deleting Issue report: %w", err)
+	}
+	return tx.Commit()
+}
