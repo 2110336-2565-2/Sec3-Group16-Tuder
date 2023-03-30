@@ -5,6 +5,8 @@ import React, { useState} from 'react';
 import styled from 'styled-components';
 import { getRole, getUserId } from '../../utils/jwtGet';
 import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
+import { submitCancelRequestHandler } from '../../handlers/cancelRequestHandler';
 
 
 export default function UserCancelRequest() {
@@ -36,7 +38,17 @@ export default function UserCancelRequest() {
             img_url: formData.img_url,
             reporter_role: getRole(),
         };
-        console.log(data);
+        console.log(data)
+        submitCancelRequestHandler(data).then((res) => {
+            if(res.data.success){
+                toast.success('Success');
+                navigate("/userrequest");
+            }
+        }).catch((err) => {
+            console.log(err);
+            toast.error(err.response.data.message);
+        }
+        )
 
     };
 
@@ -50,7 +62,7 @@ export default function UserCancelRequest() {
 
         <CancelRequest>
             <Title>
-                Class Cancellation
+                Match Cancellation
             </Title>
             <SubTitle>
               course name
@@ -69,7 +81,7 @@ export default function UserCancelRequest() {
               <Topic>
                 Picture
               </Topic>
-              <RequestPicture name="img_url" src="/images/Union.png" />
+              <RequestPicture name="img_url" src="/images/Union.png" onChange={handleChange}/>
 
             </TopicSection>
 
@@ -77,7 +89,7 @@ export default function UserCancelRequest() {
               <Topic>
                 Description
               </Topic>
-              <Description name="description"  />
+              <Description name="description"  onChange={handleChange}/>
             </DescriptionSection>
             <ButtonSection>
               <CancelButton onClick={() => navigate("/userrequest")}> 

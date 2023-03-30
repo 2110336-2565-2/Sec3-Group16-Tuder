@@ -48,7 +48,7 @@ export default function CancelRequestList(){
 
     return (
         <Container>
-            <h1>Class Cancellation Requests</h1>
+            <h1>Cancellation Requests</h1>
             <RequestListPage>     
                     <RequestListcontent>
                         {data.map(item => (
