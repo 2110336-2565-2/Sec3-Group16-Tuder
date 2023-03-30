@@ -46,13 +46,14 @@ export default function FormEditProfile({ user }) {
 
   const handleChange = (e) => {
     let value = e.target.value;
-    // Convert some fields format to match the database
+    // Convert some fields format to match the backend
     if (e.target.name === "birthdate") {
       value = new Date(e.target.value).toISOString();
     } else if (e.target.name === "schedule") {
       console.log("e.target.value: ", e.target.value);
       value = convertFrontendSchedulesToBackend(e.target.value);
     }
+    
     setFormData({
       ...formData,
       [e.target.name]: value,

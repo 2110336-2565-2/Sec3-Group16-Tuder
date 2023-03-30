@@ -40,13 +40,7 @@ export default function TimeSelector({
 
     // Convert the schedules from the backend to the frontend format
     const convertedSchedules = value?convertBackendSchedulesToFrontend(value):initialAvailableTime;
-
-    const updatedAvailableTime = initialAvailableTime.map((day) => {
-      const daySchedule = convertedSchedules.find((schedule) => schedule.day === day.day);
-
-      return daySchedule ? daySchedule : day;
-    });
-    return updatedAvailableTime;
+    return convertedSchedules;
   });
 
   const [selectedDay, setSelectedDay] = useState("Sunday");
@@ -78,7 +72,6 @@ export default function TimeSelector({
   };
 
   const handleAddOnClick = () => {
-    // Check if from === to -> Refractor this
     if (isOverlapped(timeSlotToAdd, timeSlot)) {
       return;
     }
@@ -139,7 +132,8 @@ export default function TimeSelector({
         ]);
         break;
       }
-    }
+    }const e = { target: { name: name, value: availableTime } };
+    onChange(e);
   };
 
   return (
