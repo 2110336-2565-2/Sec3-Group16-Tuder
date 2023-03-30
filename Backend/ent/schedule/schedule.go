@@ -27,8 +27,8 @@ const (
 	FieldDay6 = "day_6"
 	// EdgeTutor holds the string denoting the tutor edge name in mutations.
 	EdgeTutor = "tutor"
-	// EdgeClass holds the string denoting the class edge name in mutations.
-	EdgeClass = "class"
+	// EdgeMatch holds the string denoting the match edge name in mutations.
+	EdgeMatch = "match"
 	// Table holds the table name of the schedule in the database.
 	Table = "schedules"
 	// TutorTable is the table that holds the tutor relation/edge.
@@ -38,13 +38,13 @@ const (
 	TutorInverseTable = "tutors"
 	// TutorColumn is the table column denoting the tutor relation/edge.
 	TutorColumn = "schedule_tutor"
-	// ClassTable is the table that holds the class relation/edge.
-	ClassTable = "classes"
-	// ClassInverseTable is the table name for the Class entity.
-	// It exists in this package in order to avoid circular dependency with the "class" package.
-	ClassInverseTable = "classes"
-	// ClassColumn is the table column denoting the class relation/edge.
-	ClassColumn = "schedule_class"
+	// MatchTable is the table that holds the match relation/edge.
+	MatchTable = "matches"
+	// MatchInverseTable is the table name for the Match entity.
+	// It exists in this package in order to avoid circular dependency with the "match" package.
+	MatchInverseTable = "matches"
+	// MatchColumn is the table column denoting the match relation/edge.
+	MatchColumn = "schedule_match"
 )
 
 // Columns holds all SQL columns for schedule fields.

@@ -9,32 +9,24 @@ import (
 )
 
 // Todo holds the schema definition for the Todo entity.
-type Class struct {
+type Appointment struct {
 	ent.Schema
 }
 
 // Fields of the Todo.
-func (Class) Fields() []ent.Field {
+func (Appointment) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).Unique().StorageKey("id").Immutable(),
-		field.Bool("review_avaliable").Default(true),
-		field.Int("total_hour"),
-		field.Int("success_hour"),
+		field.Time("begin_at").Immutable(),
+		field.Time("end_at").Immutable(),
 		field.Enum("status").Values("ongoing", "completed", "cancelling", "rejected", "cancelled"),
 	}
 }
 
-func (Class) Edges() []ent.Edge {
+func (Appointment) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("match", Match.Type),
-		edge.From("schedule", Schedule.Type).
-			Ref("class").
-			Unique().
-			Required(),
-		edge.From("payment_history", PaymentHistory.Type).
-			Ref("class").
-			Unique().
-			Required(),
+		edge.To("match", Match.Type).
+			Unique(),
 	}
 }

@@ -5,6 +5,8 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
+
+	"time"
 )
 
 // Todo holds the schema definition for the Todo entity.
@@ -23,6 +25,7 @@ func (Match) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).Unique().StorageKey("id").Immutable(),
+		field.Time("match_created_at").Default(time.Now).Immutable(),
 	}
 }
 
@@ -35,9 +38,16 @@ func (Match) Edges() []ent.Edge {
 			Required(),
 		edge.From("course", Course.Type).
 			Ref("match").
+			Unique().
 			Required(),
-		edge.From("class", Class.Type).
+		edge.From("appointment", Appointment.Type).
 			Ref("match").
 			Required(),
+		edge.From("schedule", Schedule.Type).
+			Ref("match").
+			Unique().
+			Required(),
+		edge.From("cancel_request", CancelRequest.Type).
+			Ref("match"),
 	}
 }

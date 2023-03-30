@@ -52,12 +52,12 @@ type UserEdges struct {
 	Student *Student `json:"student,omitempty"`
 	// Tutor holds the value of the tutor edge.
 	Tutor *Tutor `json:"tutor,omitempty"`
-	// IssueReport holds the value of the issue_report edge.
-	IssueReport []*IssueReport `json:"issue_report,omitempty"`
 	// Payment holds the value of the payment edge.
 	Payment []*Payment `json:"payment,omitempty"`
 	// PaymentHistory holds the value of the payment_history edge.
 	PaymentHistory []*PaymentHistory `json:"payment_history,omitempty"`
+	// CancelRequest holds the value of the cancel_request edge.
+	CancelRequest []*CancelRequest `json:"cancel_request,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [5]bool
@@ -89,19 +89,10 @@ func (e UserEdges) TutorOrErr() (*Tutor, error) {
 	return nil, &NotLoadedError{edge: "tutor"}
 }
 
-// IssueReportOrErr returns the IssueReport value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) IssueReportOrErr() ([]*IssueReport, error) {
-	if e.loadedTypes[2] {
-		return e.IssueReport, nil
-	}
-	return nil, &NotLoadedError{edge: "issue_report"}
-}
-
 // PaymentOrErr returns the Payment value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) PaymentOrErr() ([]*Payment, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[2] {
 		return e.Payment, nil
 	}
 	return nil, &NotLoadedError{edge: "payment"}
@@ -110,10 +101,19 @@ func (e UserEdges) PaymentOrErr() ([]*Payment, error) {
 // PaymentHistoryOrErr returns the PaymentHistory value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) PaymentHistoryOrErr() ([]*PaymentHistory, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[3] {
 		return e.PaymentHistory, nil
 	}
 	return nil, &NotLoadedError{edge: "payment_history"}
+}
+
+// CancelRequestOrErr returns the CancelRequest value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) CancelRequestOrErr() ([]*CancelRequest, error) {
+	if e.loadedTypes[4] {
+		return e.CancelRequest, nil
+	}
+	return nil, &NotLoadedError{edge: "cancel_request"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -231,11 +231,6 @@ func (u *User) QueryTutor() *TutorQuery {
 	return NewUserClient(u.config).QueryTutor(u)
 }
 
-// QueryIssueReport queries the "issue_report" edge of the User entity.
-func (u *User) QueryIssueReport() *IssueReportQuery {
-	return NewUserClient(u.config).QueryIssueReport(u)
-}
-
 // QueryPayment queries the "payment" edge of the User entity.
 func (u *User) QueryPayment() *PaymentQuery {
 	return NewUserClient(u.config).QueryPayment(u)
@@ -244,6 +239,11 @@ func (u *User) QueryPayment() *PaymentQuery {
 // QueryPaymentHistory queries the "payment_history" edge of the User entity.
 func (u *User) QueryPaymentHistory() *PaymentHistoryQuery {
 	return NewUserClient(u.config).QueryPaymentHistory(u)
+}
+
+// QueryCancelRequest queries the "cancel_request" edge of the User entity.
+func (u *User) QueryCancelRequest() *CancelRequestQuery {
+	return NewUserClient(u.config).QueryCancelRequest(u)
 }
 
 // Update returns a builder for updating this User.

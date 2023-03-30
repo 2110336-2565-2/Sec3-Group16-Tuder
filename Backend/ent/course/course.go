@@ -42,11 +42,13 @@ const (
 	// ReviewInverseTable is the table name for the Review entity.
 	// It exists in this package in order to avoid circular dependency with the "review" package.
 	ReviewInverseTable = "reviews"
-	// MatchTable is the table that holds the match relation/edge. The primary key declared below.
-	MatchTable = "course_match"
+	// MatchTable is the table that holds the match relation/edge.
+	MatchTable = "matches"
 	// MatchInverseTable is the table name for the Match entity.
 	// It exists in this package in order to avoid circular dependency with the "match" package.
 	MatchInverseTable = "matches"
+	// MatchColumn is the table column denoting the match relation/edge.
+	MatchColumn = "course_match"
 	// TutorTable is the table that holds the tutor relation/edge.
 	TutorTable = "courses"
 	// TutorInverseTable is the table name for the Tutor entity.
@@ -79,9 +81,6 @@ var (
 	// ReviewPrimaryKey and ReviewColumn2 are the table columns denoting the
 	// primary key for the review relation (M2M).
 	ReviewPrimaryKey = []string{"course_id", "review_id"}
-	// MatchPrimaryKey and MatchColumn2 are the table columns denoting the
-	// primary key for the match relation (M2M).
-	MatchPrimaryKey = []string{"course_id", "match_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
