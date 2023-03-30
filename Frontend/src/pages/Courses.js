@@ -18,20 +18,30 @@ export default function Courses(){
     return (
         <DataContext.Provider value={{data, setData}}>
             <CourseListPage>
-                <h1>Courses</h1>
-            
+                <CenterTop><h1>Courses</h1></CenterTop>
                 <CourseSearchForm />
+                <HorizonContainer><hr></hr></HorizonContainer>
                 <CourseList>
                 </CourseList>
             </CourseListPage>
+            <br></br>
         </DataContext.Provider>
         
     )
 }
+
+const CenterTop = styled.div`
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+`
 
 const CourseListPage = styled.div`
     display: flex;
     flex-direction: column;
     gap: 20px;
     justify-content: center;
+`
+const HorizonContainer = styled.div`
+    padding:3px 12% 3px 12%;
 `
