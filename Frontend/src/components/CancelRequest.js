@@ -12,7 +12,7 @@ export default function CancelRequest(props){
 
 
     return(
-        <Request>
+        <Request status={props.status}>
             <ClassSection>
                 <ClassImg src={props.img} alt="classImg"/>
                 
@@ -52,7 +52,19 @@ const Request = styled.div`
     display: flex;
     flex-direction: row;
     justify-content: left;
-    background-color: #EB7B42;
+    background-color: ${(props) => {
+        if (props.status === "rejected") {
+            return "#EBEBEB";
+        } else if (props.status === "approved") {
+            return "#009900";
+        } else {
+            return "#EB7B42";
+        }
+    }};
+
+    border-radius: 10px;
+    border: 1px solid #DADADA ;
+    shadow: 0px 4px 4px rgba(0, 0, 0, 0.45);
 
     width: 1000px;
     height: 167px;
@@ -61,7 +73,16 @@ const Request = styled.div`
     cursor: pointer;
 
     &:hover {
-        background-color: #DAA520;
+        background-color: ${(props) => {
+            if (props.status === "rejected") {
+                return "#FBFBFB";
+            } else if (props.status === "approved") {
+                return "#00AA00";
+            } else {
+                return "#EE8E45";
+            }
+        }
+        
     }
 
 
