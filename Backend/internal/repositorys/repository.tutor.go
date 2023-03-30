@@ -120,7 +120,11 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 	}
 	tutor := user.Edges.Tutor
 
-	profilePictureURL, _ := utils.GenerateProfilePictureURL(sr.ProfilePicture, sr.Username)
+	profilePictureURL := *user.ProfilePictureURL
+	if sr.ProfilePicture != nil {
+		profilePictureURL, _ = utils.GenerateProfilePictureURL(sr.ProfilePicture, sr.Username)
+
+	}
 	user, err = txc.User.
 		UpdateOne(user).
 		SetFirstName(sr.Firstname).
@@ -131,7 +135,6 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 		SetBirthDate(sr.Birthdate).
 		SetProfilePictureURL(profilePictureURL).
 		Save(r.ctx)
-	//fmt.Print(user)
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
 			err = fmt.Errorf("%w: %v", err, rerr)
@@ -153,7 +156,7 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 
 	// update schedule
 	// query for schedule
-	var schedule *ent.Schedule = nil
+	var schedule ,_ = tutor.QuerySchedule().Only(r.ctx)
 	if sr.Schedule != nil {
 		schedule, err = r.UpdateSchedule(&schema.SchemaUpdateSchedule{
 			Username: sr.Username,
@@ -164,6 +167,7 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 	// reload tutor->user
 	tutor.Edges.User = user
 	tutor.Edges.Schedule = schedule
+	fmt.Println("pass\n")
 	return tutor, tx.Commit()
 }
 
