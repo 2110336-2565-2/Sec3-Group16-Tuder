@@ -2,11 +2,13 @@ package repositorys
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	entCourse "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	entTutor "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
+	entUser "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 )
 
@@ -16,6 +18,12 @@ type RepositoryCourse interface {
 	CreateCourse(sr *schema.SchemaCreateCourse) (*ent.Course, error)
 	UpdateCourse(sr *schema.SchemaUpdateCourse) (*ent.Course, error)
 	DeleteCourse(sr *schema.SchemaDeleteCourse) error
+	SearchByTitleRepository(sr *schema.CourseSearch) ([]*ent.Course, error)
+	SearchBySucjectRepository(sr *schema.CourseSearch) ([]*ent.Course, error)
+	SearchByTopicRepository(sr *schema.CourseSearch) ([]*ent.Course, error)
+	SearchByTutorRepository(sr *schema.CourseSearch) ([]*ent.Course, error)
+	SearchByDayRepository(sr *schema.CourseSearch) ([]*ent.Course, error)
+	checkTimeAvailable(d [24]bool) bool
 }
 
 type repositoryCourse struct {
@@ -30,10 +38,141 @@ func NewRepositoryCourse(c *ent.Client) *repositoryCourse {
 func (r *repositoryCourse) GetCourses() ([]*ent.Course, error) {
 	courses, err := r.client.Course.
 		Query().
-		WithTutor().
+		WithTutor(func(q *ent.TutorQuery) {
+			q.WithUser()
+		}).
 		All(r.ctx)
+
 	if err != nil {
-		return nil, err
+		return nil, errors.New("Course not found")
+	}
+
+	return courses, nil
+}
+
+func (r repositoryCourse) SearchByTitleRepository(sr *schema.CourseSearch) ([]*ent.Course, error) {
+	courses, err := r.client.Course.
+		Query().
+		WithTutor(func(q *ent.TutorQuery) {
+			q.WithUser()
+		}).
+		Where(entCourse.TitleContains(sr.Title)).
+		All(r.ctx)
+
+	if err != nil {
+		return nil, errors.New("Course not found")
+	}
+	return courses, nil
+}
+
+func (r repositoryCourse) checkTimeAvailable(d [24]bool) bool {
+	for _, b := range d {
+		if b {
+			return true
+		}
+	}
+	return false
+}
+
+func (r repositoryCourse) SearchByDayRepository(sr *schema.CourseSearch) ([]*ent.Course, error) {
+	//implement here
+	days := sr.Days
+	courses, err := r.client.Course.
+		Query().
+		WithTutor(func(q *ent.TutorQuery) {
+			q.WithSchedule().WithUser()
+		}).
+		All(r.ctx)
+
+	if err != nil {
+		return nil, errors.New("Course not found")
+	}
+	var matched_courses []*ent.Course
+	for _, course := range courses {
+		state := true
+		if days[0] {
+			if r.checkTimeAvailable(course.Edges.Tutor.Edges.Schedule.Day0) == false {
+				state = false
+			}
+		}
+		if days[1] {
+			if r.checkTimeAvailable(course.Edges.Tutor.Edges.Schedule.Day1) == false {
+				state = false
+			}
+		}
+		if days[2] {
+			if r.checkTimeAvailable(course.Edges.Tutor.Edges.Schedule.Day2) == false {
+				state = false
+			}
+		}
+		if days[3] {
+			if r.checkTimeAvailable(course.Edges.Tutor.Edges.Schedule.Day3) == false {
+				state = false
+			}
+		}
+		if days[4] {
+			if r.checkTimeAvailable(course.Edges.Tutor.Edges.Schedule.Day4) == false {
+				state = false
+			}
+		}
+		if days[5] {
+			if r.checkTimeAvailable(course.Edges.Tutor.Edges.Schedule.Day5) == false {
+				state = false
+			}
+		}
+		if days[6] {
+			if r.checkTimeAvailable(course.Edges.Tutor.Edges.Schedule.Day6) == false {
+				state = false
+			}
+		}
+		if state {
+			matched_courses = append(matched_courses, course)
+		}
+	}
+	return matched_courses, nil
+}
+
+func (r repositoryCourse) SearchByTutorRepository(sr *schema.CourseSearch) ([]*ent.Course, error) {
+	courses, err := r.client.Course.
+		Query().
+		WithTutor(func(q *ent.TutorQuery) {
+			q.WithUser()
+		}).
+		Where(entCourse.HasTutorWith(entTutor.HasUserWith(entUser.UsernameContains(sr.Tutor_name)))).
+		All(r.ctx)
+
+	if err != nil {
+		return nil, errors.New("Course not found")
+	}
+	return courses, nil
+}
+
+func (r repositoryCourse) SearchByTopicRepository(sr *schema.CourseSearch) ([]*ent.Course, error) {
+	courses, err := r.client.Course.
+		Query().
+		WithTutor(func(q *ent.TutorQuery) {
+			q.WithUser()
+		}).
+		Where(entCourse.TopicContains(sr.Topic)).
+		All(r.ctx)
+
+	if err != nil {
+		return nil, errors.New("Course not found")
+	}
+	return courses, nil
+}
+
+func (r repositoryCourse) SearchBySucjectRepository(sr *schema.CourseSearch) ([]*ent.Course, error) {
+	courses, err := r.client.Course.
+		Query().
+		WithTutor(func(q *ent.TutorQuery) {
+			q.WithUser()
+		}).
+		Where(entCourse.SubjectContains(sr.Subject)).
+		All(r.ctx)
+
+	if err != nil {
+		return nil, errors.New("Course not found")
 	}
 	return courses, nil
 }

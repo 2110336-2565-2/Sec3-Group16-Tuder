@@ -6,12 +6,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/appointment"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/cancelrequest"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/google/uuid"
 )
@@ -21,6 +24,20 @@ type MatchCreate struct {
 	config
 	mutation *MatchMutation
 	hooks    []Hook
+}
+
+// SetMatchCreatedAt sets the "match_created_at" field.
+func (mc *MatchCreate) SetMatchCreatedAt(t time.Time) *MatchCreate {
+	mc.mutation.SetMatchCreatedAt(t)
+	return mc
+}
+
+// SetNillableMatchCreatedAt sets the "match_created_at" field if the given value is not nil.
+func (mc *MatchCreate) SetNillableMatchCreatedAt(t *time.Time) *MatchCreate {
+	if t != nil {
+		mc.SetMatchCreatedAt(*t)
+	}
+	return mc
 }
 
 // SetID sets the "id" field.
@@ -48,34 +65,56 @@ func (mc *MatchCreate) SetStudent(s *Student) *MatchCreate {
 	return mc.SetStudentID(s.ID)
 }
 
-// AddCourseIDs adds the "course" edge to the Course entity by IDs.
-func (mc *MatchCreate) AddCourseIDs(ids ...uuid.UUID) *MatchCreate {
-	mc.mutation.AddCourseIDs(ids...)
+// SetCourseID sets the "course" edge to the Course entity by ID.
+func (mc *MatchCreate) SetCourseID(id uuid.UUID) *MatchCreate {
+	mc.mutation.SetCourseID(id)
 	return mc
 }
 
-// AddCourse adds the "course" edges to the Course entity.
-func (mc *MatchCreate) AddCourse(c ...*Course) *MatchCreate {
+// SetCourse sets the "course" edge to the Course entity.
+func (mc *MatchCreate) SetCourse(c *Course) *MatchCreate {
+	return mc.SetCourseID(c.ID)
+}
+
+// AddAppointmentIDs adds the "appointment" edge to the Appointment entity by IDs.
+func (mc *MatchCreate) AddAppointmentIDs(ids ...uuid.UUID) *MatchCreate {
+	mc.mutation.AddAppointmentIDs(ids...)
+	return mc
+}
+
+// AddAppointment adds the "appointment" edges to the Appointment entity.
+func (mc *MatchCreate) AddAppointment(a ...*Appointment) *MatchCreate {
+	ids := make([]uuid.UUID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return mc.AddAppointmentIDs(ids...)
+}
+
+// SetScheduleID sets the "schedule" edge to the Schedule entity by ID.
+func (mc *MatchCreate) SetScheduleID(id uuid.UUID) *MatchCreate {
+	mc.mutation.SetScheduleID(id)
+	return mc
+}
+
+// SetSchedule sets the "schedule" edge to the Schedule entity.
+func (mc *MatchCreate) SetSchedule(s *Schedule) *MatchCreate {
+	return mc.SetScheduleID(s.ID)
+}
+
+// AddCancelRequestIDs adds the "cancel_request" edge to the CancelRequest entity by IDs.
+func (mc *MatchCreate) AddCancelRequestIDs(ids ...uuid.UUID) *MatchCreate {
+	mc.mutation.AddCancelRequestIDs(ids...)
+	return mc
+}
+
+// AddCancelRequest adds the "cancel_request" edges to the CancelRequest entity.
+func (mc *MatchCreate) AddCancelRequest(c ...*CancelRequest) *MatchCreate {
 	ids := make([]uuid.UUID, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
-	return mc.AddCourseIDs(ids...)
-}
-
-// AddClasIDs adds the "class" edge to the Class entity by IDs.
-func (mc *MatchCreate) AddClasIDs(ids ...uuid.UUID) *MatchCreate {
-	mc.mutation.AddClasIDs(ids...)
-	return mc
-}
-
-// AddClass adds the "class" edges to the Class entity.
-func (mc *MatchCreate) AddClass(c ...*Class) *MatchCreate {
-	ids := make([]uuid.UUID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return mc.AddClasIDs(ids...)
+	return mc.AddCancelRequestIDs(ids...)
 }
 
 // Mutation returns the MatchMutation object of the builder.
@@ -113,6 +152,10 @@ func (mc *MatchCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (mc *MatchCreate) defaults() {
+	if _, ok := mc.mutation.MatchCreatedAt(); !ok {
+		v := match.DefaultMatchCreatedAt()
+		mc.mutation.SetMatchCreatedAt(v)
+	}
 	if _, ok := mc.mutation.ID(); !ok {
 		v := match.DefaultID()
 		mc.mutation.SetID(v)
@@ -121,14 +164,20 @@ func (mc *MatchCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (mc *MatchCreate) check() error {
+	if _, ok := mc.mutation.MatchCreatedAt(); !ok {
+		return &ValidationError{Name: "match_created_at", err: errors.New(`ent: missing required field "Match.match_created_at"`)}
+	}
 	if _, ok := mc.mutation.StudentID(); !ok {
 		return &ValidationError{Name: "student", err: errors.New(`ent: missing required edge "Match.student"`)}
 	}
-	if len(mc.mutation.CourseIDs()) == 0 {
+	if _, ok := mc.mutation.CourseID(); !ok {
 		return &ValidationError{Name: "course", err: errors.New(`ent: missing required edge "Match.course"`)}
 	}
-	if len(mc.mutation.ClassIDs()) == 0 {
-		return &ValidationError{Name: "class", err: errors.New(`ent: missing required edge "Match.class"`)}
+	if len(mc.mutation.AppointmentIDs()) == 0 {
+		return &ValidationError{Name: "appointment", err: errors.New(`ent: missing required edge "Match.appointment"`)}
+	}
+	if _, ok := mc.mutation.ScheduleID(); !ok {
+		return &ValidationError{Name: "schedule", err: errors.New(`ent: missing required edge "Match.schedule"`)}
 	}
 	return nil
 }
@@ -165,6 +214,10 @@ func (mc *MatchCreate) createSpec() (*Match, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
+	if value, ok := mc.mutation.MatchCreatedAt(); ok {
+		_spec.SetField(match.FieldMatchCreatedAt, field.TypeTime, value)
+		_node.MatchCreatedAt = value
+	}
 	if nodes := mc.mutation.StudentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -187,10 +240,10 @@ func (mc *MatchCreate) createSpec() (*Match, *sqlgraph.CreateSpec) {
 	}
 	if nodes := mc.mutation.CourseIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   match.CourseTable,
-			Columns: match.CoursePrimaryKey,
+			Columns: []string{match.CourseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -202,19 +255,59 @@ func (mc *MatchCreate) createSpec() (*Match, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.course_match = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := mc.mutation.ClassIDs(); len(nodes) > 0 {
+	if nodes := mc.mutation.AppointmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   match.ClassTable,
-			Columns: match.ClassPrimaryKey,
+			Table:   match.AppointmentTable,
+			Columns: []string{match.AppointmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: class.FieldID,
+					Column: appointment.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := mc.mutation.ScheduleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   match.ScheduleTable,
+			Columns: []string{match.ScheduleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: schedule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.schedule_match = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := mc.mutation.CancelRequestIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   match.CancelRequestTable,
+			Columns: []string{match.CancelRequestColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: cancelrequest.FieldID,
 				},
 			},
 		}

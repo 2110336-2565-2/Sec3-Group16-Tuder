@@ -12,8 +12,10 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
-	// Class is the client for interacting with the Class builders.
-	Class *ClassClient
+	// Appointment is the client for interacting with the Appointment builders.
+	Appointment *AppointmentClient
+	// CancelRequest is the client for interacting with the CancelRequest builders.
+	CancelRequest *CancelRequestClient
 	// Course is the client for interacting with the Course builders.
 	Course *CourseClient
 	// IssueReport is the client for interacting with the IssueReport builders.
@@ -165,7 +167,8 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
-	tx.Class = NewClassClient(tx.config)
+	tx.Appointment = NewAppointmentClient(tx.config)
+	tx.CancelRequest = NewCancelRequestClient(tx.config)
 	tx.Course = NewCourseClient(tx.config)
 	tx.IssueReport = NewIssueReportClient(tx.config)
 	tx.Match = NewMatchClient(tx.config)
@@ -185,7 +188,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Class.QueryXXX(), the query will be executed
+// applies a query, for example: Appointment.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

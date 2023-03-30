@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/google/uuid"
 )
 
@@ -38,30 +40,38 @@ type Schedule struct {
 // ScheduleEdges holds the relations/edges for other nodes in the graph.
 type ScheduleEdges struct {
 	// Tutor holds the value of the tutor edge.
-	Tutor []*Tutor `json:"tutor,omitempty"`
-	// Class holds the value of the class edge.
-	Class []*Class `json:"class,omitempty"`
+	Tutor *Tutor `json:"tutor,omitempty"`
+	// Match holds the value of the match edge.
+	Match *Match `json:"match,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
 }
 
 // TutorOrErr returns the Tutor value or an error if the edge
-// was not loaded in eager-loading.
-func (e ScheduleEdges) TutorOrErr() ([]*Tutor, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ScheduleEdges) TutorOrErr() (*Tutor, error) {
 	if e.loadedTypes[0] {
+		if e.Tutor == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: tutor.Label}
+		}
 		return e.Tutor, nil
 	}
 	return nil, &NotLoadedError{edge: "tutor"}
 }
 
-// ClassOrErr returns the Class value or an error if the edge
-// was not loaded in eager-loading.
-func (e ScheduleEdges) ClassOrErr() ([]*Class, error) {
+// MatchOrErr returns the Match value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ScheduleEdges) MatchOrErr() (*Match, error) {
 	if e.loadedTypes[1] {
-		return e.Class, nil
+		if e.Match == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: match.Label}
+		}
+		return e.Match, nil
 	}
-	return nil, &NotLoadedError{edge: "class"}
+	return nil, &NotLoadedError{edge: "match"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -160,9 +170,9 @@ func (s *Schedule) QueryTutor() *TutorQuery {
 	return NewScheduleClient(s.config).QueryTutor(s)
 }
 
-// QueryClass queries the "class" edge of the Schedule entity.
-func (s *Schedule) QueryClass() *ClassQuery {
-	return NewScheduleClient(s.config).QueryClass(s)
+// QueryMatch queries the "match" edge of the Schedule entity.
+func (s *Schedule) QueryMatch() *MatchQuery {
+	return NewScheduleClient(s.config).QueryMatch(s)
 }
 
 // Update returns a builder for updating this Schedule.

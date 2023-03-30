@@ -2,9 +2,10 @@ package main
 
 import (
 	"context"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 	"log"
 	"os"
+
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/migrate"
