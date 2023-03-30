@@ -58,8 +58,8 @@ type UserEdges struct {
 	Payment []*Payment `json:"payment,omitempty"`
 	// PaymentHistory holds the value of the payment_history edge.
 	PaymentHistory []*PaymentHistory `json:"payment_history,omitempty"`
-	// ClassCancelRequest holds the value of the class_cancel_request edge.
-	ClassCancelRequest []*ClassCancelRequest `json:"class_cancel_request,omitempty"`
+	// CancelRequest holds the value of the cancel_request edge.
+	CancelRequest []*CancelRequest `json:"cancel_request,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [6]bool
@@ -118,13 +118,13 @@ func (e UserEdges) PaymentHistoryOrErr() ([]*PaymentHistory, error) {
 	return nil, &NotLoadedError{edge: "payment_history"}
 }
 
-// ClassCancelRequestOrErr returns the ClassCancelRequest value or an error if the edge
+// CancelRequestOrErr returns the CancelRequest value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) ClassCancelRequestOrErr() ([]*ClassCancelRequest, error) {
+func (e UserEdges) CancelRequestOrErr() ([]*CancelRequest, error) {
 	if e.loadedTypes[5] {
-		return e.ClassCancelRequest, nil
+		return e.CancelRequest, nil
 	}
-	return nil, &NotLoadedError{edge: "class_cancel_request"}
+	return nil, &NotLoadedError{edge: "cancel_request"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -257,9 +257,9 @@ func (u *User) QueryPaymentHistory() *PaymentHistoryQuery {
 	return NewUserClient(u.config).QueryPaymentHistory(u)
 }
 
-// QueryClassCancelRequest queries the "class_cancel_request" edge of the User entity.
-func (u *User) QueryClassCancelRequest() *ClassCancelRequestQuery {
-	return NewUserClient(u.config).QueryClassCancelRequest(u)
+// QueryCancelRequest queries the "cancel_request" edge of the User entity.
+func (u *User) QueryCancelRequest() *CancelRequestQuery {
+	return NewUserClient(u.config).QueryCancelRequest(u)
 }
 
 // Update returns a builder for updating this User.

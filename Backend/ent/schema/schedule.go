@@ -29,7 +29,9 @@ func (Schedule) Fields() []ent.Field {
 
 func (Schedule) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("tutor", Tutor.Type),
-		edge.To("class", Class.Type),
+		edge.To("tutor", Tutor.Type).
+			Unique(),
+		edge.To("match", Match.Type).
+			Unique(),
 	}
 }

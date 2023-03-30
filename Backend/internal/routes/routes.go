@@ -14,5 +14,5 @@ func InitRoutes(c *ent.Client, e *echo.Echo) {
 	InitCourseSearchRoutes(c, v1)
 	InitCourseRoutes(c, v1)
 	InitChangePasswordRoutes(c, v1)
-	InitClassRoutes(c, v1)
+	InitCancelRequestRoutes(c, v1)
 }

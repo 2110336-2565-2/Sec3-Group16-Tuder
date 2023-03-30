@@ -33,7 +33,7 @@ func (Course) Fields() []ent.Field {
 
 func (Course) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("review_course", ReviewCourse.Type),
+		edge.To("review", Review.Type),
 		// edge.To("class", Class.Type),
 		edge.To("match", Match.Type),
 		edge.From("tutor", Tutor.Type).

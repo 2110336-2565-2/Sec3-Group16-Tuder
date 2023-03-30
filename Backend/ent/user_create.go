@@ -10,7 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/classcancelrequest"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/cancelrequest"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
@@ -198,19 +198,19 @@ func (uc *UserCreate) AddPaymentHistory(p ...*PaymentHistory) *UserCreate {
 	return uc.AddPaymentHistoryIDs(ids...)
 }
 
-// AddClassCancelRequestIDs adds the "class_cancel_request" edge to the ClassCancelRequest entity by IDs.
-func (uc *UserCreate) AddClassCancelRequestIDs(ids ...uuid.UUID) *UserCreate {
-	uc.mutation.AddClassCancelRequestIDs(ids...)
+// AddCancelRequestIDs adds the "cancel_request" edge to the CancelRequest entity by IDs.
+func (uc *UserCreate) AddCancelRequestIDs(ids ...uuid.UUID) *UserCreate {
+	uc.mutation.AddCancelRequestIDs(ids...)
 	return uc
 }
 
-// AddClassCancelRequest adds the "class_cancel_request" edges to the ClassCancelRequest entity.
-func (uc *UserCreate) AddClassCancelRequest(c ...*ClassCancelRequest) *UserCreate {
+// AddCancelRequest adds the "cancel_request" edges to the CancelRequest entity.
+func (uc *UserCreate) AddCancelRequest(c ...*CancelRequest) *UserCreate {
 	ids := make([]uuid.UUID, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
-	return uc.AddClassCancelRequestIDs(ids...)
+	return uc.AddCancelRequestIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -505,17 +505,17 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := uc.mutation.ClassCancelRequestIDs(); len(nodes) > 0 {
+	if nodes := uc.mutation.CancelRequestIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.ClassCancelRequestTable,
-			Columns: []string{user.ClassCancelRequestColumn},
+			Table:   user.CancelRequestTable,
+			Columns: []string{user.CancelRequestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: classcancelrequest.FieldID,
+					Column: cancelrequest.FieldID,
 				},
 			},
 		}

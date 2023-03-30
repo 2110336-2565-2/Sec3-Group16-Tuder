@@ -45,8 +45,8 @@ const (
 	EdgePayment = "payment"
 	// EdgePaymentHistory holds the string denoting the payment_history edge name in mutations.
 	EdgePaymentHistory = "payment_history"
-	// EdgeClassCancelRequest holds the string denoting the class_cancel_request edge name in mutations.
-	EdgeClassCancelRequest = "class_cancel_request"
+	// EdgeCancelRequest holds the string denoting the cancel_request edge name in mutations.
+	EdgeCancelRequest = "cancel_request"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 	// StudentTable is the table that holds the student relation/edge.
@@ -84,13 +84,13 @@ const (
 	PaymentHistoryInverseTable = "payment_histories"
 	// PaymentHistoryColumn is the table column denoting the payment_history relation/edge.
 	PaymentHistoryColumn = "user_payment_history"
-	// ClassCancelRequestTable is the table that holds the class_cancel_request relation/edge.
-	ClassCancelRequestTable = "class_cancel_requests"
-	// ClassCancelRequestInverseTable is the table name for the ClassCancelRequest entity.
-	// It exists in this package in order to avoid circular dependency with the "classcancelrequest" package.
-	ClassCancelRequestInverseTable = "class_cancel_requests"
-	// ClassCancelRequestColumn is the table column denoting the class_cancel_request relation/edge.
-	ClassCancelRequestColumn = "user_class_cancel_request"
+	// CancelRequestTable is the table that holds the cancel_request relation/edge.
+	CancelRequestTable = "cancel_requests"
+	// CancelRequestInverseTable is the table name for the CancelRequest entity.
+	// It exists in this package in order to avoid circular dependency with the "cancelrequest" package.
+	CancelRequestInverseTable = "cancel_requests"
+	// CancelRequestColumn is the table column denoting the cancel_request relation/edge.
+	CancelRequestColumn = "user_cancel_request"
 )
 
 // Columns holds all SQL columns for user fields.
