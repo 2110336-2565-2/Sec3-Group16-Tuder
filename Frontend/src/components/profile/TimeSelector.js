@@ -144,6 +144,7 @@ export default function TimeSelector({
           {days.map((day) => {
             return (
               <DayButton
+                type="button"
                 isSelected={selectedDay === day.value}
                 onClick={() => setSelectedDay(day.value)}
                 key={day.value}
