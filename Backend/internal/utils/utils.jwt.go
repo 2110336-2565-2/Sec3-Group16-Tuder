@@ -22,17 +22,26 @@ func GenerateToken(username string, isExpire bool) (string, error) {
 	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 }
 
-func GenerateLoginToken(username string, userid uuid.UUID, role string, isExpire bool) (string, error) {
+func GenerateLoginToken(username string, userid uuid.UUID, role string, isExpire bool, customClaims map[string]interface{}) (string, error) {
 	claims := jwt.MapClaims{}
+	// JWT required claims
 	claims["authorized"] = true
-	claims["username"] = username
-	claims["userid"] = userid
-	claims["role"] = role
 	claims["iat"] = time.Now().Unix()
 	if isExpire {
 		exp, _ := s.Atoi(os.Getenv("JWT_EXPIRES_MINUTES"))
 		claims["exp"] = time.Now().Add(time.Duration(exp) * time.Minute).Unix()
 	}
+
+	// application claims
+	// user info
+	claims["username"] = username
+	claims["userid"] = userid
+	claims["role"] = role
+	// add custom claims
+	for k, v := range customClaims {
+		claims[k] = v
+	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 }

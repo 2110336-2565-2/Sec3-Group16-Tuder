@@ -38,6 +38,7 @@ func (s serviceRegister) RegisterService(r *schemas.SchemaRegister) (*schemas.Sc
 	}
 
 	token, _ := utils.GenerateToken(r.Username, true)
+	//token, _ := utils.GenerateLoginToken(r.Username, user.ID, r.Role, true)
 	return &schemas.SchemaRegisterResponse{
 		Success: true,
 		Message: "Register Success",

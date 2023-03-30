@@ -1,8 +1,11 @@
 package controllers
 
 import (
+	"fmt"
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 	service "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/services"
+	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
@@ -27,6 +30,16 @@ func (r controllerReview) ReviewCourse(c echo.Context) (err error) {
 		})
 		return err
 	}
+	claims := c.Get("user").(*jwt.Token).Claims.(jwt.MapClaims)
+	studentId, ok := claims["studentid"]
+	if !ok {
+		return fmt.Errorf("claim \"studentid\" does not exist")
+	}
+	cR.StudentId, err = uuid.Parse(studentId.(string))
+	if err != nil {
+		return fmt.Errorf("studentId from jwt token is invalid")
+	}
+
 	review, err := r.reviewService.ReviewCourseService(cR)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, schema.SchemaErrorResponse{
