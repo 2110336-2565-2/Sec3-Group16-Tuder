@@ -7,7 +7,7 @@ export default function SignIn(){
     
 
     return(
-        <Fragment>
+        <>
             <ContainerWithHeight margintop='100px'>
                 <SeperateSection>
                     <ItemGrid justify='center' columngrid='1 / 3'>
@@ -18,13 +18,13 @@ export default function SignIn(){
                     </ItemGrid>
                 </SeperateSection>
             </ContainerWithHeight>
-            <Footer/>
-        </Fragment>
+        </>
     )
 }
 
 
 // styled-components
+
 const ImageTudor = styled.img`
     max-width: ${(props) => {
         return props.maxwidth
@@ -50,3 +50,4 @@ const ItemGrid = styled.div`
         return props.justify
     }}
 `;
+

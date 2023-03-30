@@ -6,7 +6,7 @@ export default function FormSignIn(){
 
     return(
         <form action='' method='post'>
-            <FormT.Div FormW='400px'>
+            <FormT.Div FormW='450px'>
                 <FormT.Header>Reset Password</FormT.Header>
                 <FormT.Content>Sign in and start managing your candidates!</FormT.Content>
                 <FormT.Content>
@@ -18,7 +18,7 @@ export default function FormSignIn(){
                 </FormT.Content>
                 <FormT.Content>
                     <ContentSpace />
-                    <FormT.Link to='/Signin' underline='none'>back to login</FormT.Link>
+                    <FormT.Link to='/sign-in' underline='none'>back to login</FormT.Link>
                 </FormT.Content>
             </FormT.Div>
         </form>

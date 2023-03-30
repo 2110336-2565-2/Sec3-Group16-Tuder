@@ -51,9 +51,9 @@ export default function CourseList(){
             <CourseListPage>
                 {
                     data.data.map(item => (  
-                            <CourseListcontent key={item.course_id}>
-                        <Course  title={item.title} topic={item.topic} tutor={item.tutor_name} subject={item.subject} time={item.estimate_time} price={item.price_per_hour} img={item.course_picture_url}/>       
-                    </CourseListcontent>
+                        <CourseListcontent key={item.course_id}>
+                            <Course  title={item.title} topic={item.topic} tutor={item.tutor_name} subject={item.subject} time={item.estimate_time} price={item.price_per_hour} img={item.course_picture_url}/>       
+                        </CourseListcontent>
                     ))
                 }
             </CourseListPage>
@@ -66,11 +66,14 @@ const CourseListPage = styled.div`
     flex-direction: row;
     gap: 20px;
     justify-content: center;
+    align-items: center;
 `
 
 const CourseListcontent = styled.div`
+    width: 300px;
     display: flex;
-    border: 1px solid black;
-    border-radius: 16px;
-    padding: 10px;
+    box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+    padding: 10px 10px 10px 10px;
+    justify-content: center;
 `

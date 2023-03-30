@@ -54,7 +54,7 @@ export default function FormSignIn(props){
                         </div>
                     </FormT.ContentSmall>
                     <FormT.ContentSmall>
-                        <FormT.Link to='/Forgetpassword' underline='none' color='red'>Forget password?</FormT.Link>
+                        <FormT.Link to='/forget-password' underline='none' color='red'>Forget password?</FormT.Link>
                     </FormT.ContentSmall>
                 </FormT.ContentInline>
                 <FormT.Content>
@@ -64,7 +64,7 @@ export default function FormSignIn(props){
                     <FormT.ContentSmall>
                         Don't have an account ?
                     </FormT.ContentSmall>
-                    <FormT.Link to='/Signup' underline='none'>Sign Up</FormT.Link>
+                    <FormT.Link to='/sign-up' underline='none'>Sign Up</FormT.Link>
                 </FormT.Content>
             </FormT.Div>
         </form>
