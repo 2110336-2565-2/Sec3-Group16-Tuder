@@ -15,8 +15,8 @@ export default function CancelRequestListPage(){
     const [data, setData] = useState([]);
 
     return(
-        <IsAdmin>
-            <Container>
+        <Container>
+                <IsAdmin>
                 <DataContext.Provider value={{data, setData}}>
                 <ContainerWithHeight margintop='100px'>
                     
@@ -27,8 +27,8 @@ export default function CancelRequestListPage(){
                     <WaveFooter />
                 </WaveFooterWrapper>
                 </DataContext.Provider>
+                </IsAdmin>
             </Container>
-        </IsAdmin>
         
     )
 }

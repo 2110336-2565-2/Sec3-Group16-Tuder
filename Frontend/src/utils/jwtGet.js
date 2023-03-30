@@ -35,3 +35,13 @@ export function verify(){
         return true;
     }
 }
+
+export function getUserId(){
+    const token = localStorage.getItem('jwtToken');
+    if(token){
+        const decoded = jwt_decode(token);
+        return decoded.userid;
+    }else{
+        return '';
+    }
+}

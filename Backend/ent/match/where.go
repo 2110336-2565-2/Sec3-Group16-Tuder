@@ -3,6 +3,8 @@
 package match
 
 import (
+	"time"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
@@ -54,6 +56,51 @@ func IDLTE(id uuid.UUID) predicate.Match {
 	return predicate.Match(sql.FieldLTE(FieldID, id))
 }
 
+// MatchCreatedAt applies equality check predicate on the "match_created_at" field. It's identical to MatchCreatedAtEQ.
+func MatchCreatedAt(v time.Time) predicate.Match {
+	return predicate.Match(sql.FieldEQ(FieldMatchCreatedAt, v))
+}
+
+// MatchCreatedAtEQ applies the EQ predicate on the "match_created_at" field.
+func MatchCreatedAtEQ(v time.Time) predicate.Match {
+	return predicate.Match(sql.FieldEQ(FieldMatchCreatedAt, v))
+}
+
+// MatchCreatedAtNEQ applies the NEQ predicate on the "match_created_at" field.
+func MatchCreatedAtNEQ(v time.Time) predicate.Match {
+	return predicate.Match(sql.FieldNEQ(FieldMatchCreatedAt, v))
+}
+
+// MatchCreatedAtIn applies the In predicate on the "match_created_at" field.
+func MatchCreatedAtIn(vs ...time.Time) predicate.Match {
+	return predicate.Match(sql.FieldIn(FieldMatchCreatedAt, vs...))
+}
+
+// MatchCreatedAtNotIn applies the NotIn predicate on the "match_created_at" field.
+func MatchCreatedAtNotIn(vs ...time.Time) predicate.Match {
+	return predicate.Match(sql.FieldNotIn(FieldMatchCreatedAt, vs...))
+}
+
+// MatchCreatedAtGT applies the GT predicate on the "match_created_at" field.
+func MatchCreatedAtGT(v time.Time) predicate.Match {
+	return predicate.Match(sql.FieldGT(FieldMatchCreatedAt, v))
+}
+
+// MatchCreatedAtGTE applies the GTE predicate on the "match_created_at" field.
+func MatchCreatedAtGTE(v time.Time) predicate.Match {
+	return predicate.Match(sql.FieldGTE(FieldMatchCreatedAt, v))
+}
+
+// MatchCreatedAtLT applies the LT predicate on the "match_created_at" field.
+func MatchCreatedAtLT(v time.Time) predicate.Match {
+	return predicate.Match(sql.FieldLT(FieldMatchCreatedAt, v))
+}
+
+// MatchCreatedAtLTE applies the LTE predicate on the "match_created_at" field.
+func MatchCreatedAtLTE(v time.Time) predicate.Match {
+	return predicate.Match(sql.FieldLTE(FieldMatchCreatedAt, v))
+}
+
 // HasStudent applies the HasEdge predicate on the "student" edge.
 func HasStudent() predicate.Match {
 	return predicate.Match(func(s *sql.Selector) {
@@ -86,7 +133,7 @@ func HasCourse() predicate.Match {
 	return predicate.Match(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, CourseTable, CoursePrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, CourseTable, CourseColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -98,7 +145,7 @@ func HasCourseWith(preds ...predicate.Course) predicate.Match {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(CourseInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, CourseTable, CoursePrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, CourseTable, CourseColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
@@ -108,24 +155,78 @@ func HasCourseWith(preds ...predicate.Course) predicate.Match {
 	})
 }
 
-// HasClass applies the HasEdge predicate on the "class" edge.
-func HasClass() predicate.Match {
+// HasAppointment applies the HasEdge predicate on the "appointment" edge.
+func HasAppointment() predicate.Match {
 	return predicate.Match(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, ClassTable, ClassPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, true, AppointmentTable, AppointmentColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasClassWith applies the HasEdge predicate on the "class" edge with a given conditions (other predicates).
-func HasClassWith(preds ...predicate.Class) predicate.Match {
+// HasAppointmentWith applies the HasEdge predicate on the "appointment" edge with a given conditions (other predicates).
+func HasAppointmentWith(preds ...predicate.Appointment) predicate.Match {
 	return predicate.Match(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(ClassInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, ClassTable, ClassPrimaryKey...),
+			sqlgraph.To(AppointmentInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, AppointmentTable, AppointmentColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSchedule applies the HasEdge predicate on the "schedule" edge.
+func HasSchedule() predicate.Match {
+	return predicate.Match(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, ScheduleTable, ScheduleColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasScheduleWith applies the HasEdge predicate on the "schedule" edge with a given conditions (other predicates).
+func HasScheduleWith(preds ...predicate.Schedule) predicate.Match {
+	return predicate.Match(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ScheduleInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, ScheduleTable, ScheduleColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasCancelRequest applies the HasEdge predicate on the "cancel_request" edge.
+func HasCancelRequest() predicate.Match {
+	return predicate.Match(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, CancelRequestTable, CancelRequestColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCancelRequestWith applies the HasEdge predicate on the "cancel_request" edge with a given conditions (other predicates).
+func HasCancelRequestWith(preds ...predicate.CancelRequest) predicate.Match {
+	return predicate.Match(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(CancelRequestInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, CancelRequestTable, CancelRequestColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

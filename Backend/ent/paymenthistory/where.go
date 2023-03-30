@@ -54,33 +54,6 @@ func IDLTE(id uuid.UUID) predicate.PaymentHistory {
 	return predicate.PaymentHistory(sql.FieldLTE(FieldID, id))
 }
 
-// HasClass applies the HasEdge predicate on the "class" edge.
-func HasClass() predicate.PaymentHistory {
-	return predicate.PaymentHistory(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ClassTable, ClassColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasClassWith applies the HasEdge predicate on the "class" edge with a given conditions (other predicates).
-func HasClassWith(preds ...predicate.Class) predicate.PaymentHistory {
-	return predicate.PaymentHistory(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(ClassInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ClassTable, ClassColumn),
-		)
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasUser applies the HasEdge predicate on the "user" edge.
 func HasUser() predicate.PaymentHistory {
 	return predicate.PaymentHistory(func(s *sql.Selector) {
