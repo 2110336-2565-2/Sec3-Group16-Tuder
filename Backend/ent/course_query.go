@@ -14,7 +14,7 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/review"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/google/uuid"
 )
@@ -22,14 +22,14 @@ import (
 // CourseQuery is the builder for querying Course entities.
 type CourseQuery struct {
 	config
-	ctx              *QueryContext
-	order            []OrderFunc
-	inters           []Interceptor
-	predicates       []predicate.Course
-	withReviewCourse *ReviewCourseQuery
-	withMatch        *MatchQuery
-	withTutor        *TutorQuery
-	withFKs          bool
+	ctx        *QueryContext
+	order      []OrderFunc
+	inters     []Interceptor
+	predicates []predicate.Course
+	withReview *ReviewQuery
+	withMatch  *MatchQuery
+	withTutor  *TutorQuery
+	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -66,9 +66,9 @@ func (cq *CourseQuery) Order(o ...OrderFunc) *CourseQuery {
 	return cq
 }
 
-// QueryReviewCourse chains the current query on the "review_course" edge.
-func (cq *CourseQuery) QueryReviewCourse() *ReviewCourseQuery {
-	query := (&ReviewCourseClient{config: cq.config}).Query()
+// QueryReview chains the current query on the "review" edge.
+func (cq *CourseQuery) QueryReview() *ReviewQuery {
+	query := (&ReviewClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -79,8 +79,8 @@ func (cq *CourseQuery) QueryReviewCourse() *ReviewCourseQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(course.Table, course.FieldID, selector),
-			sqlgraph.To(reviewcourse.Table, reviewcourse.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, course.ReviewCourseTable, course.ReviewCoursePrimaryKey...),
+			sqlgraph.To(review.Table, review.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, course.ReviewTable, course.ReviewPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -102,7 +102,7 @@ func (cq *CourseQuery) QueryMatch() *MatchQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(course.Table, course.FieldID, selector),
 			sqlgraph.To(match.Table, match.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, course.MatchTable, course.MatchPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, course.MatchTable, course.MatchColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -319,28 +319,28 @@ func (cq *CourseQuery) Clone() *CourseQuery {
 		return nil
 	}
 	return &CourseQuery{
-		config:           cq.config,
-		ctx:              cq.ctx.Clone(),
-		order:            append([]OrderFunc{}, cq.order...),
-		inters:           append([]Interceptor{}, cq.inters...),
-		predicates:       append([]predicate.Course{}, cq.predicates...),
-		withReviewCourse: cq.withReviewCourse.Clone(),
-		withMatch:        cq.withMatch.Clone(),
-		withTutor:        cq.withTutor.Clone(),
+		config:     cq.config,
+		ctx:        cq.ctx.Clone(),
+		order:      append([]OrderFunc{}, cq.order...),
+		inters:     append([]Interceptor{}, cq.inters...),
+		predicates: append([]predicate.Course{}, cq.predicates...),
+		withReview: cq.withReview.Clone(),
+		withMatch:  cq.withMatch.Clone(),
+		withTutor:  cq.withTutor.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
 	}
 }
 
-// WithReviewCourse tells the query-builder to eager-load the nodes that are connected to
-// the "review_course" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CourseQuery) WithReviewCourse(opts ...func(*ReviewCourseQuery)) *CourseQuery {
-	query := (&ReviewCourseClient{config: cq.config}).Query()
+// WithReview tells the query-builder to eager-load the nodes that are connected to
+// the "review" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CourseQuery) WithReview(opts ...func(*ReviewQuery)) *CourseQuery {
+	query := (&ReviewClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	cq.withReviewCourse = query
+	cq.withReview = query
 	return cq
 }
 
@@ -446,7 +446,7 @@ func (cq *CourseQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cours
 		withFKs     = cq.withFKs
 		_spec       = cq.querySpec()
 		loadedTypes = [3]bool{
-			cq.withReviewCourse != nil,
+			cq.withReview != nil,
 			cq.withMatch != nil,
 			cq.withTutor != nil,
 		}
@@ -475,10 +475,10 @@ func (cq *CourseQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cours
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := cq.withReviewCourse; query != nil {
-		if err := cq.loadReviewCourse(ctx, query, nodes,
-			func(n *Course) { n.Edges.ReviewCourse = []*ReviewCourse{} },
-			func(n *Course, e *ReviewCourse) { n.Edges.ReviewCourse = append(n.Edges.ReviewCourse, e) }); err != nil {
+	if query := cq.withReview; query != nil {
+		if err := cq.loadReview(ctx, query, nodes,
+			func(n *Course) { n.Edges.Review = []*Review{} },
+			func(n *Course, e *Review) { n.Edges.Review = append(n.Edges.Review, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -498,7 +498,7 @@ func (cq *CourseQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cours
 	return nodes, nil
 }
 
-func (cq *CourseQuery) loadReviewCourse(ctx context.Context, query *ReviewCourseQuery, nodes []*Course, init func(*Course), assign func(*Course, *ReviewCourse)) error {
+func (cq *CourseQuery) loadReview(ctx context.Context, query *ReviewQuery, nodes []*Course, init func(*Course), assign func(*Course, *Review)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[uuid.UUID]*Course)
 	nids := make(map[int]map[*Course]struct{})
@@ -510,11 +510,11 @@ func (cq *CourseQuery) loadReviewCourse(ctx context.Context, query *ReviewCourse
 		}
 	}
 	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(course.ReviewCourseTable)
-		s.Join(joinT).On(s.C(reviewcourse.FieldID), joinT.C(course.ReviewCoursePrimaryKey[1]))
-		s.Where(sql.InValues(joinT.C(course.ReviewCoursePrimaryKey[0]), edgeIDs...))
+		joinT := sql.Table(course.ReviewTable)
+		s.Join(joinT).On(s.C(review.FieldID), joinT.C(course.ReviewPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(course.ReviewPrimaryKey[0]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(course.ReviewCoursePrimaryKey[0]))
+		s.Select(joinT.C(course.ReviewPrimaryKey[0]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})
@@ -544,14 +544,14 @@ func (cq *CourseQuery) loadReviewCourse(ctx context.Context, query *ReviewCourse
 			}
 		})
 	})
-	neighbors, err := withInterceptors[[]*ReviewCourse](ctx, query, qr, query.inters)
+	neighbors, err := withInterceptors[[]*Review](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
 		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected "review_course" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "review" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)
@@ -560,63 +560,33 @@ func (cq *CourseQuery) loadReviewCourse(ctx context.Context, query *ReviewCourse
 	return nil
 }
 func (cq *CourseQuery) loadMatch(ctx context.Context, query *MatchQuery, nodes []*Course, init func(*Course), assign func(*Course, *Match)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[uuid.UUID]*Course)
-	nids := make(map[uuid.UUID]map[*Course]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Course)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
 		if init != nil {
-			init(node)
+			init(nodes[i])
 		}
 	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(course.MatchTable)
-		s.Join(joinT).On(s.C(match.FieldID), joinT.C(course.MatchPrimaryKey[1]))
-		s.Where(sql.InValues(joinT.C(course.MatchPrimaryKey[0]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(course.MatchPrimaryKey[0]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(uuid.UUID)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := *values[0].(*uuid.UUID)
-				inValue := *values[1].(*uuid.UUID)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*Course]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*Match](ctx, query, qr, query.inters)
+	query.withFKs = true
+	query.Where(predicate.Match(func(s *sql.Selector) {
+		s.Where(sql.InValues(course.MatchColumn, fks...))
+	}))
+	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
+		fk := n.course_match
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "course_match" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected "match" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "course_match" returned %v for node %v`, *fk, n.ID)
 		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
+		assign(node, n)
 	}
 	return nil
 }

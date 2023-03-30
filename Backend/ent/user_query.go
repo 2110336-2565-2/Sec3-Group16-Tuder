@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/cancelrequest"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
@@ -30,9 +30,9 @@ type UserQuery struct {
 	predicates         []predicate.User
 	withStudent        *StudentQuery
 	withTutor          *TutorQuery
-	withIssueReport    *IssueReportQuery
 	withPayment        *PaymentQuery
 	withPaymentHistory *PaymentHistoryQuery
+	withCancelRequest  *CancelRequestQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -113,28 +113,6 @@ func (uq *UserQuery) QueryTutor() *TutorQuery {
 	return query
 }
 
-// QueryIssueReport chains the current query on the "issue_report" edge.
-func (uq *UserQuery) QueryIssueReport() *IssueReportQuery {
-	query := (&IssueReportClient{config: uq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := uq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(issuereport.Table, issuereport.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.IssueReportTable, user.IssueReportColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
 // QueryPayment chains the current query on the "payment" edge.
 func (uq *UserQuery) QueryPayment() *PaymentQuery {
 	query := (&PaymentClient{config: uq.config}).Query()
@@ -172,6 +150,28 @@ func (uq *UserQuery) QueryPaymentHistory() *PaymentHistoryQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(paymenthistory.Table, paymenthistory.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.PaymentHistoryTable, user.PaymentHistoryColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCancelRequest chains the current query on the "cancel_request" edge.
+func (uq *UserQuery) QueryCancelRequest() *CancelRequestQuery {
+	query := (&CancelRequestClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(cancelrequest.Table, cancelrequest.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.CancelRequestTable, user.CancelRequestColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -373,9 +373,9 @@ func (uq *UserQuery) Clone() *UserQuery {
 		predicates:         append([]predicate.User{}, uq.predicates...),
 		withStudent:        uq.withStudent.Clone(),
 		withTutor:          uq.withTutor.Clone(),
-		withIssueReport:    uq.withIssueReport.Clone(),
 		withPayment:        uq.withPayment.Clone(),
 		withPaymentHistory: uq.withPaymentHistory.Clone(),
+		withCancelRequest:  uq.withCancelRequest.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
@@ -404,17 +404,6 @@ func (uq *UserQuery) WithTutor(opts ...func(*TutorQuery)) *UserQuery {
 	return uq
 }
 
-// WithIssueReport tells the query-builder to eager-load the nodes that are connected to
-// the "issue_report" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithIssueReport(opts ...func(*IssueReportQuery)) *UserQuery {
-	query := (&IssueReportClient{config: uq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	uq.withIssueReport = query
-	return uq
-}
-
 // WithPayment tells the query-builder to eager-load the nodes that are connected to
 // the "payment" edge. The optional arguments are used to configure the query builder of the edge.
 func (uq *UserQuery) WithPayment(opts ...func(*PaymentQuery)) *UserQuery {
@@ -434,6 +423,17 @@ func (uq *UserQuery) WithPaymentHistory(opts ...func(*PaymentHistoryQuery)) *Use
 		opt(query)
 	}
 	uq.withPaymentHistory = query
+	return uq
+}
+
+// WithCancelRequest tells the query-builder to eager-load the nodes that are connected to
+// the "cancel_request" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithCancelRequest(opts ...func(*CancelRequestQuery)) *UserQuery {
+	query := (&CancelRequestClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withCancelRequest = query
 	return uq
 }
 
@@ -518,9 +518,9 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		loadedTypes = [5]bool{
 			uq.withStudent != nil,
 			uq.withTutor != nil,
-			uq.withIssueReport != nil,
 			uq.withPayment != nil,
 			uq.withPaymentHistory != nil,
+			uq.withCancelRequest != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -553,13 +553,6 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			return nil, err
 		}
 	}
-	if query := uq.withIssueReport; query != nil {
-		if err := uq.loadIssueReport(ctx, query, nodes,
-			func(n *User) { n.Edges.IssueReport = []*IssueReport{} },
-			func(n *User, e *IssueReport) { n.Edges.IssueReport = append(n.Edges.IssueReport, e) }); err != nil {
-			return nil, err
-		}
-	}
 	if query := uq.withPayment; query != nil {
 		if err := uq.loadPayment(ctx, query, nodes,
 			func(n *User) { n.Edges.Payment = []*Payment{} },
@@ -571,6 +564,13 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		if err := uq.loadPaymentHistory(ctx, query, nodes,
 			func(n *User) { n.Edges.PaymentHistory = []*PaymentHistory{} },
 			func(n *User, e *PaymentHistory) { n.Edges.PaymentHistory = append(n.Edges.PaymentHistory, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withCancelRequest; query != nil {
+		if err := uq.loadCancelRequest(ctx, query, nodes,
+			func(n *User) { n.Edges.CancelRequest = []*CancelRequest{} },
+			func(n *User, e *CancelRequest) { n.Edges.CancelRequest = append(n.Edges.CancelRequest, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -633,37 +633,6 @@ func (uq *UserQuery) loadTutor(ctx context.Context, query *TutorQuery, nodes []*
 	}
 	return nil
 }
-func (uq *UserQuery) loadIssueReport(ctx context.Context, query *IssueReportQuery, nodes []*User, init func(*User), assign func(*User, *IssueReport)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[uuid.UUID]*User)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	query.Where(predicate.IssueReport(func(s *sql.Selector) {
-		s.Where(sql.InValues(user.IssueReportColumn, fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.user_issue_report
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "user_issue_report" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "user_issue_report" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
 func (uq *UserQuery) loadPayment(ctx context.Context, query *PaymentQuery, nodes []*User, init func(*User), assign func(*User, *Payment)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[uuid.UUID]*User)
@@ -721,6 +690,37 @@ func (uq *UserQuery) loadPaymentHistory(ctx context.Context, query *PaymentHisto
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "user_payment_history" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (uq *UserQuery) loadCancelRequest(ctx context.Context, query *CancelRequestQuery, nodes []*User, init func(*User), assign func(*User, *CancelRequest)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.CancelRequest(func(s *sql.Selector) {
+		s.Where(sql.InValues(user.CancelRequestColumn, fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.user_cancel_request
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "user_cancel_request" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "user_cancel_request" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

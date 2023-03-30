@@ -21,8 +21,6 @@ const (
 	EdgeIssueReport = "issue_report"
 	// EdgeCourse holds the string denoting the course edge name in mutations.
 	EdgeCourse = "course"
-	// EdgeReviewTutor holds the string denoting the review_tutor edge name in mutations.
-	EdgeReviewTutor = "review_tutor"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
 	// EdgeSchedule holds the string denoting the schedule edge name in mutations.
@@ -43,11 +41,6 @@ const (
 	CourseInverseTable = "courses"
 	// CourseColumn is the table column denoting the course relation/edge.
 	CourseColumn = "tutor_course"
-	// ReviewTutorTable is the table that holds the review_tutor relation/edge. The primary key declared below.
-	ReviewTutorTable = "tutor_review_tutor"
-	// ReviewTutorInverseTable is the table name for the ReviewTutor entity.
-	// It exists in this package in order to avoid circular dependency with the "reviewtutor" package.
-	ReviewTutorInverseTable = "review_tutors"
 	// UserTable is the table that holds the user relation/edge.
 	UserTable = "tutors"
 	// UserInverseTable is the table name for the User entity.
@@ -78,12 +71,6 @@ var ForeignKeys = []string{
 	"schedule_tutor",
 	"user_tutor",
 }
-
-var (
-	// ReviewTutorPrimaryKey and ReviewTutorColumn2 are the table columns denoting the
-	// primary key for the review_tutor relation (M2M).
-	ReviewTutorPrimaryKey = []string{"tutor_id", "review_tutor_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
