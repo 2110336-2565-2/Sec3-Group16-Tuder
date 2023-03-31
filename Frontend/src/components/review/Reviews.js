@@ -15,7 +15,7 @@ export default function Reviews({ reviews }) {
           allowFraction={true}
           size="20"
           fillColor="#FF5D02"
-          style={ {"grid-column": "2 / 3"} }
+          style={ {"gridColumn": "2 / 3"} }
         />
         <TotalReview>
           {reviews.total_review} review{reviews.total_review > 1 ? "s" : ""}

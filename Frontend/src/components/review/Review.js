@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Rating } from "react-simple-star-rating";
+import formatDate from "../../utils/review/dateConverter";
 
 export default function Review({ review }) {
   const [score, setScore] = useState(parseInt(review.score));
+
   return (
     <Container>
       {review.course_title? <h3>{review.course_title}</h3> : null}
@@ -16,7 +18,7 @@ export default function Review({ review }) {
         />
         <ReviewTime>
           {review.review_time_at
-            ? review.review_time_at.split("T")[0]
+            ? formatDate(review.review_time_at.split("T")[0])
             : review.review_time_at}
         </ReviewTime>
       </RowWrapper>
