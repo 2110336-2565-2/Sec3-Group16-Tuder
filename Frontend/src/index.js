@@ -56,23 +56,47 @@ const router = createBrowserRouter([
       },
       {
         path: "/profile",
-        element: <Profile />,
+        children: [
+            {
+                index: true,
+                element: <Profile />
+            },
+            {
+                path: "my-reviews",
+                element: <TutorReviews />
+            },
+            {
+                path: "edit-profile",
+                element: <EditProfile />
+            }
+        ]
       },
       {
-        path: "/edit-profile",
-        element: <EditProfile />,
+        path: "/students",
+        children: [
+            {
+                path: ":username",
+                element: <Profile />
+            }
+        ]
       },
       {
-        path: "/students/:username",
-        element: <Profile />,
-      },
-      {
-        path: "/tutors/:username",
-        element: <Profile />,
-      },
-      {
-        path: "profile/my-reviews",
-        element: <TutorReviews />,
+        path: "/tutors",
+        children: [
+            {
+                path: ":username",
+                children: [
+                    {
+                        index: true,
+                        element: <Profile />
+                    },
+                    {
+                        path: "reviews",
+                        element: <TutorReviews />
+                    }
+                ]
+            }
+        ]
       },
       {
         path: "/reviews/:courseID",
@@ -81,10 +105,6 @@ const router = createBrowserRouter([
       {
         path: "/courses/:courseID/reviews",
         element: <CourseReviews />,
-      },
-      {
-        path: "/tutors/:username/reviews",
-        element: <TutorReviews />,
       },
       {
         path: "/change-password",

@@ -71,7 +71,7 @@ export default function Profile() {
           <TitleWrapper>
             <Title>Information</Title>
             {isOwner ? (
-              <EditIcon onClick={() => navigate("/edit-profile")} />
+              <EditIcon onClick={() => navigate("edit-profile")} />
             ) : null}
           </TitleWrapper>
           {role === "student" ? (
