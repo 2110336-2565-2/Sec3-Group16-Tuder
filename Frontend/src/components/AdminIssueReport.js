@@ -8,7 +8,7 @@ export default function AdminIssueReport(props) {
   const handlePrevStage = (e) => {};
   const handleNextStage = (e) => {};
   const handleSave = (e) => {};
-  const handleDelete= (e) => {};ç
+  const handleDelete= (e) => {};
   return (
     <Request status={props.status}>
       <ClassSection>
