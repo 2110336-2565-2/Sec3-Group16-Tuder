@@ -19,6 +19,7 @@ import EnterNewPassword from './pages/EnterNewPassword';
 import CancelRequestList from './pages/CancelRequestList';
 import UserCancelRequest from './pages/UserCancelRequest';
 import CancelRequestDetail from './pages/CancelRequestDetail';
+import AdminIssueReportList from './pages/AdminIssueReportList'
 import { QueryClientProvider, QueryClient } from 'react-query';
 
 Modal.setAppElement(document.getElementById('root'))
@@ -83,6 +84,10 @@ const router = createBrowserRouter([
       {
         path: "/cancel-request-detail/:id",
         element: <CancelRequestDetail />,
+      },
+      {
+        path: "/issuereports",
+        element: <AdminIssueReportList />,
       }
     ]
   }
