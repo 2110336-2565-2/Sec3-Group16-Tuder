@@ -8,13 +8,3 @@ export const fetchAdminIssueReportHandler = () => {
     },
   });
 };
-
-// export const submitAudittingHandler = ( data) => {
-//     return api.post('api/v1/audit-request', data, {
-//         headers:
-//         {
-//             'Content-Type': 'application/json',
-//             'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
-//         }
-//     })
-// }
