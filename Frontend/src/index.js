@@ -71,6 +71,10 @@ const router = createBrowserRouter([
         element: <Profile />,
       },
       {
+        path: "profile/my-reviews",
+        element: <TutorReviews />,
+      },
+      {
         path: "/reviews/:courseID",
         element: <Review />,
       },
