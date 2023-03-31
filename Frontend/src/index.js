@@ -63,6 +63,14 @@ const router = createBrowserRouter([
         element: <EditProfile />,
       },
       {
+        path: "/students/:username",
+        element: <Profile />,
+      },
+      {
+        path: "/tutors/:username",
+        element: <Profile />,
+      },
+      {
         path: "/reviews/:courseID",
         element: <Review />,
       },

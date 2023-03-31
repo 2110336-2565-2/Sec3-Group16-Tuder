@@ -1,8 +1,16 @@
-import React from 'react'
-import { InfoContainter, InfoTitle, InfoContent, InfoWrapper } from './ProfileStyle.js'
-import styled from 'styled-components'
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  InfoContainter,
+  InfoTitle,
+  InfoContent,
+  InfoWrapper,
+} from "./ProfileStyle.js";
+import styled from "styled-components";
 
-export default function TutorInfo({user}){
+export default function TutorInfo({ user, isOwner, othersUsername }) {
+  const navigate = useNavigate();
+
   return (
     <Container>
       <InfoContainter>
@@ -20,20 +28,24 @@ export default function TutorInfo({user}){
         </InfoWrapper>
         <InfoWrapper>
           <InfoTitle>Birth Date</InfoTitle>
-          <InfoContent>{user.birthdate?user.birthdate.split("T")[0]:""}</InfoContent>
+          <InfoContent>
+            {user.birthdate ? user.birthdate.split("T")[0] : ""}
+          </InfoContent>
         </InfoWrapper>
-        <InfoWrapper>
-          <InfoTitle>Citizen ID</InfoTitle>
-          <InfoContent>{user.citizen_id}</InfoContent>
-        </InfoWrapper>
+        {isOwner ? (
+          <InfoWrapper>
+            <InfoTitle>Citizen ID</InfoTitle>
+            <InfoContent>{user.citizen_id}</InfoContent>
+          </InfoWrapper>
+        ) : null}
         <InfoWrapper isSpan={true}>
           <InfoTitle>Description</InfoTitle>
           <InfoContent>{user.description}</InfoContent>
         </InfoWrapper>
       </InfoContainter>
-      <Button>My Reviews</Button>
+      {isOwner ? <Button>My Reviews</Button> : <Button onClick={()=>navigate(`/tutors/${othersUsername}/reviews`)} >Read Reviews</Button>}
     </Container>
-  )
+  );
 }
 
 const Container = styled.div`
@@ -46,7 +58,7 @@ const Button = styled.button`
   width: 300px;
   height: 50px;
   margin-top: 55px;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   border: 2px solid #000000;
   border-radius: 10px;
   color: #000000;
@@ -59,6 +71,6 @@ const Button = styled.button`
 
   &:hover {
     background-color: #000000;
-    color: #FFFFFF;
+    color: #ffffff;
   }
 `;

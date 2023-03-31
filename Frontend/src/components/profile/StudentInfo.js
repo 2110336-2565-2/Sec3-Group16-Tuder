@@ -1,7 +1,7 @@
 import React from 'react'
 import { InfoContainter, InfoTitle, InfoContent, InfoWrapper } from './ProfileStyle.js'
 
-export default function StudentInfo({user}) {
+export default function StudentInfo({user, isOwner, othersUsername}) {
 
   return (
     <InfoContainter>
