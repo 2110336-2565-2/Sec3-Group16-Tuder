@@ -8,7 +8,7 @@ export default function Review({ review }) {
 
   return (
     <Container>
-      {review.course_title? <h3>{review.course_title}</h3> : null}
+      {review.course_title? <Title>{review.course_title}</Title> : null}
       <RowWrapper>
         <Rating
           initialValue={score}
@@ -37,6 +37,10 @@ const Container = styled.div`
   background-color: #ebebeb;
 `;
 
+const Title = styled.h2`
+  font-size: 16px;
+`
+
 const ReviewMsg = styled.p`
   margin-top: 20px;
 `;
@@ -46,6 +50,7 @@ const RowWrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  margin-top: 10px;
 `;
 
 const ReviewTime = styled.p``;
