@@ -6,7 +6,7 @@ import { Timezone, DateFormat } from "../datas/DateFormat.js";
 
 export default function AdminIssueReport(props) {
     const [statusState, setStatusState] = useState(
-        statusState = props.status
+        props.status
     );
     const handleSave = (e) => {
         {
