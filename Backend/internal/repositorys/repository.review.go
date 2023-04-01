@@ -6,13 +6,16 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/review"
 	entStudent "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
+	"github.com/google/uuid"
 	"time"
 )
 
 type RepositoryReview interface {
 	CreateReview(review *schema.SchemaCreateReview) (*ent.Review, error)
+	GetCourseWithReviewsById(courseId uuid.UUID) (*ent.Course, error)
 }
 
 type repositoryReview struct {
@@ -71,4 +74,19 @@ func (r repositoryReview) CreateReview(sR *schema.SchemaCreateReview) (*ent.Revi
 	}
 
 	return review, tx.Commit()
+}
+
+func (r repositoryReview) GetReviews(courseId uuid.UUID) ([]*ent.Review, error) {
+	reviews, err := r.client.Review.Query().Where(
+		review.HasCourseWith(course.IDEQ(courseId)),
+	).All(r.ctx)
+	return reviews, err
+}
+
+func (r repositoryReview) GetCourseWithReviewsById(courseId uuid.UUID) (*ent.Course, error) {
+	c, err := r.client.Course.Query().
+		Where(course.IDEQ(courseId)).
+		WithReview().
+		Only(r.ctx)
+	return c, err
 }

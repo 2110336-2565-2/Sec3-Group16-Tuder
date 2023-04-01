@@ -16,4 +16,5 @@ func InitReviewRoutes(client *ent.Client, e *echo.Group) {
 	controllerReview := controller.NewControllerReview(serviceReview)
 	middlewareInst := middlewares.NewAuthMiddleware(os.Getenv("JWT_SECRET"))
 	e.POST("/review", controllerReview.ReviewCourse, middlewareInst.JWT())
+	e.GET("/review/:courseid", controllerReview.GetRating)
 }
