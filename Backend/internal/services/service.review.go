@@ -56,7 +56,7 @@ func (s serviceReview) GetRating(courseId string) (*schemas.SchemaGetReviewsByCo
 	var count int
 	var accRating float32 = 0
 	for _, r := range c.Edges.Review {
-		accRating += *r.Score
+		accRating += float32(*r.Score)
 	}
 	// check if a course have never been rate yed
 	if len(c.Edges.Review) <= 0 {
