@@ -40,7 +40,7 @@ func (rd *ReviewDelete) ExecX(ctx context.Context) int {
 }
 
 func (rd *ReviewDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(review.Table, sqlgraph.NewFieldSpec(review.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewDeleteSpec(review.Table, sqlgraph.NewFieldSpec(review.FieldID, field.TypeUUID))
 	if ps := rd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {

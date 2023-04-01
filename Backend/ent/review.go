@@ -9,15 +9,16 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/review"
+	"github.com/google/uuid"
 )
 
 // Review is the model entity for the Review schema.
 type Review struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
 	// Score holds the value of the "score" field.
-	Score *float32 `json:"score,omitempty"`
+	Score *int8 `json:"score,omitempty"`
 	// ReviewMsg holds the value of the "review_msg" field.
 	ReviewMsg *string `json:"review_msg,omitempty"`
 	// ReviewTimeAt holds the value of the "review_time_at" field.
@@ -62,13 +63,13 @@ func (*Review) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case review.FieldScore:
-			values[i] = new(sql.NullFloat64)
-		case review.FieldID:
 			values[i] = new(sql.NullInt64)
 		case review.FieldReviewMsg:
 			values[i] = new(sql.NullString)
 		case review.FieldReviewTimeAt:
 			values[i] = new(sql.NullTime)
+		case review.FieldID:
+			values[i] = new(uuid.UUID)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Review", columns[i])
 		}
@@ -85,17 +86,17 @@ func (r *Review) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case review.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				r.ID = *value
 			}
-			r.ID = int(value.Int64)
 		case review.FieldScore:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field score", values[i])
 			} else if value.Valid {
-				r.Score = new(float32)
-				*r.Score = float32(value.Float64)
+				r.Score = new(int8)
+				*r.Score = int8(value.Int64)
 			}
 		case review.FieldReviewMsg:
 			if value, ok := values[i].(*sql.NullString); !ok {

@@ -53,14 +53,14 @@ func (sc *StudentCreate) AddMatch(m ...*Match) *StudentCreate {
 }
 
 // AddReviewIDs adds the "review" edge to the Review entity by IDs.
-func (sc *StudentCreate) AddReviewIDs(ids ...int) *StudentCreate {
+func (sc *StudentCreate) AddReviewIDs(ids ...uuid.UUID) *StudentCreate {
 	sc.mutation.AddReviewIDs(ids...)
 	return sc
 }
 
 // AddReview adds the "review" edges to the Review entity.
 func (sc *StudentCreate) AddReview(r ...*Review) *StudentCreate {
-	ids := make([]int, len(r))
+	ids := make([]uuid.UUID, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -187,7 +187,7 @@ func (sc *StudentCreate) createSpec() (*Student, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: review.FieldID,
 				},
 			},

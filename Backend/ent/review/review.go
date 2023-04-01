@@ -4,6 +4,8 @@ package review
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const (
@@ -64,7 +66,9 @@ func ValidColumn(column string) bool {
 
 var (
 	// ScoreValidator is a validator for the "score" field. It is called by the builders before save.
-	ScoreValidator func(float32) error
+	ScoreValidator func(int8) error
 	// DefaultReviewTimeAt holds the default value on creation for the "review_time_at" field.
 	DefaultReviewTimeAt func() time.Time
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
 )

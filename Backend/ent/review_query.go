@@ -131,8 +131,8 @@ func (rq *ReviewQuery) FirstX(ctx context.Context) *Review {
 
 // FirstID returns the first Review ID from the query.
 // Returns a *NotFoundError when no Review ID was found.
-func (rq *ReviewQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (rq *ReviewQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = rq.Limit(1).IDs(setContextOp(ctx, rq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -144,7 +144,7 @@ func (rq *ReviewQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (rq *ReviewQuery) FirstIDX(ctx context.Context) int {
+func (rq *ReviewQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := rq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -182,8 +182,8 @@ func (rq *ReviewQuery) OnlyX(ctx context.Context) *Review {
 // OnlyID is like Only, but returns the only Review ID in the query.
 // Returns a *NotSingularError when more than one Review ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (rq *ReviewQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (rq *ReviewQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = rq.Limit(2).IDs(setContextOp(ctx, rq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -199,7 +199,7 @@ func (rq *ReviewQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (rq *ReviewQuery) OnlyIDX(ctx context.Context) int {
+func (rq *ReviewQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := rq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -227,7 +227,7 @@ func (rq *ReviewQuery) AllX(ctx context.Context) []*Review {
 }
 
 // IDs executes the query and returns a list of Review IDs.
-func (rq *ReviewQuery) IDs(ctx context.Context) (ids []int, err error) {
+func (rq *ReviewQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
 	if rq.ctx.Unique == nil && rq.path != nil {
 		rq.Unique(true)
 	}
@@ -239,7 +239,7 @@ func (rq *ReviewQuery) IDs(ctx context.Context) (ids []int, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (rq *ReviewQuery) IDsX(ctx context.Context) []int {
+func (rq *ReviewQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := rq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -335,7 +335,7 @@ func (rq *ReviewQuery) WithStudent(opts ...func(*StudentQuery)) *ReviewQuery {
 // Example:
 //
 //	var v []struct {
-//		Score float32 `json:"score,omitempty"`
+//		Score int8 `json:"score,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -358,7 +358,7 @@ func (rq *ReviewQuery) GroupBy(field string, fields ...string) *ReviewGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Score float32 `json:"score,omitempty"`
+//		Score int8 `json:"score,omitempty"`
 //	}
 //
 //	client.Review.Query().
@@ -449,7 +449,7 @@ func (rq *ReviewQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Revie
 
 func (rq *ReviewQuery) loadCourse(ctx context.Context, query *CourseQuery, nodes []*Review, init func(*Review), assign func(*Review, *Course)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*Review)
+	byID := make(map[uuid.UUID]*Review)
 	nids := make(map[uuid.UUID]map[*Review]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
@@ -479,10 +479,10 @@ func (rq *ReviewQuery) loadCourse(ctx context.Context, query *CourseQuery, nodes
 				if err != nil {
 					return nil, err
 				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
+				return append([]any{new(uuid.UUID)}, values...), nil
 			}
 			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
+				outValue := *values[0].(*uuid.UUID)
 				inValue := *values[1].(*uuid.UUID)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*Review]struct{}{byID[outValue]: {}}
@@ -510,7 +510,7 @@ func (rq *ReviewQuery) loadCourse(ctx context.Context, query *CourseQuery, nodes
 }
 func (rq *ReviewQuery) loadStudent(ctx context.Context, query *StudentQuery, nodes []*Review, init func(*Review), assign func(*Review, *Student)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*Review)
+	byID := make(map[uuid.UUID]*Review)
 	nids := make(map[uuid.UUID]map[*Review]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
@@ -540,10 +540,10 @@ func (rq *ReviewQuery) loadStudent(ctx context.Context, query *StudentQuery, nod
 				if err != nil {
 					return nil, err
 				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
+				return append([]any{new(uuid.UUID)}, values...), nil
 			}
 			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
+				outValue := *values[0].(*uuid.UUID)
 				inValue := *values[1].(*uuid.UUID)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*Review]struct{}{byID[outValue]: {}}
@@ -580,7 +580,7 @@ func (rq *ReviewQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (rq *ReviewQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(review.Table, review.Columns, sqlgraph.NewFieldSpec(review.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(review.Table, review.Columns, sqlgraph.NewFieldSpec(review.FieldID, field.TypeUUID))
 	_spec.From = rq.sql
 	if unique := rq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
