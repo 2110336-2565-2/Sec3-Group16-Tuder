@@ -61,7 +61,7 @@ func (r repositoryReview) CreateReview(sR *schema.SchemaCreateReview) (*ent.Revi
 	c := student.Edges.Match[0].Edges.Course
 	review, err := tcx.Review.Create().
 		SetReviewMsg(sR.ReviewMessage).
-		SetScore(sR.Rating).
+		SetScore(int8(sR.Rating)).
 		SetReviewTimeAt(time.Now()).
 		AddCourse(c).
 		AddStudent(student).

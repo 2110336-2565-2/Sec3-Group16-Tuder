@@ -6,7 +6,7 @@ import (
 )
 
 type Review struct {
-	Score        float32   `json:"score"`
+	Score        int8      `json:"score"`
 	ReviewMsg    string    `json:"review_msg"`
 	ReviewTimeAt time.Time `json:"review_time_at"`
 }
