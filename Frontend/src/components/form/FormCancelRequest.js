@@ -133,7 +133,7 @@ const Title = styled.div`
     font-family: 'Lexend Deca';
     font-style: normal;
     font-weight: 700;
-    font-size: 35px;
+    font-size: 30px;
     line-height: 44px;
 `;
 

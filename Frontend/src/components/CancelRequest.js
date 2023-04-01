@@ -14,32 +14,37 @@ export default function CancelRequest(props){
     return(
         <Request status={props.status}>
             <ClassSection>
-                <ClassImg src={props.img} alt="classImg"/>
+                <GridSection>
+                    <ClassImg src={props.img} alt="classImg"/>
+                </GridSection>
                 
 
                 <ClassInfoSection>
-
-                    <ClassInfo>
-                        <InfoTitle>Title:</InfoTitle>
-                        &nbsp;
-                        {props.title}
-                    </ClassInfo>
+                    <ClassFlex>
+                        <ClassInfo>
+                            <InfoTitle min_w = "43px">Title :</InfoTitle>
+                            <InfoDesc>{props.title}</InfoDesc>
+                        </ClassInfo>
+                        
+                        <ClassInfo>
+                            <InfoTitle min_w = "79px">Reporter :</InfoTitle>
+                            <InfoDesc>{props.reporter}</InfoDesc>
+                        </ClassInfo>
+                        <ClassInfo>
+                            <InfoTitle min_w = "105px">Report Date :</InfoTitle>
+                            <InfoDesc>{(new Date(props.report_date)).toLocaleString(Timezone, DateFormat)}</InfoDesc>
+                        </ClassInfo>
+                        <ClassInfoButton>
+                            <InfoTitle min_w = "60px">Status :</InfoTitle>
+                            <InfoDesc>
+                                <StatusBlock>
+                                    {props.status}
+                                </StatusBlock>
+                            </InfoDesc>
+                            
+                        </ClassInfoButton>
+                    </ClassFlex>
                     
-                    <ClassInfo>
-                        <InfoTitle>Reporter:</InfoTitle>
-                        &nbsp;
-                        {props.reporter}
-                    </ClassInfo>
-                    <ClassInfo>
-                        <InfoTitle>Report Date:</InfoTitle>
-                        &nbsp;
-                        {(new Date(props.report_date)).toLocaleString(Timezone, DateFormat)}
-                    </ClassInfo>
-                    <ClassInfo>
-                        <InfoTitle>Status:</InfoTitle>
-                        &nbsp;
-                        {props.status}
-                    </ClassInfo>
                 </ClassInfoSection>
             </ClassSection>
         </Request>
@@ -47,82 +52,116 @@ export default function CancelRequest(props){
 }
 
 // color be changed depends on the status
+// const MgAuto = styled.div`
+//     margin-top: auto;
+//     margin-bottom: auto;
+// `
 
-const Request = styled.div`
+const StatusBlock = styled.div`
     display: flex;
-    flex-direction: row;
-    justify-content: left;
+    padding: 5px;
+    border-radius: 6px;
     background-color: ${(props) => {
         if (props.status === "rejected") {
-            return "#EBEBEB";
+            return "#FF0000";
         } else if (props.status === "approved") {
             return "#009900";
         } else {
-            return "#EB7B42";
+            return "#FFFF00";
         }
     }};
-
-    border-radius: 10px;
+    color: ${(props) => {
+        if (props.status === "rejected") {
+            return "#FFFFFF";
+        } else if (props.status === "approved") {
+            return "#FFFFFF";
+        } else {
+            return "#000000";
+        }
+    }};
+    font-weight: 500;
+`
+const Request = styled.div`
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    background-color: #EB7B42;
     border: 1px solid #DADADA ;
-    shadow: 0px 4px 4px rgba(0, 0, 0, 0.45);
-
-    width: 1000px;
-    height: 167px;
+    color: white;
+    min-height: 167px;
     gap: 20px;
     padding: 10px;
     cursor: pointer;
 
     &:hover {
-        background-color: ${(props) => {
-            if (props.status === "rejected") {
-                return "#FBFBFB";
-            } else if (props.status === "approved") {
-                return "#00AA00";
-            } else {
-                return "#EE8E45";
-            }
-        }
-        
+        border: 1px solid #000000 ;
+        background-color: #EE8E45 ;
     }
-
-
-    
 `
 
-const ClassSection = styled.div`
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    gap: 20px;
+const ClassSection = styled.div`    
+    display: grid;
+    grid-template-columns: 30% 70%;
+    width: 100%;
+    min-width: 750px;
+    
 `;
 
+const GridSection = styled.div`
+    display: grid;
+`
+
 const ClassImg = styled.img`
-    width: 264px;
+    min-width: 216px;
     height: 148px;
+    margin: auto;
 `;
 
 const ClassInfoSection = styled.div`
+    gap: 30px;
+    display: grid;
+    padding: 10px;
+    font-size: 30px;
+    width: 100%;
+    min-width: 500px;
+`
+
+const ClassFlex = styled.div`
     display: flex;
     flex-direction: column;
-    justify-content: left;
-    gap: 30px;
-    margin-top: 15px;
-    margin-right: 10px;
-    margin-left: 10px;
+    justify-content: center;
+    gap: 10px;
 `
 
 const ClassInfo = styled.div`
     display: flex;
     flex-direction: row;
-    justify-content: left;
-
-    font-size: 20px;
-    margin-top: -2.5%;
-    margin-bottom: -2.5%;
+    gap: 5px;
+    align-items: flex-start;
+    font-weight: 350;
+    font-size: 16px;
+`
+const ClassInfoButton = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-weight: 350;
+    font-size: 16px;
+    gap: 5px;
 `
 
 const InfoTitle = styled.div`
     display: flex;
-    font-size: 20px;
-    font-weight: bold;
+    font-size: 16px;
+    font-weight: 500;
+    min-width: ${(props)=>{
+        return props.min_w;
+    }};
 `;
+
+const InfoDesc = styled.div`
+    display: flex;
+    font-size: 16px;
+    font-weight: 300;
+`;
+
