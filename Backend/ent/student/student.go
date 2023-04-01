@@ -11,28 +11,26 @@ const (
 	Label = "student"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// EdgeIssueReport holds the string denoting the issue_report edge name in mutations.
-	EdgeIssueReport = "issue_report"
-	// EdgeClass holds the string denoting the class edge name in mutations.
-	EdgeClass = "class"
+	// EdgeMatch holds the string denoting the match edge name in mutations.
+	EdgeMatch = "match"
+	// EdgeReview holds the string denoting the review edge name in mutations.
+	EdgeReview = "review"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
 	// Table holds the table name of the student in the database.
 	Table = "students"
-	// IssueReportTable is the table that holds the issue_report relation/edge.
-	IssueReportTable = "issue_reports"
-	// IssueReportInverseTable is the table name for the IssueReport entity.
-	// It exists in this package in order to avoid circular dependency with the "issuereport" package.
-	IssueReportInverseTable = "issue_reports"
-	// IssueReportColumn is the table column denoting the issue_report relation/edge.
-	IssueReportColumn = "student_issue_report"
-	// ClassTable is the table that holds the class relation/edge.
-	ClassTable = "classes"
-	// ClassInverseTable is the table name for the Class entity.
-	// It exists in this package in order to avoid circular dependency with the "class" package.
-	ClassInverseTable = "classes"
-	// ClassColumn is the table column denoting the class relation/edge.
-	ClassColumn = "student_class"
+	// MatchTable is the table that holds the match relation/edge.
+	MatchTable = "matches"
+	// MatchInverseTable is the table name for the Match entity.
+	// It exists in this package in order to avoid circular dependency with the "match" package.
+	MatchInverseTable = "matches"
+	// MatchColumn is the table column denoting the match relation/edge.
+	MatchColumn = "student_match"
+	// ReviewTable is the table that holds the review relation/edge. The primary key declared below.
+	ReviewTable = "student_review"
+	// ReviewInverseTable is the table name for the Review entity.
+	// It exists in this package in order to avoid circular dependency with the "review" package.
+	ReviewInverseTable = "reviews"
 	// UserTable is the table that holds the user relation/edge.
 	UserTable = "students"
 	// UserInverseTable is the table name for the User entity.
@@ -52,6 +50,12 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"user_student",
 }
+
+var (
+	// ReviewPrimaryKey and ReviewColumn2 are the table columns denoting the
+	// primary key for the review relation (M2M).
+	ReviewPrimaryKey = []string{"student_id", "review_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {

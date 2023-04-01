@@ -10,7 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/cancelrequest"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
@@ -114,51 +114,6 @@ func (uc *UserCreate) SetNillableID(u *uuid.UUID) *UserCreate {
 	return uc
 }
 
-// AddIssueReportIDs adds the "issue_report" edge to the IssueReport entity by IDs.
-func (uc *UserCreate) AddIssueReportIDs(ids ...uuid.UUID) *UserCreate {
-	uc.mutation.AddIssueReportIDs(ids...)
-	return uc
-}
-
-// AddIssueReport adds the "issue_report" edges to the IssueReport entity.
-func (uc *UserCreate) AddIssueReport(i ...*IssueReport) *UserCreate {
-	ids := make([]uuid.UUID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return uc.AddIssueReportIDs(ids...)
-}
-
-// AddPaymentIDs adds the "payment" edge to the Payment entity by IDs.
-func (uc *UserCreate) AddPaymentIDs(ids ...uuid.UUID) *UserCreate {
-	uc.mutation.AddPaymentIDs(ids...)
-	return uc
-}
-
-// AddPayment adds the "payment" edges to the Payment entity.
-func (uc *UserCreate) AddPayment(p ...*Payment) *UserCreate {
-	ids := make([]uuid.UUID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return uc.AddPaymentIDs(ids...)
-}
-
-// AddPaymentHistoryIDs adds the "payment_history" edge to the PaymentHistory entity by IDs.
-func (uc *UserCreate) AddPaymentHistoryIDs(ids ...uuid.UUID) *UserCreate {
-	uc.mutation.AddPaymentHistoryIDs(ids...)
-	return uc
-}
-
-// AddPaymentHistory adds the "payment_history" edges to the PaymentHistory entity.
-func (uc *UserCreate) AddPaymentHistory(p ...*PaymentHistory) *UserCreate {
-	ids := make([]uuid.UUID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return uc.AddPaymentHistoryIDs(ids...)
-}
-
 // SetStudentID sets the "student" edge to the Student entity by ID.
 func (uc *UserCreate) SetStudentID(id uuid.UUID) *UserCreate {
 	uc.mutation.SetStudentID(id)
@@ -195,6 +150,51 @@ func (uc *UserCreate) SetNillableTutorID(id *uuid.UUID) *UserCreate {
 // SetTutor sets the "tutor" edge to the Tutor entity.
 func (uc *UserCreate) SetTutor(t *Tutor) *UserCreate {
 	return uc.SetTutorID(t.ID)
+}
+
+// AddPaymentIDs adds the "payment" edge to the Payment entity by IDs.
+func (uc *UserCreate) AddPaymentIDs(ids ...uuid.UUID) *UserCreate {
+	uc.mutation.AddPaymentIDs(ids...)
+	return uc
+}
+
+// AddPayment adds the "payment" edges to the Payment entity.
+func (uc *UserCreate) AddPayment(p ...*Payment) *UserCreate {
+	ids := make([]uuid.UUID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return uc.AddPaymentIDs(ids...)
+}
+
+// AddPaymentHistoryIDs adds the "payment_history" edge to the PaymentHistory entity by IDs.
+func (uc *UserCreate) AddPaymentHistoryIDs(ids ...uuid.UUID) *UserCreate {
+	uc.mutation.AddPaymentHistoryIDs(ids...)
+	return uc
+}
+
+// AddPaymentHistory adds the "payment_history" edges to the PaymentHistory entity.
+func (uc *UserCreate) AddPaymentHistory(p ...*PaymentHistory) *UserCreate {
+	ids := make([]uuid.UUID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return uc.AddPaymentHistoryIDs(ids...)
+}
+
+// AddCancelRequestIDs adds the "cancel_request" edge to the CancelRequest entity by IDs.
+func (uc *UserCreate) AddCancelRequestIDs(ids ...uuid.UUID) *UserCreate {
+	uc.mutation.AddCancelRequestIDs(ids...)
+	return uc
+}
+
+// AddCancelRequest adds the "cancel_request" edges to the CancelRequest entity.
+func (uc *UserCreate) AddCancelRequest(c ...*CancelRequest) *UserCreate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uc.AddCancelRequestIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -394,17 +394,36 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldRole, field.TypeEnum, value)
 		_node.Role = &value
 	}
-	if nodes := uc.mutation.IssueReportIDs(); len(nodes) > 0 {
+	if nodes := uc.mutation.StudentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   user.IssueReportTable,
-			Columns: []string{user.IssueReportColumn},
+			Table:   user.StudentTable,
+			Columns: []string{user.StudentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: issuereport.FieldID,
+					Column: student.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.TutorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   user.TutorTable,
+			Columns: []string{user.TutorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tutor.FieldID,
 				},
 			},
 		}
@@ -451,36 +470,17 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := uc.mutation.StudentIDs(); len(nodes) > 0 {
+	if nodes := uc.mutation.CancelRequestIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.StudentTable,
-			Columns: []string{user.StudentColumn},
+			Table:   user.CancelRequestTable,
+			Columns: []string{user.CancelRequestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: student.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := uc.mutation.TutorIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   user.TutorTable,
-			Columns: []string{user.TutorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: tutor.FieldID,
+					Column: cancelrequest.FieldID,
 				},
 			},
 		}

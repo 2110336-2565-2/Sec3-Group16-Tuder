@@ -12,21 +12,17 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/google/uuid"
 )
 
 // IssueReportQuery is the builder for querying IssueReport entities.
 type IssueReportQuery struct {
 	config
-	ctx         *QueryContext
-	order       []OrderFunc
-	inters      []Interceptor
-	predicates  []predicate.IssueReport
-	withStudent *StudentQuery
-	withTutor   *TutorQuery
-	withFKs     bool
+	ctx        *QueryContext
+	order      []OrderFunc
+	inters     []Interceptor
+	predicates []predicate.IssueReport
+	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -61,50 +57,6 @@ func (irq *IssueReportQuery) Unique(unique bool) *IssueReportQuery {
 func (irq *IssueReportQuery) Order(o ...OrderFunc) *IssueReportQuery {
 	irq.order = append(irq.order, o...)
 	return irq
-}
-
-// QueryStudent chains the current query on the "student" edge.
-func (irq *IssueReportQuery) QueryStudent() *StudentQuery {
-	query := (&StudentClient{config: irq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := irq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := irq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(issuereport.Table, issuereport.FieldID, selector),
-			sqlgraph.To(student.Table, student.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, issuereport.StudentTable, issuereport.StudentColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(irq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryTutor chains the current query on the "tutor" edge.
-func (irq *IssueReportQuery) QueryTutor() *TutorQuery {
-	query := (&TutorClient{config: irq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := irq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := irq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(issuereport.Table, issuereport.FieldID, selector),
-			sqlgraph.To(tutor.Table, tutor.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, issuereport.TutorTable, issuereport.TutorColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(irq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // First returns the first IssueReport entity from the query.
@@ -294,39 +246,15 @@ func (irq *IssueReportQuery) Clone() *IssueReportQuery {
 		return nil
 	}
 	return &IssueReportQuery{
-		config:      irq.config,
-		ctx:         irq.ctx.Clone(),
-		order:       append([]OrderFunc{}, irq.order...),
-		inters:      append([]Interceptor{}, irq.inters...),
-		predicates:  append([]predicate.IssueReport{}, irq.predicates...),
-		withStudent: irq.withStudent.Clone(),
-		withTutor:   irq.withTutor.Clone(),
+		config:     irq.config,
+		ctx:        irq.ctx.Clone(),
+		order:      append([]OrderFunc{}, irq.order...),
+		inters:     append([]Interceptor{}, irq.inters...),
+		predicates: append([]predicate.IssueReport{}, irq.predicates...),
 		// clone intermediate query.
 		sql:  irq.sql.Clone(),
 		path: irq.path,
 	}
-}
-
-// WithStudent tells the query-builder to eager-load the nodes that are connected to
-// the "student" edge. The optional arguments are used to configure the query builder of the edge.
-func (irq *IssueReportQuery) WithStudent(opts ...func(*StudentQuery)) *IssueReportQuery {
-	query := (&StudentClient{config: irq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	irq.withStudent = query
-	return irq
-}
-
-// WithTutor tells the query-builder to eager-load the nodes that are connected to
-// the "tutor" edge. The optional arguments are used to configure the query builder of the edge.
-func (irq *IssueReportQuery) WithTutor(opts ...func(*TutorQuery)) *IssueReportQuery {
-	query := (&TutorClient{config: irq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	irq.withTutor = query
-	return irq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -405,17 +333,10 @@ func (irq *IssueReportQuery) prepareQuery(ctx context.Context) error {
 
 func (irq *IssueReportQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*IssueReport, error) {
 	var (
-		nodes       = []*IssueReport{}
-		withFKs     = irq.withFKs
-		_spec       = irq.querySpec()
-		loadedTypes = [2]bool{
-			irq.withStudent != nil,
-			irq.withTutor != nil,
-		}
+		nodes   = []*IssueReport{}
+		withFKs = irq.withFKs
+		_spec   = irq.querySpec()
 	)
-	if irq.withStudent != nil || irq.withTutor != nil {
-		withFKs = true
-	}
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, issuereport.ForeignKeys...)
 	}
@@ -425,7 +346,6 @@ func (irq *IssueReportQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &IssueReport{config: irq.config}
 		nodes = append(nodes, node)
-		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -437,84 +357,7 @@ func (irq *IssueReportQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := irq.withStudent; query != nil {
-		if err := irq.loadStudent(ctx, query, nodes, nil,
-			func(n *IssueReport, e *Student) { n.Edges.Student = e }); err != nil {
-			return nil, err
-		}
-	}
-	if query := irq.withTutor; query != nil {
-		if err := irq.loadTutor(ctx, query, nodes, nil,
-			func(n *IssueReport, e *Tutor) { n.Edges.Tutor = e }); err != nil {
-			return nil, err
-		}
-	}
 	return nodes, nil
-}
-
-func (irq *IssueReportQuery) loadStudent(ctx context.Context, query *StudentQuery, nodes []*IssueReport, init func(*IssueReport), assign func(*IssueReport, *Student)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*IssueReport)
-	for i := range nodes {
-		if nodes[i].student_issue_report == nil {
-			continue
-		}
-		fk := *nodes[i].student_issue_report
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(student.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "student_issue_report" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
-func (irq *IssueReportQuery) loadTutor(ctx context.Context, query *TutorQuery, nodes []*IssueReport, init func(*IssueReport), assign func(*IssueReport, *Tutor)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*IssueReport)
-	for i := range nodes {
-		if nodes[i].tutor_issue_report == nil {
-			continue
-		}
-		fk := *nodes[i].tutor_issue_report
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(tutor.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "tutor_issue_report" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
 }
 
 func (irq *IssueReportQuery) sqlCount(ctx context.Context) (int, error) {

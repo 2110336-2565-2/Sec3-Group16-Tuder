@@ -13,11 +13,21 @@ func InsertSchedule(client *ent.Client, ctx context.Context) []*ent.Schedule {
 
 	free_day, busy_day, some_day := GenerateDay()
 
-	var schedule []*ent.Schedule
+	// Create schedules
+	schedule1 := CreateSchedule(client, free_day, busy_day, some_day, free_day, busy_day, some_day, busy_day)
+	schedule2 := CreateSchedule(client, busy_day, some_day, free_day, busy_day, busy_day, free_day, free_day)
+	schedule3 := CreateSchedule(client, free_day, busy_day, free_day, busy_day, free_day, busy_day, free_day)
+	schedule4 := CreateSchedule(client, some_day, some_day, busy_day, free_day, busy_day, free_day, free_day)
 
-	schedule = append(schedule, CreateSchedule(client, ctx, free_day, busy_day, some_day, free_day, busy_day, some_day, busy_day))
+	schedule, err := client.Schedule.CreateBulk(schedule1, schedule2, schedule3, schedule4).Save(ctx)
 
-	schedule = append(schedule, CreateSchedule(client, ctx, busy_day, some_day, free_day, busy_day, busy_day, free_day, free_day))
+	if err != nil {
+		log.Fatalf("failed creating schedule: %v", err)
+	}
+
+	for _, s := range schedule {
+		fmt.Println("Schedule created: ", s.ID)
+	}
 
 	return schedule
 
@@ -25,7 +35,6 @@ func InsertSchedule(client *ent.Client, ctx context.Context) []*ent.Schedule {
 
 func CreateSchedule(
 	client *ent.Client,
-	ctx context.Context,
 	d0 [24]bool,
 	d1 [24]bool,
 	d2 [24]bool,
@@ -33,26 +42,19 @@ func CreateSchedule(
 	d4 [24]bool,
 	d5 [24]bool,
 	d6 [24]bool,
-) *ent.Schedule {
+) *ent.ScheduleCreate {
 
-	scheduleId := uuid.New()
+	sId := uuid.New()
 
-	schedule, err := client.Schedule.Create().
-		SetID(scheduleId).
+	schedule := client.Schedule.Create().
+		SetID(sId).
 		SetDay0(d0).
 		SetDay1(d1).
 		SetDay2(d2).
 		SetDay3(d3).
 		SetDay4(d4).
 		SetDay5(d5).
-		SetDay6(d6).
-		Save(ctx)
-
-	if err != nil {
-		log.Fatalf("failed creating schedule: %v", err)
-	}
-
-	fmt.Println("Schedule created: ", schedule.ID)
+		SetDay6(d6)
 
 	return schedule
 }
@@ -72,5 +74,4 @@ func GenerateDay() ([24]bool, [24]bool, [24]bool) {
 	}
 
 	return free_day, busy_day, some_day
-
 }

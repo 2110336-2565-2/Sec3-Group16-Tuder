@@ -3,22 +3,19 @@ import Course from '../components/Course';
 import {useQuery} from 'react-query';
 import { fetchCourseHandler } from '../handlers/searchCourseHandler';
 import { useDataContext } from '../pages/Courses';
-
-// import { useEffect , useState} from 'react';
-
+import React from 'react';
 
 
 export default function CourseList(){ 
     const {data, setData} = useDataContext();
 
-    const {initData, isLoading, error} = useQuery(
+    const { isLoading, error} = useQuery(
         'courses',() =>
         {
             fetchCourseHandler().then((res) => {
                 
                 if(res.data.success){
-                    
-                    setData({data:res.data.result});
+                    setData(res.data.result);
                 }
             }).catch((err) => {
                 console.log(err);
@@ -43,7 +40,7 @@ export default function CourseList(){
         return <div>Error</div>
     }
 
-    if(data.data === []){
+    if(data === []){
         return <div>Empty</div>
     }
    
@@ -52,10 +49,10 @@ export default function CourseList(){
         <>
             <CourseListPage>
                 {
-                    data.data.map(item => (  
+                    data.map(item => (  
                             <CourseListcontent key={item.course_id}>
-                        <Course  title={item.title} topic={item.topic} tutor={item.tutor_name} subject={item.subject} time={item.estimate_time} price={item.price_per_hour} img={item.course_picture_url}/>       
-                    </CourseListcontent>
+                                <Course  title={item.title} topic={item.topic} tutor={item.tutor_name} subject={item.subject} time={item.estimate_time} price={item.price_per_hour} img={item.course_picture_url}/>       
+                            </CourseListcontent>
                     ))
                 }
             </CourseListPage>

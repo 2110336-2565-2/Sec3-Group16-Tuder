@@ -29,28 +29,26 @@ const (
 	FieldLevel = "level"
 	// FieldCoursePictureURL holds the string denoting the course_picture_url field in the database.
 	FieldCoursePictureURL = "course_picture_url"
-	// EdgeReviewCourse holds the string denoting the review_course edge name in mutations.
-	EdgeReviewCourse = "review_course"
-	// EdgeClass holds the string denoting the class edge name in mutations.
-	EdgeClass = "class"
+	// EdgeReview holds the string denoting the review edge name in mutations.
+	EdgeReview = "review"
+	// EdgeMatch holds the string denoting the match edge name in mutations.
+	EdgeMatch = "match"
 	// EdgeTutor holds the string denoting the tutor edge name in mutations.
 	EdgeTutor = "tutor"
 	// Table holds the table name of the course in the database.
 	Table = "courses"
-	// ReviewCourseTable is the table that holds the review_course relation/edge.
-	ReviewCourseTable = "review_courses"
-	// ReviewCourseInverseTable is the table name for the ReviewCourse entity.
-	// It exists in this package in order to avoid circular dependency with the "reviewcourse" package.
-	ReviewCourseInverseTable = "review_courses"
-	// ReviewCourseColumn is the table column denoting the review_course relation/edge.
-	ReviewCourseColumn = "course_review_course"
-	// ClassTable is the table that holds the class relation/edge.
-	ClassTable = "classes"
-	// ClassInverseTable is the table name for the Class entity.
-	// It exists in this package in order to avoid circular dependency with the "class" package.
-	ClassInverseTable = "classes"
-	// ClassColumn is the table column denoting the class relation/edge.
-	ClassColumn = "course_class"
+	// ReviewTable is the table that holds the review relation/edge. The primary key declared below.
+	ReviewTable = "course_review"
+	// ReviewInverseTable is the table name for the Review entity.
+	// It exists in this package in order to avoid circular dependency with the "review" package.
+	ReviewInverseTable = "reviews"
+	// MatchTable is the table that holds the match relation/edge.
+	MatchTable = "matches"
+	// MatchInverseTable is the table name for the Match entity.
+	// It exists in this package in order to avoid circular dependency with the "match" package.
+	MatchInverseTable = "matches"
+	// MatchColumn is the table column denoting the match relation/edge.
+	MatchColumn = "course_match"
 	// TutorTable is the table that holds the tutor relation/edge.
 	TutorTable = "courses"
 	// TutorInverseTable is the table name for the Tutor entity.
@@ -78,6 +76,12 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"tutor_course",
 }
+
+var (
+	// ReviewPrimaryKey and ReviewColumn2 are the table columns denoting the
+	// primary key for the review relation (M2M).
+	ReviewPrimaryKey = []string{"course_id", "review_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {

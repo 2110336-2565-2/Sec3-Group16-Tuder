@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/google/uuid"
@@ -78,34 +78,42 @@ func (sc *ScheduleCreate) SetNillableID(u *uuid.UUID) *ScheduleCreate {
 	return sc
 }
 
-// AddTutorIDs adds the "tutor" edge to the Tutor entity by IDs.
-func (sc *ScheduleCreate) AddTutorIDs(ids ...uuid.UUID) *ScheduleCreate {
-	sc.mutation.AddTutorIDs(ids...)
+// SetTutorID sets the "tutor" edge to the Tutor entity by ID.
+func (sc *ScheduleCreate) SetTutorID(id uuid.UUID) *ScheduleCreate {
+	sc.mutation.SetTutorID(id)
 	return sc
 }
 
-// AddTutor adds the "tutor" edges to the Tutor entity.
-func (sc *ScheduleCreate) AddTutor(t ...*Tutor) *ScheduleCreate {
-	ids := make([]uuid.UUID, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+// SetNillableTutorID sets the "tutor" edge to the Tutor entity by ID if the given value is not nil.
+func (sc *ScheduleCreate) SetNillableTutorID(id *uuid.UUID) *ScheduleCreate {
+	if id != nil {
+		sc = sc.SetTutorID(*id)
 	}
-	return sc.AddTutorIDs(ids...)
-}
-
-// AddClasIDs adds the "class" edge to the Class entity by IDs.
-func (sc *ScheduleCreate) AddClasIDs(ids ...uuid.UUID) *ScheduleCreate {
-	sc.mutation.AddClasIDs(ids...)
 	return sc
 }
 
-// AddClass adds the "class" edges to the Class entity.
-func (sc *ScheduleCreate) AddClass(c ...*Class) *ScheduleCreate {
-	ids := make([]uuid.UUID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// SetTutor sets the "tutor" edge to the Tutor entity.
+func (sc *ScheduleCreate) SetTutor(t *Tutor) *ScheduleCreate {
+	return sc.SetTutorID(t.ID)
+}
+
+// SetMatchID sets the "match" edge to the Match entity by ID.
+func (sc *ScheduleCreate) SetMatchID(id uuid.UUID) *ScheduleCreate {
+	sc.mutation.SetMatchID(id)
+	return sc
+}
+
+// SetNillableMatchID sets the "match" edge to the Match entity by ID if the given value is not nil.
+func (sc *ScheduleCreate) SetNillableMatchID(id *uuid.UUID) *ScheduleCreate {
+	if id != nil {
+		sc = sc.SetMatchID(*id)
 	}
-	return sc.AddClasIDs(ids...)
+	return sc
+}
+
+// SetMatch sets the "match" edge to the Match entity.
+func (sc *ScheduleCreate) SetMatch(m *Match) *ScheduleCreate {
+	return sc.SetMatchID(m.ID)
 }
 
 // Mutation returns the ScheduleMutation object of the builder.
@@ -237,7 +245,7 @@ func (sc *ScheduleCreate) createSpec() (*Schedule, *sqlgraph.CreateSpec) {
 	}
 	if nodes := sc.mutation.TutorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   schedule.TutorTable,
 			Columns: []string{schedule.TutorColumn},
@@ -254,17 +262,17 @@ func (sc *ScheduleCreate) createSpec() (*Schedule, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := sc.mutation.ClassIDs(); len(nodes) > 0 {
+	if nodes := sc.mutation.MatchIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   schedule.ClassTable,
-			Columns: []string{schedule.ClassColumn},
+			Table:   schedule.MatchTable,
+			Columns: []string{schedule.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: class.FieldID,
+					Column: match.FieldID,
 				},
 			},
 		}

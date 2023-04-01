@@ -1,13 +1,15 @@
-import { Fragment } from "react";
+import React, { Fragment } from "react";
 import styled from "styled-components"
-import FormSignIn from "../components/FormSignIn.js";
-import Footer from "../components/SignInFooter.js";
+import WaveFooter from "../components/global/WaveFooter.js";
+import FormSignIn from "../components/form/FormSignIn.js";
+import { IsGuest } from "../components/IsAuth.js";
 
 export default function SignIn(){
     
 
     return(
-        <Fragment>
+        <Container>
+            <IsGuest>
             <ContainerWithHeight margintop='100px'>
                 <SeperateSection>
                     <ItemGrid justify='center' columngrid='1 / 3'>
@@ -18,13 +20,22 @@ export default function SignIn(){
                     </ItemGrid>
                 </SeperateSection>
             </ContainerWithHeight>
-            <Footer/>
-        </Fragment>
+            <WaveFooter/>
+            </IsGuest>
+        </Container>
     )
 }
 
 
 // styled-components
+const Container = styled.div`
+    width: 100%;
+    height: 92.2vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+`;
 const ImageTudor = styled.img`
     max-width: ${(props) => {
         return props.maxwidth

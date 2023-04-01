@@ -22,26 +22,6 @@ type PaymentHistoryCreate struct {
 	hooks    []Hook
 }
 
-// SetAmount sets the "amount" field.
-func (phc *PaymentHistoryCreate) SetAmount(f float64) *PaymentHistoryCreate {
-	phc.mutation.SetAmount(f)
-	return phc
-}
-
-// SetNillableAmount sets the "amount" field if the given value is not nil.
-func (phc *PaymentHistoryCreate) SetNillableAmount(f *float64) *PaymentHistoryCreate {
-	if f != nil {
-		phc.SetAmount(*f)
-	}
-	return phc
-}
-
-// SetType sets the "type" field.
-func (phc *PaymentHistoryCreate) SetType(s string) *PaymentHistoryCreate {
-	phc.mutation.SetType(s)
-	return phc
-}
-
 // SetID sets the "id" field.
 func (phc *PaymentHistoryCreate) SetID(u uuid.UUID) *PaymentHistoryCreate {
 	phc.mutation.SetID(u)
@@ -121,19 +101,6 @@ func (phc *PaymentHistoryCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (phc *PaymentHistoryCreate) check() error {
-	if v, ok := phc.mutation.Amount(); ok {
-		if err := paymenthistory.AmountValidator(v); err != nil {
-			return &ValidationError{Name: "amount", err: fmt.Errorf(`ent: validator failed for field "PaymentHistory.amount": %w`, err)}
-		}
-	}
-	if _, ok := phc.mutation.GetType(); !ok {
-		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "PaymentHistory.type"`)}
-	}
-	if v, ok := phc.mutation.GetType(); ok {
-		if err := paymenthistory.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "PaymentHistory.type": %w`, err)}
-		}
-	}
 	if _, ok := phc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "PaymentHistory.user"`)}
 	}
@@ -174,14 +141,6 @@ func (phc *PaymentHistoryCreate) createSpec() (*PaymentHistory, *sqlgraph.Create
 	if id, ok := phc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
-	}
-	if value, ok := phc.mutation.Amount(); ok {
-		_spec.SetField(paymenthistory.FieldAmount, field.TypeFloat64, value)
-		_node.Amount = &value
-	}
-	if value, ok := phc.mutation.GetType(); ok {
-		_spec.SetField(paymenthistory.FieldType, field.TypeString, value)
-		_node.Type = value
 	}
 	if nodes := phc.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

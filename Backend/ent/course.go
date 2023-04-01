@@ -41,10 +41,10 @@ type Course struct {
 
 // CourseEdges holds the relations/edges for other nodes in the graph.
 type CourseEdges struct {
-	// ReviewCourse holds the value of the review_course edge.
-	ReviewCourse []*ReviewCourse `json:"review_course,omitempty"`
-	// Class holds the value of the class edge.
-	Class []*Class `json:"class,omitempty"`
+	// Review holds the value of the review edge.
+	Review []*Review `json:"review,omitempty"`
+	// Match holds the value of the match edge.
+	Match []*Match `json:"match,omitempty"`
 	// Tutor holds the value of the tutor edge.
 	Tutor *Tutor `json:"tutor,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -52,22 +52,22 @@ type CourseEdges struct {
 	loadedTypes [3]bool
 }
 
-// ReviewCourseOrErr returns the ReviewCourse value or an error if the edge
+// ReviewOrErr returns the Review value or an error if the edge
 // was not loaded in eager-loading.
-func (e CourseEdges) ReviewCourseOrErr() ([]*ReviewCourse, error) {
+func (e CourseEdges) ReviewOrErr() ([]*Review, error) {
 	if e.loadedTypes[0] {
-		return e.ReviewCourse, nil
+		return e.Review, nil
 	}
-	return nil, &NotLoadedError{edge: "review_course"}
+	return nil, &NotLoadedError{edge: "review"}
 }
 
-// ClassOrErr returns the Class value or an error if the edge
+// MatchOrErr returns the Match value or an error if the edge
 // was not loaded in eager-loading.
-func (e CourseEdges) ClassOrErr() ([]*Class, error) {
+func (e CourseEdges) MatchOrErr() ([]*Match, error) {
 	if e.loadedTypes[1] {
-		return e.Class, nil
+		return e.Match, nil
 	}
-	return nil, &NotLoadedError{edge: "class"}
+	return nil, &NotLoadedError{edge: "match"}
 }
 
 // TutorOrErr returns the Tutor value or an error if the edge
@@ -178,14 +178,14 @@ func (c *Course) assignValues(columns []string, values []any) error {
 	return nil
 }
 
-// QueryReviewCourse queries the "review_course" edge of the Course entity.
-func (c *Course) QueryReviewCourse() *ReviewCourseQuery {
-	return NewCourseClient(c.config).QueryReviewCourse(c)
+// QueryReview queries the "review" edge of the Course entity.
+func (c *Course) QueryReview() *ReviewQuery {
+	return NewCourseClient(c.config).QueryReview(c)
 }
 
-// QueryClass queries the "class" edge of the Course entity.
-func (c *Course) QueryClass() *ClassQuery {
-	return NewCourseClient(c.config).QueryClass(c)
+// QueryMatch queries the "match" edge of the Course entity.
+func (c *Course) QueryMatch() *MatchQuery {
+	return NewCourseClient(c.config).QueryMatch(c)
 }
 
 // QueryTutor queries the "tutor" edge of the Course entity.

@@ -9,9 +9,9 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/reviewcourse"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/review"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/google/uuid"
 )
@@ -101,34 +101,34 @@ func (cc *CourseCreate) SetNillableID(u *uuid.UUID) *CourseCreate {
 	return cc
 }
 
-// AddReviewCourseIDs adds the "review_course" edge to the ReviewCourse entity by IDs.
-func (cc *CourseCreate) AddReviewCourseIDs(ids ...int) *CourseCreate {
-	cc.mutation.AddReviewCourseIDs(ids...)
+// AddReviewIDs adds the "review" edge to the Review entity by IDs.
+func (cc *CourseCreate) AddReviewIDs(ids ...int) *CourseCreate {
+	cc.mutation.AddReviewIDs(ids...)
 	return cc
 }
 
-// AddReviewCourse adds the "review_course" edges to the ReviewCourse entity.
-func (cc *CourseCreate) AddReviewCourse(r ...*ReviewCourse) *CourseCreate {
+// AddReview adds the "review" edges to the Review entity.
+func (cc *CourseCreate) AddReview(r ...*Review) *CourseCreate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return cc.AddReviewCourseIDs(ids...)
+	return cc.AddReviewIDs(ids...)
 }
 
-// AddClasIDs adds the "class" edge to the Class entity by IDs.
-func (cc *CourseCreate) AddClasIDs(ids ...uuid.UUID) *CourseCreate {
-	cc.mutation.AddClasIDs(ids...)
+// AddMatchIDs adds the "match" edge to the Match entity by IDs.
+func (cc *CourseCreate) AddMatchIDs(ids ...uuid.UUID) *CourseCreate {
+	cc.mutation.AddMatchIDs(ids...)
 	return cc
 }
 
-// AddClass adds the "class" edges to the Class entity.
-func (cc *CourseCreate) AddClass(c ...*Class) *CourseCreate {
-	ids := make([]uuid.UUID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// AddMatch adds the "match" edges to the Match entity.
+func (cc *CourseCreate) AddMatch(m ...*Match) *CourseCreate {
+	ids := make([]uuid.UUID, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
 	}
-	return cc.AddClasIDs(ids...)
+	return cc.AddMatchIDs(ids...)
 }
 
 // SetTutorID sets the "tutor" edge to the Tutor entity by ID.
@@ -303,17 +303,17 @@ func (cc *CourseCreate) createSpec() (*Course, *sqlgraph.CreateSpec) {
 		_spec.SetField(course.FieldCoursePictureURL, field.TypeString, value)
 		_node.CoursePictureURL = &value
 	}
-	if nodes := cc.mutation.ReviewCourseIDs(); len(nodes) > 0 {
+	if nodes := cc.mutation.ReviewIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   course.ReviewCourseTable,
-			Columns: []string{course.ReviewCourseColumn},
+			Table:   course.ReviewTable,
+			Columns: course.ReviewPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: reviewcourse.FieldID,
+					Column: review.FieldID,
 				},
 			},
 		}
@@ -322,17 +322,17 @@ func (cc *CourseCreate) createSpec() (*Course, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cc.mutation.ClassIDs(); len(nodes) > 0 {
+	if nodes := cc.mutation.MatchIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   course.ClassTable,
-			Columns: []string{course.ClassColumn},
+			Table:   course.MatchTable,
+			Columns: []string{course.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: class.FieldID,
+					Column: match.FieldID,
 				},
 			},
 		}

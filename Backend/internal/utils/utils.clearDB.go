@@ -1,61 +1,38 @@
 package utils
 
 import (
-	"context"
+	"database/sql"
 	"fmt"
 	"log"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
-	
+	"os"
 )
 
-func ClearDB(client *ent.Client, ctx context.Context) {
-	
-	// Clear all data in the database.
-	
-	if _, err := client.Course.Delete().Exec(ctx); err!= nil{
-		log.Fatalf("failed clearing course: %v", err)
-	}
+func NukeDB() {
+	/*
+		This function will NUKE the Database (specified in .env) and every table in it
+	*/
+	// retrieving vars from .env
+	host := os.Getenv("SERVER_HOST")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	dbname := os.Getenv("DB_NAME")
+	dbport := os.Getenv("DB_PORT")
 
-	if _, err := client.Tutor.Delete().Exec(ctx); err!= nil{
-		log.Fatalf("failed clearing tutor: %v", err)
+	// create a connection string
+	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=disable\n",
+		user, password, dbname, host, dbport)
+	// roughly connect to postgres
+	db, err := sql.Open("postgres",
+		connStr)
+	if err != nil {
+		log.Fatal(err)
 	}
-	
-	if _, err := client.Schedule.Delete().Exec(ctx); err!= nil{
-		log.Fatalf("failed clearing schedule: %v", err)
+	defer db.Close()
+
+	// exec drop schema query
+	_, err = db.Exec("DO $$ \nDECLARE \n  tabname RECORD; \nBEGIN \n  FOR tabname IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP \n    EXECUTE 'DROP TABLE IF EXISTS \"' || tabname.tablename || '\" CASCADE'; \n  END LOOP; \nEND $$;")
+	if err != nil {
+		log.Fatalf("failed executing NUKE query\n %v", err)
 	}
-
-	if _, err :=client.Student.Delete().Exec(ctx); err!= nil{
-		log.Fatalf("failed clearing student: %v", err)
-	}
-
-	if _, err := client.User.Delete().Exec(ctx); err!= nil{
-		log.Fatalf("failed clearing user: %v", err)
-	}
-
-	if _, err := client.IssueReport.Delete().Exec(ctx); err!= nil{
-		log.Fatalf("failed clearing issue report: %v", err)
-	}
-
-	if _, err := client.Payment.Delete().Exec(ctx); err!= nil{
-		log.Fatalf("failed clearing payment: %v", err)
-	}
-
-	if _, err := client.PaymentHistory.Delete().Exec(ctx); err!= nil{
-		log.Fatalf("failed clearing payment history: %v", err)
-	}
-
-	if _, err := client.ReviewCourse.Delete().Exec(ctx); err!= nil{
-		log.Fatalf("failed clearing review course: %v", err)
-	}
-
-	if _, err := client.ReviewTutor.Delete().Exec(ctx); err!= nil{
-		log.Fatalf("failed clearing review tutor: %v", err)
-	}
-
-
-	if _, err := client.Class.Delete().Exec(ctx); err!= nil{
-		log.Fatalf("failed clearing class: %v", err)
-	}
-
-	fmt.Print("\n\t::::::::: Database cleared! :::::::::\n")
+	fmt.Println("======= public schema is NUKED =======")
 }

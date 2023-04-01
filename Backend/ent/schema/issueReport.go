@@ -2,7 +2,6 @@ package schema
 
 import (
 	"entgo.io/ent"
-	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 
 	"github.com/google/uuid"
@@ -21,20 +20,8 @@ func (IssueReport) Fields() []ent.Field {
 		// field.String("user_id").NotEmpty().Unique(),
 		field.String("title").NotEmpty(),
 		field.String("description").NotEmpty(),
+		field.String("contact").Default("No contact"),
 		field.Time("report_date"),
-		field.String("status").NotEmpty(),
-	}
-}
-
-func (IssueReport) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.From("student", Student.Type).
-			Ref("issue_report").
-			Unique().
-			Required(),
-		edge.From("tutor", Tutor.Type).
-			Ref("issue_report").
-			Unique().
-			Required(),
+		field.Enum("status").Values("ongoing", "completed", "rejected").Default("ongoing"),
 	}
 }

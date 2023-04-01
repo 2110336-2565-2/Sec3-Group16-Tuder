@@ -1,12 +1,16 @@
+import React from "react";
 import styled from "styled-components"
-import FormForgetPassword from '../components/FormForgetPassword.js'
+import FormForgetPassword from '../components/form/FormForgetPassword.js'
+import { IsGuest } from "../components/IsAuth.js";
 
 export default function ForgetPassword(){
 
     return(
-        <ContainerWithHeight margintop='100px'>
-            <FormForgetPassword />
-        </ContainerWithHeight>
+        <IsGuest>
+            <ContainerWithHeight margintop='100px'>
+                <FormForgetPassword />
+            </ContainerWithHeight>
+        </IsGuest>
     )
 }
 

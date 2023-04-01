@@ -30,39 +30,6 @@ func (phu *PaymentHistoryUpdate) Where(ps ...predicate.PaymentHistory) *PaymentH
 	return phu
 }
 
-// SetAmount sets the "amount" field.
-func (phu *PaymentHistoryUpdate) SetAmount(f float64) *PaymentHistoryUpdate {
-	phu.mutation.ResetAmount()
-	phu.mutation.SetAmount(f)
-	return phu
-}
-
-// SetNillableAmount sets the "amount" field if the given value is not nil.
-func (phu *PaymentHistoryUpdate) SetNillableAmount(f *float64) *PaymentHistoryUpdate {
-	if f != nil {
-		phu.SetAmount(*f)
-	}
-	return phu
-}
-
-// AddAmount adds f to the "amount" field.
-func (phu *PaymentHistoryUpdate) AddAmount(f float64) *PaymentHistoryUpdate {
-	phu.mutation.AddAmount(f)
-	return phu
-}
-
-// ClearAmount clears the value of the "amount" field.
-func (phu *PaymentHistoryUpdate) ClearAmount() *PaymentHistoryUpdate {
-	phu.mutation.ClearAmount()
-	return phu
-}
-
-// SetType sets the "type" field.
-func (phu *PaymentHistoryUpdate) SetType(s string) *PaymentHistoryUpdate {
-	phu.mutation.SetType(s)
-	return phu
-}
-
 // SetUserID sets the "user" edge to the User entity by ID.
 func (phu *PaymentHistoryUpdate) SetUserID(id uuid.UUID) *PaymentHistoryUpdate {
 	phu.mutation.SetUserID(id)
@@ -131,16 +98,6 @@ func (phu *PaymentHistoryUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (phu *PaymentHistoryUpdate) check() error {
-	if v, ok := phu.mutation.Amount(); ok {
-		if err := paymenthistory.AmountValidator(v); err != nil {
-			return &ValidationError{Name: "amount", err: fmt.Errorf(`ent: validator failed for field "PaymentHistory.amount": %w`, err)}
-		}
-	}
-	if v, ok := phu.mutation.GetType(); ok {
-		if err := paymenthistory.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "PaymentHistory.type": %w`, err)}
-		}
-	}
 	if _, ok := phu.mutation.UserID(); phu.mutation.UserCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "PaymentHistory.user"`)
 	}
@@ -161,18 +118,6 @@ func (phu *PaymentHistoryUpdate) sqlSave(ctx context.Context) (n int, err error)
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := phu.mutation.Amount(); ok {
-		_spec.SetField(paymenthistory.FieldAmount, field.TypeFloat64, value)
-	}
-	if value, ok := phu.mutation.AddedAmount(); ok {
-		_spec.AddField(paymenthistory.FieldAmount, field.TypeFloat64, value)
-	}
-	if phu.mutation.AmountCleared() {
-		_spec.ClearField(paymenthistory.FieldAmount, field.TypeFloat64)
-	}
-	if value, ok := phu.mutation.GetType(); ok {
-		_spec.SetField(paymenthistory.FieldType, field.TypeString, value)
 	}
 	if phu.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -264,39 +209,6 @@ type PaymentHistoryUpdateOne struct {
 	mutation *PaymentHistoryMutation
 }
 
-// SetAmount sets the "amount" field.
-func (phuo *PaymentHistoryUpdateOne) SetAmount(f float64) *PaymentHistoryUpdateOne {
-	phuo.mutation.ResetAmount()
-	phuo.mutation.SetAmount(f)
-	return phuo
-}
-
-// SetNillableAmount sets the "amount" field if the given value is not nil.
-func (phuo *PaymentHistoryUpdateOne) SetNillableAmount(f *float64) *PaymentHistoryUpdateOne {
-	if f != nil {
-		phuo.SetAmount(*f)
-	}
-	return phuo
-}
-
-// AddAmount adds f to the "amount" field.
-func (phuo *PaymentHistoryUpdateOne) AddAmount(f float64) *PaymentHistoryUpdateOne {
-	phuo.mutation.AddAmount(f)
-	return phuo
-}
-
-// ClearAmount clears the value of the "amount" field.
-func (phuo *PaymentHistoryUpdateOne) ClearAmount() *PaymentHistoryUpdateOne {
-	phuo.mutation.ClearAmount()
-	return phuo
-}
-
-// SetType sets the "type" field.
-func (phuo *PaymentHistoryUpdateOne) SetType(s string) *PaymentHistoryUpdateOne {
-	phuo.mutation.SetType(s)
-	return phuo
-}
-
 // SetUserID sets the "user" edge to the User entity by ID.
 func (phuo *PaymentHistoryUpdateOne) SetUserID(id uuid.UUID) *PaymentHistoryUpdateOne {
 	phuo.mutation.SetUserID(id)
@@ -378,16 +290,6 @@ func (phuo *PaymentHistoryUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (phuo *PaymentHistoryUpdateOne) check() error {
-	if v, ok := phuo.mutation.Amount(); ok {
-		if err := paymenthistory.AmountValidator(v); err != nil {
-			return &ValidationError{Name: "amount", err: fmt.Errorf(`ent: validator failed for field "PaymentHistory.amount": %w`, err)}
-		}
-	}
-	if v, ok := phuo.mutation.GetType(); ok {
-		if err := paymenthistory.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "PaymentHistory.type": %w`, err)}
-		}
-	}
 	if _, ok := phuo.mutation.UserID(); phuo.mutation.UserCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "PaymentHistory.user"`)
 	}
@@ -425,18 +327,6 @@ func (phuo *PaymentHistoryUpdateOne) sqlSave(ctx context.Context) (_node *Paymen
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := phuo.mutation.Amount(); ok {
-		_spec.SetField(paymenthistory.FieldAmount, field.TypeFloat64, value)
-	}
-	if value, ok := phuo.mutation.AddedAmount(); ok {
-		_spec.AddField(paymenthistory.FieldAmount, field.TypeFloat64, value)
-	}
-	if phuo.mutation.AmountCleared() {
-		_spec.ClearField(paymenthistory.FieldAmount, field.TypeFloat64)
-	}
-	if value, ok := phuo.mutation.GetType(); ok {
-		_spec.SetField(paymenthistory.FieldType, field.TypeString, value)
 	}
 	if phuo.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{

@@ -8,45 +8,55 @@ import (
 )
 
 var (
-	// ClassesColumns holds the columns for the "classes" table.
-	ClassesColumns = []*schema.Column{
+	// AppointmentsColumns holds the columns for the "appointments" table.
+	AppointmentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
-		{Name: "review_avaliable", Type: field.TypeBool, Default: true},
-		{Name: "total_hour", Type: field.TypeTime},
-		{Name: "success_hour", Type: field.TypeTime},
-		{Name: "class_schedule", Type: field.TypeUUID},
-		{Name: "course_class", Type: field.TypeUUID},
-		{Name: "schedule_class", Type: field.TypeUUID, Nullable: true},
-		{Name: "student_class", Type: field.TypeUUID},
+		{Name: "begin_at", Type: field.TypeTime},
+		{Name: "end_at", Type: field.TypeTime},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"ongoing", "completed", "cancelling", "rejected", "cancelled"}},
+		{Name: "appointment_match", Type: field.TypeUUID, Nullable: true},
 	}
-	// ClassesTable holds the schema information for the "classes" table.
-	ClassesTable = &schema.Table{
-		Name:       "classes",
-		Columns:    ClassesColumns,
-		PrimaryKey: []*schema.Column{ClassesColumns[0]},
+	// AppointmentsTable holds the schema information for the "appointments" table.
+	AppointmentsTable = &schema.Table{
+		Name:       "appointments",
+		Columns:    AppointmentsColumns,
+		PrimaryKey: []*schema.Column{AppointmentsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "classes_schedules_schedule",
-				Columns:    []*schema.Column{ClassesColumns[4]},
-				RefColumns: []*schema.Column{SchedulesColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
-				Symbol:     "classes_courses_class",
-				Columns:    []*schema.Column{ClassesColumns[5]},
-				RefColumns: []*schema.Column{CoursesColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
-				Symbol:     "classes_schedules_class",
-				Columns:    []*schema.Column{ClassesColumns[6]},
-				RefColumns: []*schema.Column{SchedulesColumns[0]},
+				Symbol:     "appointments_matches_match",
+				Columns:    []*schema.Column{AppointmentsColumns[4]},
+				RefColumns: []*schema.Column{MatchesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
+		},
+	}
+	// CancelRequestsColumns holds the columns for the "cancel_requests" table.
+	CancelRequestsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "title", Type: field.TypeString},
+		{Name: "report_date", Type: field.TypeTime},
+		{Name: "img_url", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"pending", "approved", "rejected"}},
+		{Name: "cancel_request_match", Type: field.TypeUUID},
+		{Name: "user_cancel_request", Type: field.TypeUUID},
+	}
+	// CancelRequestsTable holds the schema information for the "cancel_requests" table.
+	CancelRequestsTable = &schema.Table{
+		Name:       "cancel_requests",
+		Columns:    CancelRequestsColumns,
+		PrimaryKey: []*schema.Column{CancelRequestsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "classes_students_class",
-				Columns:    []*schema.Column{ClassesColumns[7]},
-				RefColumns: []*schema.Column{StudentsColumns[0]},
+				Symbol:     "cancel_requests_matches_match",
+				Columns:    []*schema.Column{CancelRequestsColumns[6]},
+				RefColumns: []*schema.Column{MatchesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "cancel_requests_users_cancel_request",
+				Columns:    []*schema.Column{CancelRequestsColumns[7]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -83,11 +93,10 @@ var (
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "title", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString},
+		{Name: "contact", Type: field.TypeString, Default: "No contact"},
 		{Name: "report_date", Type: field.TypeTime},
-		{Name: "status", Type: field.TypeString},
-		{Name: "student_issue_report", Type: field.TypeUUID},
-		{Name: "tutor_issue_report", Type: field.TypeUUID},
-		{Name: "user_issue_report", Type: field.TypeUUID, Nullable: true},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"ongoing", "completed", "rejected"}, Default: "ongoing"},
+		{Name: "tutor_issue_report", Type: field.TypeUUID, Nullable: true},
 	}
 	// IssueReportsTable holds the schema information for the "issue_reports" table.
 	IssueReportsTable = &schema.Table{
@@ -96,22 +105,44 @@ var (
 		PrimaryKey: []*schema.Column{IssueReportsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "issue_reports_students_issue_report",
-				Columns:    []*schema.Column{IssueReportsColumns[5]},
-				RefColumns: []*schema.Column{StudentsColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
 				Symbol:     "issue_reports_tutors_issue_report",
 				Columns:    []*schema.Column{IssueReportsColumns[6]},
 				RefColumns: []*schema.Column{TutorsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// MatchesColumns holds the columns for the "matches" table.
+	MatchesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "match_created_at", Type: field.TypeTime},
+		{Name: "course_match", Type: field.TypeUUID},
+		{Name: "schedule_match", Type: field.TypeUUID, Unique: true},
+		{Name: "student_match", Type: field.TypeUUID},
+	}
+	// MatchesTable holds the schema information for the "matches" table.
+	MatchesTable = &schema.Table{
+		Name:       "matches",
+		Columns:    MatchesColumns,
+		PrimaryKey: []*schema.Column{MatchesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "matches_courses_match",
+				Columns:    []*schema.Column{MatchesColumns[2]},
+				RefColumns: []*schema.Column{CoursesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "issue_reports_users_issue_report",
-				Columns:    []*schema.Column{IssueReportsColumns[7]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
+				Symbol:     "matches_schedules_match",
+				Columns:    []*schema.Column{MatchesColumns[3]},
+				RefColumns: []*schema.Column{SchedulesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "matches_students_match",
+				Columns:    []*schema.Column{MatchesColumns[4]},
+				RefColumns: []*schema.Column{StudentsColumns[0]},
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
@@ -138,8 +169,6 @@ var (
 	// PaymentHistoriesColumns holds the columns for the "payment_histories" table.
 	PaymentHistoriesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
-		{Name: "amount", Type: field.TypeFloat64, Nullable: true},
-		{Name: "type", Type: field.TypeString},
 		{Name: "payment_payment_history", Type: field.TypeUUID},
 		{Name: "user_payment_history", Type: field.TypeUUID},
 	}
@@ -151,59 +180,30 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "payment_histories_payments_payment_history",
-				Columns:    []*schema.Column{PaymentHistoriesColumns[3]},
+				Columns:    []*schema.Column{PaymentHistoriesColumns[1]},
 				RefColumns: []*schema.Column{PaymentsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "payment_histories_users_payment_history",
-				Columns:    []*schema.Column{PaymentHistoriesColumns[4]},
+				Columns:    []*schema.Column{PaymentHistoriesColumns[2]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
 	}
-	// ReviewCoursesColumns holds the columns for the "review_courses" table.
-	ReviewCoursesColumns = []*schema.Column{
+	// ReviewsColumns holds the columns for the "reviews" table.
+	ReviewsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "score", Type: field.TypeFloat32, Nullable: true},
 		{Name: "review_msg", Type: field.TypeString, Nullable: true},
-		{Name: "course_review_course", Type: field.TypeUUID},
+		{Name: "review_time_at", Type: field.TypeTime},
 	}
-	// ReviewCoursesTable holds the schema information for the "review_courses" table.
-	ReviewCoursesTable = &schema.Table{
-		Name:       "review_courses",
-		Columns:    ReviewCoursesColumns,
-		PrimaryKey: []*schema.Column{ReviewCoursesColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "review_courses_courses_review_course",
-				Columns:    []*schema.Column{ReviewCoursesColumns[3]},
-				RefColumns: []*schema.Column{CoursesColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-		},
-	}
-	// ReviewTutorsColumns holds the columns for the "review_tutors" table.
-	ReviewTutorsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "score", Type: field.TypeFloat32, Nullable: true},
-		{Name: "review_msg", Type: field.TypeString, Nullable: true},
-		{Name: "tutor_review_tutor", Type: field.TypeUUID},
-	}
-	// ReviewTutorsTable holds the schema information for the "review_tutors" table.
-	ReviewTutorsTable = &schema.Table{
-		Name:       "review_tutors",
-		Columns:    ReviewTutorsColumns,
-		PrimaryKey: []*schema.Column{ReviewTutorsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "review_tutors_tutors_review_tutor",
-				Columns:    []*schema.Column{ReviewTutorsColumns[3]},
-				RefColumns: []*schema.Column{TutorsColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-		},
+	// ReviewsTable holds the schema information for the "reviews" table.
+	ReviewsTable = &schema.Table{
+		Name:       "reviews",
+		Columns:    ReviewsColumns,
+		PrimaryKey: []*schema.Column{ReviewsColumns[0]},
 	}
 	// SchedulesColumns holds the columns for the "schedules" table.
 	SchedulesColumns = []*schema.Column{
@@ -247,7 +247,7 @@ var (
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "omise_bank_token", Type: field.TypeString, Nullable: true},
 		{Name: "citizen_id", Type: field.TypeString, Unique: true},
-		{Name: "schedule_tutor", Type: field.TypeUUID},
+		{Name: "schedule_tutor", Type: field.TypeUUID, Unique: true},
 		{Name: "user_tutor", Type: field.TypeUUID, Unique: true},
 	}
 	// TutorsTable holds the schema information for the "tutors" table.
@@ -283,7 +283,7 @@ var (
 		{Name: "birth_date", Type: field.TypeTime},
 		{Name: "gender", Type: field.TypeString},
 		{Name: "profile_picture_url", Type: field.TypeString, Nullable: true},
-		{Name: "role", Type: field.TypeEnum, Enums: []string{"student", "tutor"}},
+		{Name: "role", Type: field.TypeEnum, Enums: []string{"student", "tutor", "admin"}},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
@@ -298,37 +298,92 @@ var (
 			},
 		},
 	}
+	// CourseReviewColumns holds the columns for the "course_review" table.
+	CourseReviewColumns = []*schema.Column{
+		{Name: "course_id", Type: field.TypeUUID},
+		{Name: "review_id", Type: field.TypeInt},
+	}
+	// CourseReviewTable holds the schema information for the "course_review" table.
+	CourseReviewTable = &schema.Table{
+		Name:       "course_review",
+		Columns:    CourseReviewColumns,
+		PrimaryKey: []*schema.Column{CourseReviewColumns[0], CourseReviewColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "course_review_course_id",
+				Columns:    []*schema.Column{CourseReviewColumns[0]},
+				RefColumns: []*schema.Column{CoursesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "course_review_review_id",
+				Columns:    []*schema.Column{CourseReviewColumns[1]},
+				RefColumns: []*schema.Column{ReviewsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// StudentReviewColumns holds the columns for the "student_review" table.
+	StudentReviewColumns = []*schema.Column{
+		{Name: "student_id", Type: field.TypeUUID},
+		{Name: "review_id", Type: field.TypeInt},
+	}
+	// StudentReviewTable holds the schema information for the "student_review" table.
+	StudentReviewTable = &schema.Table{
+		Name:       "student_review",
+		Columns:    StudentReviewColumns,
+		PrimaryKey: []*schema.Column{StudentReviewColumns[0], StudentReviewColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "student_review_student_id",
+				Columns:    []*schema.Column{StudentReviewColumns[0]},
+				RefColumns: []*schema.Column{StudentsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "student_review_review_id",
+				Columns:    []*schema.Column{StudentReviewColumns[1]},
+				RefColumns: []*schema.Column{ReviewsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		ClassesTable,
+		AppointmentsTable,
+		CancelRequestsTable,
 		CoursesTable,
 		IssueReportsTable,
+		MatchesTable,
 		PaymentsTable,
 		PaymentHistoriesTable,
-		ReviewCoursesTable,
-		ReviewTutorsTable,
+		ReviewsTable,
 		SchedulesTable,
 		StudentsTable,
 		TutorsTable,
 		UsersTable,
+		CourseReviewTable,
+		StudentReviewTable,
 	}
 )
 
 func init() {
-	ClassesTable.ForeignKeys[0].RefTable = SchedulesTable
-	ClassesTable.ForeignKeys[1].RefTable = CoursesTable
-	ClassesTable.ForeignKeys[2].RefTable = SchedulesTable
-	ClassesTable.ForeignKeys[3].RefTable = StudentsTable
+	AppointmentsTable.ForeignKeys[0].RefTable = MatchesTable
+	CancelRequestsTable.ForeignKeys[0].RefTable = MatchesTable
+	CancelRequestsTable.ForeignKeys[1].RefTable = UsersTable
 	CoursesTable.ForeignKeys[0].RefTable = TutorsTable
-	IssueReportsTable.ForeignKeys[0].RefTable = StudentsTable
-	IssueReportsTable.ForeignKeys[1].RefTable = TutorsTable
-	IssueReportsTable.ForeignKeys[2].RefTable = UsersTable
+	IssueReportsTable.ForeignKeys[0].RefTable = TutorsTable
+	MatchesTable.ForeignKeys[0].RefTable = CoursesTable
+	MatchesTable.ForeignKeys[1].RefTable = SchedulesTable
+	MatchesTable.ForeignKeys[2].RefTable = StudentsTable
 	PaymentsTable.ForeignKeys[0].RefTable = UsersTable
 	PaymentHistoriesTable.ForeignKeys[0].RefTable = PaymentsTable
 	PaymentHistoriesTable.ForeignKeys[1].RefTable = UsersTable
-	ReviewCoursesTable.ForeignKeys[0].RefTable = CoursesTable
-	ReviewTutorsTable.ForeignKeys[0].RefTable = TutorsTable
 	StudentsTable.ForeignKeys[0].RefTable = UsersTable
 	TutorsTable.ForeignKeys[0].RefTable = SchedulesTable
 	TutorsTable.ForeignKeys[1].RefTable = UsersTable
+	CourseReviewTable.ForeignKeys[0].RefTable = CoursesTable
+	CourseReviewTable.ForeignKeys[1].RefTable = ReviewsTable
+	StudentReviewTable.ForeignKeys[0].RefTable = StudentsTable
+	StudentReviewTable.ForeignKeys[1].RefTable = ReviewsTable
 }

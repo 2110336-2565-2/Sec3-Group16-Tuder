@@ -11,8 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/issuereport"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/google/uuid"
 )
 
@@ -35,6 +33,20 @@ func (irc *IssueReportCreate) SetDescription(s string) *IssueReportCreate {
 	return irc
 }
 
+// SetContact sets the "contact" field.
+func (irc *IssueReportCreate) SetContact(s string) *IssueReportCreate {
+	irc.mutation.SetContact(s)
+	return irc
+}
+
+// SetNillableContact sets the "contact" field if the given value is not nil.
+func (irc *IssueReportCreate) SetNillableContact(s *string) *IssueReportCreate {
+	if s != nil {
+		irc.SetContact(*s)
+	}
+	return irc
+}
+
 // SetReportDate sets the "report_date" field.
 func (irc *IssueReportCreate) SetReportDate(t time.Time) *IssueReportCreate {
 	irc.mutation.SetReportDate(t)
@@ -42,8 +54,16 @@ func (irc *IssueReportCreate) SetReportDate(t time.Time) *IssueReportCreate {
 }
 
 // SetStatus sets the "status" field.
-func (irc *IssueReportCreate) SetStatus(s string) *IssueReportCreate {
-	irc.mutation.SetStatus(s)
+func (irc *IssueReportCreate) SetStatus(i issuereport.Status) *IssueReportCreate {
+	irc.mutation.SetStatus(i)
+	return irc
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (irc *IssueReportCreate) SetNillableStatus(i *issuereport.Status) *IssueReportCreate {
+	if i != nil {
+		irc.SetStatus(*i)
+	}
 	return irc
 }
 
@@ -59,28 +79,6 @@ func (irc *IssueReportCreate) SetNillableID(u *uuid.UUID) *IssueReportCreate {
 		irc.SetID(*u)
 	}
 	return irc
-}
-
-// SetStudentID sets the "student" edge to the Student entity by ID.
-func (irc *IssueReportCreate) SetStudentID(id uuid.UUID) *IssueReportCreate {
-	irc.mutation.SetStudentID(id)
-	return irc
-}
-
-// SetStudent sets the "student" edge to the Student entity.
-func (irc *IssueReportCreate) SetStudent(s *Student) *IssueReportCreate {
-	return irc.SetStudentID(s.ID)
-}
-
-// SetTutorID sets the "tutor" edge to the Tutor entity by ID.
-func (irc *IssueReportCreate) SetTutorID(id uuid.UUID) *IssueReportCreate {
-	irc.mutation.SetTutorID(id)
-	return irc
-}
-
-// SetTutor sets the "tutor" edge to the Tutor entity.
-func (irc *IssueReportCreate) SetTutor(t *Tutor) *IssueReportCreate {
-	return irc.SetTutorID(t.ID)
 }
 
 // Mutation returns the IssueReportMutation object of the builder.
@@ -118,6 +116,14 @@ func (irc *IssueReportCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (irc *IssueReportCreate) defaults() {
+	if _, ok := irc.mutation.Contact(); !ok {
+		v := issuereport.DefaultContact
+		irc.mutation.SetContact(v)
+	}
+	if _, ok := irc.mutation.Status(); !ok {
+		v := issuereport.DefaultStatus
+		irc.mutation.SetStatus(v)
+	}
 	if _, ok := irc.mutation.ID(); !ok {
 		v := issuereport.DefaultID()
 		irc.mutation.SetID(v)
@@ -142,6 +148,9 @@ func (irc *IssueReportCreate) check() error {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "IssueReport.description": %w`, err)}
 		}
 	}
+	if _, ok := irc.mutation.Contact(); !ok {
+		return &ValidationError{Name: "contact", err: errors.New(`ent: missing required field "IssueReport.contact"`)}
+	}
 	if _, ok := irc.mutation.ReportDate(); !ok {
 		return &ValidationError{Name: "report_date", err: errors.New(`ent: missing required field "IssueReport.report_date"`)}
 	}
@@ -152,12 +161,6 @@ func (irc *IssueReportCreate) check() error {
 		if err := issuereport.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "IssueReport.status": %w`, err)}
 		}
-	}
-	if _, ok := irc.mutation.StudentID(); !ok {
-		return &ValidationError{Name: "student", err: errors.New(`ent: missing required edge "IssueReport.student"`)}
-	}
-	if _, ok := irc.mutation.TutorID(); !ok {
-		return &ValidationError{Name: "tutor", err: errors.New(`ent: missing required edge "IssueReport.tutor"`)}
 	}
 	return nil
 }
@@ -202,53 +205,17 @@ func (irc *IssueReportCreate) createSpec() (*IssueReport, *sqlgraph.CreateSpec) 
 		_spec.SetField(issuereport.FieldDescription, field.TypeString, value)
 		_node.Description = value
 	}
+	if value, ok := irc.mutation.Contact(); ok {
+		_spec.SetField(issuereport.FieldContact, field.TypeString, value)
+		_node.Contact = value
+	}
 	if value, ok := irc.mutation.ReportDate(); ok {
 		_spec.SetField(issuereport.FieldReportDate, field.TypeTime, value)
 		_node.ReportDate = value
 	}
 	if value, ok := irc.mutation.Status(); ok {
-		_spec.SetField(issuereport.FieldStatus, field.TypeString, value)
+		_spec.SetField(issuereport.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
-	}
-	if nodes := irc.mutation.StudentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   issuereport.StudentTable,
-			Columns: []string{issuereport.StudentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: student.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.student_issue_report = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := irc.mutation.TutorIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   issuereport.TutorTable,
-			Columns: []string{issuereport.TutorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: tutor.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.tutor_issue_report = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

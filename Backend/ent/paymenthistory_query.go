@@ -331,18 +331,6 @@ func (phq *PaymentHistoryQuery) WithPayment(opts ...func(*PaymentQuery)) *Paymen
 
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
-//
-// Example:
-//
-//	var v []struct {
-//		Amount float64 `json:"amount,omitempty"`
-//		Count int `json:"count,omitempty"`
-//	}
-//
-//	client.PaymentHistory.Query().
-//		GroupBy(paymenthistory.FieldAmount).
-//		Aggregate(ent.Count()).
-//		Scan(ctx, &v)
 func (phq *PaymentHistoryQuery) GroupBy(field string, fields ...string) *PaymentHistoryGroupBy {
 	phq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &PaymentHistoryGroupBy{build: phq}
@@ -354,16 +342,6 @@ func (phq *PaymentHistoryQuery) GroupBy(field string, fields ...string) *Payment
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
-//
-// Example:
-//
-//	var v []struct {
-//		Amount float64 `json:"amount,omitempty"`
-//	}
-//
-//	client.PaymentHistory.Query().
-//		Select(paymenthistory.FieldAmount).
-//		Scan(ctx, &v)
 func (phq *PaymentHistoryQuery) Select(fields ...string) *PaymentHistorySelect {
 	phq.ctx.Fields = append(phq.ctx.Fields, fields...)
 	sbuild := &PaymentHistorySelect{PaymentHistoryQuery: phq}

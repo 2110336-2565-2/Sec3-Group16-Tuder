@@ -35,39 +35,18 @@ const (
 	FieldProfilePictureURL = "profile_picture_url"
 	// FieldRole holds the string denoting the role field in the database.
 	FieldRole = "role"
-	// EdgeIssueReport holds the string denoting the issue_report edge name in mutations.
-	EdgeIssueReport = "issue_report"
-	// EdgePayment holds the string denoting the payment edge name in mutations.
-	EdgePayment = "payment"
-	// EdgePaymentHistory holds the string denoting the payment_history edge name in mutations.
-	EdgePaymentHistory = "payment_history"
 	// EdgeStudent holds the string denoting the student edge name in mutations.
 	EdgeStudent = "student"
 	// EdgeTutor holds the string denoting the tutor edge name in mutations.
 	EdgeTutor = "tutor"
+	// EdgePayment holds the string denoting the payment edge name in mutations.
+	EdgePayment = "payment"
+	// EdgePaymentHistory holds the string denoting the payment_history edge name in mutations.
+	EdgePaymentHistory = "payment_history"
+	// EdgeCancelRequest holds the string denoting the cancel_request edge name in mutations.
+	EdgeCancelRequest = "cancel_request"
 	// Table holds the table name of the user in the database.
 	Table = "users"
-	// IssueReportTable is the table that holds the issue_report relation/edge.
-	IssueReportTable = "issue_reports"
-	// IssueReportInverseTable is the table name for the IssueReport entity.
-	// It exists in this package in order to avoid circular dependency with the "issuereport" package.
-	IssueReportInverseTable = "issue_reports"
-	// IssueReportColumn is the table column denoting the issue_report relation/edge.
-	IssueReportColumn = "user_issue_report"
-	// PaymentTable is the table that holds the payment relation/edge.
-	PaymentTable = "payments"
-	// PaymentInverseTable is the table name for the Payment entity.
-	// It exists in this package in order to avoid circular dependency with the "payment" package.
-	PaymentInverseTable = "payments"
-	// PaymentColumn is the table column denoting the payment relation/edge.
-	PaymentColumn = "user_payment"
-	// PaymentHistoryTable is the table that holds the payment_history relation/edge.
-	PaymentHistoryTable = "payment_histories"
-	// PaymentHistoryInverseTable is the table name for the PaymentHistory entity.
-	// It exists in this package in order to avoid circular dependency with the "paymenthistory" package.
-	PaymentHistoryInverseTable = "payment_histories"
-	// PaymentHistoryColumn is the table column denoting the payment_history relation/edge.
-	PaymentHistoryColumn = "user_payment_history"
 	// StudentTable is the table that holds the student relation/edge.
 	StudentTable = "students"
 	// StudentInverseTable is the table name for the Student entity.
@@ -82,6 +61,27 @@ const (
 	TutorInverseTable = "tutors"
 	// TutorColumn is the table column denoting the tutor relation/edge.
 	TutorColumn = "user_tutor"
+	// PaymentTable is the table that holds the payment relation/edge.
+	PaymentTable = "payments"
+	// PaymentInverseTable is the table name for the Payment entity.
+	// It exists in this package in order to avoid circular dependency with the "payment" package.
+	PaymentInverseTable = "payments"
+	// PaymentColumn is the table column denoting the payment relation/edge.
+	PaymentColumn = "user_payment"
+	// PaymentHistoryTable is the table that holds the payment_history relation/edge.
+	PaymentHistoryTable = "payment_histories"
+	// PaymentHistoryInverseTable is the table name for the PaymentHistory entity.
+	// It exists in this package in order to avoid circular dependency with the "paymenthistory" package.
+	PaymentHistoryInverseTable = "payment_histories"
+	// PaymentHistoryColumn is the table column denoting the payment_history relation/edge.
+	PaymentHistoryColumn = "user_payment_history"
+	// CancelRequestTable is the table that holds the cancel_request relation/edge.
+	CancelRequestTable = "cancel_requests"
+	// CancelRequestInverseTable is the table name for the CancelRequest entity.
+	// It exists in this package in order to avoid circular dependency with the "cancelrequest" package.
+	CancelRequestInverseTable = "cancel_requests"
+	// CancelRequestColumn is the table column denoting the cancel_request relation/edge.
+	CancelRequestColumn = "user_cancel_request"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -138,6 +138,7 @@ type Role string
 const (
 	RoleStudent Role = "student"
 	RoleTutor   Role = "tutor"
+	RoleAdmin   Role = "admin"
 )
 
 func (r Role) String() string {
@@ -147,7 +148,7 @@ func (r Role) String() string {
 // RoleValidator is a validator for the "role" field enum values. It is called by the builders before save.
 func RoleValidator(r Role) error {
 	switch r {
-	case RoleStudent, RoleTutor:
+	case RoleStudent, RoleTutor, RoleAdmin:
 		return nil
 	default:
 		return fmt.Errorf("user: invalid enum value for role field: %q", r)

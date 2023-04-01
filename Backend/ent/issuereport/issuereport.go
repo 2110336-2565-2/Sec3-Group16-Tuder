@@ -3,6 +3,8 @@
 package issuereport
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 )
 
@@ -15,30 +17,14 @@ const (
 	FieldTitle = "title"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// FieldContact holds the string denoting the contact field in the database.
+	FieldContact = "contact"
 	// FieldReportDate holds the string denoting the report_date field in the database.
 	FieldReportDate = "report_date"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
-	// EdgeStudent holds the string denoting the student edge name in mutations.
-	EdgeStudent = "student"
-	// EdgeTutor holds the string denoting the tutor edge name in mutations.
-	EdgeTutor = "tutor"
 	// Table holds the table name of the issuereport in the database.
 	Table = "issue_reports"
-	// StudentTable is the table that holds the student relation/edge.
-	StudentTable = "issue_reports"
-	// StudentInverseTable is the table name for the Student entity.
-	// It exists in this package in order to avoid circular dependency with the "student" package.
-	StudentInverseTable = "students"
-	// StudentColumn is the table column denoting the student relation/edge.
-	StudentColumn = "student_issue_report"
-	// TutorTable is the table that holds the tutor relation/edge.
-	TutorTable = "issue_reports"
-	// TutorInverseTable is the table name for the Tutor entity.
-	// It exists in this package in order to avoid circular dependency with the "tutor" package.
-	TutorInverseTable = "tutors"
-	// TutorColumn is the table column denoting the tutor relation/edge.
-	TutorColumn = "tutor_issue_report"
 )
 
 // Columns holds all SQL columns for issuereport fields.
@@ -46,6 +32,7 @@ var Columns = []string{
 	FieldID,
 	FieldTitle,
 	FieldDescription,
+	FieldContact,
 	FieldReportDate,
 	FieldStatus,
 }
@@ -53,9 +40,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "issue_reports"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"student_issue_report",
 	"tutor_issue_report",
-	"user_issue_report",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -78,8 +63,35 @@ var (
 	TitleValidator func(string) error
 	// DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	DescriptionValidator func(string) error
-	// StatusValidator is a validator for the "status" field. It is called by the builders before save.
-	StatusValidator func(string) error
+	// DefaultContact holds the default value on creation for the "contact" field.
+	DefaultContact string
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
+
+// Status defines the type for the "status" enum field.
+type Status string
+
+// StatusOngoing is the default value of the Status enum.
+const DefaultStatus = StatusOngoing
+
+// Status values.
+const (
+	StatusOngoing   Status = "ongoing"
+	StatusCompleted Status = "completed"
+	StatusRejected  Status = "rejected"
+)
+
+func (s Status) String() string {
+	return string(s)
+}
+
+// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
+func StatusValidator(s Status) error {
+	switch s {
+	case StatusOngoing, StatusCompleted, StatusRejected:
+		return nil
+	default:
+		return fmt.Errorf("issuereport: invalid enum value for status field: %q", s)
+	}
+}
