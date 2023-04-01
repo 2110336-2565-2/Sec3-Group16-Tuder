@@ -40,6 +40,7 @@ type SchemaUpdateStudent struct {
 	Username          string    `json:"username"` // TODO This must be removed when jwt is completely function
 	Firstname         string    `json:"firstname"`
 	Lastname          string    `json:"lastname"`
+	Email			  string 	`json:"email"`
 	Phone             string    `json:"phone"`
 	Address           string    `json:"address"`
 	ProfilePicture []byte    `json:"new_profile_picture"`
