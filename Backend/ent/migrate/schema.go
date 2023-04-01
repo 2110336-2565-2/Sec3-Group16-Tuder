@@ -195,7 +195,7 @@ var (
 	// ReviewsColumns holds the columns for the "reviews" table.
 	ReviewsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
-		{Name: "score", Type: field.TypeFloat32, Nullable: true},
+		{Name: "score", Type: field.TypeInt8, Nullable: true},
 		{Name: "review_msg", Type: field.TypeString, Nullable: true},
 		{Name: "review_time_at", Type: field.TypeTime},
 	}

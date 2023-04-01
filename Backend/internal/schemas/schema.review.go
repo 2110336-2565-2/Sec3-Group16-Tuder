@@ -7,7 +7,7 @@ import (
 
 type SchemaCreateReview struct {
 	CourseId      uuid.UUID `json:"course_id"`
-	Rating        float32   `json:"rating"`
+	Rating        int       `json:"rating"`
 	ReviewMessage string    `json:"review_message"`
 	StudentId     uuid.UUID `json:"student_id"`
 }

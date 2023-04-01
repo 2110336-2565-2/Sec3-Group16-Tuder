@@ -120,7 +120,7 @@ func init() {
 	// reviewDescScore is the schema descriptor for score field.
 	reviewDescScore := reviewFields[1].Descriptor()
 	// review.ScoreValidator is a validator for the "score" field. It is called by the builders before save.
-	review.ScoreValidator = reviewDescScore.Validators[0].(func(float32) error)
+	review.ScoreValidator = reviewDescScore.Validators[0].(func(int8) error)
 	// reviewDescReviewTimeAt is the schema descriptor for review_time_at field.
 	reviewDescReviewTimeAt := reviewFields[3].Descriptor()
 	// review.DefaultReviewTimeAt holds the default value on creation for the review_time_at field.

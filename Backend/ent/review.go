@@ -18,7 +18,7 @@ type Review struct {
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
 	// Score holds the value of the "score" field.
-	Score *float32 `json:"score,omitempty"`
+	Score *int8 `json:"score,omitempty"`
 	// ReviewMsg holds the value of the "review_msg" field.
 	ReviewMsg *string `json:"review_msg,omitempty"`
 	// ReviewTimeAt holds the value of the "review_time_at" field.
@@ -63,7 +63,7 @@ func (*Review) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case review.FieldScore:
-			values[i] = new(sql.NullFloat64)
+			values[i] = new(sql.NullInt64)
 		case review.FieldReviewMsg:
 			values[i] = new(sql.NullString)
 		case review.FieldReviewTimeAt:
@@ -92,11 +92,11 @@ func (r *Review) assignValues(columns []string, values []any) error {
 				r.ID = *value
 			}
 		case review.FieldScore:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field score", values[i])
 			} else if value.Valid {
-				r.Score = new(float32)
-				*r.Score = float32(value.Float64)
+				r.Score = new(int8)
+				*r.Score = int8(value.Int64)
 			}
 		case review.FieldReviewMsg:
 			if value, ok := values[i].(*sql.NullString); !ok {

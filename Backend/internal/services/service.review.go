@@ -32,7 +32,7 @@ func (s serviceReview) ReviewCourseService(r *schemas.SchemaCreateReview) (*sche
 	}
 	return &schemas.SchemaCreateReviewResponse{
 		CourseId:      r.CourseId,
-		Rating:        *review.Score,
+		Rating:        float32(*review.Score),
 		ReviewMessage: *review.ReviewMsg,
 		ReviewTime:    review.ReviewTimeAt,
 	}, nil

@@ -4428,8 +4428,8 @@ type ReviewMutation struct {
 	op             Op
 	typ            string
 	id             *uuid.UUID
-	score          *float32
-	addscore       *float32
+	score          *int8
+	addscore       *int8
 	review_msg     *string
 	review_time_at *time.Time
 	clearedFields  map[string]struct{}
@@ -4549,13 +4549,13 @@ func (m *ReviewMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 }
 
 // SetScore sets the "score" field.
-func (m *ReviewMutation) SetScore(f float32) {
-	m.score = &f
+func (m *ReviewMutation) SetScore(i int8) {
+	m.score = &i
 	m.addscore = nil
 }
 
 // Score returns the value of the "score" field in the mutation.
-func (m *ReviewMutation) Score() (r float32, exists bool) {
+func (m *ReviewMutation) Score() (r int8, exists bool) {
 	v := m.score
 	if v == nil {
 		return
@@ -4566,7 +4566,7 @@ func (m *ReviewMutation) Score() (r float32, exists bool) {
 // OldScore returns the old "score" field's value of the Review entity.
 // If the Review object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ReviewMutation) OldScore(ctx context.Context) (v *float32, err error) {
+func (m *ReviewMutation) OldScore(ctx context.Context) (v *int8, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldScore is only allowed on UpdateOne operations")
 	}
@@ -4580,17 +4580,17 @@ func (m *ReviewMutation) OldScore(ctx context.Context) (v *float32, err error) {
 	return oldValue.Score, nil
 }
 
-// AddScore adds f to the "score" field.
-func (m *ReviewMutation) AddScore(f float32) {
+// AddScore adds i to the "score" field.
+func (m *ReviewMutation) AddScore(i int8) {
 	if m.addscore != nil {
-		*m.addscore += f
+		*m.addscore += i
 	} else {
-		m.addscore = &f
+		m.addscore = &i
 	}
 }
 
 // AddedScore returns the value that was added to the "score" field in this mutation.
-func (m *ReviewMutation) AddedScore() (r float32, exists bool) {
+func (m *ReviewMutation) AddedScore() (r int8, exists bool) {
 	v := m.addscore
 	if v == nil {
 		return
@@ -4894,7 +4894,7 @@ func (m *ReviewMutation) OldField(ctx context.Context, name string) (ent.Value, 
 func (m *ReviewMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case review.FieldScore:
-		v, ok := value.(float32)
+		v, ok := value.(int8)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -4945,7 +4945,7 @@ func (m *ReviewMutation) AddedField(name string) (ent.Value, bool) {
 func (m *ReviewMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case review.FieldScore:
-		v, ok := value.(float32)
+		v, ok := value.(int8)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

@@ -335,7 +335,7 @@ func (rq *ReviewQuery) WithStudent(opts ...func(*StudentQuery)) *ReviewQuery {
 // Example:
 //
 //	var v []struct {
-//		Score float32 `json:"score,omitempty"`
+//		Score int8 `json:"score,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -358,7 +358,7 @@ func (rq *ReviewQuery) GroupBy(field string, fields ...string) *ReviewGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Score float32 `json:"score,omitempty"`
+//		Score int8 `json:"score,omitempty"`
 //	}
 //
 //	client.Review.Query().

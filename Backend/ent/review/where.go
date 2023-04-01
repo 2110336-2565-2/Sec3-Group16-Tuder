@@ -57,7 +57,7 @@ func IDLTE(id uuid.UUID) predicate.Review {
 }
 
 // Score applies equality check predicate on the "score" field. It's identical to ScoreEQ.
-func Score(v float32) predicate.Review {
+func Score(v int8) predicate.Review {
 	return predicate.Review(sql.FieldEQ(FieldScore, v))
 }
 
@@ -72,42 +72,42 @@ func ReviewTimeAt(v time.Time) predicate.Review {
 }
 
 // ScoreEQ applies the EQ predicate on the "score" field.
-func ScoreEQ(v float32) predicate.Review {
+func ScoreEQ(v int8) predicate.Review {
 	return predicate.Review(sql.FieldEQ(FieldScore, v))
 }
 
 // ScoreNEQ applies the NEQ predicate on the "score" field.
-func ScoreNEQ(v float32) predicate.Review {
+func ScoreNEQ(v int8) predicate.Review {
 	return predicate.Review(sql.FieldNEQ(FieldScore, v))
 }
 
 // ScoreIn applies the In predicate on the "score" field.
-func ScoreIn(vs ...float32) predicate.Review {
+func ScoreIn(vs ...int8) predicate.Review {
 	return predicate.Review(sql.FieldIn(FieldScore, vs...))
 }
 
 // ScoreNotIn applies the NotIn predicate on the "score" field.
-func ScoreNotIn(vs ...float32) predicate.Review {
+func ScoreNotIn(vs ...int8) predicate.Review {
 	return predicate.Review(sql.FieldNotIn(FieldScore, vs...))
 }
 
 // ScoreGT applies the GT predicate on the "score" field.
-func ScoreGT(v float32) predicate.Review {
+func ScoreGT(v int8) predicate.Review {
 	return predicate.Review(sql.FieldGT(FieldScore, v))
 }
 
 // ScoreGTE applies the GTE predicate on the "score" field.
-func ScoreGTE(v float32) predicate.Review {
+func ScoreGTE(v int8) predicate.Review {
 	return predicate.Review(sql.FieldGTE(FieldScore, v))
 }
 
 // ScoreLT applies the LT predicate on the "score" field.
-func ScoreLT(v float32) predicate.Review {
+func ScoreLT(v int8) predicate.Review {
 	return predicate.Review(sql.FieldLT(FieldScore, v))
 }
 
 // ScoreLTE applies the LTE predicate on the "score" field.
-func ScoreLTE(v float32) predicate.Review {
+func ScoreLTE(v int8) predicate.Review {
 	return predicate.Review(sql.FieldLTE(FieldScore, v))
 }
 

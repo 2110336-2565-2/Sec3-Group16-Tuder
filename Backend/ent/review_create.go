@@ -24,15 +24,15 @@ type ReviewCreate struct {
 }
 
 // SetScore sets the "score" field.
-func (rc *ReviewCreate) SetScore(f float32) *ReviewCreate {
-	rc.mutation.SetScore(f)
+func (rc *ReviewCreate) SetScore(i int8) *ReviewCreate {
+	rc.mutation.SetScore(i)
 	return rc
 }
 
 // SetNillableScore sets the "score" field if the given value is not nil.
-func (rc *ReviewCreate) SetNillableScore(f *float32) *ReviewCreate {
-	if f != nil {
-		rc.SetScore(*f)
+func (rc *ReviewCreate) SetNillableScore(i *int8) *ReviewCreate {
+	if i != nil {
+		rc.SetScore(*i)
 	}
 	return rc
 }
@@ -206,7 +206,7 @@ func (rc *ReviewCreate) createSpec() (*Review, *sqlgraph.CreateSpec) {
 		_spec.ID.Value = &id
 	}
 	if value, ok := rc.mutation.Score(); ok {
-		_spec.SetField(review.FieldScore, field.TypeFloat32, value)
+		_spec.SetField(review.FieldScore, field.TypeInt8, value)
 		_node.Score = &value
 	}
 	if value, ok := rc.mutation.ReviewMsg(); ok {
