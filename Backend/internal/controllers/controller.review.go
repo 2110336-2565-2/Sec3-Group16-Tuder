@@ -40,7 +40,7 @@ func (r controllerReview) ReviewCourse(c echo.Context) (err error) {
 		return fmt.Errorf("studentId from jwt token is invalid")
 	}
 
-	review, err := r.reviewService.ReviewCourseService(cR)
+	review, err := r.reviewService.ReviewService(cR)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, schema.SchemaErrorResponse{
 			Success: false,
@@ -53,6 +53,25 @@ func (r controllerReview) ReviewCourse(c echo.Context) (err error) {
 		Success: true,
 		Message: "review submitted successfully",
 		Data:    review,
+	})
+	return nil
+}
+
+func (r controllerReview) GetRating(c echo.Context) (err error) {
+	courseId := c.Param("courseid")
+	sG, err := r.reviewService.GetRating(courseId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, schema.SchemaErrorResponse{
+			Success: false,
+			Message: err.Error(),
+			Error:   err,
+		})
+		return err
+	}
+	c.JSON(http.StatusOK, schema.SchemaResponses{
+		Success: true,
+		Message: "retrieve rating and reviews successfully",
+		Data:    sG,
 	})
 	return nil
 }

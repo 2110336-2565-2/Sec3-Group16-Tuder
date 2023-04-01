@@ -5,6 +5,12 @@ import (
 	"time"
 )
 
+type Review struct {
+	Score        float32   `json:"score"`
+	ReviewMsg    string    `json:"review_msg"`
+	ReviewTimeAt time.Time `json:"review_time_at"`
+}
+
 type SchemaCreateReview struct {
 	CourseId      uuid.UUID `json:"course_id"`
 	Rating        int       `json:"rating"`
@@ -17,4 +23,11 @@ type SchemaCreateReviewResponse struct {
 	Rating        float32   `json:"rating,omitempty"`
 	ReviewMessage string    `json:"review_message,omitempty"`
 	ReviewTime    time.Time `json:"review_time,omitempty"`
+}
+
+type SchemaGetReviewsByCourseIdResponse struct {
+	CourseTitle string   `json:"course_title"`
+	TotalScore  float32  `json:"total_score"`
+	TotalReview int      `json:"total_review"`
+	Reviews     []Review `json:"reviews"`
 }
