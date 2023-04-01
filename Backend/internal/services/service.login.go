@@ -34,14 +34,23 @@ func (s *serviceLogin) LoginService(l *schemas.SchemaLogin) (*schemas.SchemaLogi
 		return nil, errors.New("the password isn't match")
 	}
 
-	customClaims := map[string]interface{}{}
+	// writing claims
+	claims := map[string]interface{}{}
+
+	// adding claims for user
+	claims["username"] = luser.Username
+	claims["userid"] = luser.ID
+	claims["role"] = luser.Role
+
+	// add claims if student
 	if *luser.Role == user.RoleStudent {
-		customClaims["studentid"] = luser.Edges.Student.ID
+		claims["studentid"] = luser.Edges.Student.ID
+		// add claims if tutor
 	} else if *luser.Role == user.RoleTutor {
-		customClaims["tutorid"] = luser.Edges.Tutor.ID
+		claims["tutorid"] = luser.Edges.Tutor.ID
 	}
 
-	token, _ := utils.GenerateLoginToken(luser.Username, luser.ID, luser.Role.String(), true, customClaims)
+	token, _ := utils.GenerateLoginToken(claims, true)
 
 	return &schemas.SchemaLoginResponses{
 		Username: luser.Username,
