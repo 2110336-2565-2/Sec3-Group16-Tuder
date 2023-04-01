@@ -14,6 +14,7 @@ import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
 import Review from './pages/Review';
 import ErrorPage from './pages/ErrorPage';
+import ResetPassword from './pages/ResetPassword';
 import ChangePassword from './pages/ChangePassword';
 import EnterNewPassword from './pages/EnterNewPassword';
 import CancelRequestList from './pages/CancelRequestList';
@@ -63,6 +64,10 @@ const router = createBrowserRouter([
       {
         path: "/review/:id",
         element: <Review />,
+      },
+      {
+        path: "/reset-password/:token",
+        element: <ResetPassword />,
       },
       {
         path: "/change-password",

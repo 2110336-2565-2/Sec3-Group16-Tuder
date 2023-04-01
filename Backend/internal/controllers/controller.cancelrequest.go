@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 
 	schemas "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -86,7 +85,6 @@ func (cC *controllerCancelRequest) CancelRequest(c echo.Context) error {
 
 		return err
 	}
-	fmt.Println(request)
 
 	err := cC.service.CancelRequest(request)
 	if err != nil {

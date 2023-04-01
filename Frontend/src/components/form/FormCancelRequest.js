@@ -38,7 +38,6 @@ export default function UserCancelRequest() {
             img_url: formData.img_url,
             reporter_role: getRole(),
         };
-        console.log(data)
         submitCancelRequestHandler(data).then((res) => {
             if(res.data.success){
                 toast.success('Success');
