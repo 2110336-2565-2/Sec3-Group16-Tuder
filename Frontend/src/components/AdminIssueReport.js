@@ -1,16 +1,77 @@
-import React from "react";
+import React, {useState} from "react";
 import styled from "styled-components";
-import { fetchAdminIssueReportHandler } from "../handlers/AdminIssueReportHandler";
+import { submitSaveStateHandler,submitDeleteStateHandler } from "../handlers/AdminIssueReportHandler";
 import { toast } from "react-hot-toast";
 import { Timezone, DateFormat } from "../datas/DateFormat.js";
 
 export default function AdminIssueReport(props) {
-  const handlePrevStage = (e) => {};
-  const handleNextStage = (e) => {};
-  const handleSave = (e) => {};
-  const handleDelete= (e) => {};
+    const [statusState, setStatusState] = useState(
+        statusState = props.status
+    );
+
+  const handlePrevState = (e) => {
+    if(statusState == "ongoing" ){
+        setStatusState("complete")
+    }else if(statusState == "complete"){
+        setStatusState("reject")
+    }else if(statusState == "reject"){
+        setStatusState("ongoing")
+    }else{
+        setStatusState("ongoing")
+    }
+  };
+  const handleNextState = (e) => {
+    if(statusState == "ongoing" ){
+        setStatusState("reject")
+    }else if(statusState == "reject"){
+        setStatusState("complete")
+    }else if(statusState == "complete"){
+        setStatusState("ongoing")
+    }else{
+        setStatusState("ongoing")
+    }
+  };
+
+  const handleSave = (e) => {
+    {
+      const data = {
+        IssueReportId: props.issuereport_id,
+        status: statusState,
+      };
+      submitSaveStateHandler(data)
+        .then((res) => {
+          if (res.data.success) {
+            toast.success("Success");
+          } else {
+            toast.error("Error");
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  };
+
+  const handleDelete = (e) => {
+    {
+      const data = {
+        IssueReportId: props.issuereport_id,
+      };
+      submitDeleteStateHandler(data)
+        .then((res) => {
+          if (res.data.success) {
+            toast.success("Success");
+          } else {
+            toast.error("Error");
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  };;
   return (
-    <Request status={props.status}>
+    <Request status={statusState}>
       <ClassSection>
         <ClassInfoSection>
           <ClassInfo>
@@ -35,19 +96,19 @@ export default function AdminIssueReport(props) {
           </ClassInfo>
         </ClassInfoSection>
 
-        <StageSection>
-          <PrevStageButton value="false" onClick={handlePrevStage}>
+        <StateSection>
+          <PrevStateButton value="false" onClick={handlePrevState}>
             Prev
-          </PrevStageButton>
-          <StageInfo>
+          </PrevStateButton>
+          <StateInfo>
             <InfoTitle>Status:</InfoTitle>
             &nbsp;
-            {props.status}
-          </StageInfo>
-          <NextStageButton value="true" onClick={handleNextStage}>
+            {statusState}
+          </StateInfo>
+          <NextStateButton value="true" onClick={handleNextState}>
             Next
-          </NextStageButton>
-        </StageSection>
+          </NextStateButton>
+        </StateSection>
 
         <ButtonSection>
           <SaveButton value="false" onClick={handleSave}>
@@ -121,7 +182,7 @@ const ClassInfoSection = styled.div`
   margin-left: 10px;
 `;
 
-const StageSection = styled.div`
+const StateSection = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: left;
@@ -149,7 +210,7 @@ const ClassInfo = styled.div`
   margin-top: -2.5%;
   margin-bottom: -2.5%;
 `;
-const StageInfo = styled.div`
+const StateInfo = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: left;
@@ -164,31 +225,31 @@ const InfoTitle = styled.div`
   font-size: 10px;
   font-weight: bold;
 `;
-const PrevStageButton = styled.button`
-width: 100px;
-height: 50px;
-border: 2px solid #ff7008;
-border-radius: 5px;
+const PrevStateButton = styled.button`
+  width: 100px;
+  height: 50px;
+  border: 2px solid #ff7008;
+  border-radius: 5px;
 
-font-family: "Lexend Deca";
-font-style: normal;
-font-weight: 500;
-font-size: 16px;
-line-height: 20px;
-text-align: center;
-color: #ffffff;
-background-color: #ff7008;
-
-&:hover {
-  background-color: #ff8009;
-  border: 2px solid #ff8008;
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 20px;
+  text-align: center;
   color: #ffffff;
-}
+  background-color: #ff7008;
 
-cursor: pointer;
+  &:hover {
+    background-color: #ff8009;
+    border: 2px solid #ff8008;
+    color: #ffffff;
+  }
+
+  cursor: pointer;
 `;
 
-const NextStageButton = styled.button`
+const NextStateButton = styled.button`
   width: 100px;
   height: 50px;
   border: 2px solid #ff7008;
@@ -237,7 +298,7 @@ const SaveButton = styled.button`
 const DeleteButton = styled.button`
   width: 100px;
   height: 50px;
-  border: 2px solid #B22222;
+  border: 2px solid #b22222;
   border-radius: 5px;
 
   font-family: "Lexend Deca";
@@ -247,12 +308,11 @@ const DeleteButton = styled.button`
   line-height: 20px;
   text-align: center;
   color: #ffffff;
-  background-color: #B22222;
- 
+  background-color: #b22222;
 
   &:hover {
-    background-color: #DC143C;
-    border: 2px solid #DC143C;
+    background-color: #dc143c;
+    border: 2px solid #dc143c;
     color: #ffffff;
   }
 

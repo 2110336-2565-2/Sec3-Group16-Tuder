@@ -6,6 +6,7 @@ import AdminIssueReport from "../components/AdminIssueReport";
 import React from "react";
 
 export default function AdminIssueReportList() {
+  
   const { data, setData } = useDataContext();
 
   const { isLoading, error } = useQuery(
@@ -15,8 +16,7 @@ export default function AdminIssueReportList() {
         .then((res) => {
           console.log(res.data.result);
           if (res.data.success) {
-            if (res.data.data !== null) setData(res.data.result);
-            console.log(555);
+            if (res.data.result !== null) setData(res.data.result);
           }
         })
         .catch((err) => {
@@ -53,6 +53,7 @@ export default function AdminIssueReportList() {
             <div key={item.issuereport_id}>
               <AdminIssueReport
                 key={item.issuereport_id}
+                issuereport_id={item.issuereport_id}
                 title={item.title}
                 description={item.description}
                 contact={item.contact}
