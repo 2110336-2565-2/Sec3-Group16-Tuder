@@ -193,7 +193,7 @@ export default function TimeSelector({
               />
             </FormP.InputComponent>
           </AddFormWrapper>
-          <Button onClick={handleAddOnClick}>Add</Button>
+          <Button onClick={handleAddOnClick} type="button" >Add</Button>
         </AddMenu>
       </Container>
     </FormP.InputComponent>
