@@ -8,49 +8,52 @@ export default function AdminIssueReport(props) {
     const [statusState, setStatusState] = useState(
         statusState = props.status
     );
-
+    const handleSave = (e) => {
+        {
+          const data = {
+            IssueReportId: props.issuereport_id,
+            status: statusState,
+          };
+          submitSaveStateHandler(data)
+            .then((res) => {
+              if (res.data.success) {
+                toast.success("Success");
+              } else {
+                toast.error("Error");
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
+      };
   const handlePrevState = (e) => {
     if(statusState == "ongoing" ){
-        setStatusState("complete")
-    }else if(statusState == "complete"){
-        setStatusState("reject")
-    }else if(statusState == "reject"){
+        setStatusState("rejected")
+    }else if(statusState == "rejected"){
+        setStatusState("completed")
+    }else if(statusState == "completed"){
         setStatusState("ongoing")
     }else{
         setStatusState("ongoing")
     }
+    handleSave()
   };
   const handleNextState = (e) => {
+    
     if(statusState == "ongoing" ){
-        setStatusState("reject")
-    }else if(statusState == "reject"){
-        setStatusState("complete")
-    }else if(statusState == "complete"){
+        setStatusState("completed")
+    }else if(statusState == "completed"){
+        setStatusState("rejected")
+    }else if(statusState == "rejected"){
         setStatusState("ongoing")
     }else{
         setStatusState("ongoing")
     }
+    handleSave()
   };
 
-  const handleSave = (e) => {
-    {
-      const data = {
-        IssueReportId: props.issuereport_id,
-        status: statusState,
-      };
-      submitSaveStateHandler(data)
-        .then((res) => {
-          if (res.data.success) {
-            toast.success("Success");
-          } else {
-            toast.error("Error");
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  };
+
 
   const handleDelete = (e) => {
     {
@@ -68,8 +71,9 @@ export default function AdminIssueReport(props) {
         .catch((err) => {
           console.log(err);
         });
+        props.onDelete(props.issuereport_id);
     }
-  };;
+  };
   return (
     <Request status={statusState}>
       <ClassSection>
@@ -105,17 +109,13 @@ export default function AdminIssueReport(props) {
             &nbsp;
             {statusState}
           </StateInfo>
-          <NextStateButton value="true" onClick={handleNextState}>
+          <NextStateButton value="false" onClick={handleNextState}>
             Next
           </NextStateButton>
         </StateSection>
 
         <ButtonSection>
-          <SaveButton value="false" onClick={handleSave}>
-            Save
-          </SaveButton>
-
-          <DeleteButton value="true" onClick={handleDelete}>
+          <DeleteButton disabled={statusState!="ongoing" ? false:true} value="false" onClick={handleDelete}>
             Delete
           </DeleteButton>
         </ButtonSection>
@@ -272,29 +272,7 @@ const NextStateButton = styled.button`
 
   cursor: pointer;
 `;
-const SaveButton = styled.button`
-  width: 100px;
-  height: 50px;
-  border: 2px solid #808000;
-  border-radius: 5px;
 
-  font-family: "Lexend Deca";
-  font-style: normal;
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 20px;
-  text-align: center;
-  color: #ffffff;
-  background-color: #808000;
-
-  &:hover {
-    background-color: #008000;
-    border: 2px solid #008000;
-    color: #ffffff;
-  }
-
-  cursor: pointer;
-`;
 const DeleteButton = styled.button`
   width: 100px;
   height: 50px;

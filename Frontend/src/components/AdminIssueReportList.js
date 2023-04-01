@@ -3,12 +3,21 @@ import { useQuery } from "react-query";
 import { fetchAdminIssueReportHandler } from "../handlers/AdminIssueReportHandler";
 import { useDataContext } from "../pages/AdminIssueReportList";
 import AdminIssueReport from "../components/AdminIssueReport";
-import React from "react";
+import React, { useState } from "react";
 
 export default function AdminIssueReportList() {
-  
-  const { data, setData } = useDataContext();
+  //const { data, setData } = useDataContext();
+  const [ item, setItem ] = useState([]);
 
+  function deleteIssue(id) {
+    try {
+      setItem(prevNotes => prevNotes.filter(issueItem => issueItem.issuereport_id  !== id));
+    } catch (error) {
+      console.error("Error deleting issue report:", error);
+      // display error message to user or perform some other error handling
+    }
+    
+  }
   const { isLoading, error } = useQuery(
     "AdminIssueReport",
     () => {
@@ -16,7 +25,7 @@ export default function AdminIssueReportList() {
         .then((res) => {
           console.log(res.data.result);
           if (res.data.success) {
-            if (res.data.result !== null) setData(res.data.result);
+            if (res.data.result !== null) setItem(res.data.result);
           }
         })
         .catch((err) => {
@@ -27,7 +36,6 @@ export default function AdminIssueReportList() {
       refetchOnWindowFocus: false,
     }
   );
-
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -35,33 +43,35 @@ export default function AdminIssueReportList() {
   if (error) {
     return <div>Error: {error.message}</div>;
   }
-  console.log(data);
-  if (data === null) {
+  console.log(item);
+  if (item === null) {
     return <div>Error</div>;
   }
 
-  if (data === []) {
+  if (item === []) {
     return <div>Empty</div>;
   }
+
 
   return (
     <Container>
       <h1>AdminIssueReport Requests</h1>
       <RequestListPage>
         <RequestListcontent>
-          {data.map((item) => (
-            <div key={item.issuereport_id}>
+          {
+              item.map(issueItem => (
               <AdminIssueReport
-                key={item.issuereport_id}
-                issuereport_id={item.issuereport_id}
-                title={item.title}
-                description={item.description}
-                contact={item.contact}
-                report_date={item.report_date}
-                status={item.status}
+                key={issueItem.issuereport_id}
+                issuereport_id={issueItem.issuereport_id}
+                title={issueItem.title}
+                description={issueItem.description}
+                contact={issueItem.contact}
+                report_date={issueItem.report_date}
+                status={issueItem.status}
+                onDelete={deleteIssue}
               />
-            </div>
-          ))}
+          ))
+          }
         </RequestListcontent>
       </RequestListPage>
     </Container>
