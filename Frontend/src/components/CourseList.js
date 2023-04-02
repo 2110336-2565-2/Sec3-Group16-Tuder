@@ -65,11 +65,14 @@ const CourseListPage = styled.div`
     flex-direction: row;
     gap: 20px;
     justify-content: center;
+    align-items: center;
 `
 
 const CourseListcontent = styled.div`
+    width: 300px;
     display: flex;
-    border: 1px solid black;
-    border-radius: 16px;
-    padding: 10px;
+    box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+    padding: 10px 10px 10px 10px;
+    justify-content: center;
 `
