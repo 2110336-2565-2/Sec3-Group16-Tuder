@@ -15,7 +15,7 @@ type ServiceTutor interface {
 	UpdateTutor(tutorUpdate *schemas.SchemaUpdateTutor) (*schemas.SchemaTutor, error)
 	UpdateTutorSchedule(scheduleUpdate *schemas.SchemaUpdateSchedule) (*schemas.SchemaRawSchedule, error)
 	DeleteTutor(tutorDelete *schemas.SchemaDeleteTutor) error
-	GetTutorReviews(tutorGet *schemas.SchemaGetReviews) (*schemas.SchemaGetReviewsByTutorIdResponse, error)
+	GetTutorReviews(tutorGet *schemas.SchemaGetReviews) (*schemas.SchemaGetReviewsResponse, error)
 }
 
 type serviceTutor struct {
@@ -211,7 +211,7 @@ func (s *serviceTutor) GetTutorSchedule(scheduleRequest *schemas.SchemaGetSchedu
 	}, nil
 }
 
-func (s *serviceTutor) GetTutorReviews(reviewRequest *schemas.SchemaGetReviews) (*schemas.SchemaGetReviewsByTutorIdResponse, error) {
+func (s *serviceTutor) GetTutorReviews(reviewRequest *schemas.SchemaGetReviews) (*schemas.SchemaGetReviewsResponse, error) {
 	reviews, err := s.repository.GetReviews(reviewRequest)
 	if err != nil {
 		fmt.Println(err)
@@ -221,19 +221,17 @@ func (s *serviceTutor) GetTutorReviews(reviewRequest *schemas.SchemaGetReviews) 
 	total_score := int8(0)
 	total_review := 0
 
-	groupedReviews := make(map[string][]*schemas.Review)
+	var groupedReviews []*schemas.ReviewResponse
 
 	for _, review := range reviews {
 		courseName := review.Edges.Course[0].Title
-		if _, ok := groupedReviews[courseName]; !ok {
-			groupedReviews[courseName] = make([]*schemas.Review, 0)
-		}
-		review_respone := &schemas.Review{
+		review_respone := &schemas.ReviewResponse{
+			CourseTitle:  courseName,
 			Score:        *review.Score,
 			ReviewMsg:    *review.ReviewMsg,
 			ReviewTimeAt: review.ReviewTimeAt,
 		}
-		groupedReviews[courseName] = append(groupedReviews[courseName], review_respone)
+		groupedReviews = append(groupedReviews, review_respone)
 		total_score += *review.Score
 		total_review += 1
 	}
@@ -247,5 +245,11 @@ func (s *serviceTutor) GetTutorReviews(reviewRequest *schemas.SchemaGetReviews) 
 		TutorReviews: groupedReviews,
 	}
 
-	return schemaGroupedReviews, nil
+	reviewResponse := &schemas.SchemaGetReviewsResponse{
+		Firstname: reviews[0].Edges.Course[0].Edges.Tutor.Edges.User.FirstName,
+		Lastname:  reviews[0].Edges.Course[0].Edges.Tutor.Edges.User.LastName,
+		Reviews:   schemaGroupedReviews,
+	}
+
+	return reviewResponse, nil
 }

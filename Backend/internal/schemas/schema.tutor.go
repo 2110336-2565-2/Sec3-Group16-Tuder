@@ -80,5 +80,11 @@ type SchemaDeleteTutor struct {
 }
 
 type SchemaGetReviews struct {
-	ID uuid.UUID `json:"id"`
+	Username string `json:"username"`
+}
+
+type SchemaGetReviewsResponse struct {
+	Firstname string                             `json:"tutor_firstname"`
+	Lastname  string                             `json:"tutor_lastname"`
+	Reviews   *SchemaGetReviewsByTutorIdResponse `json:"reviews"`
 }

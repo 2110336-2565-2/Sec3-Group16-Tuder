@@ -6,7 +6,6 @@ import (
 
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 	service "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/services"
-	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
@@ -221,9 +220,9 @@ func (cR controllerTutor) GetTutorSchedule(c echo.Context) (err error) {
 }
 
 func (cR controllerTutor) GetTutorReviews(c echo.Context) (err error) {
-	id, _ := uuid.Parse(c.Param("id"))
+	username := c.Param("username")
 	r := &schema.SchemaGetReviews{
-		ID: id,
+		Username: username,
 	}
 	if err = c.Bind(r); err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
