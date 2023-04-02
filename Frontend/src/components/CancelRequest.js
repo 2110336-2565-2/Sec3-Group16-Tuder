@@ -92,7 +92,7 @@ const Request = styled.div`
     gap: 20px;
     padding: 10px;
     cursor: pointer;
-
+    border-radius: 10px;
     &:hover {
         border: 1px solid #000000 ;
         background-color: #EE8E45 ;
@@ -115,6 +115,7 @@ const ClassImg = styled.img`
     min-width: 216px;
     height: 148px;
     margin: auto;
+    border-radius: 10px;
 `;
 
 const ClassInfoSection = styled.div`

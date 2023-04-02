@@ -69,8 +69,7 @@ const Container = styled.div`
     justify-content: center;
     align-items: center;
     padding: 10px;
-    margin-top: 5px;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 `
 
 const RequestListPage = styled.div`

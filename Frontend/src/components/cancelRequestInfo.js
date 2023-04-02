@@ -52,7 +52,7 @@ export default function CancelRequestInfo(props){
 
 
     return (
-        <ContainerWithHeight margintop='100px'>
+        <ContainerWithHeight margintop='25px'>
                     <Title>
                         {props.title}
                     </Title>
