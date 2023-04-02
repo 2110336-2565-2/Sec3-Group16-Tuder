@@ -1,79 +1,88 @@
-import React, {useState} from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { submitSaveStateHandler,submitDeleteStateHandler } from "../handlers/AdminIssueReportHandler";
+import {
+  submitSaveStateHandler,
+  submitDeleteStateHandler,
+} from "../handlers/AdminIssueReportHandler";
 import { toast } from "react-hot-toast";
 import { Timezone, DateFormat } from "../datas/DateFormat.js";
 
 export default function AdminIssueReport(props) {
-    const [statusState, setStatusState] = useState(
-        props.status
-    );
-    const handleSave = (e) => {
-        {
-          const data = {
-            IssueReportId: props.issuereport_id,
-            status: statusState,
-          };
-          submitSaveStateHandler(data)
-            .then((res) => {
-              if (res.data.success) {
-                toast.success("Success");
-              } else {
-                toast.error("Error");
-              }
-            })
-            .catch((err) => {
-              console.log(err);
-            });
+  const [statusState, setStatusState] = useState(props.status);
+
+  const handleSave = () => {
+    const data = {
+      IssueReportId: props.issuereport_id,
+      status: statusState,
+    };
+    console.log(data);
+    submitSaveStateHandler(data)
+      .then((res) => {
+        if (res.data.success) {
+          toast.success("Success");
+        } else {
+          toast.error("Error");
         }
-      };
-  const handlePrevState = (e) => {
-    if(statusState == "ongoing" ){
-        setStatusState("rejected")
-    }else if(statusState == "rejected"){
-        setStatusState("completed")
-    }else if(statusState == "completed"){
-        setStatusState("ongoing")
-    }else{
-        setStatusState("ongoing")
-    }
-    handleSave()
-  };
-  const handleNextState = (e) => {
-    
-    if(statusState == "ongoing" ){
-        setStatusState("completed")
-    }else if(statusState == "completed"){
-        setStatusState("rejected")
-    }else if(statusState == "rejected"){
-        setStatusState("ongoing")
-    }else{
-        setStatusState("ongoing")
-    }
-    handleSave()
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
-
-
-  const handleDelete = (e) => {
-    {
-      const data = {
-        IssueReportId: props.issuereport_id,
-      };
-      submitDeleteStateHandler(data)
-        .then((res) => {
-          if (res.data.success) {
-            toast.success("Success");
-          } else {
-            toast.error("Error");
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-        props.onDelete(props.issuereport_id);
-    }
+  const handlePrevState = () => {
+    setStatusState((prevState) => {
+      let newState;
+      if (prevState === "ongoing") {
+        newState = "rejected";
+      } else if (prevState === "rejected") {
+        newState = "completed";
+      } else if (prevState === "completed") {
+        newState = "ongoing";
+      } else {
+        newState = "ongoing";
+      }
+      return newState;
+    });
   };
+
+  const handleNextState = () => {
+    setStatusState((prevState) => {
+      let newState;
+      if (prevState === "ongoing") {
+        newState = "completed";
+      } else if (prevState === "completed") {
+        newState = "rejected";
+      } else if (prevState === "rejected") {
+        newState = "ongoing";
+      } else {
+        newState = "ongoing";
+      }
+      return newState;
+    });
+  };
+
+  useEffect(() => {
+    handleSave();
+  }, [statusState]);
+
+  const handleDelete = () => {
+    const data = {
+      IssueReportId: props.issuereport_id,
+    };
+    submitDeleteStateHandler(data)
+      .then((res) => {
+        if (res.data.success) {
+          toast.success("Success");
+        } else {
+          toast.error("Error");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    props.onDelete(props.issuereport_id);
+  };
+
   return (
     <Request status={statusState}>
       <ClassSection>
@@ -115,7 +124,11 @@ export default function AdminIssueReport(props) {
         </StateSection>
 
         <ButtonSection>
-          <DeleteButton disabled={statusState!="ongoing" ? false:true} value="false" onClick={handleDelete}>
+          <DeleteButton
+            disabled={statusState != "ongoing" ? false : true}
+            value="false"
+            onClick={handleDelete}
+          >
             Delete
           </DeleteButton>
         </ButtonSection>
@@ -133,7 +146,7 @@ const Request = styled.div`
     background-color: ${(props) => {
       if (props.status === "rejected") {
         return "#EBEBEB";
-      } else if (props.status === "approved") {
+      } else if (props.status === "completed") {
         return "#009900";
       } else {
         return "#EB7B42";
@@ -154,12 +167,13 @@ const Request = styled.div`
         background-color: ${(props) => {
           if (props.status === "rejected") {
             return "#FBFBFB";
-          } else if (props.status === "approved") {
+          } else if (props.status === "completed") {
             return "#00AA00";
           } else {
             return "#EE8E45";
           }
         }}
+
 
 
     
