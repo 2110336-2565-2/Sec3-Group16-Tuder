@@ -57,7 +57,7 @@ export default function FormSignIn(props){
                         </div>
                     </FormT.ContentSmall>
                     <FormT.ContentSmall>
-                        <FormT.Link to='/Forgetpassword' underline='none' color='red'>Forget password?</FormT.Link>
+                        <FormT.Link to='/forget-password' underline='none' color='red'>Forget password?</FormT.Link>
                     </FormT.ContentSmall>
                 </FormT.ContentInline>
                 <FormT.Content>

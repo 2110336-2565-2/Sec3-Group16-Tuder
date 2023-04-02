@@ -15,7 +15,7 @@ export const InfoWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  width: ${(props) => (props.isSpan ? "100%" : "")};
+  min-width: ${(props) => (props.isSpan ? "100%" : "240px")};
   gap: 10px;
 `;
 
