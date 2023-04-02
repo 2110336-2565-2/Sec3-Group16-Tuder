@@ -10,10 +10,12 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/appointment"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/cancelrequest"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/google/uuid"
 )
@@ -42,34 +44,56 @@ func (mu *MatchUpdate) SetStudent(s *Student) *MatchUpdate {
 	return mu.SetStudentID(s.ID)
 }
 
-// AddCourseIDs adds the "course" edge to the Course entity by IDs.
-func (mu *MatchUpdate) AddCourseIDs(ids ...uuid.UUID) *MatchUpdate {
-	mu.mutation.AddCourseIDs(ids...)
+// SetCourseID sets the "course" edge to the Course entity by ID.
+func (mu *MatchUpdate) SetCourseID(id uuid.UUID) *MatchUpdate {
+	mu.mutation.SetCourseID(id)
 	return mu
 }
 
-// AddCourse adds the "course" edges to the Course entity.
-func (mu *MatchUpdate) AddCourse(c ...*Course) *MatchUpdate {
+// SetCourse sets the "course" edge to the Course entity.
+func (mu *MatchUpdate) SetCourse(c *Course) *MatchUpdate {
+	return mu.SetCourseID(c.ID)
+}
+
+// AddAppointmentIDs adds the "appointment" edge to the Appointment entity by IDs.
+func (mu *MatchUpdate) AddAppointmentIDs(ids ...uuid.UUID) *MatchUpdate {
+	mu.mutation.AddAppointmentIDs(ids...)
+	return mu
+}
+
+// AddAppointment adds the "appointment" edges to the Appointment entity.
+func (mu *MatchUpdate) AddAppointment(a ...*Appointment) *MatchUpdate {
+	ids := make([]uuid.UUID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return mu.AddAppointmentIDs(ids...)
+}
+
+// SetScheduleID sets the "schedule" edge to the Schedule entity by ID.
+func (mu *MatchUpdate) SetScheduleID(id uuid.UUID) *MatchUpdate {
+	mu.mutation.SetScheduleID(id)
+	return mu
+}
+
+// SetSchedule sets the "schedule" edge to the Schedule entity.
+func (mu *MatchUpdate) SetSchedule(s *Schedule) *MatchUpdate {
+	return mu.SetScheduleID(s.ID)
+}
+
+// AddCancelRequestIDs adds the "cancel_request" edge to the CancelRequest entity by IDs.
+func (mu *MatchUpdate) AddCancelRequestIDs(ids ...uuid.UUID) *MatchUpdate {
+	mu.mutation.AddCancelRequestIDs(ids...)
+	return mu
+}
+
+// AddCancelRequest adds the "cancel_request" edges to the CancelRequest entity.
+func (mu *MatchUpdate) AddCancelRequest(c ...*CancelRequest) *MatchUpdate {
 	ids := make([]uuid.UUID, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
-	return mu.AddCourseIDs(ids...)
-}
-
-// AddClasIDs adds the "class" edge to the Class entity by IDs.
-func (mu *MatchUpdate) AddClasIDs(ids ...uuid.UUID) *MatchUpdate {
-	mu.mutation.AddClasIDs(ids...)
-	return mu
-}
-
-// AddClass adds the "class" edges to the Class entity.
-func (mu *MatchUpdate) AddClass(c ...*Class) *MatchUpdate {
-	ids := make([]uuid.UUID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return mu.AddClasIDs(ids...)
+	return mu.AddCancelRequestIDs(ids...)
 }
 
 // Mutation returns the MatchMutation object of the builder.
@@ -83,46 +107,58 @@ func (mu *MatchUpdate) ClearStudent() *MatchUpdate {
 	return mu
 }
 
-// ClearCourse clears all "course" edges to the Course entity.
+// ClearCourse clears the "course" edge to the Course entity.
 func (mu *MatchUpdate) ClearCourse() *MatchUpdate {
 	mu.mutation.ClearCourse()
 	return mu
 }
 
-// RemoveCourseIDs removes the "course" edge to Course entities by IDs.
-func (mu *MatchUpdate) RemoveCourseIDs(ids ...uuid.UUID) *MatchUpdate {
-	mu.mutation.RemoveCourseIDs(ids...)
+// ClearAppointment clears all "appointment" edges to the Appointment entity.
+func (mu *MatchUpdate) ClearAppointment() *MatchUpdate {
+	mu.mutation.ClearAppointment()
 	return mu
 }
 
-// RemoveCourse removes "course" edges to Course entities.
-func (mu *MatchUpdate) RemoveCourse(c ...*Course) *MatchUpdate {
+// RemoveAppointmentIDs removes the "appointment" edge to Appointment entities by IDs.
+func (mu *MatchUpdate) RemoveAppointmentIDs(ids ...uuid.UUID) *MatchUpdate {
+	mu.mutation.RemoveAppointmentIDs(ids...)
+	return mu
+}
+
+// RemoveAppointment removes "appointment" edges to Appointment entities.
+func (mu *MatchUpdate) RemoveAppointment(a ...*Appointment) *MatchUpdate {
+	ids := make([]uuid.UUID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return mu.RemoveAppointmentIDs(ids...)
+}
+
+// ClearSchedule clears the "schedule" edge to the Schedule entity.
+func (mu *MatchUpdate) ClearSchedule() *MatchUpdate {
+	mu.mutation.ClearSchedule()
+	return mu
+}
+
+// ClearCancelRequest clears all "cancel_request" edges to the CancelRequest entity.
+func (mu *MatchUpdate) ClearCancelRequest() *MatchUpdate {
+	mu.mutation.ClearCancelRequest()
+	return mu
+}
+
+// RemoveCancelRequestIDs removes the "cancel_request" edge to CancelRequest entities by IDs.
+func (mu *MatchUpdate) RemoveCancelRequestIDs(ids ...uuid.UUID) *MatchUpdate {
+	mu.mutation.RemoveCancelRequestIDs(ids...)
+	return mu
+}
+
+// RemoveCancelRequest removes "cancel_request" edges to CancelRequest entities.
+func (mu *MatchUpdate) RemoveCancelRequest(c ...*CancelRequest) *MatchUpdate {
 	ids := make([]uuid.UUID, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
-	return mu.RemoveCourseIDs(ids...)
-}
-
-// ClearClass clears all "class" edges to the Class entity.
-func (mu *MatchUpdate) ClearClass() *MatchUpdate {
-	mu.mutation.ClearClass()
-	return mu
-}
-
-// RemoveClasIDs removes the "class" edge to Class entities by IDs.
-func (mu *MatchUpdate) RemoveClasIDs(ids ...uuid.UUID) *MatchUpdate {
-	mu.mutation.RemoveClasIDs(ids...)
-	return mu
-}
-
-// RemoveClass removes "class" edges to Class entities.
-func (mu *MatchUpdate) RemoveClass(c ...*Class) *MatchUpdate {
-	ids := make([]uuid.UUID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return mu.RemoveClasIDs(ids...)
+	return mu.RemoveCancelRequestIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -156,6 +192,12 @@ func (mu *MatchUpdate) ExecX(ctx context.Context) {
 func (mu *MatchUpdate) check() error {
 	if _, ok := mu.mutation.StudentID(); mu.mutation.StudentCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Match.student"`)
+	}
+	if _, ok := mu.mutation.CourseID(); mu.mutation.CourseCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Match.course"`)
+	}
+	if _, ok := mu.mutation.ScheduleID(); mu.mutation.ScheduleCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Match.schedule"`)
 	}
 	return nil
 }
@@ -209,10 +251,10 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if mu.mutation.CourseCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   match.CourseTable,
-			Columns: match.CoursePrimaryKey,
+			Columns: []string{match.CourseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -220,34 +262,15 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 					Column: course.FieldID,
 				},
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := mu.mutation.RemovedCourseIDs(); len(nodes) > 0 && !mu.mutation.CourseCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   match.CourseTable,
-			Columns: match.CoursePrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := mu.mutation.CourseIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   match.CourseTable,
-			Columns: match.CoursePrimaryKey,
+			Columns: []string{match.CourseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -261,33 +284,33 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if mu.mutation.ClassCleared() {
+	if mu.mutation.AppointmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   match.ClassTable,
-			Columns: match.ClassPrimaryKey,
+			Table:   match.AppointmentTable,
+			Columns: []string{match.AppointmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: class.FieldID,
+					Column: appointment.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mu.mutation.RemovedClassIDs(); len(nodes) > 0 && !mu.mutation.ClassCleared() {
+	if nodes := mu.mutation.RemovedAppointmentIDs(); len(nodes) > 0 && !mu.mutation.AppointmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   match.ClassTable,
-			Columns: match.ClassPrimaryKey,
+			Table:   match.AppointmentTable,
+			Columns: []string{match.AppointmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: class.FieldID,
+					Column: appointment.FieldID,
 				},
 			},
 		}
@@ -296,17 +319,106 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mu.mutation.ClassIDs(); len(nodes) > 0 {
+	if nodes := mu.mutation.AppointmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   match.ClassTable,
-			Columns: match.ClassPrimaryKey,
+			Table:   match.AppointmentTable,
+			Columns: []string{match.AppointmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: class.FieldID,
+					Column: appointment.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if mu.mutation.ScheduleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   match.ScheduleTable,
+			Columns: []string{match.ScheduleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: schedule.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mu.mutation.ScheduleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   match.ScheduleTable,
+			Columns: []string{match.ScheduleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: schedule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if mu.mutation.CancelRequestCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   match.CancelRequestTable,
+			Columns: []string{match.CancelRequestColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: cancelrequest.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mu.mutation.RemovedCancelRequestIDs(); len(nodes) > 0 && !mu.mutation.CancelRequestCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   match.CancelRequestTable,
+			Columns: []string{match.CancelRequestColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: cancelrequest.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mu.mutation.CancelRequestIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   match.CancelRequestTable,
+			Columns: []string{match.CancelRequestColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: cancelrequest.FieldID,
 				},
 			},
 		}
@@ -346,34 +458,56 @@ func (muo *MatchUpdateOne) SetStudent(s *Student) *MatchUpdateOne {
 	return muo.SetStudentID(s.ID)
 }
 
-// AddCourseIDs adds the "course" edge to the Course entity by IDs.
-func (muo *MatchUpdateOne) AddCourseIDs(ids ...uuid.UUID) *MatchUpdateOne {
-	muo.mutation.AddCourseIDs(ids...)
+// SetCourseID sets the "course" edge to the Course entity by ID.
+func (muo *MatchUpdateOne) SetCourseID(id uuid.UUID) *MatchUpdateOne {
+	muo.mutation.SetCourseID(id)
 	return muo
 }
 
-// AddCourse adds the "course" edges to the Course entity.
-func (muo *MatchUpdateOne) AddCourse(c ...*Course) *MatchUpdateOne {
+// SetCourse sets the "course" edge to the Course entity.
+func (muo *MatchUpdateOne) SetCourse(c *Course) *MatchUpdateOne {
+	return muo.SetCourseID(c.ID)
+}
+
+// AddAppointmentIDs adds the "appointment" edge to the Appointment entity by IDs.
+func (muo *MatchUpdateOne) AddAppointmentIDs(ids ...uuid.UUID) *MatchUpdateOne {
+	muo.mutation.AddAppointmentIDs(ids...)
+	return muo
+}
+
+// AddAppointment adds the "appointment" edges to the Appointment entity.
+func (muo *MatchUpdateOne) AddAppointment(a ...*Appointment) *MatchUpdateOne {
+	ids := make([]uuid.UUID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return muo.AddAppointmentIDs(ids...)
+}
+
+// SetScheduleID sets the "schedule" edge to the Schedule entity by ID.
+func (muo *MatchUpdateOne) SetScheduleID(id uuid.UUID) *MatchUpdateOne {
+	muo.mutation.SetScheduleID(id)
+	return muo
+}
+
+// SetSchedule sets the "schedule" edge to the Schedule entity.
+func (muo *MatchUpdateOne) SetSchedule(s *Schedule) *MatchUpdateOne {
+	return muo.SetScheduleID(s.ID)
+}
+
+// AddCancelRequestIDs adds the "cancel_request" edge to the CancelRequest entity by IDs.
+func (muo *MatchUpdateOne) AddCancelRequestIDs(ids ...uuid.UUID) *MatchUpdateOne {
+	muo.mutation.AddCancelRequestIDs(ids...)
+	return muo
+}
+
+// AddCancelRequest adds the "cancel_request" edges to the CancelRequest entity.
+func (muo *MatchUpdateOne) AddCancelRequest(c ...*CancelRequest) *MatchUpdateOne {
 	ids := make([]uuid.UUID, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
-	return muo.AddCourseIDs(ids...)
-}
-
-// AddClasIDs adds the "class" edge to the Class entity by IDs.
-func (muo *MatchUpdateOne) AddClasIDs(ids ...uuid.UUID) *MatchUpdateOne {
-	muo.mutation.AddClasIDs(ids...)
-	return muo
-}
-
-// AddClass adds the "class" edges to the Class entity.
-func (muo *MatchUpdateOne) AddClass(c ...*Class) *MatchUpdateOne {
-	ids := make([]uuid.UUID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return muo.AddClasIDs(ids...)
+	return muo.AddCancelRequestIDs(ids...)
 }
 
 // Mutation returns the MatchMutation object of the builder.
@@ -387,46 +521,58 @@ func (muo *MatchUpdateOne) ClearStudent() *MatchUpdateOne {
 	return muo
 }
 
-// ClearCourse clears all "course" edges to the Course entity.
+// ClearCourse clears the "course" edge to the Course entity.
 func (muo *MatchUpdateOne) ClearCourse() *MatchUpdateOne {
 	muo.mutation.ClearCourse()
 	return muo
 }
 
-// RemoveCourseIDs removes the "course" edge to Course entities by IDs.
-func (muo *MatchUpdateOne) RemoveCourseIDs(ids ...uuid.UUID) *MatchUpdateOne {
-	muo.mutation.RemoveCourseIDs(ids...)
+// ClearAppointment clears all "appointment" edges to the Appointment entity.
+func (muo *MatchUpdateOne) ClearAppointment() *MatchUpdateOne {
+	muo.mutation.ClearAppointment()
 	return muo
 }
 
-// RemoveCourse removes "course" edges to Course entities.
-func (muo *MatchUpdateOne) RemoveCourse(c ...*Course) *MatchUpdateOne {
+// RemoveAppointmentIDs removes the "appointment" edge to Appointment entities by IDs.
+func (muo *MatchUpdateOne) RemoveAppointmentIDs(ids ...uuid.UUID) *MatchUpdateOne {
+	muo.mutation.RemoveAppointmentIDs(ids...)
+	return muo
+}
+
+// RemoveAppointment removes "appointment" edges to Appointment entities.
+func (muo *MatchUpdateOne) RemoveAppointment(a ...*Appointment) *MatchUpdateOne {
+	ids := make([]uuid.UUID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return muo.RemoveAppointmentIDs(ids...)
+}
+
+// ClearSchedule clears the "schedule" edge to the Schedule entity.
+func (muo *MatchUpdateOne) ClearSchedule() *MatchUpdateOne {
+	muo.mutation.ClearSchedule()
+	return muo
+}
+
+// ClearCancelRequest clears all "cancel_request" edges to the CancelRequest entity.
+func (muo *MatchUpdateOne) ClearCancelRequest() *MatchUpdateOne {
+	muo.mutation.ClearCancelRequest()
+	return muo
+}
+
+// RemoveCancelRequestIDs removes the "cancel_request" edge to CancelRequest entities by IDs.
+func (muo *MatchUpdateOne) RemoveCancelRequestIDs(ids ...uuid.UUID) *MatchUpdateOne {
+	muo.mutation.RemoveCancelRequestIDs(ids...)
+	return muo
+}
+
+// RemoveCancelRequest removes "cancel_request" edges to CancelRequest entities.
+func (muo *MatchUpdateOne) RemoveCancelRequest(c ...*CancelRequest) *MatchUpdateOne {
 	ids := make([]uuid.UUID, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
-	return muo.RemoveCourseIDs(ids...)
-}
-
-// ClearClass clears all "class" edges to the Class entity.
-func (muo *MatchUpdateOne) ClearClass() *MatchUpdateOne {
-	muo.mutation.ClearClass()
-	return muo
-}
-
-// RemoveClasIDs removes the "class" edge to Class entities by IDs.
-func (muo *MatchUpdateOne) RemoveClasIDs(ids ...uuid.UUID) *MatchUpdateOne {
-	muo.mutation.RemoveClasIDs(ids...)
-	return muo
-}
-
-// RemoveClass removes "class" edges to Class entities.
-func (muo *MatchUpdateOne) RemoveClass(c ...*Class) *MatchUpdateOne {
-	ids := make([]uuid.UUID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return muo.RemoveClasIDs(ids...)
+	return muo.RemoveCancelRequestIDs(ids...)
 }
 
 // Where appends a list predicates to the MatchUpdate builder.
@@ -473,6 +619,12 @@ func (muo *MatchUpdateOne) ExecX(ctx context.Context) {
 func (muo *MatchUpdateOne) check() error {
 	if _, ok := muo.mutation.StudentID(); muo.mutation.StudentCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Match.student"`)
+	}
+	if _, ok := muo.mutation.CourseID(); muo.mutation.CourseCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Match.course"`)
+	}
+	if _, ok := muo.mutation.ScheduleID(); muo.mutation.ScheduleCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Match.schedule"`)
 	}
 	return nil
 }
@@ -543,10 +695,10 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 	}
 	if muo.mutation.CourseCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   match.CourseTable,
-			Columns: match.CoursePrimaryKey,
+			Columns: []string{match.CourseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -554,34 +706,15 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 					Column: course.FieldID,
 				},
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := muo.mutation.RemovedCourseIDs(); len(nodes) > 0 && !muo.mutation.CourseCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   match.CourseTable,
-			Columns: match.CoursePrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := muo.mutation.CourseIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   match.CourseTable,
-			Columns: match.CoursePrimaryKey,
+			Columns: []string{match.CourseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -595,33 +728,33 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if muo.mutation.ClassCleared() {
+	if muo.mutation.AppointmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   match.ClassTable,
-			Columns: match.ClassPrimaryKey,
+			Table:   match.AppointmentTable,
+			Columns: []string{match.AppointmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: class.FieldID,
+					Column: appointment.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := muo.mutation.RemovedClassIDs(); len(nodes) > 0 && !muo.mutation.ClassCleared() {
+	if nodes := muo.mutation.RemovedAppointmentIDs(); len(nodes) > 0 && !muo.mutation.AppointmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   match.ClassTable,
-			Columns: match.ClassPrimaryKey,
+			Table:   match.AppointmentTable,
+			Columns: []string{match.AppointmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: class.FieldID,
+					Column: appointment.FieldID,
 				},
 			},
 		}
@@ -630,17 +763,106 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := muo.mutation.ClassIDs(); len(nodes) > 0 {
+	if nodes := muo.mutation.AppointmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   match.ClassTable,
-			Columns: match.ClassPrimaryKey,
+			Table:   match.AppointmentTable,
+			Columns: []string{match.AppointmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: class.FieldID,
+					Column: appointment.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if muo.mutation.ScheduleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   match.ScheduleTable,
+			Columns: []string{match.ScheduleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: schedule.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := muo.mutation.ScheduleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   match.ScheduleTable,
+			Columns: []string{match.ScheduleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: schedule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if muo.mutation.CancelRequestCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   match.CancelRequestTable,
+			Columns: []string{match.CancelRequestColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: cancelrequest.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := muo.mutation.RemovedCancelRequestIDs(); len(nodes) > 0 && !muo.mutation.CancelRequestCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   match.CancelRequestTable,
+			Columns: []string{match.CancelRequestColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: cancelrequest.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := muo.mutation.CancelRequestIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   match.CancelRequestTable,
+			Columns: []string{match.CancelRequestColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: cancelrequest.FieldID,
 				},
 			},
 		}

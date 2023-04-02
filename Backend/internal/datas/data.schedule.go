@@ -16,8 +16,10 @@ func InsertSchedule(client *ent.Client, ctx context.Context) []*ent.Schedule {
 	// Create schedules
 	schedule1 := CreateSchedule(client, free_day, busy_day, some_day, free_day, busy_day, some_day, busy_day)
 	schedule2 := CreateSchedule(client, busy_day, some_day, free_day, busy_day, busy_day, free_day, free_day)
+	schedule3 := CreateSchedule(client, free_day, busy_day, free_day, busy_day, free_day, busy_day, free_day)
+	schedule4 := CreateSchedule(client, some_day, some_day, busy_day, free_day, busy_day, free_day, free_day)
 
-	schedule, err := client.Schedule.CreateBulk(schedule1, schedule2).Save(ctx)
+	schedule, err := client.Schedule.CreateBulk(schedule1, schedule2, schedule3, schedule4).Save(ctx)
 
 	if err != nil {
 		log.Fatalf("failed creating schedule: %v", err)
@@ -42,10 +44,10 @@ func CreateSchedule(
 	d6 [24]bool,
 ) *ent.ScheduleCreate {
 
-	scheduleId := uuid.New()
+	sId := uuid.New()
 
 	schedule := client.Schedule.Create().
-		SetID(scheduleId).
+		SetID(sId).
 		SetDay0(d0).
 		SetDay1(d1).
 		SetDay2(d2).

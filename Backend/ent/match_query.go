@@ -11,10 +11,12 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/class"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/appointment"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/cancelrequest"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/google/uuid"
 )
@@ -22,14 +24,16 @@ import (
 // MatchQuery is the builder for querying Match entities.
 type MatchQuery struct {
 	config
-	ctx         *QueryContext
-	order       []OrderFunc
-	inters      []Interceptor
-	predicates  []predicate.Match
-	withStudent *StudentQuery
-	withCourse  *CourseQuery
-	withClass   *ClassQuery
-	withFKs     bool
+	ctx               *QueryContext
+	order             []OrderFunc
+	inters            []Interceptor
+	predicates        []predicate.Match
+	withStudent       *StudentQuery
+	withCourse        *CourseQuery
+	withAppointment   *AppointmentQuery
+	withSchedule      *ScheduleQuery
+	withCancelRequest *CancelRequestQuery
+	withFKs           bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -102,7 +106,7 @@ func (mq *MatchQuery) QueryCourse() *CourseQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(match.Table, match.FieldID, selector),
 			sqlgraph.To(course.Table, course.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, match.CourseTable, match.CoursePrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, match.CourseTable, match.CourseColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
 		return fromU, nil
@@ -110,9 +114,9 @@ func (mq *MatchQuery) QueryCourse() *CourseQuery {
 	return query
 }
 
-// QueryClass chains the current query on the "class" edge.
-func (mq *MatchQuery) QueryClass() *ClassQuery {
-	query := (&ClassClient{config: mq.config}).Query()
+// QueryAppointment chains the current query on the "appointment" edge.
+func (mq *MatchQuery) QueryAppointment() *AppointmentQuery {
+	query := (&AppointmentClient{config: mq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := mq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -123,8 +127,52 @@ func (mq *MatchQuery) QueryClass() *ClassQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(match.Table, match.FieldID, selector),
-			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, match.ClassTable, match.ClassPrimaryKey...),
+			sqlgraph.To(appointment.Table, appointment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, match.AppointmentTable, match.AppointmentColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySchedule chains the current query on the "schedule" edge.
+func (mq *MatchQuery) QuerySchedule() *ScheduleQuery {
+	query := (&ScheduleClient{config: mq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := mq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := mq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(match.Table, match.FieldID, selector),
+			sqlgraph.To(schedule.Table, schedule.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, match.ScheduleTable, match.ScheduleColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCancelRequest chains the current query on the "cancel_request" edge.
+func (mq *MatchQuery) QueryCancelRequest() *CancelRequestQuery {
+	query := (&CancelRequestClient{config: mq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := mq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := mq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(match.Table, match.FieldID, selector),
+			sqlgraph.To(cancelrequest.Table, cancelrequest.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, match.CancelRequestTable, match.CancelRequestColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
 		return fromU, nil
@@ -319,14 +367,16 @@ func (mq *MatchQuery) Clone() *MatchQuery {
 		return nil
 	}
 	return &MatchQuery{
-		config:      mq.config,
-		ctx:         mq.ctx.Clone(),
-		order:       append([]OrderFunc{}, mq.order...),
-		inters:      append([]Interceptor{}, mq.inters...),
-		predicates:  append([]predicate.Match{}, mq.predicates...),
-		withStudent: mq.withStudent.Clone(),
-		withCourse:  mq.withCourse.Clone(),
-		withClass:   mq.withClass.Clone(),
+		config:            mq.config,
+		ctx:               mq.ctx.Clone(),
+		order:             append([]OrderFunc{}, mq.order...),
+		inters:            append([]Interceptor{}, mq.inters...),
+		predicates:        append([]predicate.Match{}, mq.predicates...),
+		withStudent:       mq.withStudent.Clone(),
+		withCourse:        mq.withCourse.Clone(),
+		withAppointment:   mq.withAppointment.Clone(),
+		withSchedule:      mq.withSchedule.Clone(),
+		withCancelRequest: mq.withCancelRequest.Clone(),
 		// clone intermediate query.
 		sql:  mq.sql.Clone(),
 		path: mq.path,
@@ -355,19 +405,53 @@ func (mq *MatchQuery) WithCourse(opts ...func(*CourseQuery)) *MatchQuery {
 	return mq
 }
 
-// WithClass tells the query-builder to eager-load the nodes that are connected to
-// the "class" edge. The optional arguments are used to configure the query builder of the edge.
-func (mq *MatchQuery) WithClass(opts ...func(*ClassQuery)) *MatchQuery {
-	query := (&ClassClient{config: mq.config}).Query()
+// WithAppointment tells the query-builder to eager-load the nodes that are connected to
+// the "appointment" edge. The optional arguments are used to configure the query builder of the edge.
+func (mq *MatchQuery) WithAppointment(opts ...func(*AppointmentQuery)) *MatchQuery {
+	query := (&AppointmentClient{config: mq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	mq.withClass = query
+	mq.withAppointment = query
+	return mq
+}
+
+// WithSchedule tells the query-builder to eager-load the nodes that are connected to
+// the "schedule" edge. The optional arguments are used to configure the query builder of the edge.
+func (mq *MatchQuery) WithSchedule(opts ...func(*ScheduleQuery)) *MatchQuery {
+	query := (&ScheduleClient{config: mq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	mq.withSchedule = query
+	return mq
+}
+
+// WithCancelRequest tells the query-builder to eager-load the nodes that are connected to
+// the "cancel_request" edge. The optional arguments are used to configure the query builder of the edge.
+func (mq *MatchQuery) WithCancelRequest(opts ...func(*CancelRequestQuery)) *MatchQuery {
+	query := (&CancelRequestClient{config: mq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	mq.withCancelRequest = query
 	return mq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
+//
+// Example:
+//
+//	var v []struct {
+//		MatchCreatedAt time.Time `json:"match_created_at,omitempty"`
+//		Count int `json:"count,omitempty"`
+//	}
+//
+//	client.Match.Query().
+//		GroupBy(match.FieldMatchCreatedAt).
+//		Aggregate(ent.Count()).
+//		Scan(ctx, &v)
 func (mq *MatchQuery) GroupBy(field string, fields ...string) *MatchGroupBy {
 	mq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &MatchGroupBy{build: mq}
@@ -379,6 +463,16 @@ func (mq *MatchQuery) GroupBy(field string, fields ...string) *MatchGroupBy {
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
+//
+// Example:
+//
+//	var v []struct {
+//		MatchCreatedAt time.Time `json:"match_created_at,omitempty"`
+//	}
+//
+//	client.Match.Query().
+//		Select(match.FieldMatchCreatedAt).
+//		Scan(ctx, &v)
 func (mq *MatchQuery) Select(fields ...string) *MatchSelect {
 	mq.ctx.Fields = append(mq.ctx.Fields, fields...)
 	sbuild := &MatchSelect{MatchQuery: mq}
@@ -423,13 +517,15 @@ func (mq *MatchQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Match,
 		nodes       = []*Match{}
 		withFKs     = mq.withFKs
 		_spec       = mq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [5]bool{
 			mq.withStudent != nil,
 			mq.withCourse != nil,
-			mq.withClass != nil,
+			mq.withAppointment != nil,
+			mq.withSchedule != nil,
+			mq.withCancelRequest != nil,
 		}
 	)
-	if mq.withStudent != nil {
+	if mq.withStudent != nil || mq.withCourse != nil || mq.withSchedule != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -460,16 +556,28 @@ func (mq *MatchQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Match,
 		}
 	}
 	if query := mq.withCourse; query != nil {
-		if err := mq.loadCourse(ctx, query, nodes,
-			func(n *Match) { n.Edges.Course = []*Course{} },
-			func(n *Match, e *Course) { n.Edges.Course = append(n.Edges.Course, e) }); err != nil {
+		if err := mq.loadCourse(ctx, query, nodes, nil,
+			func(n *Match, e *Course) { n.Edges.Course = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := mq.withClass; query != nil {
-		if err := mq.loadClass(ctx, query, nodes,
-			func(n *Match) { n.Edges.Class = []*Class{} },
-			func(n *Match, e *Class) { n.Edges.Class = append(n.Edges.Class, e) }); err != nil {
+	if query := mq.withAppointment; query != nil {
+		if err := mq.loadAppointment(ctx, query, nodes,
+			func(n *Match) { n.Edges.Appointment = []*Appointment{} },
+			func(n *Match, e *Appointment) { n.Edges.Appointment = append(n.Edges.Appointment, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := mq.withSchedule; query != nil {
+		if err := mq.loadSchedule(ctx, query, nodes, nil,
+			func(n *Match, e *Schedule) { n.Edges.Schedule = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := mq.withCancelRequest; query != nil {
+		if err := mq.loadCancelRequest(ctx, query, nodes,
+			func(n *Match) { n.Edges.CancelRequest = []*CancelRequest{} },
+			func(n *Match, e *CancelRequest) { n.Edges.CancelRequest = append(n.Edges.CancelRequest, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -509,124 +617,128 @@ func (mq *MatchQuery) loadStudent(ctx context.Context, query *StudentQuery, node
 	return nil
 }
 func (mq *MatchQuery) loadCourse(ctx context.Context, query *CourseQuery, nodes []*Match, init func(*Match), assign func(*Match, *Course)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[uuid.UUID]*Match)
-	nids := make(map[uuid.UUID]map[*Match]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
-		if init != nil {
-			init(node)
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Match)
+	for i := range nodes {
+		if nodes[i].course_match == nil {
+			continue
 		}
+		fk := *nodes[i].course_match
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(match.CourseTable)
-		s.Join(joinT).On(s.C(course.FieldID), joinT.C(match.CoursePrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(match.CoursePrimaryKey[1]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(match.CoursePrimaryKey[1]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
+	if len(ids) == 0 {
+		return nil
 	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(uuid.UUID)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := *values[0].(*uuid.UUID)
-				inValue := *values[1].(*uuid.UUID)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*Match]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*Course](ctx, query, qr, query.inters)
+	query.Where(course.IDIn(ids...))
+	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
+		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected "course" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "course_match" returned %v`, n.ID)
 		}
-		for kn := range nodes {
-			assign(kn, n)
+		for i := range nodes {
+			assign(nodes[i], n)
 		}
 	}
 	return nil
 }
-func (mq *MatchQuery) loadClass(ctx context.Context, query *ClassQuery, nodes []*Match, init func(*Match), assign func(*Match, *Class)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[uuid.UUID]*Match)
-	nids := make(map[uuid.UUID]map[*Match]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
+func (mq *MatchQuery) loadAppointment(ctx context.Context, query *AppointmentQuery, nodes []*Match, init func(*Match), assign func(*Match, *Appointment)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Match)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
 		if init != nil {
-			init(node)
+			init(nodes[i])
 		}
 	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(match.ClassTable)
-		s.Join(joinT).On(s.C(class.FieldID), joinT.C(match.ClassPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(match.ClassPrimaryKey[1]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(match.ClassPrimaryKey[1]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(uuid.UUID)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := *values[0].(*uuid.UUID)
-				inValue := *values[1].(*uuid.UUID)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*Match]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*Class](ctx, query, qr, query.inters)
+	query.withFKs = true
+	query.Where(predicate.Appointment(func(s *sql.Selector) {
+		s.Where(sql.InValues(match.AppointmentColumn, fks...))
+	}))
+	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
+		fk := n.appointment_match
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "appointment_match" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected "class" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "appointment_match" returned %v for node %v`, *fk, n.ID)
 		}
-		for kn := range nodes {
-			assign(kn, n)
+		assign(node, n)
+	}
+	return nil
+}
+func (mq *MatchQuery) loadSchedule(ctx context.Context, query *ScheduleQuery, nodes []*Match, init func(*Match), assign func(*Match, *Schedule)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Match)
+	for i := range nodes {
+		if nodes[i].schedule_match == nil {
+			continue
 		}
+		fk := *nodes[i].schedule_match
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(schedule.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "schedule_match" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (mq *MatchQuery) loadCancelRequest(ctx context.Context, query *CancelRequestQuery, nodes []*Match, init func(*Match), assign func(*Match, *CancelRequest)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Match)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.CancelRequest(func(s *sql.Selector) {
+		s.Where(sql.InValues(match.CancelRequestColumn, fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.cancel_request_match
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "cancel_request_match" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "cancel_request_match" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

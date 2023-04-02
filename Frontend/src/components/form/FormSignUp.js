@@ -23,6 +23,7 @@ export default function FormSignUp(){
     const [birthdate, setBirthDate] = useState('');
     const [role, setRole] = useState('');
     const [citizenID, setCitizenID] = useState('');
+    const [description, setDescription] = useState('');
 
 
     const valueSetter = {"First Name":setFirstName, "Last Name":setLastName,
@@ -52,7 +53,8 @@ export default function FormSignUp(){
             birthdate: birthdateISO,
             gender: gender,
             role: role,
-            citizen_id: role==='tutor'? citizenID : ''
+            citizen_id: role==='tutor'? citizenID : '',
+            description: role==='tutor'? description : ''
          }
          setStatus('submitting')
          try{
@@ -173,6 +175,13 @@ export default function FormSignUp(){
                                 <FormT.Component key={elementindex}>
                                     <FormT.Label>{element} :</FormT.Label>
                                     <FormT.TextInput BoxSize='315px' name={name} type='text' placeholder={pholder} onChange={(e)=>setCitizenID(e.target.value)} required/>
+                                </FormT.Component>
+                            )
+                        }else if (element === 'Description'){
+                            return (
+                                <FormT.Component key={elementindex}>
+                                    <FormT.Label>{element} :</FormT.Label>
+                                    <FormT.TextInput BoxSize='315px' name={name} type='text' placeholder={pholder} onChange={(e)=>setDescription(e.target.value)} required/>
                                 </FormT.Component>
                             )
                         }

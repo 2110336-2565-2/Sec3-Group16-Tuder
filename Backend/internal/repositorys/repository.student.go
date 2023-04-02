@@ -107,11 +107,17 @@ func (rS *repositoryStudent) UpdateStudent(sr *schema.SchemaUpdateStudent) (*ent
 
 	student := user.Edges.Student
 
-	profilePictureURL, _ := utils.GenerateProfilePictureURL(sr.ProfilePicture, sr.Username)
+	profilePictureURL := *user.ProfilePictureURL
+	fmt.Println(profilePictureURL)
+	if sr.ProfilePicture != nil {
+		profilePictureURL, _ = utils.GenerateProfilePictureURL(sr.ProfilePicture, sr.Username)
+
+	}
 
 	user, err = txc.User.UpdateOne(user).
 		SetFirstName(sr.Firstname).
 		SetLastName(sr.Lastname).
+		SetEmail(sr.Email).
 		SetPhone(sr.Phone).
 		SetAddress(sr.Address).
 		SetBirthDate(sr.Birthdate).

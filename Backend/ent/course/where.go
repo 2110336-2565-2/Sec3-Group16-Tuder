@@ -534,24 +534,24 @@ func CoursePictureURLContainsFold(v string) predicate.Course {
 	return predicate.Course(sql.FieldContainsFold(FieldCoursePictureURL, v))
 }
 
-// HasReviewCourse applies the HasEdge predicate on the "review_course" edge.
-func HasReviewCourse() predicate.Course {
+// HasReview applies the HasEdge predicate on the "review" edge.
+func HasReview() predicate.Course {
 	return predicate.Course(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ReviewCourseTable, ReviewCoursePrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, ReviewTable, ReviewPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasReviewCourseWith applies the HasEdge predicate on the "review_course" edge with a given conditions (other predicates).
-func HasReviewCourseWith(preds ...predicate.ReviewCourse) predicate.Course {
+// HasReviewWith applies the HasEdge predicate on the "review" edge with a given conditions (other predicates).
+func HasReviewWith(preds ...predicate.Review) predicate.Course {
 	return predicate.Course(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(ReviewCourseInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ReviewCourseTable, ReviewCoursePrimaryKey...),
+			sqlgraph.To(ReviewInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, ReviewTable, ReviewPrimaryKey...),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
@@ -566,7 +566,7 @@ func HasMatch() predicate.Course {
 	return predicate.Course(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, MatchTable, MatchPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, MatchTable, MatchColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -578,7 +578,7 @@ func HasMatchWith(preds ...predicate.Match) predicate.Course {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(MatchInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, MatchTable, MatchPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, MatchTable, MatchColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

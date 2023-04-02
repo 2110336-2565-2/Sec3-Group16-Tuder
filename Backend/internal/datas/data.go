@@ -5,15 +5,11 @@ import (
 	"fmt"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
-	util "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 )
 
 func InsertData(client *ent.Client) {
 
 	ctx := context.Background()
-
-	// Delete all data in database
-	util.ClearDB(client, ctx)
 
 	// Insert users
 	user := InsertUser(client, ctx)
@@ -31,16 +27,22 @@ func InsertData(client *ent.Client) {
 	course := InsertCourse(client, ctx, tutor)
 
 	// Insert payment
-	payment := InsertPayment(client, ctx, user)
+	// payment := InsertPayment(client, ctx, user)
 
 	// Insert payment history
-	ph := InsertPaymentHistory(client, ctx, user, payment)
+	// InsertPaymentHistory(client, ctx, user, payment)
 
 	// Insert classes
-	class := InsertClass(client, ctx, schedule, ph)
+	app := InsertAppointment(client, ctx)
 
 	// Insert match
-	InsertMatch(client, ctx, class, course, student)
+	match := InsertMatch(client, ctx, app, course, student, schedule)
+
+	// Insert cancel request
+	InsertCancelRequest(client, ctx, user, match)
+
+	// Insert issue report
+	InsertIssueReport(client, ctx)
 
 	fmt.Print("\n\t::::::::: Data inserted! :::::::::\n")
 
