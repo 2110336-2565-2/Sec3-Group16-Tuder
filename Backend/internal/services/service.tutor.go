@@ -2,18 +2,20 @@ package services
 
 import (
 	"fmt"
+
 	repository "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 )
 
 type ServiceTutor interface {
-	GetTutorByUsername(tutorGet *schemas.SchemaGetTutor) (*schemas.SchemaTutor, error)
-	GetTutors() ([]*schemas.SchemaTutor, error)
 	CreateTutor(tutorCreate *schemas.SchemaCreateTutor) (*schemas.SchemaTutor, error)
-	UpdateTutor(tutorUpdate *schemas.SchemaUpdateTutor) (*schemas.SchemaTutor, error)
-	DeleteTutor(tutorDelete *schemas.SchemaDeleteTutor) error
-	UpdateTutorSchedule(scheduleUpdate *schemas.SchemaUpdateSchedule) (*schemas.SchemaRawSchedule, error)
+	GetTutors() ([]*schemas.SchemaTutor, error)
+	GetTutorByUsername(tutorGet *schemas.SchemaGetTutor) (*schemas.SchemaTutor, error)
 	GetTutorSchedule(scheduleRequest *schemas.SchemaGetSchedule) (*schemas.SchemaRawSchedule, error)
+	UpdateTutor(tutorUpdate *schemas.SchemaUpdateTutor) (*schemas.SchemaTutor, error)
+	UpdateTutorSchedule(scheduleUpdate *schemas.SchemaUpdateSchedule) (*schemas.SchemaRawSchedule, error)
+	DeleteTutor(tutorDelete *schemas.SchemaDeleteTutor) error
+	GetTutorReviews(tutorGet *schemas.SchemaGetReviews) (*schemas.SchemaGetReviewsByTutorIdResponse, error)
 }
 
 type serviceTutor struct {
@@ -50,7 +52,7 @@ func (s *serviceTutor) GetTutorByUsername(tutorGet *schemas.SchemaGetTutor) (*sc
 		Description:       *tutor.Description,
 		OmiseBankToken:    *tutor.OmiseBankToken,
 		CitizenId:         tutor.CitizenID,
-		Schedule: 		   schemas.SchemaRawSchedule{
+		Schedule: schemas.SchemaRawSchedule{
 			Sunday:    schedule.Day0,
 			Monday:    schedule.Day1,
 			Tuesday:   schedule.Day2,
@@ -91,7 +93,7 @@ func (s *serviceTutor) GetTutors() ([]*schemas.SchemaTutor, error) {
 			Description:       *tutor.Description,
 			OmiseBankToken:    *tutor.OmiseBankToken,
 			CitizenId:         tutor.CitizenID,
-			Schedule: 		   schemas.SchemaRawSchedule{
+			Schedule: schemas.SchemaRawSchedule{
 				Sunday:    schedule.Day0,
 				Monday:    schedule.Day1,
 				Tuesday:   schedule.Day2,
@@ -141,19 +143,19 @@ func (s *serviceTutor) UpdateTutor(tutorUpdate *schemas.SchemaUpdateTutor) (*sch
 		return nil, err
 	}
 	return &schemas.SchemaTutor{
-		ID:        tutor.ID,
-		Username:  tutor.Edges.User.Username,
-		Firstname: tutor.Edges.User.FirstName,
-		Lastname:  tutor.Edges.User.LastName,
-		Email:     tutor.Edges.User.Email,
-		Phone:     tutor.Edges.User.Phone,
-		Address:   tutor.Edges.User.Address,
-		Birthdate: tutor.Edges.User.BirthDate,
-		Gender:    tutor.Edges.User.Gender,
+		ID:                tutor.ID,
+		Username:          tutor.Edges.User.Username,
+		Firstname:         tutor.Edges.User.FirstName,
+		Lastname:          tutor.Edges.User.LastName,
+		Email:             tutor.Edges.User.Email,
+		Phone:             tutor.Edges.User.Phone,
+		Address:           tutor.Edges.User.Address,
+		Birthdate:         tutor.Edges.User.BirthDate,
+		Gender:            tutor.Edges.User.Gender,
 		ProfilePictureURL: *tutor.Edges.User.ProfilePictureURL,
-		Description:    *tutor.Description,
-		OmiseBankToken: *tutor.OmiseBankToken,
-		CitizenId:      tutor.CitizenID,
+		Description:       *tutor.Description,
+		OmiseBankToken:    *tutor.OmiseBankToken,
+		CitizenId:         tutor.CitizenID,
 		Schedule: schemas.SchemaRawSchedule{
 			Sunday:    schedule.Day0,
 			Monday:    schedule.Day1,
@@ -207,4 +209,43 @@ func (s *serviceTutor) GetTutorSchedule(scheduleRequest *schemas.SchemaGetSchedu
 		Friday:    schedule.Day5,
 		Saturday:  schedule.Day6,
 	}, nil
+}
+
+func (s *serviceTutor) GetTutorReviews(reviewRequest *schemas.SchemaGetReviews) (*schemas.SchemaGetReviewsByTutorIdResponse, error) {
+	reviews, err := s.repository.GetReviews(reviewRequest)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	total_score := int8(0)
+	total_review := 0
+
+	groupedReviews := make(map[string][]*schemas.Review)
+
+	for _, review := range reviews {
+		courseName := review.Edges.Course[0].Title
+		if _, ok := groupedReviews[courseName]; !ok {
+			groupedReviews[courseName] = make([]*schemas.Review, 0)
+		}
+		review_respone := &schemas.Review{
+			Score:        *review.Score,
+			ReviewMsg:    *review.ReviewMsg,
+			ReviewTimeAt: review.ReviewTimeAt,
+		}
+		groupedReviews[courseName] = append(groupedReviews[courseName], review_respone)
+		total_score += *review.Score
+		total_review += 1
+	}
+
+	// fmt.Println(groupedReviews)
+	score := fmt.Sprintf("%.2f", float64(total_score)/float64(total_review))
+
+	schemaGroupedReviews := &schemas.SchemaGetReviewsByTutorIdResponse{
+		TotalScore:   score,
+		TotalReview:  total_review,
+		TutorReviews: groupedReviews,
+	}
+
+	return schemaGroupedReviews, nil
 }
