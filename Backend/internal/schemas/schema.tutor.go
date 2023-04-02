@@ -61,11 +61,11 @@ type SchemaCreateTutor struct {
 }
 
 type SchemaUpdateTutor struct {
-	Username  string `json:"username,omitempty"` // TODO This must be removed when jwt is completely function
-	Firstname string `json:"firstname"`
-	Lastname  string `json:"lastname"`
-	Phone     string `json:"phone"`
-	Address   string `json:"address"`
+	Username       string    `json:"username,omitempty"` // TODO This must be removed when jwt is completely function
+	Firstname      string    `json:"firstname"`
+	Lastname       string    `json:"lastname"`
+	Phone          string    `json:"phone"`
+	Address        string    `json:"address"`
 	ProfilePicture []byte    `json:"new_profile_picture"`
 	Birthdate      time.Time `json:"birthdate"`
 	Gender         string    `json:"gender"`
@@ -76,5 +76,9 @@ type SchemaUpdateTutor struct {
 }
 
 type SchemaDeleteTutor struct {
+	ID uuid.UUID `json:"id"`
+}
+
+type SchemaGetReviews struct {
 	ID uuid.UUID `json:"id"`
 }

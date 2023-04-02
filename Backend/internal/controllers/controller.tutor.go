@@ -6,8 +6,20 @@ import (
 
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 	service "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/services"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
+
+type ControllerTutor interface {
+	CreateTutor(c echo.Context) error
+	GetTutors(c echo.Context) error
+	GetTutorByUsername(c echo.Context) error
+	GetTutorSchedule(c echo.Context) error
+	UpdateTutor(c echo.Context) error
+	UpdateSchedule(c echo.Context) error
+	DeleteTutor(c echo.Context) error
+	GetTutorReviews(c echo.Context) error
+}
 
 type controllerTutor struct {
 	service service.ServiceTutor
@@ -32,7 +44,7 @@ func (cR *controllerTutor) GetTutorByUsername(c echo.Context) (err error) {
 	}
 
 	tutor, err := cR.service.GetTutorByUsername(uR)
-	
+
 	if err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
 			Success: false,
@@ -204,6 +216,38 @@ func (cR controllerTutor) GetTutorSchedule(c echo.Context) (err error) {
 		Success: true,
 		Message: "Get Schedule successfully",
 		Data:    schedule,
+	})
+	return
+}
+
+func (cR controllerTutor) GetTutorReviews(c echo.Context) (err error) {
+	id, _ := uuid.Parse(c.Param("id"))
+	r := &schema.SchemaGetReviews{
+		ID: id,
+	}
+	if err = c.Bind(r); err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: "invalid request payload",
+			Error:   err,
+		})
+		return
+	}
+	// r.Username = c.Get("user").(*jwt.Token).Claims.(jwt.MapClaims)["username"].(string)
+	reviews, err := cR.service.GetTutorReviews(r)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: err.Error(),
+			Error:   err,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, schema.SchemaResponses{
+		Success: true,
+		Message: "Get Reviews successfully",
+		Data:    reviews,
 	})
 	return
 }
