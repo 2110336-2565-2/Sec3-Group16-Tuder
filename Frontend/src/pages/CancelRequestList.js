@@ -23,9 +23,6 @@ export default function CancelRequestListPage(){
                     <CancelRequestList />
 
                 </ContainerWithHeight>
-                <WaveFooterWrapper>
-                    <WaveFooter />
-                </WaveFooterWrapper>
                 </DataContext.Provider>
                 </IsAdmin>
             </Container>

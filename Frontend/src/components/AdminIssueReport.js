@@ -87,123 +87,91 @@ export default function AdminIssueReport(props) {
     <Request status={statusState}>
       <ClassSection>
         <ClassInfoSection>
-          <ClassInfo>
-            <InfoTitle>Title:</InfoTitle>
-            &nbsp;
-            {props.title}
-          </ClassInfo>
-          <ClassInfo>
-            <InfoTitle>description:</InfoTitle>
-            &nbsp;
-            {props.description}
-          </ClassInfo>
-          <ClassInfo>
-            <InfoTitle>Contract:</InfoTitle>
-            &nbsp;
-            {props.contact}
-          </ClassInfo>
-          <ClassInfo>
-            <InfoTitle>Report_Date:</InfoTitle>
-            &nbsp;
-            {new Date(props.report_date).toLocaleString(Timezone, DateFormat)}
-          </ClassInfo>
+          <ClassFlex>
+            <ClassInfo>
+              <InfoTitle min_w = "45px">Title :</InfoTitle>
+              <InfoDesc>{props.title}</InfoDesc>              
+            </ClassInfo>
+            <ClassInfo>
+              <InfoTitle min_w = "99px">Description :</InfoTitle>
+              <InfoDesc>{props.description}</InfoDesc>
+            </ClassInfo>
+            <ClassInfo>
+              <InfoTitle min_w = "72px">Contact :</InfoTitle>
+              <InfoDesc>{props.contact}</InfoDesc>
+            </ClassInfo>
+            <ClassInfo>
+              <InfoTitle min_w = "112px">Report_Date :</InfoTitle>
+              <InfoDesc>{new Date(props.report_date).toLocaleString(Timezone, DateFormat)}</InfoDesc>
+            </ClassInfo>
+          </ClassFlex>
         </ClassInfoSection>
 
         <StateSection>
-          <PrevStateButton value="false" onClick={handlePrevState}>
-            Prev
-          </PrevStateButton>
-          <StateInfo>
-            <InfoTitle>Status:</InfoTitle>
-            &nbsp;
-            {statusState}
-          </StateInfo>
-          <NextStateButton value="false" onClick={handleNextState}>
-            Next
-          </NextStateButton>
+          <StateFlex>
+            <StateInfo>
+              <PrevStateButton value="false" onClick={handlePrevState}>
+                Prev
+              </PrevStateButton>
+              <NextStateButton value="false" onClick={handleNextState}>
+                Next
+              </NextStateButton>
+            </StateInfo>
+            <StateInfo>
+              <InfoTitle>Status :</InfoTitle>
+              <InfoDesc>
+                <StatusBlock statusState = {statusState}>
+                  {statusState}
+                </StatusBlock>
+              </InfoDesc>
+            </StateInfo>
+            <StateInfo>
+              <DeleteButton disabled={statusState != "ongoing" ? false : true}
+                value="false" onClick={handleDelete}>
+                Delete
+              </DeleteButton>
+            </StateInfo>
+            
+          </StateFlex>
         </StateSection>
-
-        <ButtonSection>
-          <DeleteButton
-            disabled={statusState != "ongoing" ? false : true}
-            value="false"
-            onClick={handleDelete}
-          >
-            Delete
-          </DeleteButton>
-        </ButtonSection>
       </ClassSection>
     </Request>
   );
 }
 
-// color be changed depends on the status
 
 const Request = styled.div`
     display: flex;
     flex-direction: row;
-    justify-content: left;
-    background-color: ${(props) => {
-      if (props.status === "rejected") {
-        return "#EBEBEB";
-      } else if (props.status === "completed") {
-        return "#009900";
-      } else {
-        return "#EB7B42";
-      }
-    }};
-
-    border-radius: 10px;
-    border: 1px solid #DADADA ;
-    shadow: 0px 4px 4px rgba(0, 0, 0, 0.45);
-
-    width: 1000px;
-    height: 167px;
+    justify-content: center;
+    background-color: #EB7B42;
+    border: 0.5px solid #DADADA ;
+    color: white;
+    min-height: 167px;
     gap: 20px;
     padding: 10px;
-    cursor: pointer;
-
-    &:hover {
-        background-color: ${(props) => {
-          if (props.status === "rejected") {
-            return "#FBFBFB";
-          } else if (props.status === "completed") {
-            return "#00AA00";
-          } else {
-            return "#EE8E45";
-          }
-        }}
-
-
-
-    
+    border-radius: 10px;
+    border: 1px solid black;
 `;
 
 const ClassSection = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  gap: 20px;
+    display: grid;
+    grid-template-columns: 70% 30%;
+    width: 100%;
+    min-width: 750px;
 `;
 
 const ClassInfoSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: left;
-  gap: 20px;
-  margin-top: 15px;
-  margin-right: 10px;
-  margin-left: 10px;
+    gap: 30px;
+    display: grid;
+    padding: 10px;
+    font-size: 30px;
+    width: 100%;
+    min-width: 500px;
 `;
 
 const StateSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: left;
-  gap: 20px;
-  margin-top: 15px;
-  margin-right: 10px;
-  margin-left: 10px;
+  display: grid;
 `;
 
 const ButtonSection = styled.div`
@@ -216,32 +184,40 @@ const ButtonSection = styled.div`
   margin-left: 10px;
 `;
 const ClassInfo = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: left;
-
-  font-size: 10px;
-  margin-top: -2.5%;
-  margin-bottom: -2.5%;
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    align-items: flex-start;
+    font-weight: 350;
+    font-size: 16px;
 `;
 const StateInfo = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: left;
-
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
   font-size: 20px;
-  margin-top: 2.5%;
-  margin-bottom: 2.5%;
 `;
 
 const InfoTitle = styled.div`
-  display: flex;
-  font-size: 10px;
-  font-weight: bold;
+    display: flex;
+    font-size: 16px;
+    font-weight: 500;
+    min-width: ${(props)=>{
+        return props.min_w;
+    }};
 `;
+
+const InfoDesc = styled.div`
+    display: flex;
+    font-size: 16px;
+    font-weight: 300;
+`
+
 const PrevStateButton = styled.button`
-  width: 100px;
-  height: 50px;
+  width: 80px;
+  height: 35px;
   border: 2px solid #ff7008;
   border-radius: 5px;
 
@@ -251,12 +227,11 @@ const PrevStateButton = styled.button`
   font-size: 16px;
   line-height: 20px;
   text-align: center;
-  color: #ffffff;
-  background-color: #ff7008;
+  color: #FF7008;
+  background-color: #FFFFFF;
 
   &:hover {
-    background-color: #ff8009;
-    border: 2px solid #ff8008;
+    background-color: #FF7008;
     color: #ffffff;
   }
 
@@ -264,8 +239,8 @@ const PrevStateButton = styled.button`
 `;
 
 const NextStateButton = styled.button`
-  width: 100px;
-  height: 50px;
+  width: 80px;
+  height: 35px;
   border: 2px solid #ff7008;
   border-radius: 5px;
 
@@ -275,12 +250,11 @@ const NextStateButton = styled.button`
   font-size: 16px;
   line-height: 20px;
   text-align: center;
-  color: #ffffff;
-  background-color: #ff7008;
+  color: #FF7008;
+  background-color: #FFFFFF;
 
   &:hover {
-    background-color: #ff8009;
-    border: 2px solid #ff8008;
+    background-color: #FF7008;
     color: #ffffff;
   }
 
@@ -288,10 +262,11 @@ const NextStateButton = styled.button`
 `;
 
 const DeleteButton = styled.button`
-  width: 100px;
-  height: 50px;
-  border: 2px solid #b22222;
+  width: 80px;
+  height: 35px;
+  border: 2px solid #FF0000;
   border-radius: 5px;
+  min-width: 160px;
 
   font-family: "Lexend Deca";
   font-style: normal;
@@ -300,13 +275,53 @@ const DeleteButton = styled.button`
   line-height: 20px;
   text-align: center;
   color: #ffffff;
-  background-color: #b22222;
+  background-color: #FF0000;
 
   &:hover {
-    background-color: #dc143c;
-    border: 2px solid #dc143c;
+    background-color: #FF2000;
+    border: 2px solid #FF2000;
     color: #ffffff;
   }
 
   cursor: pointer;
 `;
+
+
+const ClassFlex = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+`
+
+const StateFlex = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+`
+
+const StatusBlock = styled.div`
+    display: flex;
+    padding: 7px;
+    border-radius: 6px;
+    background-color: ${(props) => {
+        if (props.statusState === "rejected") {
+            return "#FF0000";
+        } else if (props.statusState === "completed") {
+            return "#009900";
+        } else {
+            return "#FFFF00";
+        }
+    }};
+    color: ${(props) => {
+        if (props.statusState === "rejected") {
+            return "#FFFFFF";
+        } else if (props.statusState === "completed") {
+            return "#FFFFFF";
+        } else {
+            return "#000000";
+        }
+    }};
+    font-weight: 500;
+`

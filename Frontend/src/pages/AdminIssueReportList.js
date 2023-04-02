@@ -17,12 +17,10 @@ export default function AdminIssueReportListPage() {
     <Container>
       <IsAdmin>
         <DataContext.Provider value={{ data, setData }}>
-          <ContainerWithHeight margintop="100px">
+          <ContainerWithHeight margintop="25px">
             <AdminIssueReportList />
           </ContainerWithHeight>
-          <WaveFooterWrapper>
-            <WaveFooter />
-          </WaveFooterWrapper>
+          
         </DataContext.Provider>
       </IsAdmin>
     </Container>
@@ -50,3 +48,4 @@ const Container = styled.div`
   min-height: 100vh;
   width: 100%;
 `;
+

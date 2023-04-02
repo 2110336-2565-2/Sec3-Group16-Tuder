@@ -59,7 +59,7 @@ export default function CancelRequest(props){
 
 const StatusBlock = styled.div`
     display: flex;
-    padding: 5px;
+    padding: 7px;
     border-radius: 6px;
     background-color: ${(props) => {
         if (props.status === "rejected") {
