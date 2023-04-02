@@ -239,16 +239,12 @@ func (s *serviceTutor) GetTutorReviews(reviewRequest *schemas.SchemaGetReviews) 
 	// fmt.Println(groupedReviews)
 	score := fmt.Sprintf("%.2f", float64(total_score)/float64(total_review))
 
-	schemaGroupedReviews := &schemas.SchemaGetReviewsByTutorIdResponse{
-		TotalScore:   score,
-		TotalReview:  total_review,
-		TutorReviews: groupedReviews,
-	}
-
 	reviewResponse := &schemas.SchemaGetReviewsResponse{
-		Firstname: reviews[0].Edges.Course[0].Edges.Tutor.Edges.User.FirstName,
-		Lastname:  reviews[0].Edges.Course[0].Edges.Tutor.Edges.User.LastName,
-		Reviews:   schemaGroupedReviews,
+		Firstname:   reviews[0].Edges.Course[0].Edges.Tutor.Edges.User.FirstName,
+		Lastname:    reviews[0].Edges.Course[0].Edges.Tutor.Edges.User.LastName,
+		TotalScore:  score,
+		TotalReview: total_review,
+		Reviews:     groupedReviews,
 	}
 
 	return reviewResponse, nil
