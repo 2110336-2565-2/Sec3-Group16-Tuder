@@ -33,8 +33,15 @@ type SchemaGetReviewsByCourseIdResponse struct {
 	Reviews     []Review `json:"reviews"`
 }
 
+type ReviewResponse struct {
+	CourseTitle  string    `json:"course_title"`
+	Score        int8      `json:"score"`
+	ReviewMsg    string    `json:"review_msg"`
+	ReviewTimeAt time.Time `json:"review_time_at"`
+}
+
 type SchemaGetReviewsByTutorIdResponse struct {
-	TotalScore   string               `json:"total_score"`
-	TotalReview  int                  `json:"total_review"`
-	TutorReviews map[string][]*Review `json:"tutor_reviews"`
+	TotalScore   string            `json:"total_score"`
+	TotalReview  int               `json:"total_review"`
+	TutorReviews []*ReviewResponse `json:"tutor_reviews"`
 }
