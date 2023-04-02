@@ -286,11 +286,16 @@ func (r *repositoryTutor) GetReviews(sr *schema.SchemaGetReviews) ([]*ent.Review
 		Where(
 			entReview.HasCourseWith(
 				entCourse.HasTutorWith(
-					entTutor.HasUserWith(entUser.IDEQ(sr.ID)),
+					entTutor.HasUserWith(entUser.UsernameEQ(sr.Username)),
 				),
 			),
 		).
-		WithCourse().
+		WithCourse(func(q *ent.CourseQuery) {
+			q.WithTutor(func(q *ent.TutorQuery) {
+				q.WithUser()
+			},
+			)
+		}).
 		All(r.ctx)
 
 	if err != nil {
