@@ -151,7 +151,7 @@ const Request = styled.div`
     gap: 20px;
     padding: 10px;
     border-radius: 10px;
-    border: 1px solid black;
+    
 `;
 
 const ClassSection = styled.div`

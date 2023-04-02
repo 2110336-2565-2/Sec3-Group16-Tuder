@@ -94,7 +94,9 @@ const Request = styled.div`
     cursor: pointer;
     border-radius: 10px;
     &:hover {
-        border: 1px solid #000000 ;
+        box-shadow: 5px 6px 11px -3px rgba(0,0,0,0.81);
+        -webkit-box-shadow: 5px 6px 11px -7px rgba(0,0,0,0.81);
+        -moz-box-shadow: 5px 6px 11px -7px rgba(0,0,0,0.81);
         background-color: #EE8E45 ;
     }
 `
