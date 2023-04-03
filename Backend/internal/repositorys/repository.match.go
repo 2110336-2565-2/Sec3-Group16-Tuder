@@ -7,14 +7,17 @@ import (
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
+	entMatch "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
+	"github.com/google/uuid"
 
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 )
 
 type RepositoryMatch interface {
 	CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match, error)
+	GetMatchByID(id uuid.UUID) (*ent.Match, error)
 }
 
 type repositoryMatch struct {
@@ -68,8 +71,8 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 	}
 
 	fmt.Println("Schedule", schedule)
-	fmt.Println("Course", course)
-	fmt.Println("Student", student)
+	fmt.Println("Course", course.Edges.Tutor.Edges.Schedule)
+	// fmt.Println("Student", student)
 	fmt.Println("scheduleID", schedule.ID)
 
 	// Create Appointment
@@ -79,6 +82,7 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 	})
 
 	if err != nil {
+		fmt.Println("Create Appointment: %w", err)
 		return nil, err
 	}
 
@@ -89,6 +93,7 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 	})
 
 	if err != nil {
+		fmt.Println("Update Tutor Schedule: %w", err)
 		return nil, err
 	}
 
@@ -98,10 +103,13 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 		SetCourse(course).
 		AddAppointment(appointments...).
 		SetStudent(student).
-		SetSchedule(schedule).
+		SetScheduleID(schedule.ID).
 		Save(r.ctx)
 
+	fmt.Println("Match", match)
+
 	if err != nil {
+		fmt.Println("Create Match: %w", err)
 		return nil, err
 	}
 
@@ -112,7 +120,7 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 		return nil, fmt.Errorf("creating match: %w", err)
 	}
 
-	return match, nil
+	return match, tx.Commit()
 }
 
 // If frontend want to create appointment by new approach, use this function
@@ -169,7 +177,7 @@ func (r *repositoryMatch) CreateSchedule(sr *schema.SchemaCreateSchedule) (*ent.
 		return nil, fmt.Errorf("creating schedule: %w", err)
 	}
 
-	return schedule, nil
+	return schedule, tx.Commit()
 }
 
 // Update tutor schedule when creating match
@@ -261,7 +269,7 @@ func (r *repositoryMatch) CreateAppointment(sr *schema.SchemaCreateAppointment) 
 			return nil, err
 		}
 
-		fmt.Println("appointment ", appointment)
+		// fmt.Println("appointment ", appointment)
 
 		appointments = append(appointments, appointment)
 
@@ -280,7 +288,7 @@ func (r *repositoryMatch) CreateAppointment(sr *schema.SchemaCreateAppointment) 
 		}
 		return nil, fmt.Errorf("creating course: %w", err)
 	}
-	return appointments, nil
+	return appointments, tx.Commit()
 }
 
 func (r *repositoryMatch) GetNow() time.Time {
@@ -293,4 +301,21 @@ func (r *repositoryMatch) GetNow() time.Time {
 	now = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 
 	return now
+}
+
+func (r *repositoryMatch) GetMatchByID(id uuid.UUID) (*ent.Match, error) {
+	match, err := r.client.Match.
+		Query().
+		Where(entMatch.IDEQ(id)).
+		WithStudent().
+		WithCourse().
+		WithSchedule().
+		WithAppointment().
+		Only(r.ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return match, nil
 }

@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	repository "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 )
@@ -20,6 +22,16 @@ func NewServiceMatch(repository repository.RepositoryMatch) *serviceMatch {
 // CreateMatch creates a match between a student and a course
 func (s *serviceMatch) CreateMatch(sr *schemas.SchemaCreateMatch) (*schemas.SchemaMatch, error) {
 	match, err := s.repository.CreateMatch(sr)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	fmt.Println("create match")
+	match, err = s.repository.GetMatchByID(match.ID)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
 	rawSchedule := &schemas.SchemaRawSchedule{
 		Sunday:    match.Edges.Schedule.Day0,
 		Monday:    match.Edges.Schedule.Day1,
@@ -29,9 +41,7 @@ func (s *serviceMatch) CreateMatch(sr *schemas.SchemaCreateMatch) (*schemas.Sche
 		Friday:    match.Edges.Schedule.Day5,
 		Saturday:  match.Edges.Schedule.Day6,
 	}
-	if err != nil {
-		return nil, err
-	}
+	fmt.Println("end service")
 	return &schemas.SchemaMatch{
 		ID:           match.ID,
 		Student:      match.Edges.Student,
