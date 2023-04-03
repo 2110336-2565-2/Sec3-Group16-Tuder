@@ -11,3 +11,7 @@ export const  searchCourseHandler = (searchData)=>{
 export const fetchCourseHandler = () => {
     return api.get('api/v1/courses')
 }
+
+export const fetchCourseByIdHandler = (courseId) => {
+    return api.get(`api/v1/course/${courseId}`)
+}
