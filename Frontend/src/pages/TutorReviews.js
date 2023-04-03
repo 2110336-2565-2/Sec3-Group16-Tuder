@@ -41,7 +41,9 @@ export default function TutorReviews() {
       {reviews.total_review > 0 ? (
         <Reviews reviews={reviews} />
       ) : (
-        <p>No review yet.</p>
+        <NoReviewContainer>
+          <p>No review yet.</p>
+        </NoReviewContainer>
       )}
       <Footer />
     </Container>
@@ -65,4 +67,13 @@ const TitleWrapper = styled.div`
   justify-content: center;
   align-items: center;
   min-height: 150px;
+`;
+
+const NoReviewContainer = styled.div`
+  display: flex;
+  width: 100%;
+  background-color: white;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
 `;
