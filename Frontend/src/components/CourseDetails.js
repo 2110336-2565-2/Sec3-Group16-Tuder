@@ -10,20 +10,20 @@ export default function CourseDetails(props){
             <DetailGrid>
                 <GridContent>
                     <DetailImgFix>
-                        <DetailImg src={props.img}/>
+                        <DetailImg src={data.course_picture_url}/>
                     </DetailImgFix>
                 </GridContent>
                 <GridContent>
                     <DetailContent>
                         <Detailrow fsize="30px" fweight="700">{data.title}</Detailrow>
-                        <Detailrow mgtop="1rem" fsize="16px" fweight="400">#review# review</Detailrow>
-                        <Detailrow mgtop="1rem" fsize="16px" fweight="400">Tutor : #tutor name#</Detailrow>
-                        <Detailrow mgtop="1rem" fsize="16px" fweight="400">Level : #level#</Detailrow>
+                        <Detailrow mgtop="1rem" fsize="16px" fweight="400">{data.ReviewCount} review(s)</Detailrow>
+                        <Detailrow mgtop="1rem" fsize="16px" fweight="400">Tutor : {`${data.TutorFirstname} ${data.TutorLastname}` }</Detailrow>
+                        <Detailrow mgtop="1rem" fsize="16px" fweight="400">Level : {data.level}</Detailrow>
                         <Detailrow mgtop="1rem" fsize="16px" fweight="400">Description :</Detailrow>
-                        <Detailrow mgtop="0.2rem" fsize="16px" fweight="400">#description#</Detailrow>
-                        <Detailrow mgtop="1rem" fsize="16px" fweight="400">Estimate time : #time#</Detailrow>
+                        <Detailrow mgtop="0.2rem" fsize="16px" fweight="400">{data.description}</Detailrow>
+                        <Detailrow mgtop="1rem" fsize="16px" fweight="400">Estimate time : {data.estimate_time}</Detailrow>
                         <DetailRight>
-                            <Content fsize="25px" fweight="400">#price# Bath/hour</Content>
+                            <Content fsize="25px" fweight="400">{data.price_per_hour} Bath/hour</Content>
                         </DetailRight>
                         <DetailRight>
                             <Content fsize="16px" fweight="400"><ButtonCourse>Enroll</ButtonCourse></Content>

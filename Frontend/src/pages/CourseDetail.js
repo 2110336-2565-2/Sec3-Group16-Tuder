@@ -4,14 +4,14 @@ import Footer from "../components/global/Footer.js";
 import CourseDetails from "../components/CourseDetails.js";
 import { useParams } from "react-router-dom";
 import { useQuery } from "react-query";
-import { fetchCourseDetailHandler } from "../handlers/searchCourseHandler.js";
+import { fetchCourseByIdHandler } from "../handlers/searchCourseHandler.js";
 
 export default function CourseDetail() {
     const [data, setData] = useState({});
     const { id } = useParams();
     const { isLoading, error } = useQuery(
         'course', () => {
-        fetchCourseDetailHandler(id).then((res) => {
+        fetchCourseByIdHandler(id).then((res) => {
             if (res.data.success) {
                 if (res.data.data !== null)
                     setData(res.data.data);

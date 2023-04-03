@@ -12,6 +12,6 @@ export const fetchCourseHandler = () => {
     return api.get('api/v1/courses')
 }
 
-export const fetchCourseDetailHandler = (id) => {
+export const fetchCourseByIdHandler = (id) => {
     return api.get(`api/v1/course/${id}`)
 }
