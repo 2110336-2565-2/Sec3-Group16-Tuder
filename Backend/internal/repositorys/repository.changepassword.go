@@ -35,6 +35,13 @@ func (r *repositoryChangePassword) ChangePassword(sc *schemas.SchemaChangePasswo
 		return err
 	}
 
+	// validate password
+
+	passwordValidator := utils.PasswordValidator(user.Username, user.Email, user.FirstName, user.LastName)
+	if err := passwordValidator.Validate(sc.Password); err != nil {
+		return err
+	}
+
 	hashedPassword, _ := utils.HashPassword(sc.Password)
 
 	_, err = user.Update().

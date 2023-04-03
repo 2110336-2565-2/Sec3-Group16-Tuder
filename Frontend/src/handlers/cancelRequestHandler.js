@@ -11,3 +11,13 @@ export const fetchCancellingRequestHandler = (id) => {
         }
     })
 }
+
+export const submitCancelRequestHandler = (data) => {
+    return api.post('api/v1/cancel-request', data, {
+            headers:
+            {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+            }
+    });
+}

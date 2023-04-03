@@ -14,12 +14,15 @@ import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
 import Review from './pages/Review';
 import ErrorPage from './pages/ErrorPage';
+import ResetPassword from './pages/ResetPassword';
 import ChangePassword from './pages/ChangePassword';
 import EnterNewPassword from './pages/EnterNewPassword';
 import CancelRequestList from './pages/CancelRequestList';
 import CourseReviews from './pages/CourseReviews';
 import UserCancelRequest from './pages/UserCancelRequest';
 import CancelRequestDetail from './pages/CancelRequestDetail';
+import AdminIssueReportList from './pages/AdminIssueReportList'
+import CourseDetail from './pages/CourseDetail';
 import TutorReviews from './pages/TutorReviews';
 import Enroll from './pages/Enroll';
 import { QueryClientProvider, QueryClient } from 'react-query';
@@ -112,6 +115,10 @@ const router = createBrowserRouter([
         element: <CourseReviews />,
       },
       {
+        path: "/reset-password/:token",
+        element: <ResetPassword />,
+      },
+      {
         path: "/change-password",
         element: <ChangePassword />,
       },
@@ -130,6 +137,14 @@ const router = createBrowserRouter([
       {
         path: "/cancel-request-detail/:id",
         element: <CancelRequestDetail />,
+      },
+      {
+        path: "/issuereports",
+        element: <AdminIssueReportList />,
+      },
+      {
+        path: "/course-detail/:id",
+        element: <CourseDetail />
       }
     ]
   }
