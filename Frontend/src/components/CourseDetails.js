@@ -102,6 +102,7 @@ const DetailContent = styled.div`
     display: flex;
     flex-direction: column;
     padding: 10px;
+    min-width: 450px;
 `
 const Detailrow = styled.div`
     display: flex;

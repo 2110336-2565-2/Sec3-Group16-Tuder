@@ -37,7 +37,7 @@ export default function CancelRequest(props){
                         <ClassInfoButton>
                             <InfoTitle min_w = "60px">Status :</InfoTitle>
                             <InfoDesc>
-                                <StatusBlock>
+                                <StatusBlock state={props.status}>
                                     {props.status}
                                 </StatusBlock>
                             </InfoDesc>
@@ -58,18 +58,18 @@ const StatusBlock = styled.div`
     padding: 7px;
     border-radius: 6px;
     background-color: ${(props) => {
-        if (props.status === "rejected") {
+        if (props.state === "rejected") {
             return "#FF0000";
-        } else if (props.status === "approved") {
+        } else if (props.state === "approved") {
             return "#009900";
         } else {
             return "#FFFF00";
         }
     }};
     color: ${(props) => {
-        if (props.status === "rejected") {
+        if (props.state === "rejected") {
             return "#FFFFFF";
-        } else if (props.status === "approved") {
+        } else if (props.state === "approved") {
             return "#FFFFFF";
         } else {
             return "#000000";
