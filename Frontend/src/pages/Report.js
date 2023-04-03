@@ -46,7 +46,7 @@ export default function Report(){
                             </InputContent>
                             <LabelContent>Contact :</LabelContent>
                             <InputContent>
-                                <InputTopic  BoxSize='300px' name='contact' type='contact' placeholder='' value={contact} onChange={(e) => setContact(e.target.value)}/>
+                                <InputTopic  BoxSize='300px' name='contact' type='contact' placeholder='Email or Phonenumber' value={contact} onChange={(e) => setContact(e.target.value)}/>
                             </InputContent>
                             <ButtonContent>
                                 <ButtonFlex>
