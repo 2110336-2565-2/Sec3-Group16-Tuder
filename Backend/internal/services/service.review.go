@@ -4,6 +4,7 @@ import (
 	"fmt"
 	repository "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 	"github.com/google/uuid"
 )
 
@@ -51,26 +52,7 @@ func (s serviceReview) GetRating(courseId string) (*schemas.SchemaGetReviewsByCo
 	if err != nil {
 		return nil, err
 	}
-	// calculate stats
-	var rating float32
-	var count int
-	var accRating float32 = 0
-	for _, r := range c.Edges.Review {
-		accRating += float32(*r.Score)
-	}
-	// check if a course have never been rate yed
-	if len(c.Edges.Review) <= 0 {
-		count = 0
-		rating = 0.0
-		// prevent zero division
-	} else if accRating == 0.0 {
-		count = len(c.Edges.Review)
-		rating = 0.0
-		// start counting
-	} else {
-		count = len(c.Edges.Review)
-		rating = accRating / float32(count)
-	}
+	count, rating := utils.CalcReviewStat(c.Edges.Review)
 
 	// assign values to fields
 	sG := &schemas.SchemaGetReviewsByCourseIdResponse{

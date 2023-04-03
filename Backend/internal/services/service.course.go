@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	repository "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
@@ -199,17 +200,31 @@ func (s *serviceCourse) GetCourseByID(sr *schemas.SchemaGetCourse) (*schemas.Sch
 	if err != nil {
 		return nil, err
 	}
+	count, rating := utils.CalcReviewStat(course.Edges.Review)
 	courseResponse := &schemas.SchemaCourse{
 		ID:                 course.ID,
-		Tutor_id:           course.Edges.Tutor.ID,
 		Title:              course.Title,
-		Description:        course.Description,
+		Rating:             rating,
+		ReviewCount:        count,
+		Reviews:            []schemas.Review{},
+		Tutor_id:           course.Edges.Tutor.ID,
+		TutorFirstname:     course.Edges.Tutor.Edges.User.FirstName,
+		TutorLastname:      course.Edges.Tutor.Edges.User.LastName,
 		Subject:            course.Subject,
 		Topic:              course.Topic,
+		Level:              course.Level.String(),
+		Description:        course.Description,
 		Estimate_time:      course.EstimatedTime,
 		Price_per_hour:     course.PricePerHour,
 		Course_picture_url: *course.CoursePictureURL,
-		Level:              course.Level.String(),
+	}
+	// append ent.Review to sG
+	for _, r := range course.Edges.Review {
+		courseResponse.Reviews = append(courseResponse.Reviews, schemas.Review{
+			Score:        *r.Score,
+			ReviewMsg:    *r.ReviewMsg,
+			ReviewTimeAt: r.ReviewTimeAt,
+		})
 	}
 	return courseResponse, nil
 }

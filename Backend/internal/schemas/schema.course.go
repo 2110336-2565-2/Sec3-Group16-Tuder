@@ -1,6 +1,8 @@
 package schemas
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+)
 
 type CourseSearchResult struct {
 	Course_id          uuid.UUID `json:"course_id"`
@@ -23,15 +25,20 @@ type CourseSearch struct {
 
 type SchemaCourse struct {
 	ID                 uuid.UUID `json:"id"`
-	Tutor_id           uuid.UUID `json:"tutor_id"`
 	Title              string    `json:"title"`
-	Subject            string    `json:"subject"`
-	Topic              string    `json:"topic"`
-	Estimate_time      int       `json:"estimate_time"`
-	Description        string    `json:"description"`
-	Price_per_hour     int       `json:"price_per_hour"`
-	Level              string    `json:"level"`
-	Course_picture_url string    `json:"course_picture_url"`
+	Rating             float32
+	ReviewCount        int
+	Reviews            []Review
+	Tutor_id           uuid.UUID `json:"tutor_id"`
+	TutorFirstname     string
+	TutorLastname      string
+	Subject            string `json:"subject"`
+	Topic              string `json:"topic"`
+	Level              string `json:"level"`
+	Description        string `json:"description"`
+	Estimate_time      int    `json:"estimate_time"`
+	Price_per_hour     int    `json:"price_per_hour"`
+	Course_picture_url string `json:"course_picture_url"`
 }
 
 type SchemaGetCourse struct {
