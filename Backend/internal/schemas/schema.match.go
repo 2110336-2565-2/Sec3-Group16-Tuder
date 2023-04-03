@@ -22,9 +22,9 @@ type SchemaAppointmentTime struct {
 
 type SchemaCreateAppointment struct {
 	// Course_time      int                     `json:"course_time"`
-	Match      *ent.Match `json:"match"`
-	Total_hour int        `json:"total_hour"`
-	Schedule   Schedule   `json:"schedule"`
+	// Match      *ent.Match `json:"match"`
+	Total_hour int      `json:"total_hour"`
+	Schedule   Schedule `json:"schedule"`
 	// Appointment_list []SchemaAppointmentTime `json:"appointment_list"`
 }
 

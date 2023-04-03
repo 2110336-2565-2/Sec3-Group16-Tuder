@@ -27,17 +27,29 @@ func NewRepositoryMatch(c *ent.Client) *repositoryMatch {
 }
 
 func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match, error) {
+	// create a transaction
+	tx, err := r.client.Tx(r.ctx)
+	if err != nil {
+		return nil, fmt.Errorf("starting a transaction: %w", err)
+	}
+
+	// wrap the client with the transaction
+	txc := tx.Client()
+
 	//Check if course and student exist
-	course, err := r.client.Course.
+	course, err := txc.Course.
 		Query().
 		Where(course.IDEQ(sr.Course_id)).
+		WithTutor(func(tq *ent.TutorQuery) {
+			tq.WithSchedule()
+		}).
 		Only(r.ctx)
 
 	if err != nil {
 		return nil, err
 	}
 
-	student, err := r.client.Student.
+	student, err := txc.Student.
 		Query().
 		Where(student.IDEQ(sr.Student_id)).
 		Only(r.ctx)
@@ -55,23 +67,15 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 		return nil, err
 	}
 
-	//Create Match
-	match, err := r.client.Match.
-		Create().
-		SetCourse(course).
-		SetStudent(student).
-		SetSchedule(schedule).
-		Save(r.ctx)
-
-	if err != nil {
-		return nil, err
-	}
+	fmt.Println("Schedule", schedule)
+	fmt.Println("Course", course)
+	fmt.Println("Student", student)
+	fmt.Println("scheduleID", schedule.ID)
 
 	// Create Appointment
 	appointments, err := r.CreateAppointment(&schema.SchemaCreateAppointment{
-		Match:      match,
 		Schedule:   sr.Schedule,
-		Total_hour: course.EstimatedTime,
+		Total_hour: sr.Total_hour,
 	})
 
 	if err != nil {
@@ -88,13 +92,24 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 		return nil, err
 	}
 
-	// Add Appointment to Match
-	match, err = match.Update().
+	//Create Match
+	match, err := txc.Match.
+		Create().
+		SetCourse(course).
 		AddAppointment(appointments...).
+		SetStudent(student).
+		SetSchedule(schedule).
 		Save(r.ctx)
 
 	if err != nil {
 		return nil, err
+	}
+
+	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+		return nil, fmt.Errorf("creating match: %w", err)
 	}
 
 	return match, nil
@@ -123,8 +138,16 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 // }
 
 func (r *repositoryMatch) CreateSchedule(sr *schema.SchemaCreateSchedule) (*ent.Schedule, error) {
+	// create a transaction
+	tx, err := r.client.Tx(r.ctx)
+	if err != nil {
+		return nil, fmt.Errorf("starting a transaction: %w", err)
+	}
+	// wrap the client with the transaction
+	txc := tx.Client()
+
 	ata := sr.Schedule.AvailableTimeArrays()
-	schedule, err := r.client.Schedule.
+	schedule, err := txc.Schedule.
 		Create().
 		SetDay0(ata[0]).
 		SetDay1(ata[1]).
@@ -137,6 +160,13 @@ func (r *repositoryMatch) CreateSchedule(sr *schema.SchemaCreateSchedule) (*ent.
 
 	if err != nil {
 		return nil, err
+	}
+
+	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+		return nil, fmt.Errorf("creating schedule: %w", err)
 	}
 
 	return schedule, nil
@@ -186,6 +216,14 @@ func (r *repositoryMatch) UpdateTutorSchedule(sr *schema.SchemaUpdateTutorSchedu
 }
 
 func (r *repositoryMatch) CreateAppointment(sr *schema.SchemaCreateAppointment) ([]*ent.Appointment, error) {
+	// create a transaction
+	tx, err := r.client.Tx(r.ctx)
+	if err != nil {
+		return nil, fmt.Errorf("starting a transaction: %w", err)
+	}
+	// wrap the client with the transaction
+	txc := tx.Client()
+
 	ata := sr.Schedule.AvailableTimeArrays()
 	appointments := make([]*ent.Appointment, 0)
 
@@ -195,7 +233,7 @@ func (r *repositoryMatch) CreateAppointment(sr *schema.SchemaCreateAppointment) 
 	totalHour := sr.Total_hour
 	dayCount := 1
 
-	for totalHour >= 0 {
+	for totalHour > 0 {
 		// Find the first available time
 		for !ata[day][hoursCount] {
 			hoursCount++
@@ -212,7 +250,7 @@ func (r *repositoryMatch) CreateAppointment(sr *schema.SchemaCreateAppointment) 
 
 		endAt := time.Date(beginAtDay.Year(), beginAtDay.Month(), beginAtDay.Day(), hoursCount+1, 0, 0, 0, beginAtDay.Location())
 
-		appointment, err := r.client.Appointment.
+		appointment, err := txc.Appointment.
 			Create().
 			SetBeginAt(beginAt).
 			SetEndAt(endAt).
@@ -223,6 +261,8 @@ func (r *repositoryMatch) CreateAppointment(sr *schema.SchemaCreateAppointment) 
 			return nil, err
 		}
 
+		fmt.Println("appointment ", appointment)
+
 		appointments = append(appointments, appointment)
 
 		totalHour -= 1
@@ -232,7 +272,13 @@ func (r *repositoryMatch) CreateAppointment(sr *schema.SchemaCreateAppointment) 
 			dayCount++
 			hoursCount = 0
 		}
+	}
 
+	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+		return nil, fmt.Errorf("creating course: %w", err)
 	}
 	return appointments, nil
 }
