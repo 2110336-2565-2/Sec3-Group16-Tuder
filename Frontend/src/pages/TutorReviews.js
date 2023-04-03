@@ -21,11 +21,10 @@ export default function TutorReviews() {
 
   // console.log("username: ", username);
   // NOTE to backend: Change this to fetch reviews from backend then it should work
-  useEffect(async () =>  {
-    const res = await fetchTutorReviews(username) 
-    // console.log(res.data.data)
-    setReviews(res.data.data);
-    // GET(`/api/v1/tutors/${username}/reviews`)
+  useEffect(() =>  {
+    const res = fetchTutorReviews(username).then((res) => {
+      setReviews(res.data.data);
+    });
   }, []);
   // ---------------------------------------------
 
@@ -42,7 +41,9 @@ export default function TutorReviews() {
       {reviews.total_review > 0 ? (
         <Reviews reviews={reviews} />
       ) : (
-        <p>No review yet.</p>
+        <NoReviewContainer>
+          <p>No review yet.</p>
+        </NoReviewContainer>
       )}
       <Footer />
     </Container>
@@ -66,4 +67,13 @@ const TitleWrapper = styled.div`
   justify-content: center;
   align-items: center;
   min-height: 150px;
+`;
+
+const NoReviewContainer = styled.div`
+  display: flex;
+  width: 100%;
+  background-color: white;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
 `;

@@ -1,38 +1,42 @@
-import React, {useState, useEffect} from 'react'
-import styled from 'styled-components'
-import Reviews from '../components/review/Reviews.js'
-import Footer from '../components/global/Footer.js'
-import { IsStudent } from '../components/IsAuth.js'
-import { courseReviews } from '../datas/DummyReview'
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import Reviews from "../components/review/Reviews.js";
+import Footer from "../components/global/Footer.js";
+import { IsStudent } from "../components/IsAuth.js";
+import { courseReviews } from "../datas/DummyReview";
 
 export default function CourseReviews() {
-  const [reviews, setReviews] = useState([])
+  const [reviews, setReviews] = useState([]);
 
   // NOTE to backend: Change this to fetch reviews from backend then it should work
   useEffect(() => {
-    setReviews(courseReviews)
-  }, [])
+    setReviews(courseReviews);
+  }, []);
   // ---------------------------------------------
 
   return (
     <Container>
-      {/* <IsStudent /> */}
+      <IsStudent />
       <TitleWrapper>
         <Title>{reviews.course_title}</Title>
       </TitleWrapper>
-      {reviews.total_review > 0?
-        <Reviews reviews={reviews} />:
-        <p>No review yet.</p>}
+      {reviews.total_review > 0 ? (
+        <Reviews reviews={reviews} />
+      ) : (
+        <NoReviewContainer>
+          <p>No review yet.</p>
+        </NoReviewContainer>
+      )}
       <Footer />
     </Container>
-  )
+  );
 }
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #EB7B42;
+  background-color: #eb7b42;
   width: 100%;
 `;
 
@@ -45,5 +49,13 @@ const TitleWrapper = styled.div`
   justify-content: center;
   align-items: center;
   min-height: 150px;
-`
+`;
 
+const NoReviewContainer = styled.div`
+  display: flex;
+  width: 100%;
+  background-color: white;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+`;
