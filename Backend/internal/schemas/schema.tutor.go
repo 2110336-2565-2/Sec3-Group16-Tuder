@@ -44,6 +44,10 @@ type SchemaGetTutor struct {
 	Username string `json:"username"`
 }
 
+type SchemaGetTutorByID struct {
+	ID uuid.UUID `json:"id"`
+}
+
 type SchemaCreateTutor struct {
 	Username          string    `json:"username"`
 	Password          string    `json:"password"`

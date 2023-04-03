@@ -4,13 +4,19 @@ import Reviews from "../components/review/Reviews.js";
 import Footer from "../components/global/Footer.js";
 import { IsStudent } from "../components/IsAuth.js";
 import { courseReviews } from "../datas/DummyReview";
+import { getCourseReviewHandler } from "../handlers/courseReviewHandler.js";
+import { useParams } from "react-router-dom";
 
 export default function CourseReviews() {
   const [reviews, setReviews] = useState([]);
+  const { courseID } = useParams();
 
   // NOTE to backend: Change this to fetch reviews from backend then it should work
   useEffect(() => {
-    setReviews(courseReviews);
+    console.log(courseID)
+    getCourseReviewHandler(courseID).then((res) => {
+      setReviews(res.data.data)
+    });
   }, []);
   // ---------------------------------------------
 

@@ -3,6 +3,7 @@ package controllers
 import (
 	// "github.com/golang-jwt/jwt/v4"
 	"net/http"
+	"github.com/google/uuid"
 
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 	service "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/services"
@@ -13,6 +14,7 @@ type ControllerTutor interface {
 	CreateTutor(c echo.Context) error
 	GetTutors(c echo.Context) error
 	GetTutorByUsername(c echo.Context) error
+	GetTutorByID(c echo.Context) error
 	GetTutorSchedule(c echo.Context) error
 	UpdateTutor(c echo.Context) error
 	UpdateSchedule(c echo.Context) error
@@ -60,6 +62,38 @@ func (cR *controllerTutor) GetTutorByUsername(c echo.Context) (err error) {
 	return nil
 }
 
+func (cR *controllerTutor) GetTutorByID(c echo.Context) (err error) {
+	id, _ := uuid.Parse(c.Param("id"))
+	uR := &schema.SchemaGetTutorByID{
+		ID: id,
+	}
+	if err = c.Bind(uR); err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: "invalid request payload",
+			Error:   err,
+		})
+		return
+	}
+
+	tutor, err := cR.service.GetTutorByID(uR)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: err.Error(),
+			Error:   err,
+		})
+		return
+	}
+	c.JSON(http.StatusOK, schema.SchemaResponses{
+		Success: true,
+		Message: "Get tutor successfully",
+		Data:    tutor,
+	})
+	return nil
+}
+
 func (cR *controllerTutor) GetTutors(c echo.Context) (err error) {
 	tutors, err := cR.service.GetTutors()
 	if err != nil {
@@ -77,6 +111,8 @@ func (cR *controllerTutor) GetTutors(c echo.Context) (err error) {
 	})
 	return nil
 }
+
+
 
 func (cR *controllerTutor) CreateTutor(c echo.Context) (err error) {
 	uR := &schema.SchemaCreateTutor{}

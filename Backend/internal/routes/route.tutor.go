@@ -19,6 +19,7 @@ func InitTutorRoutes(client *ent.Client, e *echo.Group) {
 	// authMiddleware := middlewares.NewAuthMiddleware(os.Getenv("JWT_SECRET"))
 
 	e.GET("/tutor/:username", controllerTutor.GetTutorByUsername)
+	e.GET("/tutorID/:id", controllerTutor.GetTutorByID)
 	e.GET("/tutors", controllerTutor.GetTutors)
 	e.POST("/tutor", controllerTutor.CreateTutor)
 	e.PUT("/tutor", controllerTutor.UpdateTutor)
