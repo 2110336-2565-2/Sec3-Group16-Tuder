@@ -13,10 +13,9 @@ func InitIssueReportRoutes(client *ent.Client, e *echo.Group) {
 	serviceIssueReport := service.NewServiceIssueReport(repoIssueReport)
 	controllerIssueReport := controller.NewControllerIssueReport(serviceIssueReport)
 
-	// e.GET("/course/:id", controllerCourse.GetCourseByCourseID)
 	e.GET("/issuereports", controllerIssueReport.GetIssueReports)
 	e.POST("/createissuereport", controllerIssueReport.CreateIssueReport)
-	// e.PUT("/course/:id", controllerCourse.UpdateCourse)
-	// e.DELETE("/course/:id", controllerCourse.DeleteCourse)
-	// e.POST("/coursesearch", controllerCourse.SearchContent)
+	e.PUT("/issuereport/update/:id", controllerIssueReport.UpdateIssueReport)
+	e.PUT("/issuereport/updatestatus/:id", controllerIssueReport.UpdateIssueReportStatus)
+	e.DELETE("/issuereport/:id", controllerIssueReport.DeleteIssueReport)
 }

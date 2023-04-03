@@ -209,15 +209,15 @@ func (r *repositoryCancelRequest) AuditRequest(sc *schemas.SchemaCancelRequestAp
 	status := cancelrequest.StatusPending
 	if approve {
 		status = cancelrequest.StatusApproved
-
-		if ccr.Status == cancelrequest.StatusApproved {
-			return errors.New("cancel request is already approved")
-		}
 	} else {
 		status = cancelrequest.StatusRejected
-		if ccr.Status == cancelrequest.StatusRejected {
-			return errors.New("cancel request is already rejected")
-		}
+	}
+
+	if ccr.Status == cancelrequest.StatusApproved {
+		return errors.New("cancel request is already approved")
+	}
+	if ccr.Status == cancelrequest.StatusRejected {
+		return errors.New("cancel request is already rejected")
 	}
 
 	_, err = r.client.CancelRequest.

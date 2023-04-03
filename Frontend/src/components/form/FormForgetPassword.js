@@ -1,27 +1,55 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import FormT from './FormStyle.js';
 import styled from 'styled-components';
+import { toast } from 'react-hot-toast';
+import {forgetPasswordHandler} from '../../handlers/forgetPasswordHandler.js';
+import { useNavigate } from 'react-router-dom';
 
 export default function FormSignIn(){
 
+    const [email, setEmail] = React.useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
+
+
+
+    const handleSubmit = async(e) => {
+        e.preventDefault();
+        toast.promise(
+            forgetPasswordHandler({email}),
+            {
+              loading: 'Sending email',
+              success: 'Email has been sent!',
+              error: (error) => error.response.data.message,
+            },
+            {
+              // Optional options object for toast configuration
+            }
+          );
+        
+    }
+
+
+
     return(
-        <form action='' method='post'>
             <FormT.Div FormW='400px'>
-                <FormT.Header>Reset Password</FormT.Header>
+                <FormT.Header>Forget Password</FormT.Header>
                 <FormT.Content>Sign in and start managing your candidates!</FormT.Content>
                 <FormT.Content>
-                    <FormT.TextInput BoxSize='200px' name='username' type='text' placeholder='Enter your Email'/>
+                    <FormT.TextInput BoxSize='200px' value={email} onChange={(e)=> setEmail(e.target.value)} type='email' placeholder='Enter your Email'/>
                 </FormT.Content>
     
                 <FormT.Content>
-                    <FormT.Button type='submit'>Send</FormT.Button>
+                    <FormT.Button onClick={handleSubmit}>Send</FormT.Button>
                 </FormT.Content>
                 <FormT.Content>
                     <ContentSpace />
-                    <FormT.Link to='/Signin' underline='none'>back to login</FormT.Link>
+                    <FormT.Link to='/sign-in' underline='none'>back to login</FormT.Link>
                 </FormT.Content>
+
+                {isLoading && toast.loading('Submitting data...')}
             </FormT.Div>
-        </form>
+        
     )
 }
 

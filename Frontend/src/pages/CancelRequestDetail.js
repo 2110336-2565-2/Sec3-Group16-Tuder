@@ -12,10 +12,8 @@ export default function CancelRequestDetailPage(){
 
     const {id} = useParams();
 
-
-
     const { isLoading, error} = useQuery(
-        'cancelRequest',() =>
+        'cancelRequest', () =>
         {
             fetchCancellingRequestHandler(id).then((res) => {
                 
@@ -23,8 +21,10 @@ export default function CancelRequestDetailPage(){
                     if(res.data.data !== null)
                         setData(res.data.data);
                 }
+
             }).catch((err) => {
                 console.log(err);
+                
             }
             )
         },
@@ -33,9 +33,14 @@ export default function CancelRequestDetailPage(){
         }
         );
 
-    if (isLoading) {
+    if (isLoading || Object.keys(data).length === 0) {
         return <div>Loading...</div>
     }
+
+    if (data === {}) {
+        return <div>Loading...</div>
+    }
+
 
     if (error) {
         return <div>Error: {error.message}</div>
@@ -50,12 +55,12 @@ export default function CancelRequestDetailPage(){
     }
 
     return(
-        <IsAdmin>
-            <Container>
+        <Container>
+            <IsAdmin>
                 <CancelRequestInfo cancelRequestId={data.cancelRequestId} title={data.title} reporter={data.reporter} img={data.img_url} description={data.description} report_date={data.report_date} status={data.status} />
                 <Footer />   
+            </IsAdmin>  
             </Container>
-        </IsAdmin>
         
     )
 }
