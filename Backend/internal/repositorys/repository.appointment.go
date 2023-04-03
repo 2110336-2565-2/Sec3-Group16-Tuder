@@ -39,9 +39,7 @@ func (r *repositoryAppointment) GetAppointmentByStudentID(sr *schemas.SchemaGetA
 	for _, match := range matches {
 		schemaAppointments = append(schemaAppointments, &schemas.SchemaAppointment{
 			ID:          match.ID,
-			Begin_at:    match.Edges.Appointment.BeginAt,
-			End_at:      match.Edges.Appointment.EndAt,
-			Status:      match.Edges.Appointment.Status,
+			Appointment: match.Edges.Appointment,
 			Course_name: match.Edges.Course.Title,
 			Tutor_name:  match.Edges.Course.Edges.Tutor.Edges.User.Username,
 		})
