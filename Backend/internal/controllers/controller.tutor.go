@@ -2,10 +2,12 @@ package controllers
 
 import (
 	// "github.com/golang-jwt/jwt/v4"
+
 	"net/http"
 
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 	service "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/services"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
@@ -32,7 +34,7 @@ func (cR *controllerTutor) GetTutorByUsername(c echo.Context) (err error) {
 	}
 
 	tutor, err := cR.service.GetTutorByUsername(uR)
-	
+
 	if err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
 			Success: false,
@@ -45,6 +47,30 @@ func (cR *controllerTutor) GetTutorByUsername(c echo.Context) (err error) {
 		Success: true,
 		Message: "Get tutor successfully",
 		Data:    tutor,
+	})
+	return nil
+}
+
+func (cR *controllerTutor) GetTutorScheduleByCourseId(c echo.Context) error {
+	courseId, _ := uuid.Parse(c.Param("courseId"))
+	uR := &schema.SchemaGetTutorScheduleByCourseId{
+		Course_id: courseId,
+	}
+
+	tutorSchedule, err := cR.service.GetTutorScheduleByCourseId(uR)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: err.Error(),
+			Error:   err,
+		})
+		return err
+	}
+	c.JSON(http.StatusOK, schema.SchemaResponses{
+		Success: true,
+		Message: "Get tutor schedule successfully",
+		Data:    tutorSchedule,
 	})
 	return nil
 }

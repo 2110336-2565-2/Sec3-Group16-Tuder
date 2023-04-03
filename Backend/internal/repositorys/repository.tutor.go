@@ -3,7 +3,10 @@ package repositorys
 import (
 	"context"
 	"fmt"
+
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
+	entCourse "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
+	entSchedule "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	entTutor "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	entUser "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -14,6 +17,7 @@ import (
 type RepositoryTutor interface {
 	GetTutors() ([]*ent.Tutor, error)
 	GetTutorByUsername(sr *schema.SchemaGetTutor) (*ent.Tutor, error)
+	GetTutorScheduleByCourseId(sr *schema.SchemaGetTutorScheduleByCourseId) (*ent.Schedule, error)
 	CreateTutor(sr *schema.SchemaCreateTutor) (*ent.Tutor, error)
 	UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor, error)
 	DeleteTutor(sr *schema.SchemaDeleteTutor) error
@@ -40,6 +44,30 @@ func (r *repositoryTutor) GetTutorByUsername(sr *schema.SchemaGetTutor) (*ent.Tu
 		return nil, err
 	}
 	return tutor, nil
+}
+
+func (r *repositoryTutor) GetTutorScheduleByCourseId(sr *schema.SchemaGetTutorScheduleByCourseId) (*ent.Schedule, error) {
+	//Check if course
+	course, err := r.client.Course.
+		Query().
+		Where(entCourse.IDEQ(sr.Course_id)).
+		WithTutor().
+		Only(r.ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	//Get Schedules by tutor id
+	schedule, err := r.client.Schedule.
+		Query().
+		Where(entSchedule.HasTutorWith(entTutor.IDEQ(course.Edges.Tutor.ID))).
+		Only(r.ctx)
+
+	if err != nil {
+		return nil, err
+	}
+	return schedule, nil
 }
 
 func (r *repositoryTutor) GetTutors() ([]*ent.Tutor, error) {
@@ -156,7 +184,7 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 
 	// update schedule
 	// query for schedule
-	var schedule ,_ = tutor.QuerySchedule().Only(r.ctx)
+	var schedule, _ = tutor.QuerySchedule().Only(r.ctx)
 	if sr.Schedule != nil {
 		schedule, err = r.UpdateSchedule(&schema.SchemaUpdateSchedule{
 			Username: sr.Username,
