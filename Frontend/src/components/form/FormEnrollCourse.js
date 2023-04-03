@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import TimeSelector from "../enrollment/TimeSelector";
+import { getStudentID } from "../../utils/jwtGet";
 import { convertFrontendSchedulesToBackend } from "../../utils/profile/scheduleConverter";
 import { submitEnrollFormHandler } from "../../handlers/match/enrollHandler";
 
 export default function FormEnrollCourse({ course, courseSchedule }) {
+  const navigate = useNavigate();
+  const studentID = getStudentID();
   const [totalHours, setTotalHours] = useState(0);
   const [selectedSchedule, setSelectedSchedule] = useState({});
   function handleSubmit(e) {
@@ -19,6 +23,7 @@ export default function FormEnrollCourse({ course, courseSchedule }) {
     const backendSchedule = convertFrontendSchedulesToBackend(filteredSchedule);
     // Create data to send to backend
     const data = {
+      student_id: studentID,
       course_id: course.id,
       total_hour: parseInt(totalHours),
       schedule: backendSchedule,
@@ -27,6 +32,7 @@ export default function FormEnrollCourse({ course, courseSchedule }) {
     submitEnrollFormHandler(data)
       .then((res) => {
         toast.success("Enroll Success");
+        navigate("/");
       })
       .catch((err) => {
         toast.error("Enroll Failed");
