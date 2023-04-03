@@ -38,6 +38,9 @@ func InsertData(client *ent.Client) {
 	// Insert match
 	match := InsertMatch(client, ctx, app, course, student, schedule)
 
+	// Insert review
+	InsertReview(client, ctx, student, course)
+
 	// Insert cancel request
 	InsertCancelRequest(client, ctx, user, match)
 

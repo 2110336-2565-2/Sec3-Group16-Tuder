@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -33,7 +34,23 @@ func (s *serviceLogin) LoginService(l *schemas.SchemaLogin) (*schemas.SchemaLogi
 		return nil, errors.New("the password isn't match")
 	}
 
-	token, _ := utils.GenerateLoginToken(luser.Username, luser.ID, luser.Role.String(), true)
+	// writing claims
+	claims := map[string]interface{}{}
+
+	// adding claims for user
+	claims["username"] = luser.Username
+	claims["userid"] = luser.ID
+	claims["role"] = luser.Role
+
+	// add claims if student
+	if *luser.Role == user.RoleStudent {
+		claims["studentid"] = luser.Edges.Student.ID
+		// add claims if tutor
+	} else if *luser.Role == user.RoleTutor {
+		claims["tutorid"] = luser.Edges.Tutor.ID
+	}
+
+	token, _ := utils.GenerateLoginToken(claims, true)
 
 	return &schemas.SchemaLoginResponses{
 		Username: luser.Username,

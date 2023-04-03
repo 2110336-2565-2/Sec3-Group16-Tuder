@@ -24,15 +24,15 @@ type ReviewCreate struct {
 }
 
 // SetScore sets the "score" field.
-func (rc *ReviewCreate) SetScore(f float32) *ReviewCreate {
-	rc.mutation.SetScore(f)
+func (rc *ReviewCreate) SetScore(i int8) *ReviewCreate {
+	rc.mutation.SetScore(i)
 	return rc
 }
 
 // SetNillableScore sets the "score" field if the given value is not nil.
-func (rc *ReviewCreate) SetNillableScore(f *float32) *ReviewCreate {
-	if f != nil {
-		rc.SetScore(*f)
+func (rc *ReviewCreate) SetNillableScore(i *int8) *ReviewCreate {
+	if i != nil {
+		rc.SetScore(*i)
 	}
 	return rc
 }
@@ -61,6 +61,20 @@ func (rc *ReviewCreate) SetReviewTimeAt(t time.Time) *ReviewCreate {
 func (rc *ReviewCreate) SetNillableReviewTimeAt(t *time.Time) *ReviewCreate {
 	if t != nil {
 		rc.SetReviewTimeAt(*t)
+	}
+	return rc
+}
+
+// SetID sets the "id" field.
+func (rc *ReviewCreate) SetID(u uuid.UUID) *ReviewCreate {
+	rc.mutation.SetID(u)
+	return rc
+}
+
+// SetNillableID sets the "id" field if the given value is not nil.
+func (rc *ReviewCreate) SetNillableID(u *uuid.UUID) *ReviewCreate {
+	if u != nil {
+		rc.SetID(*u)
 	}
 	return rc
 }
@@ -134,6 +148,10 @@ func (rc *ReviewCreate) defaults() {
 		v := review.DefaultReviewTimeAt()
 		rc.mutation.SetReviewTimeAt(v)
 	}
+	if _, ok := rc.mutation.ID(); !ok {
+		v := review.DefaultID()
+		rc.mutation.SetID(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -166,8 +184,13 @@ func (rc *ReviewCreate) sqlSave(ctx context.Context) (*Review, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != nil {
+		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
+		}
+	}
 	rc.mutation.id = &_node.ID
 	rc.mutation.done = true
 	return _node, nil
@@ -176,10 +199,14 @@ func (rc *ReviewCreate) sqlSave(ctx context.Context) (*Review, error) {
 func (rc *ReviewCreate) createSpec() (*Review, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Review{config: rc.config}
-		_spec = sqlgraph.NewCreateSpec(review.Table, sqlgraph.NewFieldSpec(review.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(review.Table, sqlgraph.NewFieldSpec(review.FieldID, field.TypeUUID))
 	)
+	if id, ok := rc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = &id
+	}
 	if value, ok := rc.mutation.Score(); ok {
-		_spec.SetField(review.FieldScore, field.TypeFloat32, value)
+		_spec.SetField(review.FieldScore, field.TypeInt8, value)
 		_node.Score = &value
 	}
 	if value, ok := rc.mutation.ReviewMsg(); ok {
@@ -272,10 +299,6 @@ func (rcb *ReviewCreateBulk) Save(ctx context.Context) ([]*Review, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				mutation.done = true
 				return nodes[i], nil
 			})

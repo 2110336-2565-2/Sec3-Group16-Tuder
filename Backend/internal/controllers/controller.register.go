@@ -29,7 +29,7 @@ func (cR *controllerRegister) RegisterUser(c echo.Context) (err error) {
 		return err
 	}
 
-	userLoginInfo, err := cR.registerService.RegisterService(uR)
+	_, err = cR.registerService.RegisterService(uR)
 	if err != nil {
 
 		c.JSON(http.StatusBadRequest, schema.SchemaRegisterResponse{
@@ -39,12 +39,10 @@ func (cR *controllerRegister) RegisterUser(c echo.Context) (err error) {
 		})
 		return err
 	}
-	token := userLoginInfo.Token
 
 	c.JSON(http.StatusOK, schema.SchemaRegisterResponse{
 		Success: true,
 		Message: "Register successfully",
-		Token:   token,
 	})
 	return nil
 }
