@@ -5,6 +5,8 @@ import useUsername from "../hooks/useUsername.js";
 import Reviews from "../components/review/Reviews.js";
 import Footer from "../components/global/Footer.js";
 import { IsTutor } from "../components/IsAuth.js";
+import { fetchTutorReviews } from "../handlers/tutorReviewHandler.js";
+import { getTutorByUsername } from "../handlers/profile/getUserHandler.js";
 import { tutorReviews } from "../datas/DummyReview";
 
 export default function TutorReviews() {
@@ -17,10 +19,13 @@ export default function TutorReviews() {
 
   const [reviews, setReviews] = useState({});
 
+  // console.log("username: ", username);
   // NOTE to backend: Change this to fetch reviews from backend then it should work
-  useEffect(() => {
-    setReviews(tutorReviews);
-    // GET(`/api/v1/tutors/${username}/reviews`) for backend
+  useEffect(async () =>  {
+    const res = await fetchTutorReviews(username) 
+    // console.log(res.data.data)
+    setReviews(res.data.data);
+    // GET(`/api/v1/tutors/${username}/reviews`)
   }, []);
   // ---------------------------------------------
 
