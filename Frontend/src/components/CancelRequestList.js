@@ -48,7 +48,7 @@ export default function CancelRequestList(){
 
     return (
         <Container>
-            <h1>Class Cancellation Requests</h1>
+            <h1>Cancellation Requests</h1>
             <RequestListPage>     
                     <RequestListcontent>
                         {data.map(item => (
@@ -69,8 +69,7 @@ const Container = styled.div`
     justify-content: center;
     align-items: center;
     padding: 10px;
-    margin-top: 5px;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 `
 
 const RequestListPage = styled.div`

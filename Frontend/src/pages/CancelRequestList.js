@@ -18,14 +18,11 @@ export default function CancelRequestListPage(){
         <Container>
                 <IsAdmin>
                 <DataContext.Provider value={{data, setData}}>
-                <ContainerWithHeight margintop='100px'>
+                <ContainerWithHeight margintop='25px'>
                     
                     <CancelRequestList />
 
                 </ContainerWithHeight>
-                <WaveFooterWrapper>
-                    <WaveFooter />
-                </WaveFooterWrapper>
                 </DataContext.Provider>
                 </IsAdmin>
             </Container>
