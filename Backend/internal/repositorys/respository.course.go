@@ -181,7 +181,10 @@ func (r *repositoryCourse) GetCourseByID(sr *schema.SchemaGetCourse) (*ent.Cours
 	course, err := r.client.Course.
 		Query().
 		Where(entCourse.IDEQ(sr.ID)).
-		WithTutor().
+		WithTutor(func(query *ent.TutorQuery) {
+			query.Where().WithUser().Only(r.ctx)
+		}).
+		WithReview().
 		Only(r.ctx)
 
 	if err != nil {
