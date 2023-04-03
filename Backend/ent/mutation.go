@@ -1249,8 +1249,8 @@ type CourseMutation struct {
 	level              *course.Level
 	course_picture_url *string
 	clearedFields      map[string]struct{}
-	review             map[int]struct{}
-	removedreview      map[int]struct{}
+	review             map[uuid.UUID]struct{}
+	removedreview      map[uuid.UUID]struct{}
 	clearedreview      bool
 	match              map[uuid.UUID]struct{}
 	removedmatch       map[uuid.UUID]struct{}
@@ -1721,9 +1721,9 @@ func (m *CourseMutation) ResetCoursePictureURL() {
 }
 
 // AddReviewIDs adds the "review" edge to the Review entity by ids.
-func (m *CourseMutation) AddReviewIDs(ids ...int) {
+func (m *CourseMutation) AddReviewIDs(ids ...uuid.UUID) {
 	if m.review == nil {
-		m.review = make(map[int]struct{})
+		m.review = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.review[ids[i]] = struct{}{}
@@ -1741,9 +1741,9 @@ func (m *CourseMutation) ReviewCleared() bool {
 }
 
 // RemoveReviewIDs removes the "review" edge to the Review entity by IDs.
-func (m *CourseMutation) RemoveReviewIDs(ids ...int) {
+func (m *CourseMutation) RemoveReviewIDs(ids ...uuid.UUID) {
 	if m.removedreview == nil {
-		m.removedreview = make(map[int]struct{})
+		m.removedreview = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.review, ids[i])
@@ -1752,7 +1752,7 @@ func (m *CourseMutation) RemoveReviewIDs(ids ...int) {
 }
 
 // RemovedReview returns the removed IDs of the "review" edge to the Review entity.
-func (m *CourseMutation) RemovedReviewIDs() (ids []int) {
+func (m *CourseMutation) RemovedReviewIDs() (ids []uuid.UUID) {
 	for id := range m.removedreview {
 		ids = append(ids, id)
 	}
@@ -1760,7 +1760,7 @@ func (m *CourseMutation) RemovedReviewIDs() (ids []int) {
 }
 
 // ReviewIDs returns the "review" edge IDs in the mutation.
-func (m *CourseMutation) ReviewIDs() (ids []int) {
+func (m *CourseMutation) ReviewIDs() (ids []uuid.UUID) {
 	for id := range m.review {
 		ids = append(ids, id)
 	}
@@ -4427,9 +4427,9 @@ type ReviewMutation struct {
 	config
 	op             Op
 	typ            string
-	id             *int
-	score          *float32
-	addscore       *float32
+	id             *uuid.UUID
+	score          *int8
+	addscore       *int8
 	review_msg     *string
 	review_time_at *time.Time
 	clearedFields  map[string]struct{}
@@ -4464,7 +4464,7 @@ func newReviewMutation(c config, op Op, opts ...reviewOption) *ReviewMutation {
 }
 
 // withReviewID sets the ID field of the mutation.
-func withReviewID(id int) reviewOption {
+func withReviewID(id uuid.UUID) reviewOption {
 	return func(m *ReviewMutation) {
 		var (
 			err   error
@@ -4514,9 +4514,15 @@ func (m ReviewMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Review entities.
+func (m *ReviewMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *ReviewMutation) ID() (id int, exists bool) {
+func (m *ReviewMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -4527,12 +4533,12 @@ func (m *ReviewMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *ReviewMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *ReviewMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []int{id}, nil
+			return []uuid.UUID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -4543,13 +4549,13 @@ func (m *ReviewMutation) IDs(ctx context.Context) ([]int, error) {
 }
 
 // SetScore sets the "score" field.
-func (m *ReviewMutation) SetScore(f float32) {
-	m.score = &f
+func (m *ReviewMutation) SetScore(i int8) {
+	m.score = &i
 	m.addscore = nil
 }
 
 // Score returns the value of the "score" field in the mutation.
-func (m *ReviewMutation) Score() (r float32, exists bool) {
+func (m *ReviewMutation) Score() (r int8, exists bool) {
 	v := m.score
 	if v == nil {
 		return
@@ -4560,7 +4566,7 @@ func (m *ReviewMutation) Score() (r float32, exists bool) {
 // OldScore returns the old "score" field's value of the Review entity.
 // If the Review object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ReviewMutation) OldScore(ctx context.Context) (v *float32, err error) {
+func (m *ReviewMutation) OldScore(ctx context.Context) (v *int8, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldScore is only allowed on UpdateOne operations")
 	}
@@ -4574,17 +4580,17 @@ func (m *ReviewMutation) OldScore(ctx context.Context) (v *float32, err error) {
 	return oldValue.Score, nil
 }
 
-// AddScore adds f to the "score" field.
-func (m *ReviewMutation) AddScore(f float32) {
+// AddScore adds i to the "score" field.
+func (m *ReviewMutation) AddScore(i int8) {
 	if m.addscore != nil {
-		*m.addscore += f
+		*m.addscore += i
 	} else {
-		m.addscore = &f
+		m.addscore = &i
 	}
 }
 
 // AddedScore returns the value that was added to the "score" field in this mutation.
-func (m *ReviewMutation) AddedScore() (r float32, exists bool) {
+func (m *ReviewMutation) AddedScore() (r int8, exists bool) {
 	v := m.addscore
 	if v == nil {
 		return
@@ -4888,7 +4894,7 @@ func (m *ReviewMutation) OldField(ctx context.Context, name string) (ent.Value, 
 func (m *ReviewMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case review.FieldScore:
-		v, ok := value.(float32)
+		v, ok := value.(int8)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -4939,7 +4945,7 @@ func (m *ReviewMutation) AddedField(name string) (ent.Value, bool) {
 func (m *ReviewMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case review.FieldScore:
-		v, ok := value.(float32)
+		v, ok := value.(int8)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -5902,8 +5908,8 @@ type StudentMutation struct {
 	match         map[uuid.UUID]struct{}
 	removedmatch  map[uuid.UUID]struct{}
 	clearedmatch  bool
-	review        map[int]struct{}
-	removedreview map[int]struct{}
+	review        map[uuid.UUID]struct{}
+	removedreview map[uuid.UUID]struct{}
 	clearedreview bool
 	user          *uuid.UUID
 	cleareduser   bool
@@ -6071,9 +6077,9 @@ func (m *StudentMutation) ResetMatch() {
 }
 
 // AddReviewIDs adds the "review" edge to the Review entity by ids.
-func (m *StudentMutation) AddReviewIDs(ids ...int) {
+func (m *StudentMutation) AddReviewIDs(ids ...uuid.UUID) {
 	if m.review == nil {
-		m.review = make(map[int]struct{})
+		m.review = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.review[ids[i]] = struct{}{}
@@ -6091,9 +6097,9 @@ func (m *StudentMutation) ReviewCleared() bool {
 }
 
 // RemoveReviewIDs removes the "review" edge to the Review entity by IDs.
-func (m *StudentMutation) RemoveReviewIDs(ids ...int) {
+func (m *StudentMutation) RemoveReviewIDs(ids ...uuid.UUID) {
 	if m.removedreview == nil {
-		m.removedreview = make(map[int]struct{})
+		m.removedreview = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.review, ids[i])
@@ -6102,7 +6108,7 @@ func (m *StudentMutation) RemoveReviewIDs(ids ...int) {
 }
 
 // RemovedReview returns the removed IDs of the "review" edge to the Review entity.
-func (m *StudentMutation) RemovedReviewIDs() (ids []int) {
+func (m *StudentMutation) RemovedReviewIDs() (ids []uuid.UUID) {
 	for id := range m.removedreview {
 		ids = append(ids, id)
 	}
@@ -6110,7 +6116,7 @@ func (m *StudentMutation) RemovedReviewIDs() (ids []int) {
 }
 
 // ReviewIDs returns the "review" edge IDs in the mutation.
-func (m *StudentMutation) ReviewIDs() (ids []int) {
+func (m *StudentMutation) ReviewIDs() (ids []uuid.UUID) {
 	for id := range m.review {
 		ids = append(ids, id)
 	}

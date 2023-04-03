@@ -26,6 +26,8 @@ func (r *repositoryLogin) Login(l *schema.SchemaLogin) (*ent.User, error) {
 	user, err := r.client.User.
 		Query().
 		Where(entUser.UsernameEQ(l.Username)).
+		WithTutor().
+		WithStudent().
 		Only(r.ctx)
 
 	if err != nil {

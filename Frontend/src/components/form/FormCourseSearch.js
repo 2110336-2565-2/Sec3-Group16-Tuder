@@ -63,47 +63,45 @@ export default function CourseSearchForm(props){
     
 
     return (    
-    <FormData>
-        <FormRow>
-            <ItemGrid justify='center' columngrid='1 / 3'>
-                <SearchBar>
-                    <SearchInput key="searchBar" placeholder="Search by a course name" value={coursename} onChange={(e) => setCoursename(e.target.value)}/>
-                </SearchBar>
-            </ItemGrid>
-            <ItemGrid columngrid='4'>
-                <SearchButton onClick={submitHandler} >Search</SearchButton>
-            </ItemGrid>  
-        </FormRow>
-        <FormRow>
-            <ItemGrid justify='center' columngrid='1 / 3'>
-                <FormInput key="topic" placeholder="Topic Name" value={topic} onChange={(e) => setTopic(e.target.value)}/>
-            </ItemGrid>
-        </FormRow>
-        <FormRow>
-        
-            <ItemGrid justify='center' columngrid='1 / 3'>
-                    <FormInput key="tutor" placeholder="Tutor Name" value={tutor_name} onChange={(e) => setTutorName(e.target.value)}/>
-            </ItemGrid>
-            <ItemGrid  columngrid='4'>
-                    <FormInput key="subject" placeholder="Subject" value={subject} onChange={(e) => setSubject(e.target.value)}/>
-            </ItemGrid>
-        </FormRow>
-        <FormRow>
-            {day.map((idx, val) => (
-                <CheckboxLable key={val}>
-                    <Checkbox value={idx} type="checkbox" onChange={e => {
-                        const newDays = [...days];
-                        newDays[val] = e.target.checked ? true : false ;
-                        setDays(newDays);
-                        }
-                    }/>
-                    day : {idx[val+1]}
-                </CheckboxLable>
-            ))
-            }
+        <FormData>
+            <FormRow gap="20px">
+                <ItemGrid justify='center' columngrid='1 / 3'>
+                    <SearchBar>
+                        <SearchInput boxsize="350px" key="searchBar" placeholder="Search by a Course Name" value={coursename} onChange={(e) => setCoursename(e.target.value)}/>
+                    </SearchBar>
+                </ItemGrid>
+                <ItemGrid justify='center' columngrid='1 / 3'>
+                    <SearchInput boxsize="350px" key="topic" placeholder="Topic Name" value={topic} onChange={(e) => setTopic(e.target.value)}/>
+                </ItemGrid>
+            </FormRow>
+            <FormRow gap="20px">
             
-        </FormRow>
-
+                <ItemGrid justify='center' columngrid='1 / 3'>
+                        <SearchInput boxsize="350px" key="tutor" placeholder="Tutor Name" value={tutor_name} onChange={(e) => setTutorName(e.target.value)}/>
+                </ItemGrid>
+                <ItemGrid  columngrid='4'>
+                        <SearchInput boxsize="350px"key="subject" placeholder="Subject Name" value={subject} onChange={(e) => setSubject(e.target.value)}/>
+                </ItemGrid>
+            </FormRow>
+            <FormRow gap="0px">
+                {day.map((idx, val) => (
+                    <CheckboxLable key={val}>
+                        <Checkbox value={idx} type="checkbox" onChange={e => {
+                            const newDays = [...days];
+                            newDays[val] = e.target.checked ? true : false ;
+                            setDays(newDays);
+                            }
+                        }/>
+                        {idx[val+1]}
+                    </CheckboxLable>
+                ))
+                }
+            </FormRow>
+            <FormRow>
+                <ItemGrid columngrid='4'>
+                    <SearchButton onClick={submitHandler} >Search</SearchButton>
+                </ItemGrid>  
+            </FormRow>
         </FormData>
         )
 }
@@ -112,7 +110,10 @@ export default function CourseSearchForm(props){
 const FormRow = styled.div`
     display: flex;
     justify-content: center;
-    gap: 20px;
+    align-items: center;
+    gap: ${(props) => {
+        return props.gap
+    }};
 `
 const FormData = styled.div`
     display: flex;
@@ -136,30 +137,19 @@ const CheckboxLable = styled.label`
     align-items: center;
     width: 150px;
     height: 30px;
-    border-radius: 16px;
-    border: 1px solid black;
-    padding: 10px;
-    font-size: 20px;
+    padding: 0px;
+    font-size: 16px;
+    gap: 5px
 `  
 const Checkbox = styled.input`
     width: 20px;
     height: 20px;
     border-radius: 16px;
     border: 1px solid black;
-    padding: 10px;
+    padding: 0px;
     font-size: 20px;
+    accent-color: #EB7B42;
 `
-
-const Option = styled.select`
-    width: 250px;
-    height: 50px;
-    border-radius: 16px;
-    border: 1px solid black;
-    padding: 10px;
-    font-size: 20px;
-`
-
-
 
 const ItemGrid = styled.div`
     grid-column: ${(props) => {
@@ -177,20 +167,27 @@ const SearchBar = styled.div`
 `
 
 const SearchInput = styled.input`
-    width: 500px;
+    width: ${(props)=>{
+            return props.boxsize
+        }};
     height: 30px;
-    border-radius: 16px;
-    border: 1px solid black;
+    border: 1px solid #BEBEBE;
+    border-radius: 5px; 
     padding: 10px;
-    font-size: 20px;
+    font-size: 16px;
 `
 
 const SearchButton = styled.button`
     width: 100px;
-    height: 50px;
-    border-radius: 16px;
-    border: 1px solid black;
-    background-color: #FFC300;
-    padding: 10px;
-    font-size: 20px;
+    padding: 10px 10px;
+    border: 0px solid;
+    border-radius: 6px;
+    color:white;
+    font-size: 14px;
+    background-color: #EB7B42;
+    cursor: pointer;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;  
+    &:hover{
+        background-color: rgb(240, 123, 36);
+    }
 `

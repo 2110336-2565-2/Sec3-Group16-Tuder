@@ -3,7 +3,10 @@ package repositorys
 import (
 	"context"
 	"fmt"
+
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
+	entCourse "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
+	entReview "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/review"
 	entTutor "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	entUser "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -19,6 +22,7 @@ type RepositoryTutor interface {
 	DeleteTutor(sr *schema.SchemaDeleteTutor) error
 	UpdateSchedule(sr *schema.SchemaUpdateSchedule) (*ent.Schedule, error)
 	GetSchedule(sr *schema.SchemaGetSchedule) (*ent.Schedule, error)
+	GetReviews(sr *schema.SchemaGetReviews) ([]*ent.Review, error)
 }
 
 type repositoryTutor struct {
@@ -120,18 +124,21 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 	}
 	tutor := user.Edges.Tutor
 
-	profilePictureURL, _ := utils.GenerateProfilePictureURL(sr.ProfilePicture, sr.Username)
+	profilePictureURL := *user.ProfilePictureURL
+	if sr.ProfilePicture != nil {
+		profilePictureURL, _ = utils.GenerateProfilePictureURL(sr.ProfilePicture, sr.Username)
 
+	}
 	user, err = txc.User.
 		UpdateOne(user).
 		SetFirstName(sr.Firstname).
 		SetLastName(sr.Lastname).
+		SetEmail(sr.Email).
 		SetPhone(sr.Phone).
 		SetAddress(sr.Address).
 		SetBirthDate(sr.Birthdate).
 		SetProfilePictureURL(profilePictureURL).
 		Save(r.ctx)
-	//fmt.Print(user)
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
 			err = fmt.Errorf("%w: %v", err, rerr)
@@ -153,7 +160,7 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 
 	// update schedule
 	// query for schedule
-	var schedule *ent.Schedule = nil
+	var schedule, _ = tutor.QuerySchedule().Only(r.ctx)
 	if sr.Schedule != nil {
 		schedule, err = r.UpdateSchedule(&schema.SchemaUpdateSchedule{
 			Username: sr.Username,
@@ -164,6 +171,7 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 	// reload tutor->user
 	tutor.Edges.User = user
 	tutor.Edges.Schedule = schedule
+	fmt.Println("pass")
 	return tutor, tx.Commit()
 }
 
@@ -262,4 +270,37 @@ func (r *repositoryTutor) GetSchedule(sr *schema.SchemaGetSchedule) (*ent.Schedu
 		return nil, err
 	}
 	return schedule, nil
+}
+
+func (r *repositoryTutor) GetReviews(sr *schema.SchemaGetReviews) ([]*ent.Review, error) {
+	// user, err := r.client.User.Query().
+	// 	Where(entUser.IDEQ(sr.ID)).
+	// 	WithTutor(func(q *ent.TutorQuery) {
+	// 		q.WithCourse(func(q *ent.CourseQuery) {
+	// 			q.WithReview()
+	// 		})
+	// 	}).
+	// 	All(r.ctx)
+
+	reviews, err := r.client.Review.Query().
+		Where(
+			entReview.HasCourseWith(
+				entCourse.HasTutorWith(
+					entTutor.HasUserWith(entUser.UsernameEQ(sr.Username)),
+				),
+			),
+		).
+		WithCourse(func(q *ent.CourseQuery) {
+			q.WithTutor(func(q *ent.TutorQuery) {
+				q.WithUser()
+			},
+			)
+		}).
+		All(r.ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return reviews, nil
 }

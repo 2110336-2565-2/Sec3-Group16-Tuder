@@ -102,14 +102,14 @@ func (cc *CourseCreate) SetNillableID(u *uuid.UUID) *CourseCreate {
 }
 
 // AddReviewIDs adds the "review" edge to the Review entity by IDs.
-func (cc *CourseCreate) AddReviewIDs(ids ...int) *CourseCreate {
+func (cc *CourseCreate) AddReviewIDs(ids ...uuid.UUID) *CourseCreate {
 	cc.mutation.AddReviewIDs(ids...)
 	return cc
 }
 
 // AddReview adds the "review" edges to the Review entity.
 func (cc *CourseCreate) AddReview(r ...*Review) *CourseCreate {
-	ids := make([]int, len(r))
+	ids := make([]uuid.UUID, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -312,7 +312,7 @@ func (cc *CourseCreate) createSpec() (*Course, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: review.FieldID,
 				},
 			},

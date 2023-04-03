@@ -17,8 +17,10 @@ import ErrorPage from './pages/ErrorPage';
 import ChangePassword from './pages/ChangePassword';
 import EnterNewPassword from './pages/EnterNewPassword';
 import CancelRequestList from './pages/CancelRequestList';
+import CourseReviews from './pages/CourseReviews';
 import UserCancelRequest from './pages/UserCancelRequest';
 import CancelRequestDetail from './pages/CancelRequestDetail';
+import TutorReviews from './pages/TutorReviews';
 import { QueryClientProvider, QueryClient } from 'react-query';
 
 Modal.setAppElement(document.getElementById('root'))
@@ -54,15 +56,55 @@ const router = createBrowserRouter([
       },
       {
         path: "/profile",
-        element: <Profile />,
+        children: [
+            {
+                index: true,
+                element: <Profile />
+            },
+            {
+                path: "my-reviews",
+                element: <TutorReviews />
+            },
+            {
+                path: "edit-profile",
+                element: <EditProfile />
+            }
+        ]
       },
       {
-        path: "/edit-profile",
-        element: <EditProfile />,
+        path: "/students",
+        children: [
+            {
+                path: ":username",
+                element: <Profile />
+            }
+        ]
       },
       {
-        path: "/review/:id",
+        path: "/tutors",
+        children: [
+            {
+                path: ":username",
+                children: [
+                    {
+                        index: true,
+                        element: <Profile />
+                    },
+                    {
+                        path: "reviews",
+                        element: <TutorReviews />
+                    }
+                ]
+            }
+        ]
+      },
+      {
+        path: "/reviews/:courseID",
         element: <Review />,
+      },
+      {
+        path: "/courses/:courseID/reviews",
+        element: <CourseReviews />,
       },
       {
         path: "/change-password",

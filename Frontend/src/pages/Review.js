@@ -1,33 +1,44 @@
 import React, { useState } from "react";
 import { Rating } from "react-simple-star-rating";
 import styled from "styled-components";
+import { getUserID } from "../utils/jwtGet";
+import { useParams } from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
 import Button from "../components/global/Button";
 import TextInput from "../components/profile/TextInput";
 import Footer from "../components/global/Footer";
+import { IsStudent } from '../components/IsAuth.js'
 import { confirm } from "../components/global/customToast";
 
 export default function Review() {
+  const studentID = getUserID();
+  const { courseID } = useParams();
+  console.log(studentID)
+  console.log(courseID)
   const [rating, setRating] = useState(0);
   const [reviewMsg, setReviewMsg] = useState("");
   const navigate = useNavigate();
-  // Request backend to implement this API
+  // Note to backend: Change this to fetch course details from backend
   const course = {
     course_name: "Search Engine Optimization",
     tutor_firstname: "John",
     tutor_lastname: "Doe",
   };
+  // ---------------------------------------------
   
   function handleRatingClick(newRating) {
     setRating(newRating);
   }
   function handleSubmit(e) {
     e.preventDefault();
+    // Note to backend: Change this to send review to backend
+    // each field is already stored in variable corresponding to its name
 
   }
 
   return (
     <Container>
+      {/* <IsStudent /> */}
       <Form onSubmit={handleSubmit}>
         <Topic>Course Review</Topic>
         <Detail>

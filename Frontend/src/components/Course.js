@@ -6,34 +6,41 @@ export default function Course(props){
         <>
             <CardHeader>
                 <CardImg src={props.img}/>
-                <CardContent >
-                    TITLE : {props.title}
+                <br></br>
+                <CardContent fsize="16px">
+                    {props.title}
                 </CardContent>
-                <CardContent>    
-                    TUTOR : {props.tutor}
-                </CardContent>
-                <CardContent>
+                <CardContent fsize="16px">
                     TOPIC : {props.topic}
                 </CardContent>  
-                <CardContent>
+                <CardContent fsize="16px">
                     SUBJECT : {props.subject}
                 </CardContent>  
-                <CardContent>
+                <CardContent fsize="12px">
                     Time: {props.time} hr
-                </CardContent>  
-                <CardContent>
-                    Price/hr: {props.price}
+                </CardContent>
+                <HorizonL></HorizonL>  
+                <CardContent fsize="17px">
+                    <Inrow>
+                        <div>{props.tutor}</div>
+                        <div>{props.price} Bath/hr</div>
+                    </Inrow>
                 </CardContent>    
             </CardHeader>
         </>
     )
 }
+const HorizonL = styled.hr`
+    margin-top: 10px;
+`
 
 const CardImg = styled.img`
-    width: 500px;
-    height: auto;
+    width: 270px;
+    height: 180px;
     object-fit: cover;
     border-radius: 10px;
+    margin: auto;
+    object-fit: cover;
 `
 
 const CardHeader = styled.div`
@@ -43,6 +50,21 @@ const CardHeader = styled.div`
 `
 
 const CardContent = styled.div`
+    margin-top: 10px;
     display: flex;
-    font-size: 20px;
+    font-size: ${(props) => {
+        return props.fsize
+    }};
+`
+
+const Inrow = styled.div`
+    display: flex;
+    width: 270px;
+    justify-content: space-between;
+`
+
+const Fdiv = styled.div`
+    font-size: ${(props) => {
+        return props.fsize
+    }};
 `

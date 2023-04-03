@@ -5,40 +5,41 @@ import (
 	"fmt"
 	"bytes"
 	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/joho/godotenv"
 )
 
 func GenerateProfilePictureURL(imageBytes []byte, key string) (string, error) {
 	bucket := "se2-tuder"
+	err := godotenv.Load() 
 
 	// Load AWS session configuration
 	cfg, err := config.LoadDefaultConfig(context.Background())
 	if err != nil {
 		return "", fmt.Errorf("failed to load AWS SDK configuration: %v", err)
 	}
-	fmt.Println("AWS SDK configuration loaded")
-
 	// Create a new S3 client
 	client := s3.NewFromConfig(cfg)
-	fmt.Println("S3 client created")
 
 	// Set up a new S3 uploader
 	uploader := manager.NewUploader(client)
-	fmt.Println("S3 uploader created")
 
 	// Upload the image to S3
 	_, err = uploader.Upload(context.TODO(), &s3.PutObjectInput{
-		Bucket: &bucket,
-		Key:    &key,
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key+ ".jpg"),
 		Body:   bytes.NewReader(imageBytes),
+		ACL: "public-read ",
 	})
 	if err != nil {
+		fmt.Println("failed to upload image to S3",err)
 		return "", fmt.Errorf("failed to upload image to S3: %v", err)
 	}
 
 	// Generate the S3 object URL
-	objectURL := fmt.Sprintf("https://%s.s3.amazonaws.com/%s", bucket, key)
+	objectURL := fmt.Sprintf("https://%s.s3.amazonaws.com/%s.jpg", bucket, key)
 
 	return objectURL, nil
 }

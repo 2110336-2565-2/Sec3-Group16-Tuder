@@ -33,20 +33,14 @@ export default function TimeSelector({
   ];
 
   const [availableTime, setAvailableTime] = useState(() => {
-    // Convert the schedules from the backend to the frontend format
-    // const convertedSchedules = convertBackendSchedulesToFrontend(value);
-
     const initialAvailableTime = days.map((day) => ({
       day: day.value,
       timeSlot: [],
     }));
 
-    const updatedAvailableTime = initialAvailableTime.map((day) => {
-      const daySchedule = value.find((schedule) => schedule.day === day.day);
-
-      return daySchedule ? daySchedule : day;
-    });
-    return updatedAvailableTime;
+    // Convert the schedules from the backend to the frontend format
+    const convertedSchedules = value?convertBackendSchedulesToFrontend(value):initialAvailableTime;
+    return convertedSchedules;
   });
 
   const [selectedDay, setSelectedDay] = useState("Sunday");
@@ -78,7 +72,6 @@ export default function TimeSelector({
   };
 
   const handleAddOnClick = () => {
-    // Check if from === to -> Refractor this
     if (isOverlapped(timeSlotToAdd, timeSlot)) {
       return;
     }
@@ -139,7 +132,8 @@ export default function TimeSelector({
         ]);
         break;
       }
-    }
+    }const e = { target: { name: name, value: availableTime } };
+    onChange(e);
   };
 
   return (
@@ -150,6 +144,7 @@ export default function TimeSelector({
           {days.map((day) => {
             return (
               <DayButton
+                type="button"
                 isSelected={selectedDay === day.value}
                 onClick={() => setSelectedDay(day.value)}
                 key={day.value}
@@ -198,7 +193,7 @@ export default function TimeSelector({
               />
             </FormP.InputComponent>
           </AddFormWrapper>
-          <Button onClick={handleAddOnClick}>Add</Button>
+          <Button onClick={handleAddOnClick} type="button" >Add</Button>
         </AddMenu>
       </Container>
     </FormP.InputComponent>

@@ -31,23 +31,23 @@ func (ru *ReviewUpdate) Where(ps ...predicate.Review) *ReviewUpdate {
 }
 
 // SetScore sets the "score" field.
-func (ru *ReviewUpdate) SetScore(f float32) *ReviewUpdate {
+func (ru *ReviewUpdate) SetScore(i int8) *ReviewUpdate {
 	ru.mutation.ResetScore()
-	ru.mutation.SetScore(f)
+	ru.mutation.SetScore(i)
 	return ru
 }
 
 // SetNillableScore sets the "score" field if the given value is not nil.
-func (ru *ReviewUpdate) SetNillableScore(f *float32) *ReviewUpdate {
-	if f != nil {
-		ru.SetScore(*f)
+func (ru *ReviewUpdate) SetNillableScore(i *int8) *ReviewUpdate {
+	if i != nil {
+		ru.SetScore(*i)
 	}
 	return ru
 }
 
-// AddScore adds f to the "score" field.
-func (ru *ReviewUpdate) AddScore(f float32) *ReviewUpdate {
-	ru.mutation.AddScore(f)
+// AddScore adds i to the "score" field.
+func (ru *ReviewUpdate) AddScore(i int8) *ReviewUpdate {
+	ru.mutation.AddScore(i)
 	return ru
 }
 
@@ -195,7 +195,7 @@ func (ru *ReviewUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := ru.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(review.Table, review.Columns, sqlgraph.NewFieldSpec(review.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(review.Table, review.Columns, sqlgraph.NewFieldSpec(review.FieldID, field.TypeUUID))
 	if ps := ru.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -204,13 +204,13 @@ func (ru *ReviewUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if value, ok := ru.mutation.Score(); ok {
-		_spec.SetField(review.FieldScore, field.TypeFloat32, value)
+		_spec.SetField(review.FieldScore, field.TypeInt8, value)
 	}
 	if value, ok := ru.mutation.AddedScore(); ok {
-		_spec.AddField(review.FieldScore, field.TypeFloat32, value)
+		_spec.AddField(review.FieldScore, field.TypeInt8, value)
 	}
 	if ru.mutation.ScoreCleared() {
-		_spec.ClearField(review.FieldScore, field.TypeFloat32)
+		_spec.ClearField(review.FieldScore, field.TypeInt8)
 	}
 	if value, ok := ru.mutation.ReviewMsg(); ok {
 		_spec.SetField(review.FieldReviewMsg, field.TypeString, value)
@@ -347,23 +347,23 @@ type ReviewUpdateOne struct {
 }
 
 // SetScore sets the "score" field.
-func (ruo *ReviewUpdateOne) SetScore(f float32) *ReviewUpdateOne {
+func (ruo *ReviewUpdateOne) SetScore(i int8) *ReviewUpdateOne {
 	ruo.mutation.ResetScore()
-	ruo.mutation.SetScore(f)
+	ruo.mutation.SetScore(i)
 	return ruo
 }
 
 // SetNillableScore sets the "score" field if the given value is not nil.
-func (ruo *ReviewUpdateOne) SetNillableScore(f *float32) *ReviewUpdateOne {
-	if f != nil {
-		ruo.SetScore(*f)
+func (ruo *ReviewUpdateOne) SetNillableScore(i *int8) *ReviewUpdateOne {
+	if i != nil {
+		ruo.SetScore(*i)
 	}
 	return ruo
 }
 
-// AddScore adds f to the "score" field.
-func (ruo *ReviewUpdateOne) AddScore(f float32) *ReviewUpdateOne {
-	ruo.mutation.AddScore(f)
+// AddScore adds i to the "score" field.
+func (ruo *ReviewUpdateOne) AddScore(i int8) *ReviewUpdateOne {
+	ruo.mutation.AddScore(i)
 	return ruo
 }
 
@@ -524,7 +524,7 @@ func (ruo *ReviewUpdateOne) sqlSave(ctx context.Context) (_node *Review, err err
 	if err := ruo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(review.Table, review.Columns, sqlgraph.NewFieldSpec(review.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(review.Table, review.Columns, sqlgraph.NewFieldSpec(review.FieldID, field.TypeUUID))
 	id, ok := ruo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Review.id" for update`)}
@@ -550,13 +550,13 @@ func (ruo *ReviewUpdateOne) sqlSave(ctx context.Context) (_node *Review, err err
 		}
 	}
 	if value, ok := ruo.mutation.Score(); ok {
-		_spec.SetField(review.FieldScore, field.TypeFloat32, value)
+		_spec.SetField(review.FieldScore, field.TypeInt8, value)
 	}
 	if value, ok := ruo.mutation.AddedScore(); ok {
-		_spec.AddField(review.FieldScore, field.TypeFloat32, value)
+		_spec.AddField(review.FieldScore, field.TypeInt8, value)
 	}
 	if ruo.mutation.ScoreCleared() {
-		_spec.ClearField(review.FieldScore, field.TypeFloat32)
+		_spec.ClearField(review.FieldScore, field.TypeInt8)
 	}
 	if value, ok := ruo.mutation.ReviewMsg(); ok {
 		_spec.SetField(review.FieldReviewMsg, field.TypeString, value)
