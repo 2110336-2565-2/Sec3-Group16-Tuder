@@ -8,9 +8,10 @@ import (
 )
 
 type ServiceTutor interface {
-	CreateTutor(tutorCreate *schemas.SchemaCreateTutor) (*schemas.SchemaTutor, error)
-	GetTutors() ([]*schemas.SchemaTutor, error)
 	GetTutorByUsername(tutorGet *schemas.SchemaGetTutor) (*schemas.SchemaTutor, error)
+	GetTutorScheduleByCourseId(courseGet *schemas.SchemaGetTutorScheduleByCourseId) (*schemas.SchemaRawSchedule, error)
+	GetTutors() ([]*schemas.SchemaTutor, error)
+	CreateTutor(tutorCreate *schemas.SchemaCreateTutor) (*schemas.SchemaTutor, error)
 	GetTutorSchedule(scheduleRequest *schemas.SchemaGetSchedule) (*schemas.SchemaRawSchedule, error)
 	UpdateTutor(tutorUpdate *schemas.SchemaUpdateTutor) (*schemas.SchemaTutor, error)
 	UpdateTutorSchedule(scheduleUpdate *schemas.SchemaUpdateSchedule) (*schemas.SchemaRawSchedule, error)
@@ -61,6 +62,24 @@ func (s *serviceTutor) GetTutorByUsername(tutorGet *schemas.SchemaGetTutor) (*sc
 			Friday:    schedule.Day5,
 			Saturday:  schedule.Day6,
 		},
+	}, nil
+}
+
+func (s *serviceTutor) GetTutorScheduleByCourseId(sr *schemas.SchemaGetTutorScheduleByCourseId) (*schemas.SchemaRawSchedule, error) {
+	schedule, err := s.repository.GetTutorScheduleByCourseId(sr)
+
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	return &schemas.SchemaRawSchedule{
+		Sunday:    schedule.Day0,
+		Monday:    schedule.Day1,
+		Tuesday:   schedule.Day2,
+		Wednesday: schedule.Day3,
+		Thursday:  schedule.Day4,
+		Friday:    schedule.Day5,
+		Saturday:  schedule.Day6,
 	}, nil
 }
 
