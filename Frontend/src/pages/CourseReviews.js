@@ -16,7 +16,7 @@ export default function CourseReviews() {
 
   return (
     <Container>
-      {/* <IsStudent /> */}
+      <IsStudent />
       <TitleWrapper>
         <Title>{reviews.course_title}</Title>
       </TitleWrapper>
