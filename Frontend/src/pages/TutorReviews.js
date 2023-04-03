@@ -21,11 +21,10 @@ export default function TutorReviews() {
 
   // console.log("username: ", username);
   // NOTE to backend: Change this to fetch reviews from backend then it should work
-  useEffect(async () =>  {
-    const res = await fetchTutorReviews(username) 
-    // console.log(res.data.data)
-    setReviews(res.data.data);
-    // GET(`/api/v1/tutors/${username}/reviews`)
+  useEffect(() =>  {
+    const res = fetchTutorReviews(username).then((res) => {
+      setReviews(res.data.data);
+    });
   }, []);
   // ---------------------------------------------
 
