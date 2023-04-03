@@ -14,16 +14,20 @@ export const convertBackendSchedulesToFrontend = (schedules) => {
   ];
   // schedules is an object with key as day and value as an array of 24 hours as boolean
   const convertedSchedules = days.map((day) => {
-    const timeSlots = schedules[day].map((isAvailable, index) => {
-      if (isAvailable) {
-        const from = (index < 10 ? "0" : "") + index + ":00";
-        const to = (index + 1 < 10 ? "0" : "") + (index + 1) + ":00";
-        return {
-          from: from,
-          to: to,
-        };
+    let timeSlots = []
+    for (let i = 0; i < 24; i++) {
+      let from;
+      let to;
+      if (schedules[day][i]) {
+        from = (i < 10 ? "0" : "") + i + ":00"
+        to = (i + 1 < 10 ? "0" : "") + (i + 1) + ":00"
+        while(i < 24 && schedules[day][i]) {
+          to = (i + 1 < 10 ? "0" : "") + (i + 1) + ":00"
+          i++;
+        }
+        timeSlots.push({from, to})
       }
-    });
+    }
     const filteredTimeSlots = timeSlots.filter(
       (timeSlot) => timeSlot !== undefined
     );

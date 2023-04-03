@@ -21,6 +21,7 @@ import CourseReviews from './pages/CourseReviews';
 import UserCancelRequest from './pages/UserCancelRequest';
 import CancelRequestDetail from './pages/CancelRequestDetail';
 import TutorReviews from './pages/TutorReviews';
+import Enroll from './pages/Enroll';
 import { QueryClientProvider, QueryClient } from 'react-query';
 
 Modal.setAppElement(document.getElementById('root'))
@@ -101,6 +102,10 @@ const router = createBrowserRouter([
       {
         path: "/reviews/:courseID",
         element: <Review />,
+      },
+      {
+        path: "/courses/:courseID/enroll",
+        element: <Enroll />,
       },
       {
         path: "/courses/:courseID/reviews",
