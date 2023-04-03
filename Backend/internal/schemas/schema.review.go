@@ -39,9 +39,3 @@ type ReviewResponse struct {
 	ReviewMsg    string    `json:"review_msg"`
 	ReviewTimeAt time.Time `json:"review_time_at"`
 }
-
-type SchemaGetReviewsByTutorIdResponse struct {
-	TotalScore   string            `json:"total_score"`
-	TotalReview  int               `json:"total_review"`
-	TutorReviews []*ReviewResponse `json:"tutor_reviews"`
-}

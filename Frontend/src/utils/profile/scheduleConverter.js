@@ -29,7 +29,7 @@ export const convertBackendSchedulesToFrontend = (schedules) => {
     );
     return {
       day: capitalizeFirstLetter(day),
-      timeSlot: filteredTimeSlots,
+      timeSlot: (filteredTimeSlots || []),
     };
   });
   return convertedSchedules;

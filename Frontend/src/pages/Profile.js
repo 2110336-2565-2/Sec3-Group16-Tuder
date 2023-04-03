@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import StudentInfo from "../components/profile/StudentInfo.js";
 import TutorInfo from "../components/profile/TutorInfo.js";
 import Footer from "../components/global/Footer.js";
 // import { dummyStudent, dummyTutor } from "../datas/Profile.role.js";
-import { getStudentByUsername, getTutorByUsername } from "../handlers/profile/getUserHandler.js";
+import {
+  getStudentByUsername,
+  getTutorByUsername,
+} from "../handlers/profile/getUserHandler.js";
 import useRole from "../hooks/useRole.js";
 import useUsername from "../hooks/useUsername.js";
 import { IsUser } from "../components/IsAuth.js";
@@ -17,10 +20,22 @@ export default function Profile() {
   function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
-  // CHANGE THIS TO GET USER FROM BACKEND
+  // Handle owner and others' profile
+  const othersUsername = useParams().username;
+  // if path is /profile/:username, then othersUsername is not undefined
+  // indicating that the user is viewing other's profile
+  const isOwner = othersUsername === undefined;
+  let othersRole = useLocation().pathname.split("/")[1];
+  // remove last character 's' from role
+  othersRole = othersRole.substring(0, othersRole.length - 1);
+  // ------------------------------------
+
   const [user, setUser] = useState({});
-  const [role, handleRole] = useRole();
-  const [username, handleUsername] = useUsername();
+  const [myRole, handleMyRole] = useRole();
+  const role = isOwner ? myRole : othersRole;
+  const [myUsername, handleMyUsername] = useUsername();
+  const username = isOwner ? myUsername : othersUsername;
+
   useEffect(() => {
     if (role === "student") {
       getStudentByUsername(username).then((res) => {
@@ -40,9 +55,11 @@ export default function Profile() {
 
   return (
     <Container>
-      <IsUser>
+      {isOwner ? <IsUser /> : null}
       <TopSection>
-        <Role>{capitalizeFirstLetter(role)}</Role>
+        <Role>
+          {capitalizeFirstLetter(role)}
+        </Role>
         <ProfileImageWrapper>
           <ProfileImage src={user.profile_picture_URL} />
         </ProfileImageWrapper>
@@ -53,19 +70,27 @@ export default function Profile() {
         <MiddleSection>
           <TitleWrapper>
             <Title>Information</Title>
-            <EditIcon onClick={()=>navigate("/edit-profile")} />
+            {isOwner ? (
+              <EditIcon onClick={() => navigate("edit-profile")} />
+            ) : null}
           </TitleWrapper>
           {role === "student" ? (
-            <StudentInfo user={user} />
+            <StudentInfo
+              user={user}
+              isOwner={isOwner}
+              othersUsername={othersUsername}
+            />
           ) : (
-            <TutorInfo user={user} />
+            <TutorInfo
+              user={user}
+              isOwner={isOwner}
+              othersUsername={othersUsername}
+            />
           )}
         </MiddleSection>
       </Wrapper>
       <Footer />
-    </IsUser>
     </Container>
-    
   );
 }
 
