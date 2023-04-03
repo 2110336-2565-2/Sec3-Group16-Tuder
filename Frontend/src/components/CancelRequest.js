@@ -52,10 +52,6 @@ export default function CancelRequest(props){
 }
 
 // color be changed depends on the status
-// const MgAuto = styled.div`
-//     margin-top: auto;
-//     margin-bottom: auto;
-// `
 
 const StatusBlock = styled.div`
     display: flex;
