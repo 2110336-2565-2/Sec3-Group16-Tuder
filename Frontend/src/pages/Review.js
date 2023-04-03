@@ -18,18 +18,21 @@ export default function Review() {
   const [rating, setRating] = useState(0);
   const [reviewMsg, setReviewMsg] = useState("");
   const navigate = useNavigate();
-  // Request backend to implement this API
+  // Note to backend: Change this to fetch course details from backend
   const course = {
     course_name: "Search Engine Optimization",
     tutor_firstname: "John",
     tutor_lastname: "Doe",
   };
+  // ---------------------------------------------
   
   function handleRatingClick(newRating) {
     setRating(newRating);
   }
   function handleSubmit(e) {
     e.preventDefault();
+    // Note to backend: Change this to send review to backend
+    // each field is already stored in variable corresponding to its name
 
   }
 

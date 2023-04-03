@@ -20,7 +20,6 @@ export default function TutorReviews() {
   const [reviews, setReviews] = useState({});
 
   // console.log("username: ", username);
-  // NOTE to backend: Change this to fetch reviews from backend then it should work
   useEffect(() =>  {
     const res = fetchTutorReviews(username).then((res) => {
       setReviews(res.data.data);
