@@ -6,6 +6,7 @@ import (
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	entCourse "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
+	entReview "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/review"
 	entSchedule "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	entTutor "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	entUser "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
@@ -23,6 +24,7 @@ type RepositoryTutor interface {
 	DeleteTutor(sr *schema.SchemaDeleteTutor) error
 	UpdateSchedule(sr *schema.SchemaUpdateSchedule) (*ent.Schedule, error)
 	GetSchedule(sr *schema.SchemaGetSchedule) (*ent.Schedule, error)
+	GetReviews(sr *schema.SchemaGetReviews) ([]*ent.Review, error)
 }
 
 type repositoryTutor struct {
@@ -195,7 +197,7 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 	// reload tutor->user
 	tutor.Edges.User = user
 	tutor.Edges.Schedule = schedule
-	fmt.Println("pass\n")
+	fmt.Println("pass")
 	return tutor, tx.Commit()
 }
 
@@ -294,4 +296,37 @@ func (r *repositoryTutor) GetSchedule(sr *schema.SchemaGetSchedule) (*ent.Schedu
 		return nil, err
 	}
 	return schedule, nil
+}
+
+func (r *repositoryTutor) GetReviews(sr *schema.SchemaGetReviews) ([]*ent.Review, error) {
+	// user, err := r.client.User.Query().
+	// 	Where(entUser.IDEQ(sr.ID)).
+	// 	WithTutor(func(q *ent.TutorQuery) {
+	// 		q.WithCourse(func(q *ent.CourseQuery) {
+	// 			q.WithReview()
+	// 		})
+	// 	}).
+	// 	All(r.ctx)
+
+	reviews, err := r.client.Review.Query().
+		Where(
+			entReview.HasCourseWith(
+				entCourse.HasTutorWith(
+					entTutor.HasUserWith(entUser.UsernameEQ(sr.Username)),
+				),
+			),
+		).
+		WithCourse(func(q *ent.CourseQuery) {
+			q.WithTutor(func(q *ent.TutorQuery) {
+				q.WithUser()
+			},
+			)
+		}).
+		All(r.ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return reviews, nil
 }

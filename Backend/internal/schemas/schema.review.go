@@ -1,8 +1,9 @@
 package schemas
 
 import (
-	"github.com/google/uuid"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Review struct {
@@ -30,4 +31,11 @@ type SchemaGetReviewsByCourseIdResponse struct {
 	TotalScore  float32  `json:"total_score"`
 	TotalReview int      `json:"total_review"`
 	Reviews     []Review `json:"reviews"`
+}
+
+type ReviewResponse struct {
+	CourseTitle  string    `json:"course_title"`
+	Score        int8      `json:"score"`
+	ReviewMsg    string    `json:"review_msg"`
+	ReviewTimeAt time.Time `json:"review_time_at"`
 }

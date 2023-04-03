@@ -82,3 +82,15 @@ type SchemaUpdateTutor struct {
 type SchemaDeleteTutor struct {
 	ID uuid.UUID `json:"id"`
 }
+
+type SchemaGetReviews struct {
+	Username string `json:"username"`
+}
+
+type SchemaGetReviewsResponse struct {
+	Firstname   string            `json:"tutor_firstname"`
+	Lastname    string            `json:"tutor_lastname"`
+	TotalScore  float32           `json:"total_score"`
+	TotalReview int               `json:"total_review"`
+	Reviews     []*ReviewResponse `json:"reviews"`
+}
