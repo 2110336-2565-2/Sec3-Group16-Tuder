@@ -70,11 +70,6 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 		return nil, err
 	}
 
-	fmt.Println("Schedule", schedule)
-	fmt.Println("Course", course.Edges.Tutor.Edges.Schedule)
-	// fmt.Println("Student", student)
-	fmt.Println("scheduleID", schedule.ID)
-
 	// Create Appointment
 	appointments, err := r.CreateAppointment(&schema.SchemaCreateAppointment{
 		Schedule:   sr.Schedule,
@@ -105,8 +100,6 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 		SetStudent(student).
 		SetScheduleID(schedule.ID).
 		Save(r.ctx)
-
-	fmt.Println("Match", match)
 
 	if err != nil {
 		fmt.Println("Create Match: %w", err)
@@ -268,8 +261,6 @@ func (r *repositoryMatch) CreateAppointment(sr *schema.SchemaCreateAppointment) 
 		if err != nil {
 			return nil, err
 		}
-
-		// fmt.Println("appointment ", appointment)
 
 		appointments = append(appointments, appointment)
 
