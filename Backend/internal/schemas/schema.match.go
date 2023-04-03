@@ -8,10 +8,11 @@ import (
 )
 
 type SchemaCreateMatch struct {
-	Student_id       uuid.UUID               `json:"student_id"`
-	Course_id        uuid.UUID               `json:"course_id"`
-	Appointment_list []SchemaAppointmentTime `json:"appointment_list"`
-	Schedule         Schedule                `json:"schedule"`
+	Student_id uuid.UUID `json:"student_id"`
+	Course_id  uuid.UUID `json:"course_id"`
+	// Appointment_list []SchemaAppointmentTime `json:"appointment_list"`
+	Total_hour int      `json:"total_hour"`
+	Schedule   Schedule `json:"schedule"`
 }
 
 type SchemaAppointmentTime struct {
@@ -21,8 +22,10 @@ type SchemaAppointmentTime struct {
 
 type SchemaCreateAppointment struct {
 	// Course_time      int                     `json:"course_time"`
-	Match            *ent.Match              `json:"match"`
-	Appointment_list []SchemaAppointmentTime `json:"appointment_list"`
+	Match      *ent.Match `json:"match"`
+	Total_hour int        `json:"total_hour"`
+	Schedule   Schedule   `json:"schedule"`
+	// Appointment_list []SchemaAppointmentTime `json:"appointment_list"`
 }
 
 type SchemaCreateSchedule struct {

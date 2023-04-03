@@ -3,6 +3,7 @@ package repositorys
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
@@ -34,11 +35,6 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 
 	if err != nil {
 		return nil, err
-	}
-
-	// Check if schedule length is longer than estimated time
-	if len(sr.Schedule) > course.EstimatedTime {
-		return nil, fmt.Errorf("schedule length is longer than estimated time")
 	}
 
 	student, err := r.client.Student.
@@ -73,8 +69,9 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 
 	// Create Appointment
 	appointments, err := r.CreateAppointment(&schema.SchemaCreateAppointment{
-		Match:            match,
-		Appointment_list: sr.Appointment_list,
+		Match:      match,
+		Schedule:   sr.Schedule,
+		Total_hour: course.EstimatedTime,
 	})
 
 	if err != nil {
@@ -103,26 +100,27 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 	return match, nil
 }
 
-func (r *repositoryMatch) CreateAppointment(sr *schema.SchemaCreateAppointment) ([]*ent.Appointment, error) {
-	// Create Appointment
-	appointments := make([]*ent.Appointment, 0)
-	for _, time := range sr.Appointment_list {
-		appointment, err := r.client.Appointment.
-			Create().
-			SetBeginAt(time.Begin_at).
-			SetEndAt(time.End_at).
-			SetStatus("pending").
-			Save(r.ctx)
+// If frontend want to create appointment by new approach, use this function
+// func (r *repositoryMatch) CreateAppointment(sr *schema.SchemaCreateAppointment) ([]*ent.Appointment, error) {
+// 	// Create Appointment
+// 	appointments := make([]*ent.Appointment, 0)
+// 	for _, time := range sr.Appointment_list {
+// 		appointment, err := r.client.Appointment.
+// 			Create().
+// 			SetBeginAt(time.Begin_at).
+// 			SetEndAt(time.End_at).
+// 			SetStatus("pending").
+// 			Save(r.ctx)
 
-		appointments = append(appointments, appointment)
+// 		appointments = append(appointments, appointment)
 
-		if err != nil {
-			return nil, err
-		}
-	}
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 	}
 
-	return appointments, nil
-}
+// 	return appointments, nil
+// }
 
 func (r *repositoryMatch) CreateSchedule(sr *schema.SchemaCreateSchedule) (*ent.Schedule, error) {
 	ata := sr.Schedule.AvailableTimeArrays()
@@ -187,67 +185,66 @@ func (r *repositoryMatch) UpdateTutorSchedule(sr *schema.SchemaUpdateTutorSchedu
 	return schedule, nil
 }
 
-// func (r *repositoryMatch) CreateAppointmentTraditional(sr *schema.SchemaCreateAppointment) (*ent.Appointment, error) {
-// ata := sr.Schedule.AvailableTimeArrays()
+func (r *repositoryMatch) CreateAppointment(sr *schema.SchemaCreateAppointment) ([]*ent.Appointment, error) {
+	ata := sr.Schedule.AvailableTimeArrays()
+	appointments := make([]*ent.Appointment, 0)
 
-// courseEstimatedTime := sr.Course_time
-// day := (r.GetNow()+1)%7
-// hoursCount := 0
+	dayNow := r.GetNow()
+	day := (int(dayNow.Weekday()) + 1) % 7
+	hoursCount := 0
+	totalHour := sr.Total_hour
+	dayCount := 1
 
-// while(courseEstimatedTime >= 0){
+	for totalHour >= 0 {
+		// Find the first available time
+		for !ata[day][hoursCount] {
+			hoursCount++
+			if hoursCount == 24 {
+				day = (day + 1) % 7
+				dayCount++
+				hoursCount = 0
+			}
+		}
 
-// 	// Find the first available time
-// 	while(!ata[day][hoursCount]) {
-// 		hoursCount++
-// 		if(hoursCount == 24) {
-// 			day = (day+1)%7
-// 			hoursCount = 0
-// 		}
-// 	}
+		//Create Appointment
+		beginAtDay := dayNow.AddDate(0, 0, dayCount)
+		beginAt := time.Date(beginAtDay.Year(), beginAtDay.Month(), beginAtDay.Day(), hoursCount, 0, 0, 0, beginAtDay.Location())
 
-// 	//
+		endAt := time.Date(beginAtDay.Year(), beginAtDay.Month(), beginAtDay.Day(), hoursCount+1, 0, 0, 0, beginAtDay.Location())
 
-// 	// get the current year
-// 	year := time.Now().Year()
+		appointment, err := r.client.Appointment.
+			Create().
+			SetBeginAt(beginAt).
+			SetEndAt(endAt).
+			SetStatus("ongoing").
+			Save(r.ctx)
 
-// 	// get the current month
-// 	month := time.Now().Month()
+		if err != nil {
+			return nil, err
+		}
 
-// 	// Set Begin_at
-// 	begin_at := time.Date(year, month, day, hoursCount, 0, 0, 0, time.UTC)
-// 	courseEstimatedTime -= 1
-// 	hoursCount++
-// 	while(courseEstimatedTime >= 0 && ata[day][hoursCount]) {
-// 		courseEstimatedTime -= 1
-// 		hoursCount++
-// 		if(hoursCount == 24) {
-// 			day = (day+1)%7
-// 			hoursCount = 0
-// 		}
-// 	}
-// }
+		appointments = append(appointments, appointment)
 
-// 	return r.client.Appointment.
-// 		Create().
-// 		SetBeginAt(sr.Begin_at).
-// 		SetEndAt(sr.End_at).
-// 		SetStatus(sr.Status).
-// 		Save(r.ctx)
-// }
+		totalHour -= 1
+		hoursCount++
+		if hoursCount == 24 {
+			day = (day + 1) % 7
+			dayCount++
+			hoursCount = 0
+		}
 
-//For CreateAppointmentTraditional
-// func (r *repositoryMatch) GetNow() (int, error) {
-// 	// Load the Thai timezone location
-// 	loc, err := time.LoadLocation("Asia/Bangkok")
-// 	if err != nil {
-// 		fmt.Println(err)
-// 		return
-// 	}
+	}
+	return appointments, nil
+}
 
-// 	// Get the current time in the Thai timezone
-// 	now := time.Now().In(loc)
+func (r *repositoryMatch) GetNow() time.Time {
+	// Load the Thai timezone location
+	loc, _ := time.LoadLocation("Asia/Bangkok")
 
-// 	// Get the day of the week (Sunday = 0, Monday = 1, etc.)
-// 	day := now.Weekday()
-// 	return day, nil
-// }
+	// Get the current time in the Thai timezone
+	now := time.Now().In(loc)
+
+	now = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+
+	return now
+}
