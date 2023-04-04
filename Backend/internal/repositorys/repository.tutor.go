@@ -19,6 +19,7 @@ type RepositoryTutor interface {
 	GetTutors() ([]*ent.Tutor, error)
 	GetTutorByUsername(sr *schema.SchemaGetTutor) (*ent.Tutor, error)
 	GetTutorScheduleByCourseId(sr *schema.SchemaGetTutorScheduleByCourseId) (*ent.Schedule, error)
+	GetTutorByID(sr *schema.SchemaGetTutorByID) (*ent.Tutor, error)
 	CreateTutor(sr *schema.SchemaCreateTutor) (*ent.Tutor, error)
 	UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor, error)
 	DeleteTutor(sr *schema.SchemaDeleteTutor) error
@@ -70,6 +71,17 @@ func (r *repositoryTutor) GetTutorScheduleByCourseId(sr *schema.SchemaGetTutorSc
 		return nil, err
 	}
 	return schedule, nil
+func (r *repositoryTutor) GetTutorByID(sr *schema.SchemaGetTutorByID) (*ent.Tutor, error) {
+	tutor, err := r.client.Tutor.
+		Query().
+		Where(entTutor.IDEQ(sr.ID)).
+		WithUser().
+		Only(r.ctx)
+	if err != nil {
+		fmt.Println("Broken here",err)
+		return nil, err
+	}
+	return tutor, nil
 }
 
 func (r *repositoryTutor) GetTutors() ([]*ent.Tutor, error) {

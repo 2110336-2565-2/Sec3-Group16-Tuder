@@ -12,6 +12,7 @@ type ServiceTutor interface {
 	GetTutorScheduleByCourseId(courseGet *schemas.SchemaGetTutorScheduleByCourseId) (*schemas.SchemaRawSchedule, error)
 	GetTutors() ([]*schemas.SchemaTutor, error)
 	CreateTutor(tutorCreate *schemas.SchemaCreateTutor) (*schemas.SchemaTutor, error)
+	GetTutorByID(tutorGet *schemas.SchemaGetTutorByID) (*schemas.SchemaTutor, error)
 	GetTutorSchedule(scheduleRequest *schemas.SchemaGetSchedule) (*schemas.SchemaRawSchedule, error)
 	UpdateTutor(tutorUpdate *schemas.SchemaUpdateTutor) (*schemas.SchemaTutor, error)
 	UpdateTutorSchedule(scheduleUpdate *schemas.SchemaUpdateSchedule) (*schemas.SchemaRawSchedule, error)
@@ -72,6 +73,7 @@ func (s *serviceTutor) GetTutorScheduleByCourseId(sr *schemas.SchemaGetTutorSche
 		fmt.Println(err)
 		return nil, err
 	}
+
 	return &schemas.SchemaRawSchedule{
 		Sunday:    schedule.Day0,
 		Monday:    schedule.Day1,
@@ -80,6 +82,44 @@ func (s *serviceTutor) GetTutorScheduleByCourseId(sr *schemas.SchemaGetTutorSche
 		Thursday:  schedule.Day4,
 		Friday:    schedule.Day5,
 		Saturday:  schedule.Day6,
+	}, nil
+}
+
+func (s *serviceTutor) GetTutorByID(tutorGet *schemas.SchemaGetTutorByID) (*schemas.SchemaTutor, error) {
+	tutor, err := s.repository.GetTutorByID(tutorGet)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	schedule, err := s.repository.GetSchedule(&schemas.SchemaGetSchedule{Username: tutor.Edges.User.Username})
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	return &schemas.SchemaTutor{
+		ID:                tutor.ID,
+		Username:          tutor.Edges.User.Username,
+		Firstname:         tutor.Edges.User.FirstName,
+		Lastname:          tutor.Edges.User.LastName,
+		Email:             tutor.Edges.User.Email,
+		Phone:             tutor.Edges.User.Phone,
+		Address:           tutor.Edges.User.Address,
+		Birthdate:         tutor.Edges.User.BirthDate,
+		Gender:            tutor.Edges.User.Gender,
+		ProfilePictureURL: *tutor.Edges.User.ProfilePictureURL,
+		Description:       *tutor.Description,
+		OmiseBankToken:    *tutor.OmiseBankToken,
+		CitizenId:         tutor.CitizenID,
+		Schedule: schemas.SchemaRawSchedule{
+			Sunday:    schedule.Day0,
+			Monday:    schedule.Day1,
+			Tuesday:   schedule.Day2,
+			Wednesday: schedule.Day3,
+			Thursday:  schedule.Day4,
+			Friday:    schedule.Day5,
+			Saturday:  schedule.Day6,
+		},
 	}, nil
 }
 
