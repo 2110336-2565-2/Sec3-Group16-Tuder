@@ -4,7 +4,8 @@ import { Rating } from "react-simple-star-rating";
 import Review from "./Review";
 
 export default function Reviews({ reviews }) {
-  const totalScore = parseFloat(reviews.total_score);
+  // Use only first 2 decimal places
+  const totalScore = reviews.total_score.toFixed(2);
   return (
     <Container>
       <TotalRating>
