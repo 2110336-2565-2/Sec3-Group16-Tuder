@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { FormP } from "./ProfileStyle";
+import { FormP } from "../profile/ProfileStyle";
 import { convertFrontendSchedulesToBackend } from "../../utils/profile/scheduleConverter";
 import { studentFields, tutorFields } from "../../datas/Profile.role";
 import { updateStudent, updateTutor } from "../../handlers/profile/updateUser";
 import FileUploader from "../global/FileUploader";
-import TextInput from "./TextInput";
-import SelectInput from "./SelectInput";
-import DateInput from "./DateInput";
-import TimeSelector from "./TimeSelector";
+import TextInput from "../profile/TextInput";
+import SelectInput from "../profile/SelectInput";
+import DateInput from "../profile/DateInput";
+import TimeSelector from "../profile/TimeSelector";
 
 export default function FormEditProfile({ user }) {
   const navigate = useNavigate();
