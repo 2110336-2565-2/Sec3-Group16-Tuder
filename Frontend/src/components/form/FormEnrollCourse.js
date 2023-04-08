@@ -23,7 +23,6 @@ export default function FormEnrollCourse({ course, courseSchedule }) {
     const backendSchedule = convertFrontendSchedulesToBackend(filteredSchedule);
     // Create data to send to backend
     const data = {
-      student_id: studentID,
       course_id: course.id,
       total_hour: parseInt(totalHours),
       schedule: backendSchedule,

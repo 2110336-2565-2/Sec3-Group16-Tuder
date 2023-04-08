@@ -52,7 +52,7 @@ export default function CancelRequestInfo(props){
 
 
     return (
-        <ContainerWithHeight margintop='100px'>
+        <ContainerWithHeight margintop='25px'>
                     <Title>
                         {props.title}
                     </Title>
@@ -234,7 +234,7 @@ const BackButton = styled.button`
 const RejectButton = styled.button`
   width: 100px;
   height: 50px;
-  border: 2px solid #FF7008;
+  border: 2px solid #FF0000;
   border-radius: 5px;
 
   font-family: 'Lexend Deca';
@@ -243,11 +243,11 @@ const RejectButton = styled.button`
   font-size: 16px;
   line-height: 20px;
   text-align: center;
-  color: #FF7008;
+  color: #FF0000;
   background-color: #FFFFFF;
 
   &:hover {
-    background-color: #FF7008;
+    background-color: #FF0000;
     color: #FFFFFF;
   }
 

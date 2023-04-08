@@ -13,5 +13,6 @@ func InitResetPasswordRoute(c *ent.Client, e *echo.Group) {
 	serviceResetPassword := services.NewServiceResetPassword(repoResetPassword)
 	controllerResetPassword := controller.NewControllerResetPassword(serviceResetPassword)
 
-	e.POST("/resetpassword", controllerResetPassword.ResetPassword)
+	e.POST("/forget-password", controllerResetPassword.ForgetPassword)
+	e.POST("/reset-password", controllerResetPassword.ResetPassword)
 }
