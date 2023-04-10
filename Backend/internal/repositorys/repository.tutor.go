@@ -71,6 +71,7 @@ func (r *repositoryTutor) GetTutorScheduleByCourseId(sr *schema.SchemaGetTutorSc
 		return nil, err
 	}
 	return schedule, nil
+}
 func (r *repositoryTutor) GetTutorByID(sr *schema.SchemaGetTutorByID) (*ent.Tutor, error) {
 	tutor, err := r.client.Tutor.
 		Query().
@@ -78,7 +79,7 @@ func (r *repositoryTutor) GetTutorByID(sr *schema.SchemaGetTutorByID) (*ent.Tuto
 		WithUser().
 		Only(r.ctx)
 	if err != nil {
-		fmt.Println("Broken here",err)
+		fmt.Println("Broken here", err)
 		return nil, err
 	}
 	return tutor, nil
