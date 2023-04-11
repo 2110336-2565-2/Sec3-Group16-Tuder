@@ -124,24 +124,31 @@ export default function Navbar() {
   });
 
   return (
-    <NavbarContainer>
-      <NavbarSection>
-        <NavbarHeader to="/">Tuder</NavbarHeader>
-        <NavbarItems>{contentElement}</NavbarItems>
-      </NavbarSection>
+    <>
+      <NavBarWrapper>
+        <NavbarSection>
+          <NavbarHeader to="/">Tuder</NavbarHeader>
+          <NavbarItems>{contentElement}</NavbarItems>
+        </NavbarSection>
+      </NavBarWrapper>
       <Outlet context={[{ role }, { handleRole }]} />
-    </NavbarContainer>
+    </>
   );
 }
 
 // styled-components for Navbar components
-const NavbarContainer = styled.div`
-    width: 100%;
-    height: 70px;
+const NavBarWrapper = styled.div`
+  width: 100%;
+  height: 70px;
 `;
 const NavbarSection = styled.nav`
-  height: 100%;
+  height: 70px;
   width: 100%;
+  background-color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
   display: flex;
   padding: 10px 30px;
   box-shadow: 0px 2.98px 7.45px rgba(0, 0, 0, 0.1);
