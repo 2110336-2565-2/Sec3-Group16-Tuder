@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Rating } from "react-simple-star-rating";
 import styled from "styled-components";
 import { getUserID } from "../utils/jwtGet";
@@ -9,6 +9,9 @@ import TextInput from "../components/profile/TextInput";
 import Footer from "../components/global/Footer";
 import { IsStudent } from '../components/IsAuth.js'
 import { confirm } from "../components/global/customToast";
+import { toast } from 'react-hot-toast';
+import submitReviewHandler, { fetchTutorHandler } from "../handlers/submitReviewHandler";
+import { fetchCourseHandler} from "../handlers/submitReviewHandler";
 
 export default function Review() {
   const studentID = getUserID();
@@ -18,19 +21,38 @@ export default function Review() {
   const [rating, setRating] = useState(0);
   const [reviewMsg, setReviewMsg] = useState("");
   const navigate = useNavigate();
+  const [course, setCourse] = useState({});
+  const [tutor, setTutor] = useState({});
   // Note to backend: Change this to fetch course details from backend
-  const course = {
-    course_name: "Search Engine Optimization",
-    tutor_firstname: "John",
-    tutor_lastname: "Doe",
-  };
+  useEffect(() => {
+    fetchCourseHandler(courseID).then((res) => {
+      setCourse(res.data.data)
+      fetchTutorHandler(res.data.data.tutor_id).then((res) => {
+        setTutor(res.data.data)
+      });
+    });
+  }, []);
+
   // ---------------------------------------------
   
   function handleRatingClick(newRating) {
     setRating(newRating);
   }
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
+    const reviewPayload = {
+      "course_id" : courseID,
+      "rating" : rating,
+      "review_message" : reviewMsg,
+    }
+    try{
+      await submitReviewHandler(reviewPayload)
+      toast.success('Submit Review Success')
+    }
+    catch(err){
+      toast.error('Submit Review Failed')
+    }
+    
     // Note to backend: Change this to send review to backend
     // each field is already stored in variable corresponding to its name
 
@@ -42,9 +64,9 @@ export default function Review() {
       <Form onSubmit={handleSubmit}>
         <Topic>Course Review</Topic>
         <Detail>
-          {course.course_name}
+          {course.title}
           <br />
-          {course.tutor_firstname + " " + course.tutor_lastname}
+          {tutor.firstname + " " + tutor.lastname}
         </Detail>
         <RatingSection>
           <Rating onClick={handleRatingClick} initialValue={rating} />

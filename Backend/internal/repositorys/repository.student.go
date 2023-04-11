@@ -3,6 +3,7 @@ package repositorys
 import (
 	"context"
 	"fmt"
+
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	entStudent "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	entUser "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
@@ -33,7 +34,6 @@ func (rS *repositoryStudent) GetStudents() ([]*ent.Student, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("\nget students successful\n")
 	return students, nil
 }
 
