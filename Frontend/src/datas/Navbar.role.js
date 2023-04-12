@@ -35,7 +35,7 @@ const navbarContent = [
             {title: 'Courses', link: '/courses'},
             {title: 'Teachers', link: '/teachers'},
             {title: 'Report List', link: '/issuereports'},
-            {title: 'Cancel-Request List', link: '/cancel-request-list'},
+            {title: 'Cancel-Request List', link: '/cancel-requests'},
             {title: 'Sign Out', link: '/'},
         ]
     }

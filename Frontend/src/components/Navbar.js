@@ -22,10 +22,6 @@ export default function Navbar(){
         handleRole();
     })
 
-    
-
-    
-    
     function signOutHandler(e) {
         e.preventDefault();
         signOutAction(navigate);

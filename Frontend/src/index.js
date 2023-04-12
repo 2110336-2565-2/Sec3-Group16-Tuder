@@ -127,15 +127,15 @@ const router = createBrowserRouter([
         element: <EnterNewPassword />,
       },
       {
-        path: "/user-cancel-request/:id",
+        path: "/cancel-request/:id",
         element: <UserCancelRequest />,
       },
       {
-        path: "/cancel-request-list",
+        path: "/cancel-requests",
         element: <CancelRequestList />,
       },
       {
-        path: "/cancel-request-detail/:id",
+        path: "/cancel-requests/:id",
         element: <CancelRequestDetail />,
       },
       {

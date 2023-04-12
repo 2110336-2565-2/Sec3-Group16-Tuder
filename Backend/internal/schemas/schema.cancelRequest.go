@@ -12,7 +12,7 @@ type SchemaCancelRequest struct {
 	MatchID      uuid.UUID `json:"matchId"`
 	UserID       uuid.UUID `json:"userId"`
 	Title        string    `json:"title"`
-	ImgURL       string    `json:"img_url"`
+	Img       []byte    `json:"img"`
 	Description  string    `json:"description"`
 	ReporterRole user.Role `json:"reporter_role"`
 }
