@@ -91,7 +91,7 @@ export default function UserCancelRequest() {
         <Description name="description" onChange={handleChange} />
       </DescriptionSection>
       <ButtonSection>
-        <CancelButton onClick={() => navigate("/userrequest")}>
+        <CancelButton onClick={() => navigate("/classes/" + matchId)}>
           Cancel
         </CancelButton>
         <SubmitButton onClick={handleSubmit}>Submit</SubmitButton>

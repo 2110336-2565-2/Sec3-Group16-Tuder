@@ -25,6 +25,7 @@ import AdminIssueReportList from "./pages/AdminIssueReportList";
 import CourseDetail from "./pages/CourseDetail";
 import TutorReviews from "./pages/TutorReviews";
 import Enroll from "./pages/Enroll";
+import ClassDetail from "./pages/ClassDetail";
 import { QueryClientProvider, QueryClient } from "react-query";
 
 Modal.setAppElement(document.getElementById("root"));
@@ -141,6 +142,10 @@ const router = createBrowserRouter([
       {
         path: "/course-detail/:id",
         element: <CourseDetail />,
+      },
+      {
+        path: "/classes/:id",
+        element: <ClassDetail />,
       },
     ],
   },
