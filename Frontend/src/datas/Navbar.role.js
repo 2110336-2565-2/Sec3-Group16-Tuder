@@ -4,7 +4,6 @@ const navbarContent = [
         content:[
             {title: 'Home', link: '/'},
             {title: 'Report', link: '/report'},
-            {title: 'Courses', link: '/courses'},
             {title: 'Sign In', link: '/sign-in'},
             {title: 'Sign Up', link: '/sign-up'},
         ]
@@ -32,7 +31,6 @@ const navbarContent = [
         role: 'admin',
         content:[
             {title: 'Home', link: '/'},
-            {title: 'Courses', link: '/courses'},
             {title: 'Teachers', link: '/teachers'},
             {title: 'Report List', link: '/issuereports'},
             {title: 'Cancel-Request List', link: '/cancel-requests'},
