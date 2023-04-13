@@ -71,7 +71,6 @@ export default function FormSignUp() {
       expiration_year: role === "tutor" ? parseInt(expiryDate.split("/")[1].trim()) : "",
       security_code: role === "tutor" ? cvv : "",
     };
-    console.log(signUpData)
     setStatus("submitting");
     try {
       await signUpHandler(signUpData, navigate);
