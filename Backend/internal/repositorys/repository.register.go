@@ -4,11 +4,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+	"os"
+
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	entUser "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
+	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 	"github.com/google/uuid"
+	"github.com/omise/omise-go"
+	"github.com/omise/omise-go/operations"
 )
 
 var (
@@ -102,12 +108,12 @@ func (r repositoryRegister) RegisterUser(sr *schemas.SchemaRegister) (*ent.User,
 			SetDay5(AllDayAvailable).
 			SetDay6(AllDayAvailable).
 			Save(r.ctx)
-		 
+
 		_, err = txc.Tutor.
 			Create().
 			SetUser(newUser).
 			SetDescription(sr.Description).
-			SetOmiseBankToken("").
+			SetOmiseBankToken(sr.OmiseBankToken).
 			SetCitizenID(sr.CitizenID).
 			SetSchedule(schedule).
 			Save(r.ctx)
@@ -121,5 +127,30 @@ func (r repositoryRegister) RegisterUser(sr *schemas.SchemaRegister) (*ent.User,
 		return nil, err
 	}
 
+	r.CreateOmiseCustomer(&schema.SchemaCreateOmiseCustomer{Email: sr.Email, OmiseBankToken: sr.OmiseBankToken})
+
 	return newUser, tx.Commit()
+}
+
+func (r *repositoryRegister) CreateOmiseCustomer(sr *schema.SchemaCreateOmiseCustomer) (err error) {
+	omisePublicKey := os.Getenv("OMISE_PUBLIC_KEY")
+	omiseSecretKey := os.Getenv("OMISE_SECRET_KEY")
+
+	client, err := omise.NewClient(omisePublicKey, omiseSecretKey)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// create a customer
+	customer, createCustomer := &omise.Customer{}, &operations.CreateCustomer{
+		Email: sr.Email,
+		Card:  sr.OmiseBankToken,
+	}
+
+	if e := client.Do(customer, createCustomer); e != nil {
+		log.Fatal(e)
+	}
+
+	return nil
 }
