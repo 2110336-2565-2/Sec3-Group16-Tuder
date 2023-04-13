@@ -227,8 +227,20 @@ const CompleteButton = styled.button`
   font-size: 16px;
   line-height: 20px;
   text-align: center;
-  background-color: #009900;
-  color: #FFFFFF;
+  background-color: ${(props) => {
+    if (props.statusState === "completed") {
+        return "#009900";
+    } else {
+        return "#D3D3D3";
+    }
+}};
+ color: ${(props) => {
+    if (props.statusState === "completed") {
+        return "#FFFFFF";
+    } else {
+        return "#000000";
+    }
+}};
   &:hover {
     background-color: #10AA00;
     color: #ffffff;
