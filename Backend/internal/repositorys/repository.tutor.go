@@ -3,6 +3,8 @@ package repositorys
 import (
 	"context"
 	"fmt"
+	"log"
+	"os"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	entCourse "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
@@ -11,6 +13,8 @@ import (
 	entTutor "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	entUser "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
+	"github.com/omise/omise-go"
+	"github.com/omise/omise-go/operations"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 )
@@ -138,7 +142,32 @@ func (r *repositoryTutor) CreateTutor(sr *schema.SchemaCreateTutor) (*ent.Tutor,
 		return nil, err
 	}
 
+	r.CreateOmiseCustomer(&schema.SchemaCreateOmiseCustomer{Email: sr.Email, OmiseBankToken: sr.OmiseBankToken})
+
 	return tutor, tx.Commit()
+}
+
+func (r *repositoryTutor) CreateOmiseCustomer(sr *schema.SchemaCreateOmiseCustomer) (err error) {
+	omisePublicKey := os.Getenv("OMISE_PUBLIC_KEY")
+	omiseSecretKey := os.Getenv("OMISE_SECRET_KEY")
+
+	client, err := omise.NewClient(omisePublicKey, omiseSecretKey)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// create a customer
+	customer, createCustomer := &omise.Customer{}, &operations.CreateCustomer{
+		Email: sr.Email,
+		Card:  sr.OmiseBankToken,
+	}
+
+	if e := client.Do(customer, createCustomer); e != nil {
+		log.Fatal(e)
+	}
+
+	return nil
 }
 
 func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor, error) {
