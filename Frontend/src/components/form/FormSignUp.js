@@ -67,8 +67,8 @@ export default function FormSignUp() {
       description: role === "tutor" ? description : "",
       card_holder_name: role === "tutor" ? cardHolderName : "",
       card_number: role === "tutor" ? cardNumber : "",
-      expiration_month: role === "tutor" ? expiryDate.split("/")[0].trim() : "",
-      expiration_year: role === "tutor" ? expiryDate.split("/")[1].trim() : "",
+      expiration_month: role === "tutor" ? parseInt(expiryDate.split("/")[0].trim()) : "",
+      expiration_year: role === "tutor" ? parseInt(expiryDate.split("/")[1].trim()) : "",
       security_code: role === "tutor" ? cvv : "",
     };
     console.log(signUpData)
@@ -282,18 +282,18 @@ export default function FormSignUp() {
                     name={name}
                     type="text"
                     value={expiryDate}
-                    placeholder="mm / yy"
+                    placeholder="mm / yyyy"
                     inputmode="numeric"
                     autocomplete="cc-exp"
-                    pattern="^(0[1-9]|1[0-2])\s\/\s[0-9]{2}$"
-                    maxLength="7"
-                    minLength="7"
+                    pattern="^(0[1-9]|1[0-2])\s\/\s[0-9]{4}$"
+                    maxLength="9"
+                    minLength="9"
                     onChange={(e) =>{
                         const formattedValue = e.target.value
                         .replace(/\D/g, "") // Remove non-numeric characters
-                        .replace(/(.{2})/g, "$1 / ")
+                        .replace(/^(\d{2})(\d{0,4})$/, "$1 / $2") // Format date as MM / YYYY
                         .trim() // Remove any leading/trailing spaces
-                        .slice(0, 7); // Limit to 7 characters
+                        .slice(0, 9); // Limit to 9 characters
                         setExpiryDate(formattedValue);
                         }}
                     required
