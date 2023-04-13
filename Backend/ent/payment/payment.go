@@ -13,6 +13,12 @@ const (
 	FieldID = "id"
 	// FieldQrPictureURL holds the string denoting the qr_picture_url field in the database.
 	FieldQrPictureURL = "qr_picture_url"
+	// FieldPaymentStatus holds the string denoting the payment_status field in the database.
+	FieldPaymentStatus = "payment_status"
+	// FieldCard holds the string denoting the card field in the database.
+	FieldCard = "card"
+	// FieldAmount holds the string denoting the amount field in the database.
+	FieldAmount = "amount"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
 	// EdgePaymentHistory holds the string denoting the payment_history edge name in mutations.
@@ -39,6 +45,9 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldQrPictureURL,
+	FieldPaymentStatus,
+	FieldCard,
+	FieldAmount,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "payments"
@@ -63,6 +72,12 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// PaymentStatusValidator is a validator for the "payment_status" field. It is called by the builders before save.
+	PaymentStatusValidator func(string) error
+	// CardValidator is a validator for the "card" field. It is called by the builders before save.
+	CardValidator func(string) error
+	// AmountValidator is a validator for the "amount" field. It is called by the builders before save.
+	AmountValidator func(int) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )

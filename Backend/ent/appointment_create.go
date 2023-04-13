@@ -185,10 +185,7 @@ func (ac *AppointmentCreate) createSpec() (*Appointment, *sqlgraph.CreateSpec) {
 			Columns: []string{appointment.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: match.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(match.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

@@ -9,6 +9,8 @@ import (
 	"sync"
 	"time"
 
+	"entgo.io/ent"
+	"entgo.io/ent/dialect/sql"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/appointment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/cancelrequest"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
@@ -23,9 +25,6 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
-
-	"entgo.io/ent"
-	"entgo.io/ent/dialect/sql"
 )
 
 const (
@@ -3527,6 +3526,10 @@ type PaymentMutation struct {
 	typ                    string
 	id                     *uuid.UUID
 	qr_picture_url         *string
+	payment_status         *string
+	card                   *string
+	amount                 *int
+	addamount              *int
 	clearedFields          map[string]struct{}
 	user                   *uuid.UUID
 	cleareduser            bool
@@ -3691,6 +3694,134 @@ func (m *PaymentMutation) ResetQrPictureURL() {
 	delete(m.clearedFields, payment.FieldQrPictureURL)
 }
 
+// SetPaymentStatus sets the "payment_status" field.
+func (m *PaymentMutation) SetPaymentStatus(s string) {
+	m.payment_status = &s
+}
+
+// PaymentStatus returns the value of the "payment_status" field in the mutation.
+func (m *PaymentMutation) PaymentStatus() (r string, exists bool) {
+	v := m.payment_status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPaymentStatus returns the old "payment_status" field's value of the Payment entity.
+// If the Payment object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PaymentMutation) OldPaymentStatus(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPaymentStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPaymentStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPaymentStatus: %w", err)
+	}
+	return oldValue.PaymentStatus, nil
+}
+
+// ResetPaymentStatus resets all changes to the "payment_status" field.
+func (m *PaymentMutation) ResetPaymentStatus() {
+	m.payment_status = nil
+}
+
+// SetCard sets the "card" field.
+func (m *PaymentMutation) SetCard(s string) {
+	m.card = &s
+}
+
+// Card returns the value of the "card" field in the mutation.
+func (m *PaymentMutation) Card() (r string, exists bool) {
+	v := m.card
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCard returns the old "card" field's value of the Payment entity.
+// If the Payment object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PaymentMutation) OldCard(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCard is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCard requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCard: %w", err)
+	}
+	return oldValue.Card, nil
+}
+
+// ResetCard resets all changes to the "card" field.
+func (m *PaymentMutation) ResetCard() {
+	m.card = nil
+}
+
+// SetAmount sets the "amount" field.
+func (m *PaymentMutation) SetAmount(i int) {
+	m.amount = &i
+	m.addamount = nil
+}
+
+// Amount returns the value of the "amount" field in the mutation.
+func (m *PaymentMutation) Amount() (r int, exists bool) {
+	v := m.amount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAmount returns the old "amount" field's value of the Payment entity.
+// If the Payment object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PaymentMutation) OldAmount(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAmount is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAmount requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAmount: %w", err)
+	}
+	return oldValue.Amount, nil
+}
+
+// AddAmount adds i to the "amount" field.
+func (m *PaymentMutation) AddAmount(i int) {
+	if m.addamount != nil {
+		*m.addamount += i
+	} else {
+		m.addamount = &i
+	}
+}
+
+// AddedAmount returns the value that was added to the "amount" field in this mutation.
+func (m *PaymentMutation) AddedAmount() (r int, exists bool) {
+	v := m.addamount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetAmount resets all changes to the "amount" field.
+func (m *PaymentMutation) ResetAmount() {
+	m.amount = nil
+	m.addamount = nil
+}
+
 // SetUserID sets the "user" edge to the User entity by id.
 func (m *PaymentMutation) SetUserID(id uuid.UUID) {
 	m.user = &id
@@ -3818,9 +3949,18 @@ func (m *PaymentMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PaymentMutation) Fields() []string {
-	fields := make([]string, 0, 1)
+	fields := make([]string, 0, 4)
 	if m.qr_picture_url != nil {
 		fields = append(fields, payment.FieldQrPictureURL)
+	}
+	if m.payment_status != nil {
+		fields = append(fields, payment.FieldPaymentStatus)
+	}
+	if m.card != nil {
+		fields = append(fields, payment.FieldCard)
+	}
+	if m.amount != nil {
+		fields = append(fields, payment.FieldAmount)
 	}
 	return fields
 }
@@ -3832,6 +3972,12 @@ func (m *PaymentMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case payment.FieldQrPictureURL:
 		return m.QrPictureURL()
+	case payment.FieldPaymentStatus:
+		return m.PaymentStatus()
+	case payment.FieldCard:
+		return m.Card()
+	case payment.FieldAmount:
+		return m.Amount()
 	}
 	return nil, false
 }
@@ -3843,6 +3989,12 @@ func (m *PaymentMutation) OldField(ctx context.Context, name string) (ent.Value,
 	switch name {
 	case payment.FieldQrPictureURL:
 		return m.OldQrPictureURL(ctx)
+	case payment.FieldPaymentStatus:
+		return m.OldPaymentStatus(ctx)
+	case payment.FieldCard:
+		return m.OldCard(ctx)
+	case payment.FieldAmount:
+		return m.OldAmount(ctx)
 	}
 	return nil, fmt.Errorf("unknown Payment field %s", name)
 }
@@ -3859,6 +4011,27 @@ func (m *PaymentMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetQrPictureURL(v)
 		return nil
+	case payment.FieldPaymentStatus:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPaymentStatus(v)
+		return nil
+	case payment.FieldCard:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCard(v)
+		return nil
+	case payment.FieldAmount:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAmount(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Payment field %s", name)
 }
@@ -3866,13 +4039,21 @@ func (m *PaymentMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *PaymentMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addamount != nil {
+		fields = append(fields, payment.FieldAmount)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *PaymentMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case payment.FieldAmount:
+		return m.AddedAmount()
+	}
 	return nil, false
 }
 
@@ -3881,6 +4062,13 @@ func (m *PaymentMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *PaymentMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case payment.FieldAmount:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddAmount(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Payment numeric field %s", name)
 }
@@ -3919,6 +4107,15 @@ func (m *PaymentMutation) ResetField(name string) error {
 	switch name {
 	case payment.FieldQrPictureURL:
 		m.ResetQrPictureURL()
+		return nil
+	case payment.FieldPaymentStatus:
+		m.ResetPaymentStatus()
+		return nil
+	case payment.FieldCard:
+		m.ResetCard()
+		return nil
+	case payment.FieldAmount:
+		m.ResetAmount()
 		return nil
 	}
 	return fmt.Errorf("unknown Payment field %s", name)
@@ -6412,6 +6609,7 @@ type TutorMutation struct {
 	description         *string
 	omise_bank_token    *string
 	citizen_id          *string
+	omise_customer_id   *string
 	clearedFields       map[string]struct{}
 	issue_report        map[uuid.UUID]struct{}
 	removedissue_report map[uuid.UUID]struct{}
@@ -6666,6 +6864,55 @@ func (m *TutorMutation) ResetCitizenID() {
 	m.citizen_id = nil
 }
 
+// SetOmiseCustomerID sets the "omise_customer_id" field.
+func (m *TutorMutation) SetOmiseCustomerID(s string) {
+	m.omise_customer_id = &s
+}
+
+// OmiseCustomerID returns the value of the "omise_customer_id" field in the mutation.
+func (m *TutorMutation) OmiseCustomerID() (r string, exists bool) {
+	v := m.omise_customer_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOmiseCustomerID returns the old "omise_customer_id" field's value of the Tutor entity.
+// If the Tutor object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TutorMutation) OldOmiseCustomerID(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOmiseCustomerID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOmiseCustomerID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOmiseCustomerID: %w", err)
+	}
+	return oldValue.OmiseCustomerID, nil
+}
+
+// ClearOmiseCustomerID clears the value of the "omise_customer_id" field.
+func (m *TutorMutation) ClearOmiseCustomerID() {
+	m.omise_customer_id = nil
+	m.clearedFields[tutor.FieldOmiseCustomerID] = struct{}{}
+}
+
+// OmiseCustomerIDCleared returns if the "omise_customer_id" field was cleared in this mutation.
+func (m *TutorMutation) OmiseCustomerIDCleared() bool {
+	_, ok := m.clearedFields[tutor.FieldOmiseCustomerID]
+	return ok
+}
+
+// ResetOmiseCustomerID resets all changes to the "omise_customer_id" field.
+func (m *TutorMutation) ResetOmiseCustomerID() {
+	m.omise_customer_id = nil
+	delete(m.clearedFields, tutor.FieldOmiseCustomerID)
+}
+
 // AddIssueReportIDs adds the "issue_report" edge to the IssueReport entity by ids.
 func (m *TutorMutation) AddIssueReportIDs(ids ...uuid.UUID) {
 	if m.issue_report == nil {
@@ -6886,7 +7133,7 @@ func (m *TutorMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TutorMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.description != nil {
 		fields = append(fields, tutor.FieldDescription)
 	}
@@ -6895,6 +7142,9 @@ func (m *TutorMutation) Fields() []string {
 	}
 	if m.citizen_id != nil {
 		fields = append(fields, tutor.FieldCitizenID)
+	}
+	if m.omise_customer_id != nil {
+		fields = append(fields, tutor.FieldOmiseCustomerID)
 	}
 	return fields
 }
@@ -6910,6 +7160,8 @@ func (m *TutorMutation) Field(name string) (ent.Value, bool) {
 		return m.OmiseBankToken()
 	case tutor.FieldCitizenID:
 		return m.CitizenID()
+	case tutor.FieldOmiseCustomerID:
+		return m.OmiseCustomerID()
 	}
 	return nil, false
 }
@@ -6925,6 +7177,8 @@ func (m *TutorMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldOmiseBankToken(ctx)
 	case tutor.FieldCitizenID:
 		return m.OldCitizenID(ctx)
+	case tutor.FieldOmiseCustomerID:
+		return m.OldOmiseCustomerID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Tutor field %s", name)
 }
@@ -6954,6 +7208,13 @@ func (m *TutorMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCitizenID(v)
+		return nil
+	case tutor.FieldOmiseCustomerID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOmiseCustomerID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Tutor field %s", name)
@@ -6991,6 +7252,9 @@ func (m *TutorMutation) ClearedFields() []string {
 	if m.FieldCleared(tutor.FieldOmiseBankToken) {
 		fields = append(fields, tutor.FieldOmiseBankToken)
 	}
+	if m.FieldCleared(tutor.FieldOmiseCustomerID) {
+		fields = append(fields, tutor.FieldOmiseCustomerID)
+	}
 	return fields
 }
 
@@ -7011,6 +7275,9 @@ func (m *TutorMutation) ClearField(name string) error {
 	case tutor.FieldOmiseBankToken:
 		m.ClearOmiseBankToken()
 		return nil
+	case tutor.FieldOmiseCustomerID:
+		m.ClearOmiseCustomerID()
+		return nil
 	}
 	return fmt.Errorf("unknown Tutor nullable field %s", name)
 }
@@ -7027,6 +7294,9 @@ func (m *TutorMutation) ResetField(name string) error {
 		return nil
 	case tutor.FieldCitizenID:
 		m.ResetCitizenID()
+		return nil
+	case tutor.FieldOmiseCustomerID:
+		m.ResetOmiseCustomerID()
 		return nil
 	}
 	return fmt.Errorf("unknown Tutor field %s", name)

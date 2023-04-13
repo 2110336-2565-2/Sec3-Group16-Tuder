@@ -105,6 +105,18 @@ func init() {
 	match.DefaultID = matchDescID.Default.(func() uuid.UUID)
 	paymentFields := schema.Payment{}.Fields()
 	_ = paymentFields
+	// paymentDescPaymentStatus is the schema descriptor for payment_status field.
+	paymentDescPaymentStatus := paymentFields[2].Descriptor()
+	// payment.PaymentStatusValidator is a validator for the "payment_status" field. It is called by the builders before save.
+	payment.PaymentStatusValidator = paymentDescPaymentStatus.Validators[0].(func(string) error)
+	// paymentDescCard is the schema descriptor for card field.
+	paymentDescCard := paymentFields[3].Descriptor()
+	// payment.CardValidator is a validator for the "card" field. It is called by the builders before save.
+	payment.CardValidator = paymentDescCard.Validators[0].(func(string) error)
+	// paymentDescAmount is the schema descriptor for amount field.
+	paymentDescAmount := paymentFields[4].Descriptor()
+	// payment.AmountValidator is a validator for the "amount" field. It is called by the builders before save.
+	payment.AmountValidator = paymentDescAmount.Validators[0].(func(int) error)
 	// paymentDescID is the schema descriptor for id field.
 	paymentDescID := paymentFields[0].Descriptor()
 	// payment.DefaultID holds the default value on creation for the id field.

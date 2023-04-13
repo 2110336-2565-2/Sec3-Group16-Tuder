@@ -59,6 +59,21 @@ func QrPictureURL(v string) predicate.Payment {
 	return predicate.Payment(sql.FieldEQ(FieldQrPictureURL, v))
 }
 
+// PaymentStatus applies equality check predicate on the "payment_status" field. It's identical to PaymentStatusEQ.
+func PaymentStatus(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldPaymentStatus, v))
+}
+
+// Card applies equality check predicate on the "card" field. It's identical to CardEQ.
+func Card(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldCard, v))
+}
+
+// Amount applies equality check predicate on the "amount" field. It's identical to AmountEQ.
+func Amount(v int) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldAmount, v))
+}
+
 // QrPictureURLEQ applies the EQ predicate on the "qr_picture_url" field.
 func QrPictureURLEQ(v string) predicate.Payment {
 	return predicate.Payment(sql.FieldEQ(FieldQrPictureURL, v))
@@ -132,6 +147,176 @@ func QrPictureURLEqualFold(v string) predicate.Payment {
 // QrPictureURLContainsFold applies the ContainsFold predicate on the "qr_picture_url" field.
 func QrPictureURLContainsFold(v string) predicate.Payment {
 	return predicate.Payment(sql.FieldContainsFold(FieldQrPictureURL, v))
+}
+
+// PaymentStatusEQ applies the EQ predicate on the "payment_status" field.
+func PaymentStatusEQ(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldPaymentStatus, v))
+}
+
+// PaymentStatusNEQ applies the NEQ predicate on the "payment_status" field.
+func PaymentStatusNEQ(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldNEQ(FieldPaymentStatus, v))
+}
+
+// PaymentStatusIn applies the In predicate on the "payment_status" field.
+func PaymentStatusIn(vs ...string) predicate.Payment {
+	return predicate.Payment(sql.FieldIn(FieldPaymentStatus, vs...))
+}
+
+// PaymentStatusNotIn applies the NotIn predicate on the "payment_status" field.
+func PaymentStatusNotIn(vs ...string) predicate.Payment {
+	return predicate.Payment(sql.FieldNotIn(FieldPaymentStatus, vs...))
+}
+
+// PaymentStatusGT applies the GT predicate on the "payment_status" field.
+func PaymentStatusGT(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldGT(FieldPaymentStatus, v))
+}
+
+// PaymentStatusGTE applies the GTE predicate on the "payment_status" field.
+func PaymentStatusGTE(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldGTE(FieldPaymentStatus, v))
+}
+
+// PaymentStatusLT applies the LT predicate on the "payment_status" field.
+func PaymentStatusLT(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldLT(FieldPaymentStatus, v))
+}
+
+// PaymentStatusLTE applies the LTE predicate on the "payment_status" field.
+func PaymentStatusLTE(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldLTE(FieldPaymentStatus, v))
+}
+
+// PaymentStatusContains applies the Contains predicate on the "payment_status" field.
+func PaymentStatusContains(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldContains(FieldPaymentStatus, v))
+}
+
+// PaymentStatusHasPrefix applies the HasPrefix predicate on the "payment_status" field.
+func PaymentStatusHasPrefix(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldHasPrefix(FieldPaymentStatus, v))
+}
+
+// PaymentStatusHasSuffix applies the HasSuffix predicate on the "payment_status" field.
+func PaymentStatusHasSuffix(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldHasSuffix(FieldPaymentStatus, v))
+}
+
+// PaymentStatusEqualFold applies the EqualFold predicate on the "payment_status" field.
+func PaymentStatusEqualFold(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldEqualFold(FieldPaymentStatus, v))
+}
+
+// PaymentStatusContainsFold applies the ContainsFold predicate on the "payment_status" field.
+func PaymentStatusContainsFold(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldContainsFold(FieldPaymentStatus, v))
+}
+
+// CardEQ applies the EQ predicate on the "card" field.
+func CardEQ(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldCard, v))
+}
+
+// CardNEQ applies the NEQ predicate on the "card" field.
+func CardNEQ(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldNEQ(FieldCard, v))
+}
+
+// CardIn applies the In predicate on the "card" field.
+func CardIn(vs ...string) predicate.Payment {
+	return predicate.Payment(sql.FieldIn(FieldCard, vs...))
+}
+
+// CardNotIn applies the NotIn predicate on the "card" field.
+func CardNotIn(vs ...string) predicate.Payment {
+	return predicate.Payment(sql.FieldNotIn(FieldCard, vs...))
+}
+
+// CardGT applies the GT predicate on the "card" field.
+func CardGT(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldGT(FieldCard, v))
+}
+
+// CardGTE applies the GTE predicate on the "card" field.
+func CardGTE(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldGTE(FieldCard, v))
+}
+
+// CardLT applies the LT predicate on the "card" field.
+func CardLT(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldLT(FieldCard, v))
+}
+
+// CardLTE applies the LTE predicate on the "card" field.
+func CardLTE(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldLTE(FieldCard, v))
+}
+
+// CardContains applies the Contains predicate on the "card" field.
+func CardContains(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldContains(FieldCard, v))
+}
+
+// CardHasPrefix applies the HasPrefix predicate on the "card" field.
+func CardHasPrefix(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldHasPrefix(FieldCard, v))
+}
+
+// CardHasSuffix applies the HasSuffix predicate on the "card" field.
+func CardHasSuffix(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldHasSuffix(FieldCard, v))
+}
+
+// CardEqualFold applies the EqualFold predicate on the "card" field.
+func CardEqualFold(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldEqualFold(FieldCard, v))
+}
+
+// CardContainsFold applies the ContainsFold predicate on the "card" field.
+func CardContainsFold(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldContainsFold(FieldCard, v))
+}
+
+// AmountEQ applies the EQ predicate on the "amount" field.
+func AmountEQ(v int) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldAmount, v))
+}
+
+// AmountNEQ applies the NEQ predicate on the "amount" field.
+func AmountNEQ(v int) predicate.Payment {
+	return predicate.Payment(sql.FieldNEQ(FieldAmount, v))
+}
+
+// AmountIn applies the In predicate on the "amount" field.
+func AmountIn(vs ...int) predicate.Payment {
+	return predicate.Payment(sql.FieldIn(FieldAmount, vs...))
+}
+
+// AmountNotIn applies the NotIn predicate on the "amount" field.
+func AmountNotIn(vs ...int) predicate.Payment {
+	return predicate.Payment(sql.FieldNotIn(FieldAmount, vs...))
+}
+
+// AmountGT applies the GT predicate on the "amount" field.
+func AmountGT(v int) predicate.Payment {
+	return predicate.Payment(sql.FieldGT(FieldAmount, v))
+}
+
+// AmountGTE applies the GTE predicate on the "amount" field.
+func AmountGTE(v int) predicate.Payment {
+	return predicate.Payment(sql.FieldGTE(FieldAmount, v))
+}
+
+// AmountLT applies the LT predicate on the "amount" field.
+func AmountLT(v int) predicate.Payment {
+	return predicate.Payment(sql.FieldLT(FieldAmount, v))
+}
+
+// AmountLTE applies the LTE predicate on the "amount" field.
+func AmountLTE(v int) predicate.Payment {
+	return predicate.Payment(sql.FieldLTE(FieldAmount, v))
 }
 
 // HasUser applies the HasEdge predicate on the "user" edge.
