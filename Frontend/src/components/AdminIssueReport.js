@@ -65,6 +65,18 @@ export default function AdminIssueReport(props) {
 
   });
 
+  const isEnablebutton = () => {
+    if (statusState === "ongoing") {
+      return ;
+    }
+    return (
+        <DeleteButton disabled={statusState != "ongoing" ? false : true}
+          value="false" onClick={handleDelete} statusState = {statusState}>
+            Delete
+        </DeleteButton>
+      );
+  };
+
   const handleDelete = () => {
     const data = {
       IssueReportId: props.issuereport_id,
@@ -126,10 +138,7 @@ export default function AdminIssueReport(props) {
               </InfoDesc>
             </StateInfo>
             <StateInfo>
-              <DeleteButton disabled={statusState != "ongoing" ? false : true}
-                value="false" onClick={handleDelete} statusState = {statusState}>
-                Delete
-              </DeleteButton>
+              {isEnablebutton()}
             </StateInfo>
             
           </StateFlex>
@@ -216,9 +225,9 @@ const InfoDesc = styled.div`
 `
 
 const CompleteButton = styled.button`
-  width: 80px;
+  width: 95px;
   height: 35px;
-  border: 2px solid #ff7008;
+  border: 2px solid #10AA00;
   border-radius: 5px;
 
   font-family: "Lexend Deca";
@@ -227,20 +236,8 @@ const CompleteButton = styled.button`
   font-size: 16px;
   line-height: 20px;
   text-align: center;
-  background-color: ${(props) => {
-    if (props.statusState === "completed") {
-        return "#009900";
-    } else {
-        return "#D3D3D3";
-    }
-}};
- color: ${(props) => {
-    if (props.statusState === "completed") {
-        return "#FFFFFF";
-    } else {
-        return "#000000";
-    }
-}};
+  background-color: #009900;
+  color: #FFFFFF;
   &:hover {
     background-color: #10AA00;
     color: #ffffff;
@@ -250,9 +247,9 @@ const CompleteButton = styled.button`
 `;
 
 const RejectButton = styled.button`
-  width: 80px;
+  width: 95px;
   height: 35px;
-  border: 2px solid #ff7008;
+  border: 2px solid #FF0F39;
   border-radius: 5px;
 
   font-family: "Lexend Deca";
@@ -261,23 +258,11 @@ const RejectButton = styled.button`
   font-size: 16px;
   line-height: 20px;
   text-align: center;
-  background-color: ${(props) => {
-    if (props.statusState === "rejected") {
-        return "#FF0000";
-    } else {
-        return "#D3D3D3";
-    }
-  }};
-  color: ${(props) => {
-    if (props.statusState === "rejected") {
-        return "#FFFFFF";
-    }else {
-        return "#000000";
-    }
-  }};
+  background-color: #FF0000;
+  color: #FFFFFF;
 
   &:hover {
-    background-color: #FF7008;
+    background-color: #FF0F39;
     color: #ffffff;
   }
 
