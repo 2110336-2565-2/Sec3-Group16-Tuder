@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Modal from "react-modal";
 import { CloseOutlined } from "@ant-design/icons";
 
-export default function FileUploader({ isOpen, setIsOpen, handleChange }) {
+export default function FileUploader({ isOpen, setIsOpen, handleChange, name }) {
   const [file, setFile] = useState(null);
   const handleFileChange = (e) => {
     const addedFile = e.target.files[0];
@@ -13,7 +13,7 @@ export default function FileUploader({ isOpen, setIsOpen, handleChange }) {
     reader.onloadend = () => {
       handleChange({
         target: {
-          name: "new_profile_picture",
+          name: name,
           value: reader.result,
         },
       });

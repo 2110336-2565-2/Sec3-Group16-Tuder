@@ -24,8 +24,9 @@ export default function FormEditProfile({ user }) {
     let compatibleFormData = { ...formData };
     // Convert some fields format to match the backend
     if (compatibleFormData.new_profile_picture) {
-      compatibleFormData.new_profile_picture = compatibleFormData.new_profile_picture.split(',')[1];
-      console.log("compatibleFormData",compatibleFormData);
+      compatibleFormData.new_profile_picture =
+        compatibleFormData.new_profile_picture.split(",")[1];
+      console.log("compatibleFormData", compatibleFormData);
     }
     try {
       if (user.role === "student") {
@@ -53,7 +54,7 @@ export default function FormEditProfile({ user }) {
       console.log("e.target.value: ", e.target.value);
       value = convertFrontendSchedulesToBackend(e.target.value);
     }
-    
+
     setFormData({
       ...formData,
       [e.target.name]: value,
@@ -69,6 +70,7 @@ export default function FormEditProfile({ user }) {
         isOpen={isFileUploaderOpen}
         setIsOpen={setIsFileUploaderOpen}
         handleChange={handleChange}
+        name="new_profile_picture"
       />
       <Title>Edit Profile</Title>
       <FormP.ProfilePictureWrapper onClick={() => setIsFileUploaderOpen(true)}>
