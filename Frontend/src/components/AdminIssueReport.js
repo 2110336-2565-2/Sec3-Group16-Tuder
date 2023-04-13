@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useLayoutEffect } from "react";
 import styled from "styled-components";
 import {
   submitSaveStateHandler,
@@ -61,9 +61,15 @@ export default function AdminIssueReport(props) {
     });
   };
 
-  useEffect(() => {
+  const firstUpdate = useRef(true);
+  useLayoutEffect(() => {
+    if (firstUpdate.current) {
+      firstUpdate.current = false;
+      return;
+    }
     handleSave();
-  }, [statusState]);
+    console.log("componentDidUpdateFunction");
+  });
 
   const handleDelete = () => {
     const data = {
