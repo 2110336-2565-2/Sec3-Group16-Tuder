@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import React from "react";
 import { getRole } from "../utils/jwtGet";
+import { Rating } from "react-simple-star-rating";
 
 export default function CourseDetails(props) {
   const data = props.courseDetail;
@@ -28,7 +29,15 @@ export default function CourseDetails(props) {
               {data.title}
             </Detailrow>
             <Detailrow mgtop="1rem" fsize="16px" fweight="400">
-              {data.ReviewCount} review(s)
+              <Rating
+                initialValue={2}
+                readonly={true}
+                size="20"
+                fillColor="#FF5D02"
+              />
+              <InRowWithStar>
+                {data.ReviewCount} review(s)
+              </InRowWithStar>
             </Detailrow>
             <Detailrow mgtop="1rem" fsize="16px" fweight="400">
               Tutor : {`${data.TutorFirstname} ${data.TutorLastname}`}
@@ -57,6 +66,10 @@ export default function CourseDetails(props) {
     </>
   );
 }
+
+const InRowWithStar = styled.div`
+  margin-left: 10px;
+`
 
 const DetailRight = styled.div`
   display: flex;
