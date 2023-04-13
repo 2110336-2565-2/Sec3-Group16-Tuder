@@ -19,7 +19,7 @@ export default function CourseDetail() {
           }
         })
         .catch((err) => {
-          conasole.log(err);
+          console.log(err);
         });
     },
     {

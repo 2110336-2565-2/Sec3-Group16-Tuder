@@ -20,7 +20,7 @@ export default function ClassDetail() {
           }
         })
         .catch((err) => {
-          conasole.log(err);
+          console.log(err);
         });
     },
     {
