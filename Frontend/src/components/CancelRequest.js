@@ -6,7 +6,7 @@ import { Timezone, DateFormat } from "../datas/DateFormat.js";
 
 export default function CancelRequest(props) {
   return (
-    <Request status={props.status}>
+    <Request state={props.status} status={props.status}>
       <ClassSection>
         <GridSection>
           <ClassImg src={props.img} alt="classImg" />
@@ -75,9 +75,25 @@ const Request = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;
-  background-color: #eb7b42;
+  background-color: ${(props) => {
+    if (props.state === "rejected") {
+      return "#EBEBEB";
+    } else if (props.state === "approved") {
+      return "#EBEBEB";
+    } else {
+      return "#eb7b42";
+    }
+  }};
+  color: ${(props) => {
+    if (props.state === "rejected") {
+      return "#000000";
+    } else if (props.state === "approved") {
+      return "#000000";
+    } else {
+      return "#FFFFFF";
+    }
+  }};
   border: 1px solid #dadada;
-  color: white;
   min-height: 167px;
   gap: 20px;
   padding: 10px;
@@ -87,7 +103,15 @@ const Request = styled.div`
     box-shadow: 5px 6px 11px -3px rgba(0, 0, 0, 0.81);
     -webkit-box-shadow: 5px 6px 11px -7px rgba(0, 0, 0, 0.81);
     -moz-box-shadow: 5px 6px 11px -7px rgba(0, 0, 0, 0.81);
-    background-color: #ee8e45;
+    background-color: ${(props) => {
+      if (props.state === "rejected") {
+        return "#EBEFEB";
+      } else if (props.state === "approved") {
+        return "#EBEFEB";
+      } else {
+        return "#ee8e45";
+      }
+    }};
   }
 `;
 

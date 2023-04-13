@@ -3,6 +3,7 @@ import CourseSearchForm from "../components/form/FormCourseSearch";
 import styled from "styled-components";
 import { Outlet } from "react-router";
 import React, { useState, createContext , useContext} from "react";
+import Home from "./Home"
 const DataContext = createContext({
         
         data: [],
@@ -16,6 +17,7 @@ export default function Courses(){
     
     return (
         <DataContext.Provider value={{data, setData}}>
+            <Home />
             <CourseListPage>
                 <CenterTop><h1>Courses</h1></CenterTop>
                 <CourseSearchForm />

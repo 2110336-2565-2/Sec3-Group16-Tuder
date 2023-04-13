@@ -4,24 +4,16 @@ import WaveFooter from "../components/global/WaveFooter.js";
 import { IsAdmin } from "../components/IsAuth.js";
 import AdminIssueReportList from "../components/AdminIssueReportList.js";
 
-const DataContext = createContext({
-  data: [],
-  setData: () => {},
-});
 
-export const useDataContext = () => useContext(DataContext);
 export default function AdminIssueReportListPage() {
-  const [data, setData] = useState([]);
+
 
   return (
     <Container>
       <IsAdmin>
-        <DataContext.Provider value={{ data, setData }}>
           <ContainerWithHeight margintop="25px">
             <AdminIssueReportList />
           </ContainerWithHeight>
-          
-        </DataContext.Provider>
       </IsAdmin>
     </Container>
   );
