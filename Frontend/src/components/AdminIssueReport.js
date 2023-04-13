@@ -28,41 +28,6 @@ export default function AdminIssueReport(props) {
         console.log(err);
       });
   };
-
-  const handlePrevState = () => {
-
-    setStatusState((prevState) => {
-      let newState;
-      if (prevState === "ongoing") {
-        newState = "rejected";
-      } else if (prevState === "rejected") {
-        newState = "completed";
-      } else if (prevState === "completed") {
-        newState = "ongoing";
-      } else {
-        newState = "ongoing";
-      }
-      return newState;
-    });
-  };
-
-  const handleNextState = () => {
-
-    setStatusState((prevState) => {
-      let newState;
-      if (prevState === "ongoing") {
-        newState = "completed";
-      } else if (prevState === "completed") {
-        newState = "rejected";
-      } else if (prevState === "rejected") {
-        newState = "ongoing";
-      } else {
-        newState = "ongoing";
-      }
-      return newState;
-    });
-  };
-
   
   const handleComplete = () => {
     console.log("complete")
@@ -249,52 +214,6 @@ const InfoDesc = styled.div`
     font-size: 16px;
     font-weight: 300;
 `
-
-const PrevStateButton = styled.button`
-  width: 80px;
-  height: 35px;
-  border: 2px solid #ff7008;
-  border-radius: 5px;
-
-  font-family: "Lexend Deca";
-  font-style: normal;
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 20px;
-  text-align: center;
-  color: #FF7008;
-  background-color: #FFFFFF;
-
-  &:hover {
-    background-color: #FF7008;
-    color: #ffffff;
-  }
-
-  cursor: pointer;
-`;
-
-const NextStateButton = styled.button`
-  width: 80px;
-  height: 35px;
-  border: 2px solid #ff7008;
-  border-radius: 5px;
-
-  font-family: "Lexend Deca";
-  font-style: normal;
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 20px;
-  text-align: center;
-  color: #FF7008;
-  background-color: #FFFFFF;
-
-  &:hover {
-    background-color: #FF7008;
-    color: #ffffff;
-  }
-
-  cursor: pointer;
-`;
 
 const CompleteButton = styled.button`
   width: 80px;
