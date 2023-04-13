@@ -1,19 +1,20 @@
 package utils
 
 import (
+	"bytes"
 	"context"
 	"fmt"
-	"bytes"
-	"github.com/aws/aws-sdk-go-v2/config"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/joho/godotenv"
 )
 
 func GenerateProfilePictureURL(imageBytes []byte, key string) (string, error) {
 	bucket := "se2-tuder"
-	err := godotenv.Load() 
+	err := godotenv.Load()
 
 	// Load AWS session configuration
 	cfg, err := config.LoadDefaultConfig(context.Background())
@@ -29,12 +30,12 @@ func GenerateProfilePictureURL(imageBytes []byte, key string) (string, error) {
 	// Upload the image to S3
 	_, err = uploader.Upload(context.TODO(), &s3.PutObjectInput{
 		Bucket: aws.String(bucket),
-		Key:    aws.String(key+ ".jpg"),
+		Key:    aws.String(key + ".jpg"),
 		Body:   bytes.NewReader(imageBytes),
-		ACL: "public-read ",
+		ACL:    "public-read ",
 	})
 	if err != nil {
-		fmt.Println("failed to upload image to S3",err)
+		fmt.Println("failed to upload image to S3", err)
 		return "", fmt.Errorf("failed to upload image to S3: %v", err)
 	}
 
