@@ -47,9 +47,12 @@ export default function FormSignUp() {
   const setStatus = useState("waiting")[1];
 
   const navigate = useNavigate();
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   async function submitHandler(e) {
     e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    const loadingToast = toast.loading("Signing up...");
     let birthdateISO = new Date(birthdate).toISOString();
     const signUpData = {
       username: username,
@@ -74,13 +77,16 @@ export default function FormSignUp() {
     setStatus("submitting");
     try {
       await signUpHandler(signUpData, navigate);
+      toast.dismiss(loadingToast);
       toast.success("Sign up successfully");
       setStatus("success");
+      setIsSubmitting(false);
     } catch (error) {
       // Handle by do sth
-
+      toast.dismiss(loadingToast);
       toast.error(error.message);
       setStatus("error");
+      setIsSubmitting(false);
     }
   }
 

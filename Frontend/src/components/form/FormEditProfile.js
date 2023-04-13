@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { FormP } from "../profile/ProfileStyle";
 import { convertFrontendSchedulesToBackend } from "../../utils/profile/scheduleConverter";
@@ -17,9 +18,13 @@ export default function FormEditProfile({ user }) {
   const fields = user.role === "student" ? studentFields : tutorFields;
   const [isFileUploaderOpen, setIsFileUploaderOpen] = useState(false);
   const [formData, setFormData] = useState({ ...user });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const submitHandler = (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    const loadingToast = toast.loading("Submitting...");
     console.log("edit profile");
     let compatibleFormData = { ...formData };
     // Convert some fields format to match the backend
@@ -32,15 +37,24 @@ export default function FormEditProfile({ user }) {
         updateStudent(compatibleFormData).then((res) => {
           console.log("res: ", res);
           navigate("/profile");
+          toast.success("Profile updated successfully");
+          toast.dismiss(loadingToast);
+          setIsSubmitting(false);
         });
       } else if (user.role === "tutor") {
         updateTutor(compatibleFormData).then((res) => {
           console.log("res: ", res);
           navigate("/profile");
+          toast.success("Profile updated successfully");
+          toast.dismiss(loadingToast);
+          setIsSubmitting(false);
         });
       }
     } catch (error) {
       console.log(error);
+      toast.error("Profile update failed");
+      toast.dismiss(loadingToast);
+      setIsSubmitting(false);
     }
   };
 
@@ -155,7 +169,10 @@ export default function FormEditProfile({ user }) {
         })}
       </FormP.FormContainer>
       <ButtonSection>
-        <Button type="cancel" onClick={() => navigate("/profile")}>
+        <Button type="cancel" onClick={() => {
+          toast.dismiss()
+          navigate("/profile")
+          }}>
           Cancel
         </Button>
         <Button type="submit">Save</Button>

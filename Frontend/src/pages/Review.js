@@ -27,7 +27,7 @@ export default function Review() {
   const navigate = useNavigate();
   const [course, setCourse] = useState({});
   const [tutor, setTutor] = useState({});
-  // Note to backend: Change this to fetch course details from backend
+  const [isSubmitting, setIsSubmitting] = useState(false);
   useEffect(() => {
     fetchCourseHandler(courseID)
       .then((res) => {
@@ -50,6 +50,9 @@ export default function Review() {
   }
   async function handleSubmit(e) {
     e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    const loadingToast = toast.loading("Submitting...");
     const reviewPayload = {
       course_id: courseID,
       rating: rating,
@@ -57,13 +60,15 @@ export default function Review() {
     };
     try {
       await submitReviewHandler(reviewPayload);
+      toast.dismiss(loadingToast);
       toast.success("Submit Review Success");
+      setIsSubmitting(false);
+      navigate("/courses/" + courseID + "/reviews");
     } catch (err) {
+      toast.dismiss(loadingToast);
       toast.error("Submit Review Failed");
+      setIsSubmitting(false);
     }
-
-    // Note to backend: Change this to send review to backend
-    // each field is already stored in variable corresponding to its name
   }
   if (error) {
     return (
@@ -75,7 +80,7 @@ export default function Review() {
   } else {
     return (
       <Container>
-        {/* <IsStudent /> */}
+        <IsStudent />
         <Form onSubmit={handleSubmit}>
           <Topic>Course Review</Topic>
           <Detail>
@@ -99,6 +104,7 @@ export default function Review() {
           <ButtonSection>
             <Button
               variance="cancel"
+              type="button"
               onClick={() =>
                 confirm("Are you sure you want to discard this form?", () =>
                   navigate("/")
