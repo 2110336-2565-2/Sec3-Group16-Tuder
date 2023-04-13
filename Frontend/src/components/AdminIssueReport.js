@@ -30,6 +30,7 @@ export default function AdminIssueReport(props) {
   };
 
   const handlePrevState = () => {
+
     setStatusState((prevState) => {
       let newState;
       if (prevState === "ongoing") {
@@ -46,6 +47,7 @@ export default function AdminIssueReport(props) {
   };
 
   const handleNextState = () => {
+
     setStatusState((prevState) => {
       let newState;
       if (prevState === "ongoing") {
@@ -61,6 +63,33 @@ export default function AdminIssueReport(props) {
     });
   };
 
+  
+  const handleComplete = () => {
+    console.log("complete")
+    setStatusState((prevState) => {
+      let newState;
+      if (prevState === "completed") {
+        newState = "ongoing";
+      }  else {
+        newState = "completed";
+      }
+      return newState;
+    });
+  };
+
+  const handleReject = () => {
+    console.log("reject")
+    setStatusState((prevState) => {
+      let newState;
+      if (prevState === "rejected") {
+        newState = "ongoing";
+      }  else {
+        newState = "rejected";
+      }
+      return newState;
+    });
+  };
+
   const firstUpdate = useRef(true);
   useLayoutEffect(() => {
     if (firstUpdate.current) {
@@ -68,7 +97,7 @@ export default function AdminIssueReport(props) {
       return;
     }
     handleSave();
-    console.log("componentDidUpdateFunction");
+
   });
 
   const handleDelete = () => {
@@ -116,12 +145,12 @@ export default function AdminIssueReport(props) {
         <StateSection>
           <StateFlex>
             <StateInfo>
-              <PrevStateButton value="false" onClick={handlePrevState}>
-                Prev
-              </PrevStateButton>
-              <NextStateButton value="false" onClick={handleNextState}>
-                Next
-              </NextStateButton>
+              <CompleteButton value="false" onClick={handleComplete} statusState = {statusState}>
+                completed
+              </CompleteButton>
+              <RejectButton value="false" onClick={handleReject} statusState = {statusState}>
+                rejected
+              </RejectButton>
             </StateInfo>
             <StateInfo>
               <InfoTitle>Status :</InfoTitle>
@@ -133,7 +162,7 @@ export default function AdminIssueReport(props) {
             </StateInfo>
             <StateInfo>
               <DeleteButton disabled={statusState != "ongoing" ? false : true}
-                value="false" onClick={handleDelete}>
+                value="false" onClick={handleDelete} statusState = {statusState}>
                 Delete
               </DeleteButton>
             </StateInfo>
@@ -267,6 +296,76 @@ const NextStateButton = styled.button`
   cursor: pointer;
 `;
 
+const CompleteButton = styled.button`
+  width: 80px;
+  height: 35px;
+  border: 2px solid #ff7008;
+  border-radius: 5px;
+
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 20px;
+  text-align: center;
+  background-color: ${(props) => {
+    if (props.statusState === "completed") {
+        return "#009900";
+    } else {
+        return "#D3D3D3";
+    }
+}};
+ color: ${(props) => {
+    if (props.statusState === "completed") {
+        return "#FFFFFF";
+    } else {
+        return "#000000";
+    }
+}};
+  &:hover {
+    background-color: #FF7008;
+    color: #ffffff;
+  }
+
+  cursor: pointer;
+`;
+
+const RejectButton = styled.button`
+  width: 80px;
+  height: 35px;
+  border: 2px solid #ff7008;
+  border-radius: 5px;
+
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 20px;
+  text-align: center;
+  background-color: ${(props) => {
+    if (props.statusState === "rejected") {
+        return "#FF0000";
+    } else {
+        return "#D3D3D3";
+    }
+  }};
+  color: ${(props) => {
+    if (props.statusState === "rejected") {
+        return "#FFFFFF";
+    }else {
+        return "#000000";
+    }
+  }};
+
+  &:hover {
+    background-color: #FF7008;
+    color: #ffffff;
+  }
+
+  cursor: pointer;
+`;
+
+
 const DeleteButton = styled.button`
   width: 80px;
   height: 35px;
@@ -280,8 +379,20 @@ const DeleteButton = styled.button`
   font-size: 16px;
   line-height: 20px;
   text-align: center;
-  color: #ffffff;
-  background-color: #FF0000;
+  background-color: ${(props) => {
+    if (props.statusState === "ongoing") {
+        return "#D3D3D3";
+    } else {
+        return "#FF0000";
+    }
+  }};
+  color: ${(props) => {
+    if (props.statusState === "ongoing") {
+        return "#000000";
+    }else {
+        return "#FFFFFF";
+    }
+  }};
 
   &:hover {
     background-color: #FF2000;
