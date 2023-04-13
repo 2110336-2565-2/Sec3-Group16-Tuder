@@ -36,7 +36,7 @@ const BlackDiv = styled.div`
   display: flex;
   flex-direction: column;
   position: relative;
-  min-height: 140vh;
+  /* min-height: 140vh; */
   width: 50%;
   padding: 60px 100px 0px 100px;
   background: #45424a;
@@ -79,6 +79,7 @@ const SeperateSection = styled.div`
 
 const FormWrapper = styled.div`
   width: 50%;
+  padding-bottom: 80px;
 `;
 
 const FooterWrapper = styled.div`

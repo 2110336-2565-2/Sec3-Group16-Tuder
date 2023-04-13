@@ -3,8 +3,6 @@ const navbarContent = [
         role: 'guest',
         content:[
             {title: 'Home', link: '/'},
-            {title: 'Report', link: '/report'},
-            {title: 'Courses', link: '/courses'},
             {title: 'Sign In', link: '/sign-in'},
             {title: 'Sign Up', link: '/sign-up'},
         ]
@@ -15,8 +13,11 @@ const navbarContent = [
             {title: 'Home', link: '/'},
             {title: 'My Courses', link: '/my-courses'},
             {title: 'My Classes', link: '/my-classes'},
-            {title: 'Profile', link: '/profile'},
-            {title: 'Sign Out', link: '/'},
+            {title: 'Account', dropdown:[
+                {title: 'Profile', link: '/profile'},
+                {title: 'Change Password', link: '/change-password'},
+                {title: 'Sign Out', link: '/'},
+            ]}
         ]
     },
     {
@@ -24,8 +25,11 @@ const navbarContent = [
         content:[
             {title: 'Home', link: '/'},
             {title: 'My Classes', link: '/my-classes'},
-            {title: 'Profile', link: '/profile'},
-            {title: 'Sign Out', link: '/'},
+            {title: 'Account', dropdown:[
+                {title: 'Profile', link: '/profile'},
+                {title: 'Change Password', link: '/change-password'},
+                {title: 'Sign Out', link: '/'},
+            ]}
         ]
     },
     {

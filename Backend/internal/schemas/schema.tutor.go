@@ -47,6 +47,9 @@ type SchemaGetTutor struct {
 type SchemaGetTutorScheduleByCourseId struct {
 	Course_id uuid.UUID `json:"course_id"`
 }
+type SchemaGetTutorByID struct {
+	ID uuid.UUID `json:"id"`
+}
 
 type SchemaCreateTutor struct {
 	Username          string    `json:"username"`
