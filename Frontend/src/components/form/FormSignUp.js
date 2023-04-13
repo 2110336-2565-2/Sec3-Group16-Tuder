@@ -43,7 +43,6 @@ export default function FormSignUp() {
     "Birth Date": setBirthDate,
     Role: setRole,
   };
-
   const setStatus = useState("waiting")[1];
 
   const navigate = useNavigate();
@@ -54,6 +53,14 @@ export default function FormSignUp() {
     setIsSubmitting(true);
     const loadingToast = toast.loading("Signing up...");
     let birthdateISO = new Date(birthdate).toISOString();
+    const omiseData = role==="tutor" ?{
+      expiration_month: parseInt(expiryDate.split("/")[0].trim()),
+      expiration_year: parseInt(expiryDate.split("/")[1].trim()),
+      name: cardHolderName,
+      number: cardNumber,
+      security_code: cvv,
+    } : null;
+    console.log("omiseData",omiseData);
     const signUpData = {
       username: username,
       password: password,
@@ -68,14 +75,25 @@ export default function FormSignUp() {
       role: role,
       citizen_id: role === "tutor" ? citizenID : "",
       description: role === "tutor" ? description : "",
-      card_holder_name: role === "tutor" ? cardHolderName : "",
-      card_number: role === "tutor" ? cardNumber : "",
-      expiration_month: role === "tutor" ? parseInt(expiryDate.split("/")[0].trim()) : "",
-      expiration_year: role === "tutor" ? parseInt(expiryDate.split("/")[1].trim()) : "",
-      security_code: role === "tutor" ? cvv : "",
     };
     setStatus("submitting");
     try {
+      if (role === "tutor") {
+        Omise.setPublicKey(process.env.REACT_APP_OMISE_PUBLIC_KEY);
+        await Omise.createToken("card", omiseData, (statusCode, response) => {
+          if (statusCode === 200) {
+            console.log(response);
+            signUpData.omise_bank_token = response.id;
+          } else {
+            console.log(response);
+            toast.dismiss(loadingToast);
+            toast.error(response.message);
+            setStatus("error");
+            setIsSubmitting(false);
+          }
+        });
+      }
+      console.log("signUpData",signUpData)
       await signUpHandler(signUpData, navigate);
       toast.dismiss(loadingToast);
       toast.success("Sign up successfully");
