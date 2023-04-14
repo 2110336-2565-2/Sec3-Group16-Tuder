@@ -2,14 +2,16 @@ import styled from "styled-components";
 import React from "react";
 import { getRole } from "../utils/jwtGet";
 import { Rating } from "react-simple-star-rating";
+import { Link } from "react-router-dom";
 
 export default function CourseDetails(props) {
   const data = props.courseDetail;
+  const review_tutor_url = "/tutors/" + data.tutor_id + "/reviews"
   const button = () => {
     if (getRole() !== "admin" && getRole() !== "tutor") {
       return (
         <Content fsize="16px" fweight="400">
-          <ButtonCourse>Enroll</ButtonCourse>
+          <ButtonCourse to="Enroll" >Enroll</ButtonCourse>
         </Content>
       );
     }
@@ -30,13 +32,14 @@ export default function CourseDetails(props) {
             </Detailrow>
             <Detailrow mgtop="1rem" fsize="16px" fweight="400">
               <Rating
-                initialValue={2}
+                initialValue= {data.Rating}
                 readonly={true}
+                allowFraction={true}
                 size="20"
                 fillColor="#FF5D02"
               />
               <InRowWithStar>
-                {data.ReviewCount} review(s)
+                <LinkReview to={review_tutor_url}>{data.ReviewCount} review(s)</LinkReview>
               </InRowWithStar>
             </Detailrow>
             <Detailrow mgtop="1rem" fsize="16px" fweight="400">
@@ -66,6 +69,10 @@ export default function CourseDetails(props) {
     </>
   );
 }
+
+const LinkReview = styled(Link)`
+  color: black;
+`
 
 const InRowWithStar = styled.div`
   margin-left: 10px;
@@ -97,7 +104,7 @@ const DetailGrid = styled.div`
 const GridContent = styled.div`
   display: grid;
 `;
-const ButtonCourse = styled.button`
+const ButtonCourse = styled(Link)`
   display: flex;
   width: 80px;
   padding: 5px;

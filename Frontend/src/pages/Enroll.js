@@ -6,7 +6,7 @@ import FormEnrollCourse from "../components/form/FormEnrollCourse";
 import { fetchCourseByIdHandler } from "../handlers/searchCourseHandler";
 import { fetchTutorSchedule } from "../handlers/tutorScheduleHandler";
 import WaveFooter from "../components/global/WaveFooter";
-import { IsStudent } from "../components/IsAuth";
+import { IsEnroll } from "../components/IsAuth";
 import { convertBackendSchedulesToFrontend } from "../utils/profile/scheduleConverter";
 
 export default function Enroll() {
@@ -41,7 +41,7 @@ export default function Enroll() {
   } else {
     return (
       <Container>
-        <IsStudent />
+        <IsEnroll />
         <TitleWrapper>
           <Title>Enroll - {course.title}</Title>
         </TitleWrapper>
