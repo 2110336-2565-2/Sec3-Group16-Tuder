@@ -7,7 +7,7 @@ import (
 )
 
 type ServiceAppointment interface {
-	GetAppointmentByStudentID(sr *schemas.SchemaGetAppointmentByStudentID) ([]*schemas.SchemaAppointmentFromStudentID, error)
+	GetAppointmentByID(sr *schemas.SchemaGetAppointmentByID) ([]*schemas.SchemaAppointmentFromID, error)
 	UpdaAppointmentStatus(sr *schemas.SchemaUpdateAppointmentStatus) (*ent.Appointment, error)
 }
 
@@ -20,8 +20,15 @@ func NewServiceAppointment(repository repository.RepositoryAppointment) *service
 }
 
 // GetAppointmentByStudentID gets all appointments of a student
-func (s *serviceAppointment) GetAppointmentByStudentID(sr *schemas.SchemaGetAppointmentByStudentID) ([]*schemas.SchemaAppointmentFromStudentID, error) {
-	appointments, err := s.repository.GetAppointmentByStudentID(sr)
+func (s *serviceAppointment) GetAppointmentByID(sr *schemas.SchemaGetAppointmentByID) ([]*schemas.SchemaAppointmentFromID, error) {
+	var appointments []*schemas.SchemaAppointmentFromID
+	var err error
+	if sr.Role == "student" {
+		appointments, err = s.repository.GetAppointmentByStudentID(sr)
+	}
+	if sr.Role == "tutor" {
+		appointments, err = s.repository.GetAppointmentByTutorID(sr)
+	}
 	if err != nil {
 		return nil, err
 	}

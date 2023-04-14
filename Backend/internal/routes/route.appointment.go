@@ -23,7 +23,7 @@ func InitAppointmentRoutes(client *ent.Client, e *echo.Group) {
 		fmt.Println()
 	})
 
-	e.GET("/appointment/:student_id", controllerAppointment.GetAppointmentByStudentID)
+	e.GET("/appointment/:student_id", controllerAppointment.GetAppointmentByID)
 	// e.GET("/appointments", controllerAppointment.GetAppointments)
 	// e.PUT("/appointment/:id", controllerAppointment.UpdateAppointment)
 	// e.DELETE("/appointment/:id", controllerAppointment.DeleteAppointment)

@@ -17,10 +17,10 @@ func NewControllerAppointment(service service.ServiceAppointment) *controllerApp
 	return &controllerAppointment{service: service}
 }
 
-func (cR *controllerAppointment) GetAppointmentByStudentID(c echo.Context) (err error) {
+func (cR *controllerAppointment) GetAppointmentByID(c echo.Context) (err error) {
 	id, _ := uuid.Parse(c.Param("student_id"))
-	uR := &schema.SchemaGetAppointmentByStudentID{
-		StudentID: id,
+	uR := &schema.SchemaGetAppointmentByID{
+		ID: id,
 	}
 
 	if err := c.Bind(&uR); err != nil {
@@ -32,7 +32,40 @@ func (cR *controllerAppointment) GetAppointmentByStudentID(c echo.Context) (err 
 		return err
 	}
 
-	appointments, err := cR.service.GetAppointmentByStudentID(uR)
+	appointments, err := cR.service.GetAppointmentByID(uR)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaResponses{
+			Success: false,
+			Message: err.Error(),
+			Data:    nil,
+		})
+		return err
+	}
+
+	c.JSON(http.StatusOK, schema.SchemaResponses{
+		Success: true,
+		Message: "Get appointment successfully",
+		Data:    appointments,
+	})
+	return
+}
+
+func (cR *controllerAppointment) GetAppointmentByTutorID(c echo.Context) (err error) {
+	id, _ := uuid.Parse(c.Param("student_id"))
+	uR := &schema.SchemaGetAppointmentByID{
+		ID: id,
+	}
+
+	if err := c.Bind(&uR); err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaResponses{
+			Success: false,
+			Message: "invalid request payload",
+			Data:    err.Error(),
+		})
+		return err
+	}
+
+	appointments, err := cR.service.GetAppointmentByID(uR)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaResponses{
 			Success: false,
