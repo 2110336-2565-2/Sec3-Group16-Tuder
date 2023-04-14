@@ -12,8 +12,12 @@ export default function FormEnrollCourse({ course, courseSchedule }) {
   const studentID = getStudentID();
   const [totalHours, setTotalHours] = useState(0);
   const [selectedSchedule, setSelectedSchedule] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   function handleSubmit(e) {
     e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    const loadingToast = toast.loading("Submitting...");
     // Filter out the timeSlot that is not selected
     const filteredSchedule = selectedSchedule.map((day) => ({
       day: day.day,
@@ -30,11 +34,15 @@ export default function FormEnrollCourse({ course, courseSchedule }) {
     console.log(data);
     submitEnrollFormHandler(data)
       .then((res) => {
+        toast.dismiss(loadingToast);
         toast.success("Enroll Success");
         navigate("/");
+        setIsSubmitting(false);
       })
       .catch((err) => {
+        toast.dismiss(loadingToast);
         toast.error("Enroll Failed");
+        setIsSubmitting(false);
       });
   }
   console.log("courseSchedule: ", courseSchedule);

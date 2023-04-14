@@ -5,7 +5,7 @@ import useUsername from "../hooks/useUsername.js";
 import { getStudentByUsername, getTutorByUsername } from "../handlers/profile/getUserHandler.js";
 import { dummyStudent, dummyTutor } from "../datas/Profile.role";
 
-import FormEditProfile from "../components/profile/FormEditProfile";
+import FormEditProfile from "../components/form/FormEditProfile";
 import WaveFooter from "../components/global/WaveFooter";
 import { IsUser } from "../components/IsAuth";
 

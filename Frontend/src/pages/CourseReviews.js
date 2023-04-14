@@ -2,34 +2,53 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Reviews from "../components/review/Reviews.js";
 import Footer from "../components/global/Footer.js";
+import Error from "../components/global/Error.js";
 import { IsStudent } from "../components/IsAuth.js";
 import { courseReviews } from "../datas/DummyReview";
+import { getCourseReviewHandler } from "../handlers/courseReviewHandler.js";
+import { useParams } from "react-router-dom";
 
 export default function CourseReviews() {
+  const [error, setError] = useState(false);
   const [reviews, setReviews] = useState([]);
+  const { courseID } = useParams();
 
-  // NOTE to backend: Change this to fetch reviews from backend then it should work
   useEffect(() => {
-    setReviews(courseReviews);
+    console.log(courseID);
+    getCourseReviewHandler(courseID)
+      .then((res) => {
+        setReviews(res.data.data);
+      })
+      .catch((err) => {
+        setError(true);
+      });
   }, []);
   // ---------------------------------------------
-
-  return (
-    <Container>
-      <IsStudent />
-      <TitleWrapper>
-        <Title>{reviews.course_title}</Title>
-      </TitleWrapper>
-      {reviews.total_review > 0 ? (
-        <Reviews reviews={reviews} />
-      ) : (
-        <NoReviewContainer>
-          <p>No review yet.</p>
-        </NoReviewContainer>
-      )}
-      <Footer />
-    </Container>
-  );
+  if (error) {
+    return (
+      <>
+        <Error error_msg="Sorry, this course does not exist." />
+        <Footer />
+      </>
+    );
+  } else {
+    return (
+      <Container>
+        <IsStudent />
+        <TitleWrapper>
+          <Title>{reviews.course_title}</Title>
+        </TitleWrapper>
+        {reviews.total_review > 0 ? (
+          <Reviews reviews={reviews} />
+        ) : (
+          <NoReviewContainer>
+            <p>No review yet.</p>
+          </NoReviewContainer>
+        )}
+        <Footer />
+      </Container>
+    );
+  }
 }
 
 const Container = styled.div`

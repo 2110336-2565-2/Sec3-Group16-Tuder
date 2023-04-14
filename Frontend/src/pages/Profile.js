@@ -3,6 +3,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import StudentInfo from "../components/profile/StudentInfo.js";
 import TutorInfo from "../components/profile/TutorInfo.js";
+import Error from "../components/global/Error.js";
 import Footer from "../components/global/Footer.js";
 // import { dummyStudent, dummyTutor } from "../datas/Profile.role.js";
 import {
@@ -17,6 +18,7 @@ import { IsUser } from "../components/IsAuth.js";
 import { EditOutlined } from "@ant-design/icons";
 
 export default function Profile() {
+  const [error, setError] = useState(false);
   function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
@@ -38,60 +40,74 @@ export default function Profile() {
 
   useEffect(() => {
     if (role === "student") {
-      getStudentByUsername(username).then((res) => {
-        setUser(res.data.data);
-        console.log("res.data.data: ", res.data.data);
-      });
+      getStudentByUsername(username)
+        .then((res) => {
+          setUser(res.data.data);
+          console.log("res.data.data: ", res.data.data);
+        })
+        .catch((err) => {
+          setError(true);
+        });
     } else if (role === "tutor") {
-      getTutorByUsername(username).then((res) => {
-        setUser(res.data.data);
-        console.log("res.data.data: ", res.data.data);
-      });
+      getTutorByUsername(username)
+        .then((res) => {
+          setUser(res.data.data);
+          console.log("res.data.data: ", res.data.data);
+        })
+        .catch((err) => {
+          setError(true);
+        });
     }
   }, [role]);
+  const navigate = useNavigate();
   // ------------------------------------
 
-  const navigate = useNavigate();
-
-  return (
-    <Container>
-      {isOwner ? <IsUser /> : null}
-      <TopSection>
-        <Role>
-          {capitalizeFirstLetter(role)}
-        </Role>
-        <ProfileImageWrapper>
-          <ProfileImage src={user.profile_picture_URL} />
-        </ProfileImageWrapper>
-        <Name>{user.firstname + " " + user.lastname}</Name>
-        <Email>{user.email}</Email>
-      </TopSection>
-      <Wrapper>
-        <MiddleSection>
-          <TitleWrapper>
-            <Title>Information</Title>
-            {isOwner ? (
-              <EditIcon onClick={() => navigate("edit-profile")} />
-            ) : null}
-          </TitleWrapper>
-          {role === "student" ? (
-            <StudentInfo
-              user={user}
-              isOwner={isOwner}
-              othersUsername={othersUsername}
-            />
-          ) : (
-            <TutorInfo
-              user={user}
-              isOwner={isOwner}
-              othersUsername={othersUsername}
-            />
-          )}
-        </MiddleSection>
-      </Wrapper>
-      <Footer />
-    </Container>
-  );
+  if (error) {
+    return (
+      <>
+        <Error error_msg="Sorry, this user does not exist." />
+        <Footer />
+      </>
+    );
+  } else {
+    return (
+      <Container>
+        {isOwner ? <IsUser /> : null}
+        <TopSection>
+          <Role>{capitalizeFirstLetter(role)}</Role>
+          <ProfileImageWrapper>
+            <ProfileImage src={user.profile_picture_URL} />
+          </ProfileImageWrapper>
+          <Name>{user.firstname + " " + user.lastname}</Name>
+          <Email>{user.email}</Email>
+        </TopSection>
+        <Wrapper>
+          <MiddleSection>
+            <TitleWrapper>
+              <Title>Information</Title>
+              {isOwner ? (
+                <EditIcon onClick={() => navigate("edit-profile")} />
+              ) : null}
+            </TitleWrapper>
+            {role === "student" ? (
+              <StudentInfo
+                user={user}
+                isOwner={isOwner}
+                othersUsername={othersUsername}
+              />
+            ) : (
+              <TutorInfo
+                user={user}
+                isOwner={isOwner}
+                othersUsername={othersUsername}
+              />
+            )}
+          </MiddleSection>
+        </Wrapper>
+        <Footer />
+      </Container>
+    );
+  }
 }
 
 const Container = styled.div`

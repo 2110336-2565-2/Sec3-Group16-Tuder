@@ -12,7 +12,7 @@ import (
 
 func InsertCancelRequest(client *ent.Client, ctx context.Context, user []*ent.User, match []*ent.Match) []*ent.CancelRequest {
 
-	r1 := CreateCancelRequest(client, "Class Cancel Request 1", user[0], match[0], "Description 1", "https://www.google.com", cancelrequest.StatusPending)
+	r1 := CreateCancelRequest(client, "Class Cancel Request 1", user[0], match[0], "Description 1", "https://picsum.photos/seed/picsum/200/100", cancelrequest.StatusPending)
 
 	ccr, err := client.CancelRequest.CreateBulk(r1).Save(ctx)
 

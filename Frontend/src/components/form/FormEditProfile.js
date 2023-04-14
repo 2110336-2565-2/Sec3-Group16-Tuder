@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { FormP } from "./ProfileStyle";
+import { FormP } from "../profile/ProfileStyle";
 import { convertFrontendSchedulesToBackend } from "../../utils/profile/scheduleConverter";
 import { studentFields, tutorFields } from "../../datas/Profile.role";
 import { updateStudent, updateTutor } from "../../handlers/profile/updateUser";
 import FileUploader from "../global/FileUploader";
-import TextInput from "./TextInput";
-import SelectInput from "./SelectInput";
-import DateInput from "./DateInput";
-import TimeSelector from "./TimeSelector";
+import TextInput from "../profile/TextInput";
+import SelectInput from "../profile/SelectInput";
+import DateInput from "../profile/DateInput";
+import TimeSelector from "../profile/TimeSelector";
 
 export default function FormEditProfile({ user }) {
   const navigate = useNavigate();
@@ -17,30 +18,44 @@ export default function FormEditProfile({ user }) {
   const fields = user.role === "student" ? studentFields : tutorFields;
   const [isFileUploaderOpen, setIsFileUploaderOpen] = useState(false);
   const [formData, setFormData] = useState({ ...user });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const submitHandler = (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    const loadingToast = toast.loading("Submitting...");
     console.log("edit profile");
     let compatibleFormData = { ...formData };
     // Convert some fields format to match the backend
     if (compatibleFormData.new_profile_picture) {
-      compatibleFormData.new_profile_picture = compatibleFormData.new_profile_picture.split(',')[1];
-      console.log("compatibleFormData",compatibleFormData);
+      compatibleFormData.new_profile_picture =
+        compatibleFormData.new_profile_picture.split(",")[1];
+      console.log("compatibleFormData", compatibleFormData);
     }
     try {
       if (user.role === "student") {
         updateStudent(compatibleFormData).then((res) => {
           console.log("res: ", res);
           navigate("/profile");
+          toast.success("Profile updated successfully");
+          toast.dismiss(loadingToast);
+          setIsSubmitting(false);
         });
       } else if (user.role === "tutor") {
         updateTutor(compatibleFormData).then((res) => {
           console.log("res: ", res);
           navigate("/profile");
+          toast.success("Profile updated successfully");
+          toast.dismiss(loadingToast);
+          setIsSubmitting(false);
         });
       }
     } catch (error) {
       console.log(error);
+      toast.error("Profile update failed");
+      toast.dismiss(loadingToast);
+      setIsSubmitting(false);
     }
   };
 
@@ -53,7 +68,7 @@ export default function FormEditProfile({ user }) {
       console.log("e.target.value: ", e.target.value);
       value = convertFrontendSchedulesToBackend(e.target.value);
     }
-    
+
     setFormData({
       ...formData,
       [e.target.name]: value,
@@ -69,6 +84,7 @@ export default function FormEditProfile({ user }) {
         isOpen={isFileUploaderOpen}
         setIsOpen={setIsFileUploaderOpen}
         handleChange={handleChange}
+        name="new_profile_picture"
       />
       <Title>Edit Profile</Title>
       <FormP.ProfilePictureWrapper onClick={() => setIsFileUploaderOpen(true)}>
@@ -155,7 +171,10 @@ export default function FormEditProfile({ user }) {
         })}
       </FormP.FormContainer>
       <ButtonSection>
-        <Button type="cancel" onClick={() => navigate("/profile")}>
+        <Button type="cancel" onClick={() => {
+          toast.dismiss()
+          navigate("/profile")
+          }}>
           Cancel
         </Button>
         <Button type="submit">Save</Button>
