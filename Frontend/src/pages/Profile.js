@@ -43,7 +43,6 @@ export default function Profile() {
       getStudentByUsername(username)
         .then((res) => {
           setUser(res.data.data);
-          console.log("res.data.data: ", res.data.data);
         })
         .catch((err) => {
           setError(true);
@@ -52,7 +51,6 @@ export default function Profile() {
       getTutorByUsername(username)
         .then((res) => {
           setUser(res.data.data);
-          console.log("res.data.data: ", res.data.data);
         })
         .catch((err) => {
           setError(true);
