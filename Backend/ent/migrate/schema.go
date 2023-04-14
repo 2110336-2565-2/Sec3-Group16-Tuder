@@ -72,7 +72,7 @@ var (
 		{Name: "price_per_hour", Type: field.TypeInt},
 		{Name: "level", Type: field.TypeEnum, Nullable: true, Enums: []string{"Grade1", "Grade2", "Grade3", "Grade4", "Grade5", "Grade6", "Grade7", "Grade8", "Grade9", "Grade10", "Grade11", "Grade12"}},
 		{Name: "course_picture_url", Type: field.TypeString, Nullable: true},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"active", "inactive"}, Default: "active"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"open", "closed"}, Default: "open"},
 		{Name: "tutor_course", Type: field.TypeUUID},
 	}
 	// CoursesTable holds the schema information for the "courses" table.

@@ -303,10 +303,10 @@ func (r *repositoryCourse) UpdateCourseStatus(sr *schema.SchemaUpdateCourseStatu
 
 	status := sr.Status
 	// update a course
-	if status == "active" {
-		status = "inactive"
+	if status == "open" {
+		status = "close"
 	} else {
-		status = "active"
+		status = "open"
 	}
 
 	course, err := txc.Course.UpdateOneID(sr.ID).

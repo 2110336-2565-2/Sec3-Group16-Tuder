@@ -152,13 +152,13 @@ func LevelValidator(l Level) error {
 // Status defines the type for the "status" enum field.
 type Status string
 
-// StatusActive is the default value of the Status enum.
-const DefaultStatus = StatusActive
+// StatusOpen is the default value of the Status enum.
+const DefaultStatus = StatusOpen
 
 // Status values.
 const (
-	StatusActive   Status = "active"
-	StatusInactive Status = "inactive"
+	StatusOpen   Status = "open"
+	StatusClosed Status = "closed"
 )
 
 func (s Status) String() string {
@@ -168,7 +168,7 @@ func (s Status) String() string {
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s Status) error {
 	switch s {
-	case StatusActive, StatusInactive:
+	case StatusOpen, StatusClosed:
 		return nil
 	default:
 		return fmt.Errorf("course: invalid enum value for status field: %q", s)

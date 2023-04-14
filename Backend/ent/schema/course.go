@@ -28,7 +28,7 @@ func (Course) Fields() []ent.Field {
 			Values("Grade1", "Grade2", "Grade3", "Grade4", "Grade5", "Grade6", "Grade7", "Grade8", "Grade9", "Grade10", "Grade11", "Grade12").
 			Optional(),
 		field.String("course_picture_url").Optional().Nillable(),
-		field.Enum("status").Values("active", "inactive").Default("active"),
+		field.Enum("status").Values("open", "closed").Default("open"),
 	}
 }
 
