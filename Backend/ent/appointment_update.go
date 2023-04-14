@@ -35,6 +35,14 @@ func (au *AppointmentUpdate) SetStatus(a appointment.Status) *AppointmentUpdate 
 	return au
 }
 
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (au *AppointmentUpdate) SetNillableStatus(a *appointment.Status) *AppointmentUpdate {
+	if a != nil {
+		au.SetStatus(*a)
+	}
+	return au
+}
+
 // SetMatchID sets the "match" edge to the Match entity by ID.
 func (au *AppointmentUpdate) SetMatchID(id uuid.UUID) *AppointmentUpdate {
 	au.mutation.SetMatchID(id)
@@ -125,10 +133,7 @@ func (au *AppointmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{appointment.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: match.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(match.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -141,10 +146,7 @@ func (au *AppointmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{appointment.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: match.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(match.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -175,6 +177,14 @@ type AppointmentUpdateOne struct {
 // SetStatus sets the "status" field.
 func (auo *AppointmentUpdateOne) SetStatus(a appointment.Status) *AppointmentUpdateOne {
 	auo.mutation.SetStatus(a)
+	return auo
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (auo *AppointmentUpdateOne) SetNillableStatus(a *appointment.Status) *AppointmentUpdateOne {
+	if a != nil {
+		auo.SetStatus(*a)
+	}
 	return auo
 }
 
@@ -298,10 +308,7 @@ func (auo *AppointmentUpdateOne) sqlSave(ctx context.Context) (_node *Appointmen
 			Columns: []string{appointment.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: match.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(match.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -314,10 +321,7 @@ func (auo *AppointmentUpdateOne) sqlSave(ctx context.Context) (_node *Appointmen
 			Columns: []string{appointment.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: match.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(match.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

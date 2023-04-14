@@ -5,13 +5,25 @@ import (
 	"github.com/google/uuid"
 )
 
-type SchemaGetAppointment struct {
-	ID uuid.UUID `json:"id"`
+type SchemaGetAppointmentByStudentID struct {
+	StudentID uuid.UUID `json:"id"`
 }
 
-type SchemaAppointment struct {
+type SchemaAppointmentFromStudentID struct {
 	ID          uuid.UUID          `json:"id"`
 	Appointment []*ent.Appointment `json:"appointment"`
 	Course_name string             `json:"course_name"`
 	Tutor_name  string             `json:"tutor_name"`
 }
+
+type SchemaUpdateAppointmentStatus struct {
+	ID     uuid.UUID `json:"id"`
+	Status string    `json:"status"`
+}
+
+// type SchemaAppointment struct {
+// 	ID         uuid.UUID          `json:"id"`
+// 	StartDate  []*ent.Appointment `json:"appointment"`
+// 	EndDate    string             `json:"course_name"`
+// 	Tutor_name string             `json:"tutor_name"`
+// }
