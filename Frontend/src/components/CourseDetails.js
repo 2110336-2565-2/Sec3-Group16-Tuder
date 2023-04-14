@@ -6,12 +6,12 @@ import { Link } from "react-router-dom";
 
 export default function CourseDetails(props) {
   const data = props.courseDetail;
-  const review_tutor_url = "/tutors/" + data.tutor_id + "/reviews"
+  const course_url = "/courses/" + data.id + "/reviews"
   const button = () => {
     if (getRole() !== "admin" && getRole() !== "tutor") {
       return (
         <Content fsize="16px" fweight="400">
-          <ButtonCourse to="Enroll" >Enroll</ButtonCourse>
+          <ButtonCourse to="Enroll">Enroll</ButtonCourse>
         </Content>
       );
     }
@@ -39,7 +39,7 @@ export default function CourseDetails(props) {
                 fillColor="#FF5D02"
               />
               <InRowWithStar>
-                <LinkReview to={review_tutor_url}>{data.ReviewCount} review(s)</LinkReview>
+                <LinkReview to={course_url}>{data.ReviewCount} review(s)</LinkReview>
               </InRowWithStar>
             </Detailrow>
             <Detailrow mgtop="1rem" fsize="16px" fweight="400">
