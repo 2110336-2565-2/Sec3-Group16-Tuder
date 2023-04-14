@@ -46,81 +46,62 @@ export default function FormSignUp() {
   const setStatus = useState("waiting")[1];
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   async function submitHandler(e) {
     e.preventDefault();
     if (isSubmitting) return;
     setIsSubmitting(true);
     const loadingToast = toast.loading("Signing up...");
     let birthdateISO = new Date(birthdate).toISOString();
-    const omiseData =
-      role === "tutor"
-        ? {
-            expiration_month: parseInt(expiryDate.split("/")[0].trim()),
-            expiration_year: parseInt(expiryDate.split("/")[1].trim()),
-            name: cardHolderName,
-            number: cardNumber,
-            security_code: cvv,
-          }
-        : null;
-    const studentSignUpData = {
-      username: username,
-      password: password,
-      email: email,
-      confirm_password: confirmpassword,
-      firstname: firstname,
-      lastname: lastname,
-      address: address,
-      phone: contactnumber,
-      birthdate: birthdateISO,
-      gender: gender,
-      role: role,
-      citizen_id: role === "tutor" ? citizenID : "",
-      description: role === "tutor" ? description : "",
+    const omiseData = {
+      expiration_month: parseInt(expiryDate.split("/")[0].trim()),
+      expiration_year: parseInt(expiryDate.split("/")[1].trim()),
+      name: cardHolderName,
+      number: cardNumber,
+      security_code: cvv,
     };
     setStatus("submitting");
-    if (role === "tutor") {
-      Omise.setPublicKey(process.env.REACT_APP_OMISE_PUBLIC_KEY);
-      Omise.createToken("card", omiseData, (statusCode, response) => {
-        if (statusCode === 200) {
-          const tutorSignUpData = {
-            ...studentSignUpData,
-            omise_bank_token: response.id,
-          };
-          signUpHandler(tutorSignUpData, navigate)
-            .then(() => {
-              toast.dismiss(loadingToast);
-              toast.success("Sign up successfully");
-              setStatus("success");
-              setIsSubmitting(false);
-            })
-            .catch((error) => {
-              toast.dismiss(loadingToast);
-              toast.error(error.message);
-              setStatus("error");
-              setIsSubmitting(false);
-            });
-        } else {
-          toast.dismiss(loadingToast);
-          toast.error(response.message);
-          setStatus("error");
-          setIsSubmitting(false);
-        }
-      });
-    } else {
-      signUpHandler(studentSignUpData, navigate)
-        .then(() => {
-          toast.dismiss(loadingToast);
-          toast.success("Sign up successfully");
-          setStatus("success");
-          setIsSubmitting(false);
-        })
-        .catch((error) => {
-          toast.dismiss(loadingToast);
-          toast.error(error.message);
-          setStatus("error");
-          setIsSubmitting(false);
-        });
-    }
+
+    Omise.setPublicKey(process.env.REACT_APP_OMISE_PUBLIC_KEY);
+    Omise.createToken("card", omiseData, (statusCode, response) => {
+      if (statusCode === 200) {
+        const signupData = {
+          username: username,
+          password: password,
+          email: email,
+          confirm_password: confirmpassword,
+          firstname: firstname,
+          lastname: lastname,
+          address: address,
+          phone: contactnumber,
+          birthdate: birthdateISO,
+          gender: gender,
+          role: role,
+          citizen_id: role === "tutor" ? citizenID : "",
+          description: role === "tutor" ? description : "",
+          omise_bank_token: response.id,
+        };
+
+        signUpHandler(signupData, navigate)
+          .then(() => {
+            toast.dismiss(loadingToast);
+            toast.success("Sign up successfully");
+            setStatus("success");
+            setIsSubmitting(false);
+          })
+          .catch((error) => {
+            toast.dismiss(loadingToast);
+            toast.error(error.message);
+            setStatus("error");
+            setIsSubmitting(false);
+          });
+      } else {
+        toast.dismiss(loadingToast);
+        toast.error(response.message);
+        setStatus("error");
+        setIsSubmitting(false);
+      }
+    });
   }
 
   const signupContents = signupContent.contents;
@@ -212,6 +193,100 @@ export default function FormSignUp() {
                 </FormT.Select>
               </FormT.Component>
             );
+          } else if (element === "Card Holder Name") {
+            return (
+              <FormT.Component key={elementindex}>
+                <FormT.Label>{element} :</FormT.Label>
+                <FormT.TextInput
+                  BoxSize="315px"
+                  name={name}
+                  type="text"
+                  value={cardHolderName}
+                  placeholder={pholder}
+                  onChange={(e) => setCardHolderName(e.target.value)}
+                  required
+                />
+              </FormT.Component>
+            );
+          } else if (element === "Card Number") {
+            return (
+              <FormT.Component key={elementindex}>
+                <FormT.Label>{element} :</FormT.Label>
+                <FormT.TextInput
+                  BoxSize="315px"
+                  name={name}
+                  type="tel"
+                  value={formattedCardNumber}
+                  placeholder="1234 5678 9012 3456"
+                  inputmode="numeric"
+                  pattern="[0-9\s]{13,19}"
+                  autocomplete="cc-number"
+                  maxLength="19"
+                  minLength="19"
+                  onChange={(e) => {
+                    const formattedValue = e.target.value
+                      .replace(/\D/g, "") // Remove non-numeric characters
+                      .replace(/(.{4})/g, "$1 ") // Add a space after every 4 digits
+                      .trim(); // Remove any leading/trailing spaces
+                    setFormattedCardNumber(formattedValue);
+                    setCardNumber(formattedValue.replace(/\s/g, ""));
+                  }}
+                  required
+                />
+              </FormT.Component>
+            );
+          } else if (element === "Expiry Date") {
+            return (
+              <FormT.Component key={elementindex}>
+                <FormT.Label>{element} :</FormT.Label>
+                <FormT.DateInput
+                  BoxSize="150px"
+                  name={name}
+                  type="text"
+                  value={expiryDate}
+                  placeholder="mm / yyyy"
+                  inputmode="numeric"
+                  autocomplete="cc-exp"
+                  pattern="^(0[1-9]|1[0-2])\s\/\s[0-9]{4}$"
+                  maxLength="9"
+                  minLength="9"
+                  onChange={(e) => {
+                    const formattedValue = e.target.value
+                      .replace(/\D/g, "") // Remove non-numeric characters
+                      .replace(/^(\d{2})(\d{0,4})$/, "$1 / $2") // Format date as MM / YYYY
+                      .trim() // Remove any leading/trailing spaces
+                      .slice(0, 9); // Limit to 9 characters
+                    setExpiryDate(formattedValue);
+                  }}
+                  required
+                />
+              </FormT.Component>
+            );
+          } else if (element === "CVV") {
+            return (
+              <FormT.Component key={elementindex}>
+                <FormT.Label>{element} :</FormT.Label>
+                <FormT.TextInput
+                  BoxSize="150px"
+                  name={name}
+                  type="tel"
+                  value={cvv}
+                  placeholder={123}
+                  inputmode="numeric"
+                  pattern="[0-9\s]{3}"
+                  autocomplete="cc-csc"
+                  minLength="3"
+                  maxlength="3"
+                  onChange={(e) => {
+                    const formattedValue = e.target.value
+                      .replace(/\D/g, "") // Remove non-numeric characters
+                      .trim(); // Remove any leading/trailing spaces
+                    setCVV(formattedValue);
+                  }}
+                  required
+                />
+              </FormT.Component>
+            );
           } else {
             return (
               <FormT.Component key={elementindex}>
@@ -265,100 +340,6 @@ export default function FormSignUp() {
                     value={description}
                     placeholder={pholder}
                     onChange={(e) => setDescription(e.target.value)}
-                    required
-                  />
-                </FormT.Component>
-              );
-            } else if (element === "Card Holder Name") {
-              return (
-                <FormT.Component key={elementindex}>
-                  <FormT.Label>{element} :</FormT.Label>
-                  <FormT.TextInput
-                    BoxSize="315px"
-                    name={name}
-                    type="text"
-                    value={cardHolderName}
-                    placeholder={pholder}
-                    onChange={(e) => setCardHolderName(e.target.value)}
-                    required
-                  />
-                </FormT.Component>
-              );
-            } else if (element === "Card Number") {
-              return (
-                <FormT.Component key={elementindex}>
-                  <FormT.Label>{element} :</FormT.Label>
-                  <FormT.TextInput
-                    BoxSize="315px"
-                    name={name}
-                    type="tel"
-                    value={formattedCardNumber}
-                    placeholder="1234 5678 9012 3456"
-                    inputmode="numeric"
-                    pattern="[0-9\s]{13,19}"
-                    autocomplete="cc-number"
-                    maxLength="19"
-                    minLength="19"
-                    onChange={(e) => {
-                      const formattedValue = e.target.value
-                        .replace(/\D/g, "") // Remove non-numeric characters
-                        .replace(/(.{4})/g, "$1 ") // Add a space after every 4 digits
-                        .trim(); // Remove any leading/trailing spaces
-                      setFormattedCardNumber(formattedValue);
-                      setCardNumber(formattedValue.replace(/\s/g, ""));
-                    }}
-                    required
-                  />
-                </FormT.Component>
-              );
-            } else if (element === "Expiry Date") {
-              return (
-                <FormT.Component key={elementindex}>
-                  <FormT.Label>{element} :</FormT.Label>
-                  <FormT.DateInput
-                    BoxSize="150px"
-                    name={name}
-                    type="text"
-                    value={expiryDate}
-                    placeholder="mm / yyyy"
-                    inputmode="numeric"
-                    autocomplete="cc-exp"
-                    pattern="^(0[1-9]|1[0-2])\s\/\s[0-9]{4}$"
-                    maxLength="9"
-                    minLength="9"
-                    onChange={(e) => {
-                      const formattedValue = e.target.value
-                        .replace(/\D/g, "") // Remove non-numeric characters
-                        .replace(/^(\d{2})(\d{0,4})$/, "$1 / $2") // Format date as MM / YYYY
-                        .trim() // Remove any leading/trailing spaces
-                        .slice(0, 9); // Limit to 9 characters
-                      setExpiryDate(formattedValue);
-                    }}
-                    required
-                  />
-                </FormT.Component>
-              );
-            } else if (element === "CVV") {
-              return (
-                <FormT.Component key={elementindex}>
-                  <FormT.Label>{element} :</FormT.Label>
-                  <FormT.TextInput
-                    BoxSize="150px"
-                    name={name}
-                    type="tel"
-                    value={cvv}
-                    placeholder={123}
-                    inputmode="numeric"
-                    pattern="[0-9\s]{3}"
-                    autocomplete="cc-csc"
-                    minLength="3"
-                    maxlength="3"
-                    onChange={(e) => {
-                      const formattedValue = e.target.value
-                        .replace(/\D/g, "") // Remove non-numeric characters
-                        .trim(); // Remove any leading/trailing spaces
-                      setCVV(formattedValue);
-                    }}
                     required
                   />
                 </FormT.Component>
