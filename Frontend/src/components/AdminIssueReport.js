@@ -153,9 +153,9 @@ const Request = styled.div`
     display: flex;
     flex-direction: row;
     justify-content: center;
-    background-color: #EB7B42;
+    background-color: #EBEBEB;
     border: 0.5px solid #DADADA ;
-    color: white;
+    color: #000;
     min-height: 167px;
     gap: 20px;
     padding: 10px;

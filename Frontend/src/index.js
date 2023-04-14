@@ -144,6 +144,10 @@ const router = createBrowserRouter([
         element: <CourseDetail />,
       },
       {
+        path: "/classes",
+        element: <ClassList />,
+      },
+      {
         path: "/classes/:id",
         element: <ClassDetail />,
       },
