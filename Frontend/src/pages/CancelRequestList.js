@@ -5,7 +5,6 @@ import { IsAdmin } from "../components/IsAuth.js";
 import CancelRequestList from "../components/CancelRequestList.js";
 
 const DataContext = createContext({
-   
     data: [],
     setData : () => {}
 });
@@ -18,10 +17,8 @@ export default function CancelRequestListPage(){
         <Container>
                 <IsAdmin>
                 <DataContext.Provider value={{data, setData}}>
-                <ContainerWithHeight margintop='25px'>
-                    
+                <ContainerWithHeight margintop='25px'>             
                     <CancelRequestList />
-
                 </ContainerWithHeight>
                 </DataContext.Provider>
                 </IsAdmin>

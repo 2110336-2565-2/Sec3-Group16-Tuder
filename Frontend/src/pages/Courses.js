@@ -14,7 +14,6 @@ export const useDataContext = () => useContext(DataContext);
 export default function Courses(){
     const [data, setData] = useState([]);
     
-
     return (
         <DataContext.Provider value={{data, setData}}>
             <CourseListPage>
