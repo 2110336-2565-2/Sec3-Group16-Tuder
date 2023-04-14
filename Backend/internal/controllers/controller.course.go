@@ -9,6 +9,15 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type ControllerCourse interface {
+	SearhContent(c echo.Context) error
+	GetCourseByCourseID(c echo.Context) error
+	GetCourses(c echo.Context) error
+	CreateCourse(c echo.Context) error
+	UpdateCourse(c echo.Context) error
+	DeleteCourse(c echo.Context) error
+	UpdateCourseStatus(c echo.Context) error
+}
 type controllerCourse struct {
 	service service.ServiceCourse
 }
@@ -176,6 +185,40 @@ func (cR *controllerCourse) DeleteCourse(c echo.Context) (err error) {
 	c.JSON(http.StatusOK, schema.SchemaResponses{
 		Success: true,
 		Message: "Delete course successfully",
+	})
+	return nil
+}
+
+func (cR *controllerCourse) UpdateCourseStatus(c echo.Context) (err error) {
+	id, _ := uuid.Parse(c.Param("id"))
+	status := &schema.CourseStatus{}
+	if err = c.Bind(status); err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: "invalid request payload : binding status",
+			Error:   err,
+		})
+		return
+	}
+
+	uR := &schema.SchemaUpdateCourseStatus{
+		ID:     id,
+		Status: status.Status,
+	}
+
+	course, err := cR.service.UpdateCourseStatus(uR)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: err.Error(),
+			Error:   err,
+		})
+		return
+	}
+	c.JSON(http.StatusOK, schema.SchemaResponses{
+		Success: true,
+		Message: "Update course status successfully",
+		Data:    course,
 	})
 	return nil
 }

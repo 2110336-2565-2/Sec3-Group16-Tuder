@@ -341,6 +341,7 @@ func (s *serviceTutor) GetTutorCourses(tutorGet *schemas.SchemaGetCourses) ([]*s
 		for _, course := range courses {
 			num_class := len(course.Edges.Match)
 			courseResponse := &schemas.CourseResponse{
+				ID:                 course.ID,
 				Title:              course.Title,
 				Subject:            course.Subject,
 				Topic:              course.Topic,

@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
@@ -23,6 +24,7 @@ type ServiceCourse interface {
 	CourseSearchByDay(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error)
 	Intercept(l [][]*schemas.CourseSearchResult) []*schemas.CourseSearchResult
 	PackToSchema(course []*ent.Course) []*schemas.CourseSearchResult
+	UpdateCourseStatus(sr *schemas.SchemaUpdateCourseStatus) (*schemas.SchemaUpdateCourseStatusResponse, error)
 }
 
 type serviceCourse struct {
@@ -275,4 +277,17 @@ func (s *serviceCourse) DeleteCourse(sr *schemas.SchemaDeleteCourse) error {
 		return err
 	}
 	return nil
+}
+
+func (s *serviceCourse) UpdateCourseStatus(sr *schemas.SchemaUpdateCourseStatus) (*schemas.SchemaUpdateCourseStatusResponse, error) {
+	course, err := s.repository.UpdateCourseStatus(sr)
+	if err != nil {
+		return nil, err
+	}
+	courseResponse := &schemas.SchemaUpdateCourseStatusResponse{
+		ID:     course.ID,
+		Title:  course.Title,
+		Status: course.Status.String(),
+	}
+	return courseResponse, nil
 }

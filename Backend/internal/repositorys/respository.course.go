@@ -24,6 +24,7 @@ type RepositoryCourse interface {
 	SearchByTutorRepository(sr *schema.CourseSearch) ([]*ent.Course, error)
 	SearchByDayRepository(sr *schema.CourseSearch) ([]*ent.Course, error)
 	checkTimeAvailable(d [24]bool) bool
+	UpdateCourseStatus(sr *schema.SchemaUpdateCourseStatus) (*ent.Course, error)
 }
 
 type repositoryCourse struct {
@@ -289,4 +290,33 @@ func (r *repositoryCourse) DeleteCourse(sr *schema.SchemaDeleteCourse) error {
 		return fmt.Errorf("deleting course: %w", err)
 	}
 	return tx.Commit()
+}
+
+func (r *repositoryCourse) UpdateCourseStatus(sr *schema.SchemaUpdateCourseStatus) (*ent.Course, error) {
+	// create a transaction
+	tx, err := r.client.Tx(r.ctx)
+	if err != nil {
+		return nil, fmt.Errorf("starting a transaction: %w", err)
+	}
+	// wrap the client with the transaction
+	txc := tx.Client()
+
+	status := sr.Status
+	// update a course
+	if status == "active" {
+		status = "inactive"
+	} else {
+		status = "active"
+	}
+
+	course, err := txc.Course.UpdateOneID(sr.ID).
+		SetStatus(entCourse.Status(status)).
+		Save(r.ctx)
+	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+		return nil, fmt.Errorf("updating course: %w", err)
+	}
+	return course, tx.Commit()
 }
