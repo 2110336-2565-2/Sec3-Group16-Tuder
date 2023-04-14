@@ -87,6 +87,20 @@ func (cc *CourseCreate) SetNillableCoursePictureURL(s *string) *CourseCreate {
 	return cc
 }
 
+// SetStatus sets the "status" field.
+func (cc *CourseCreate) SetStatus(c course.Status) *CourseCreate {
+	cc.mutation.SetStatus(c)
+	return cc
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (cc *CourseCreate) SetNillableStatus(c *course.Status) *CourseCreate {
+	if c != nil {
+		cc.SetStatus(*c)
+	}
+	return cc
+}
+
 // SetID sets the "id" field.
 func (cc *CourseCreate) SetID(u uuid.UUID) *CourseCreate {
 	cc.mutation.SetID(u)
@@ -177,6 +191,10 @@ func (cc *CourseCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (cc *CourseCreate) defaults() {
+	if _, ok := cc.mutation.Status(); !ok {
+		v := course.DefaultStatus
+		cc.mutation.SetStatus(v)
+	}
 	if _, ok := cc.mutation.ID(); !ok {
 		v := course.DefaultID()
 		cc.mutation.SetID(v)
@@ -231,6 +249,14 @@ func (cc *CourseCreate) check() error {
 	if v, ok := cc.mutation.Level(); ok {
 		if err := course.LevelValidator(v); err != nil {
 			return &ValidationError{Name: "level", err: fmt.Errorf(`ent: validator failed for field "Course.level": %w`, err)}
+		}
+	}
+	if _, ok := cc.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Course.status"`)}
+	}
+	if v, ok := cc.mutation.Status(); ok {
+		if err := course.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Course.status": %w`, err)}
 		}
 	}
 	if _, ok := cc.mutation.TutorID(); !ok {
@@ -303,6 +329,10 @@ func (cc *CourseCreate) createSpec() (*Course, *sqlgraph.CreateSpec) {
 		_spec.SetField(course.FieldCoursePictureURL, field.TypeString, value)
 		_node.CoursePictureURL = &value
 	}
+	if value, ok := cc.mutation.Status(); ok {
+		_spec.SetField(course.FieldStatus, field.TypeEnum, value)
+		_node.Status = value
+	}
 	if nodes := cc.mutation.ReviewIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -311,10 +341,7 @@ func (cc *CourseCreate) createSpec() (*Course, *sqlgraph.CreateSpec) {
 			Columns: course.ReviewPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: review.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(review.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -330,10 +357,7 @@ func (cc *CourseCreate) createSpec() (*Course, *sqlgraph.CreateSpec) {
 			Columns: []string{course.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: match.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(match.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -349,10 +373,7 @@ func (cc *CourseCreate) createSpec() (*Course, *sqlgraph.CreateSpec) {
 			Columns: []string{course.TutorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: tutor.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(tutor.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

@@ -169,10 +169,7 @@ func (pu *PaymentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{payment.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -185,10 +182,7 @@ func (pu *PaymentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{payment.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -204,10 +198,7 @@ func (pu *PaymentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{payment.PaymentHistoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: paymenthistory.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(paymenthistory.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -220,10 +211,7 @@ func (pu *PaymentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{payment.PaymentHistoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: paymenthistory.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(paymenthistory.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -239,10 +227,7 @@ func (pu *PaymentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{payment.PaymentHistoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: paymenthistory.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(paymenthistory.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -439,10 +424,7 @@ func (puo *PaymentUpdateOne) sqlSave(ctx context.Context) (_node *Payment, err e
 			Columns: []string{payment.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -455,10 +437,7 @@ func (puo *PaymentUpdateOne) sqlSave(ctx context.Context) (_node *Payment, err e
 			Columns: []string{payment.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -474,10 +453,7 @@ func (puo *PaymentUpdateOne) sqlSave(ctx context.Context) (_node *Payment, err e
 			Columns: []string{payment.PaymentHistoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: paymenthistory.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(paymenthistory.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -490,10 +466,7 @@ func (puo *PaymentUpdateOne) sqlSave(ctx context.Context) (_node *Payment, err e
 			Columns: []string{payment.PaymentHistoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: paymenthistory.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(paymenthistory.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -509,10 +482,7 @@ func (puo *PaymentUpdateOne) sqlSave(ctx context.Context) (_node *Payment, err e
 			Columns: []string{payment.PaymentHistoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: paymenthistory.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(paymenthistory.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
