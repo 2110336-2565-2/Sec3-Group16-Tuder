@@ -46,7 +46,7 @@ const FormT = {
         background-color: white;
         color: black;
         &::placeholder{
-            color:black;
+            color:#858585;
         }
     `,
     DateInput: styled.input`
@@ -57,7 +57,9 @@ const FormT = {
         border: 1px solid black;
         border-radius: 6px;
         background-color: white;
-        color: black;
+        color: ${(props) => {
+            return props.value? "black" : "#858585"
+        }};
     `,
     Checkbox: styled.input`
         margin-right: 5px;
@@ -106,6 +108,9 @@ const FormT = {
         border-radius: 6px;
         background: white;
         font-size: 13px;
+        color: ${(props) => {
+            return props.value? "black" : "#858585"
+        }};
     `,
     Option: styled.option`
         color: black;

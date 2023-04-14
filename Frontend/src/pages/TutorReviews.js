@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import useUsername from "../hooks/useUsername.js";
 import Reviews from "../components/review/Reviews.js";
+import Error from "../components/global/Error.js";
 import Footer from "../components/global/Footer.js";
 import { IsTutor } from "../components/IsAuth.js";
 import { fetchTutorReviews } from "../handlers/tutorReviewHandler.js";
@@ -10,6 +11,7 @@ import { getTutorByUsername } from "../handlers/profile/getUserHandler.js";
 import { tutorReviews } from "../datas/DummyReview";
 
 export default function TutorReviews() {
+  const [error, setError] = useState(false);
   const othersUsername = useParams().username;
   // if path is /tutors/:username/reviews, then othersUsername is not undefined
   // indicating that the user is viewing other's profile
@@ -20,33 +22,46 @@ export default function TutorReviews() {
   const [reviews, setReviews] = useState({});
 
   // console.log("username: ", username);
-  useEffect(() =>  {
-    const res = fetchTutorReviews(username).then((res) => {
-      setReviews(res.data.data);
-    });
+  useEffect(() => {
+    const res = fetchTutorReviews(username)
+      .then((res) => {
+        setReviews(res.data.data);
+      })
+      .catch((err) => {
+        console.log("Tutor not found");
+        setError(true);
+      });
   }, []);
   // ---------------------------------------------
-
-  return (
-    <Container>
-      {isOwner ? <IsTutor /> : null}
-      <TitleWrapper>
-        <Title>
-          {isOwner
-            ? "My Reviews"
-            : reviews.tutor_firstname + " " + reviews.tutor_lastname}
-        </Title>
-      </TitleWrapper>
-      {reviews.total_review > 0 ? (
-        <Reviews reviews={reviews} />
-      ) : (
-        <NoReviewContainer>
-          <p>No review yet.</p>
-        </NoReviewContainer>
-      )}
-      <Footer />
-    </Container>
-  );
+  if (error) {
+    return (
+      <>
+        <Error error_msg="Sorry, this tutor does not exist." />
+        <Footer />
+      </>
+    );
+  } else {
+    return (
+      <Container>
+        {isOwner ? <IsTutor /> : null}
+        <TitleWrapper>
+          <Title>
+            {isOwner
+              ? "My Reviews"
+              : reviews.tutor_firstname + " " + reviews.tutor_lastname}
+          </Title>
+        </TitleWrapper>
+        {reviews.total_review > 0 ? (
+          <Reviews reviews={reviews} />
+        ) : (
+          <NoReviewContainer>
+            <p>No review yet.</p>
+          </NoReviewContainer>
+        )}
+        <Footer />
+      </Container>
+    );
+  }
 }
 
 const Container = styled.div`
