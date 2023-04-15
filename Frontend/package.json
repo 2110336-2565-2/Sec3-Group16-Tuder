@@ -29,8 +29,9 @@
     "yarn": "^1.22.19"
   },
   "scripts": {
-    "start_for_poon": "SET NODE_OPTIONS=--openssl-legacy-provider && react-scripts start",
+    "start_win": "SET NODE_OPTIONS=--openssl-legacy-provider && react-scripts start",
     "start": "react-scripts start",
+    "start_mac": "set NODE_OPTIONS=--openssl-legacy-provider react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
