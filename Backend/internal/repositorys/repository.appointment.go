@@ -60,10 +60,11 @@ func (r *repositoryAppointment) GetMatchByStudentID(sr *schemas.SchemaGetMatchBy
 				}
 			}
 		}
+		tutorName := match.Edges.Course.Edges.Tutor.Edges.User.FirstName + " " + match.Edges.Course.Edges.Tutor.Edges.User.LastName
 		schemaAppointments = append(schemaAppointments, &schemas.SchemaMatchesFromID{
 			MatchID:       match.ID,
 			CourseName:    match.Edges.Course.Title,
-			TutorName:     match.Edges.Course.Edges.Tutor.Edges.User.Username,
+			TutorName:     tutorName,
 			UpcomingClass: upcoming_class,
 			Remaining:     remaining,
 			CoursePictureURL: *match.Edges.Course.CoursePictureURL,
@@ -103,10 +104,11 @@ func (r *repositoryAppointment) GetMatchByTutorID(sr *schemas.SchemaGetMatchByID
 				}
 			}
 		}
+		tutorName := match.Edges.Course.Edges.Tutor.Edges.User.FirstName + " " + match.Edges.Course.Edges.Tutor.Edges.User.LastName
 		schemaAppointments = append(schemaAppointments, &schemas.SchemaMatchesFromID{
 			MatchID:       match.ID,
 			CourseName:    match.Edges.Course.Title,
-			TutorName:     match.Edges.Course.Edges.Tutor.Edges.User.Username,
+			TutorName:     tutorName,
 			UpcomingClass: upcoming_class,
 			Remaining:     remaining,
 			CoursePictureURL: *match.Edges.Course.CoursePictureURL,
