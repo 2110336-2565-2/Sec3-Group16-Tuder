@@ -75,24 +75,8 @@ const Request = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;
-  background-color: ${(props) => {
-    if (props.state === "rejected") {
-      return "#EBEBEB";
-    } else if (props.state === "approved") {
-      return "#EBEBEB";
-    } else {
-      return "#eb7b42";
-    }
-  }};
-  color: ${(props) => {
-    if (props.state === "rejected") {
-      return "#000000";
-    } else if (props.state === "approved") {
-      return "#000000";
-    } else {
-      return "#FFFFFF";
-    }
-  }};
+  background-color: #EBEBEB;
+  color: #000000;
   border: 1px solid #dadada;
   min-height: 167px;
   gap: 20px;
@@ -103,15 +87,7 @@ const Request = styled.div`
     box-shadow: 5px 6px 11px -3px rgba(0, 0, 0, 0.81);
     -webkit-box-shadow: 5px 6px 11px -7px rgba(0, 0, 0, 0.81);
     -moz-box-shadow: 5px 6px 11px -7px rgba(0, 0, 0, 0.81);
-    background-color: ${(props) => {
-      if (props.state === "rejected") {
-        return "#EBEFEB";
-      } else if (props.state === "approved") {
-        return "#EBEFEB";
-      } else {
-        return "#ee8e45";
-      }
-    }};
+    background-color: #EBEFEB;
   }
 `;
 

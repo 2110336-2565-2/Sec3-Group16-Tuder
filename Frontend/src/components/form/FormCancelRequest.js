@@ -64,8 +64,8 @@ export default function UserCancelRequest() {
         handleChange={handleChange}
         name="img"
       />
-      <Title>Match Cancellation</Title>
-      <SubTitle>course name</SubTitle>
+      <Title>Course Cancellation & Refund</Title>
+      <SubTitle>ucourse name</SubTitle>
       <SubTitle>ufirstname ulastname</SubTitle>
 
       <TopicSection>
@@ -102,8 +102,7 @@ export default function UserCancelRequest() {
 
 const CancelRequest = styled.div`
   box-sizing: border-box;
-  width: 80vh;
-  height: 80vh;
+  min-width: 800px;
   margin-top: 50px;
   margin-bottom: 50px;
   padding: 50px;
@@ -194,6 +193,7 @@ const Description = styled.textarea`
 const ButtonSection = styled.div`
   display: flex;
   flex-direction: row;
+  justify-content: flex-end;
   gap: 20px;
   width: 100%;
   margin-top: 20px;
