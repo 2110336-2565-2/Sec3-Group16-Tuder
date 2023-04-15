@@ -42,6 +42,7 @@ export default function FormEnrollCourse({ course, courseSchedule }) {
     console.log(data);
     toast.dismiss(paymentLoadingToast);
     setIsModalOpen(true);
+    setIsSubmitting(false);
 
     // submitEnrollFormHandler(data)
     //   .then((res) => {
