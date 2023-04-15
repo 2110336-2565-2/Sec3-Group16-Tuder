@@ -176,6 +176,15 @@ func (r *repositoryPayment) GetQRCodeForTuitionFree(sr *schema.SchemaGetQRCodeFo
 }
 
 func (r *repositoryPayment) WebhookChargeHandler(sr *schema.SchemaChargeWebhook) (*ent.Payment, error) {
+	// Check if charge exists
+	_, err := r.client.Payment.
+		Query().
+		Where(entPayment.ChargeID(sr.Data.ID)).
+		Only(r.ctx)
+
+	if err != nil {
+		return nil, err
+	}
 	// Check if charge is pending
 	if sr.Data.Status == "pending" {
 		// Check if payment exists

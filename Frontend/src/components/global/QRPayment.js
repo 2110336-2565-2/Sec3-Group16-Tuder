@@ -1,15 +1,58 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import toast from "react-hot-toast";
+import {
+  fetchQRCodeForCoursePayment,
+  fetchQRCodeForTuitionFee,
+  changePaymentStatus,
+} from "../../handlers/payment/paymentHandler";
+import { paymentData } from "../../datas/Payment";
 
-export default function QRPayment({ courseID, tutorID, amount }) {
+export default function QRPayment({
+  courseID,
+  tutorID,
+  appointmentID,
+  amount,
+  callback,
+  callbackData,
+}) {
   const [qrCode, setQrCode] = useState("");
+  const [paymentInfo, setPaymentInfo] = useState(paymentData);
+  const [chargeID, setChargeID] = useState("");
+  const [paymentID, setPaymentID] = useState("");
   useEffect(() => {
     // POST api/v1/payment/qrCode
-
+    if (courseID) {
+      const data = {
+        course_id: courseID,
+        amount: amount * 100,
+      };
+      fetchQRCodeForCoursePayment(data)
+        .then((res) => {
+          setQrCode(res.data.data.qr_code_url);
+          setChargeID(res.data.data.payment.charge_id);
+          setPaymentID(res.data.data.payment.id);
+        })
+        .catch((err) => {
+          toast.error("Something went wrong");
+        });
+    } else if (tutorID) {
+      const data = {
+        tutor_id: tutorID,
+        appointment_id: appointmentID,
+        amount: amount * 100,
+      };
+      fetchQRCodeForTuitionFee(data)
+        .then((res) => {
+          setQrCode(res.data.data.qr_code_url);
+          setChargeID(res.data.data.payment.charge_id);
+          setPaymentID(res.data.data.payment.id);
+        })
+        .catch((err) => {
+          toast.error("Something went wrong");
+        });
+    }
     //---------------------------
-    setQrCode(
-      "https://api.omise.co/charges/chrg_test_5vg0c1ujdv90959eu0z/documents/docu_test_5vg0c1wyz7wk5rcs8he/downloads/B1C7932DBA80CC4E"
-    );
   }, [courseID]);
 
   const [remainingTime, setRemainingTime] = useState(600); // 10 minutes in seconds
@@ -24,9 +67,53 @@ export default function QRPayment({ courseID, tutorID, amount }) {
   useEffect(() => {
     if (remainingTime === 0) {
       // Call API to cancel payment
+      const data = {
+        ...paymentInfo,
+        data: {
+          ...paymentInfo.data,
+          id: chargeID,
+          status: "failed",
+          source: {
+            ...paymentInfo.data.source,
+            charge_status: "failed",
+          },
+        },
+      };
+      changePaymentStatus(data)
+        .then((res) => {
+          toast.error("Payment failed");
+        })
+        .catch((err) => {
+          toast.error("Something went wrong");
+        });
       // ---------------------------
-    } else if (remainingTime === 580) {
-      // This is for demo only we will change payment status to completed
+    } else if (remainingTime === 590) {
+      // This is for demo only we will change payment status to successful
+      const data = {
+        ...paymentInfo,
+        data: {
+          ...paymentInfo.data,
+          id: chargeID,
+          status: "successful",
+          source: {
+            ...paymentInfo.data.source,
+            charge_status: "successful",
+          },
+        },
+      };
+      changePaymentStatus(data)
+        .then((res) => {
+          toast.success("Payment successful");
+          // if this payment is for enroll
+          if(courseID){
+            callback({...callbackData,
+              payment_id: paymentID,});
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          toast.error("Something went wrong");
+        });
       // ---------------------------
     }
   }, [remainingTime]);

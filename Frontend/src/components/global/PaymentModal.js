@@ -12,6 +12,8 @@ export default function PaymentModal({
   courseID,
   tutorID,
   amount,
+  callback,
+  callbackData,
 }) {
   function CloseHandler() {
     confirm("Are you sure you want to discard this payment?", () =>
@@ -26,7 +28,13 @@ export default function PaymentModal({
           <Title>{title}</Title>
           <CloseIcon onClick={CloseHandler} />
         </Top>
-        <QRPayment courseID={courseID} tutorID={tutorID} amount={amount} />
+        <QRPayment
+          courseID={courseID}
+          tutorID={tutorID}
+          amount={amount}
+          callback={callback}
+          callbackData={callbackData}
+        />
       </Wrapper>
     </Modal>
   );
