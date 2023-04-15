@@ -143,19 +143,19 @@ var (
 			},
 			{
 				Symbol:     "matches_payments_match",
-				Columns:    []*schema.Column{MatchesColumns[3]},
+				Columns:    []*schema.Column{MatchesColumns[4]},
 				RefColumns: []*schema.Column{PaymentsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "matches_schedules_match",
-				Columns:    []*schema.Column{MatchesColumns[4]},
+				Columns:    []*schema.Column{MatchesColumns[5]},
 				RefColumns: []*schema.Column{SchedulesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "matches_students_match",
-				Columns:    []*schema.Column{MatchesColumns[5]},
+				Columns:    []*schema.Column{MatchesColumns[6]},
 				RefColumns: []*schema.Column{StudentsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
