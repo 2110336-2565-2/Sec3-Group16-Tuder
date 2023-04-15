@@ -16,7 +16,9 @@ export default function CancelRequestList() {
       fetchCancellingRequestsHandler()
         .then((res) => {
           if (res.data.success) {
-            if (res.data.data !== null) setData(res.data.data);
+            if (res.data.data !== null) {
+              setData(res.data.data);
+            }
           }
         })
         .catch((err) => {

@@ -20,7 +20,7 @@ export default function Courses(){
         <DataContext.Provider value={{data, setData}}>
             <Home />
             <CourseListPage>
-                <CenterTop><h1>Courses</h1></CenterTop>
+                <CenterTop><h1 id="course">Courses</h1></CenterTop>
                 <CourseSearchForm />
                 <HorizonContainer><hr></hr></HorizonContainer>
                 <CourseList>

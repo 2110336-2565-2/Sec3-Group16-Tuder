@@ -5,18 +5,19 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "react-query";
 import { IsUser } from "../components/IsAuth";
 import ClassDetails from "../components/ClassDetail";
-import { fetchCourseByIdHandler } from "../handlers/searchCourseHandler.js";
+import { fetchClassDetailById } from "../handlers/classesHandler";
+
 export default function ClassDetail() {
-  const [data, setData] = useState({});
   const { id } = useParams();
+  const [data, setData] = useState({});
+
   const { isLoading, error } = useQuery(
-    "class",
+    "classDetail",
     () => {
-      fetchCourseByIdHandler(id)
+      fetchClassDetailById(id)
         .then((res) => {
-          console.log(res.data.data);
           if (res.data.success) {
-            if (res.data.data !== null) setData(res.data.data);
+            setData(res.data.data);
           }
         })
         .catch((err) => {
@@ -28,22 +29,26 @@ export default function ClassDetail() {
     }
   );
 
-  if (isLoading || Object.keys(data).length === 0) {
+  if (isLoading) {
     return <div>Loading...</div>;
-  }
-
-  if (data === {}) {
-    return <div>Incorrect ClassID</div>;
   }
 
   if (error) {
     return <div>Error: {error.message}</div>;
   }
 
+  if (data === {}) {
+    return <div>Loading</div>;
+  }
+
+  if (data === null) {
+    return <div>Error</div>;
+  }
+
   return (
     <IsUser>
       <Container>
-        <ClassDetails classDetail={data } />
+        <ClassDetails classDetail={data} />
       </Container>
       <Footer />
     </IsUser>

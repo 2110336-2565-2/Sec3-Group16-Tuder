@@ -7,8 +7,9 @@ import (
 )
 
 type ServiceAppointment interface {
-	GetAppointmentByID(sr *schemas.SchemaGetAppointmentByID) ([]*schemas.SchemaAppointmentFromID, error)
-	UpdaAppointmentStatus(sr *schemas.SchemaUpdateAppointmentStatus) (*ent.Appointment, error)
+	GetMatchByID(sr *schemas.SchemaGetMatchByID) ([]*schemas.SchemaMatchesFromID, error)
+	UpdateAppointmentStatus(sr *schemas.SchemaUpdateAppointmentStatus) (*ent.Appointment, error)
+	GetAppointmentByMatchID(sr *schemas.SchemaGetAppointmentByMatchID) (*schemas.SchemaAppointmentsFromMatchID, error)
 }
 
 type serviceAppointment struct {
@@ -20,14 +21,10 @@ func NewServiceAppointment(repository repository.RepositoryAppointment) *service
 }
 
 // GetAppointmentByStudentID gets all appointments of a student
-func (s *serviceAppointment) GetAppointmentByID(sr *schemas.SchemaGetAppointmentByID) ([]*schemas.SchemaAppointmentFromID, error) {
-	var appointments []*schemas.SchemaAppointmentFromID
-	var err error
-	if sr.Role == "student" {
-		appointments, err = s.repository.GetAppointmentByStudentID(sr)
-	}
-	if sr.Role == "tutor" {
-		appointments, err = s.repository.GetAppointmentByTutorID(sr)
+func (s *serviceAppointment) GetMatchByID(sr *schemas.SchemaGetMatchByID) ([]*schemas.SchemaMatchesFromID, error) {
+	appointments, err := s.repository.GetMatchByStudentID(sr)
+	if len(appointments) == 0 {
+		appointments, err = s.repository.GetMatchByTutorID(sr)
 	}
 	if err != nil {
 		return nil, err
@@ -35,7 +32,17 @@ func (s *serviceAppointment) GetAppointmentByID(sr *schemas.SchemaGetAppointment
 	return appointments, nil
 }
 
-func (s *serviceAppointment) UpdaAppointmentStatus(sr *schemas.SchemaUpdateAppointmentStatus) (*ent.Appointment, error) {
+func (s *serviceAppointment) GetAppointmentByMatchID(sr *schemas.SchemaGetAppointmentByMatchID) (*schemas.SchemaAppointmentsFromMatchID, error) {
+	appointments, err := s.repository.GetAppointmentByMatchID(sr)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return appointments, nil
+}
+
+func (s *serviceAppointment) UpdateAppointmentStatus(sr *schemas.SchemaUpdateAppointmentStatus) (*ent.Appointment, error) {
 	appointment, err := s.repository.UpdateAppointmentStatus(sr)
 	if err != nil {
 		return nil, err

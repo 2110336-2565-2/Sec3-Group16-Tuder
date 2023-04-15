@@ -13,7 +13,7 @@ var (
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "begin_at", Type: field.TypeTime},
 		{Name: "end_at", Type: field.TypeTime},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"comingsoon", "ongoing", "verifying", "pending", "completed", "posponed", "considering"}, Default: "comingsoon"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"comingsoon", "ongoing", "verifying", "pending", "completed", "postponed", "considering", "canceled"}, Default: "comingsoon"},
 		{Name: "appointment_match", Type: field.TypeUUID, Nullable: true},
 		{Name: "payment_appointment", Type: field.TypeUUID, Unique: true, Nullable: true},
 	}
@@ -123,6 +123,7 @@ var (
 	MatchesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "match_created_at", Type: field.TypeTime},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"enrolled", "completed", "cancelling", "canceled"}, Default: "enrolled"},
 		{Name: "course_match", Type: field.TypeUUID},
 		{Name: "payment_match", Type: field.TypeUUID, Unique: true, Nullable: true},
 		{Name: "schedule_match", Type: field.TypeUUID, Unique: true},
@@ -136,7 +137,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "matches_courses_match",
-				Columns:    []*schema.Column{MatchesColumns[2]},
+				Columns:    []*schema.Column{MatchesColumns[3]},
 				RefColumns: []*schema.Column{CoursesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
+	appointment "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/appointment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/cancelrequest"
 	match "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	user "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
@@ -174,6 +175,26 @@ func (r *repositoryCancelRequest) CancelRequest(sc *schemas.SchemaCancelRequest)
 		return nil, errors.New("user is not a student or tutor of the match")
 	}
 
+
+	// cancelling match status
+	_, err = txc.Match.
+		Update().
+		Where(
+			match.IDEQ(m.ID),
+		).
+		SetStatus(match.StatusCancelling).
+		Save(r.ctx)
+	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+		return nil, err
+	}
+
+
+
+
+
 	// create image url
 	imgURL := fmt.Sprintf("%s/%s", sc.MatchID.String(), sc.UserID.String())
 
@@ -212,12 +233,29 @@ func (r *repositoryCancelRequest) AuditRequest(sc *schemas.SchemaCancelRequestAp
 	}
 
 	approve := sc.Approve
-
+	
 	status := cancelrequest.StatusPending
+	mStatus := match.StatusCancelling
 	if approve {
 		status = cancelrequest.StatusApproved
+		appStatus := appointment.StatusCanceled
+		// cancel all appointments of the match
+		_, err = r.client.Appointment.
+			Update().
+			Where(
+				appointment.HasMatchWith(
+					match.IDEQ(sc.MatchID),
+				),
+			).
+			SetStatus(appStatus).
+			Save(r.ctx)
+		if err != nil {
+			return err
+		}
+		mStatus = match.StatusCanceled
 	} else {
 		status = cancelrequest.StatusRejected
+		mStatus = match.StatusEnrolled
 	}
 
 	if ccr.Status == cancelrequest.StatusApproved {
@@ -236,6 +274,16 @@ func (r *repositoryCancelRequest) AuditRequest(sc *schemas.SchemaCancelRequestAp
 		return err
 	}
 
+
+	// cancel match
+	_, err = r.client.Match.
+		UpdateOneID(sc.MatchID).
+		SetStatus(mStatus).
+		Save(r.ctx)
+	if err != nil {
+		return err
+	}
+	
 	return nil
 }
 

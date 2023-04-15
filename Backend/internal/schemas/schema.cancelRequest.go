@@ -29,6 +29,7 @@ type SchemaCancelRequestDetail struct {
 }
 
 type SchemaCancelRequestApprove struct {
+	MatchID 	   uuid.UUID `json:"matchId"` // for audit
 	CancelRequestID uuid.UUID `json:"cancelRequestId"` // for audit
 	Approve         bool      `json:"approve"`
 }
