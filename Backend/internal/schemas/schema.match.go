@@ -11,8 +11,9 @@ type SchemaCreateMatch struct {
 	Student_id uuid.UUID `json:"student_id"`
 	Course_id  uuid.UUID `json:"course_id"`
 	// Appointment_list []SchemaAppointmentTime `json:"appointment_list"`
-	Total_hour int      `json:"total_hour"`
-	Schedule   Schedule `json:"schedule"`
+	Total_hour int       `json:"total_hour"`
+	Schedule   Schedule  `json:"schedule"`
+	Payment_id uuid.UUID `json:"payment_id"`
 }
 
 type SchemaAppointmentTime struct {
