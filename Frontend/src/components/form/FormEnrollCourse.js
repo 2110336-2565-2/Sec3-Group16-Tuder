@@ -15,6 +15,21 @@ export default function FormEnrollCourse({ course, courseSchedule }) {
   const [totalHours, setTotalHours] = useState(0);
   const [selectedSchedule, setSelectedSchedule] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [enrollData, setEnrollData] = useState({});
+  function paymentCallback(data) {
+    submitEnrollFormHandler(data)
+      .then((res) => {
+        toast.dismiss();
+        toast.success("Enroll Success");
+        navigate("/");
+        setIsSubmitting(false);
+      })
+      .catch((err) => {
+        toast.dismiss();
+        toast.error("Enroll Failed");
+        setIsSubmitting(false);
+      });
+  }
   function handleSubmit(e) {
     e.preventDefault();
     if (isSubmitting) return;
@@ -34,12 +49,12 @@ export default function FormEnrollCourse({ course, courseSchedule }) {
       return;
     }
     // Create data to send to backend
-    const data = {
+    setEnrollData(prevEnrollData => ({
+      ...prevEnrollData,
       course_id: course.id,
       total_hour: parseInt(totalHours),
       schedule: backendSchedule,
-    };
-    console.log(data);
+    }));
     toast.dismiss(paymentLoadingToast);
     setIsModalOpen(true);
     setIsSubmitting(false);
@@ -66,6 +81,8 @@ export default function FormEnrollCourse({ course, courseSchedule }) {
         setIsOpen={setIsModalOpen}
         courseID={course.id}
         amount={totalHours * course.price_per_hour}
+        callback={paymentCallback}
+        callbackData={enrollData}
       />
       <Form onSubmit={handleSubmit}>
         {courseSchedule.length > 0 ? (

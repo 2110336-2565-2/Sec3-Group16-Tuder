@@ -143,7 +143,7 @@ const router = createBrowserRouter([
         element: <AdminIssueReportList />,
       },
       {
-        path: "/course-detail/:id",
+        path: "/courses/:id",
         element: <CourseDetail />
       },
       {

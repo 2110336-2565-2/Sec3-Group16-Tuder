@@ -57,7 +57,6 @@ export default function TimeSelector({
     setSelectedSchedule([...selectedSchedule]);
     onChange(selectedSchedule);
   }
-  console.log(selectedSchedule, "selectedSchedule");
   return (
     <FormP.InputComponent width={width}>
       <Label>{label}</Label>
