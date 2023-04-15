@@ -61,6 +61,7 @@ export default function CancelRequestDetailPage() {
           description={data.description}
           report_date={data.report_date}
           status={data.status}
+          matchId={data.matchId}
         />
         <Footer />
       </IsAdmin>
