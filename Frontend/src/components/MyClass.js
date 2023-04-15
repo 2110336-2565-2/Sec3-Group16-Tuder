@@ -5,22 +5,16 @@ import styled from "styled-components";
 import { Timezone, DateFormat } from "../datas/DateFormat.js";
 
 export default function MyClass(props) {
-  const course_picture_url = props.data.course.course_picture_url;
+  const course_picture_url = props.data.course_picture_url;
   const course_name = props.data.course_name;
   const tutor_name = props.data.tutor_name;
   const navigate = useNavigate();
-  const remaining = props.data.appointment.filter((item) => {
-    return item.status === "comingsoon";
-  });
-
+  const remaining = props.data.remaining;
   // the first appointment in the array which is in state coming soon
-  var upcoming;
-  if (remaining.length > 0) {
-    upcoming = new Date(remaining[0].begin_at).toLocaleString(
-      Timezone,
-      DateFormat
-    );
-  } else upcoming = "No Upcoming Class";
+  const upcoming =
+    remaining != 0
+      ? new Date(props.data.upcoming_class).toLocaleString(Timezone, DateFormat)
+      : "No Upcoming Class";
 
   return (
     <Request>
@@ -44,7 +38,7 @@ export default function MyClass(props) {
             </ClassInfo>
             <ClassInfo>
               <InfoTitle min_w="105px">Remaining :</InfoTitle>
-              <InfoDesc>{remaining.length} hrs</InfoDesc>
+              <InfoDesc>{remaining} hrs</InfoDesc>
             </ClassInfo>
           </ClassFlex>
         </ClassInfoSection>

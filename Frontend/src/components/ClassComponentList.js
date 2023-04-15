@@ -3,7 +3,7 @@ import styled from "styled-components";
 import MyClass from "./MyClass";
 import { IsUser } from "./IsAuth";
 import { useQuery } from "react-query";
-import { fetchClassByStudentIdHandler } from "../handlers/classesHandler";
+import { fetchClassByIdHandler } from "../handlers/classesHandler";
 import { getStudentID, getTutorID } from "../utils/jwtGet";
 import { useDataContext } from "../pages/ClassList";
 
@@ -13,7 +13,7 @@ export default function ClassComponentList() {
   const { isLoading, error } = useQuery(
     "myClass",
     () => {
-      fetchClassByStudentIdHandler(getStudentID() || getTutorID())
+      fetchClassByIdHandler(getStudentID() || getTutorID())
         .then((res) => {
           if (res.data.success) {
             setData(res.data.data);
