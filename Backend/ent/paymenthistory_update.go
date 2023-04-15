@@ -127,10 +127,7 @@ func (phu *PaymentHistoryUpdate) sqlSave(ctx context.Context) (n int, err error)
 			Columns: []string{paymenthistory.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -143,10 +140,7 @@ func (phu *PaymentHistoryUpdate) sqlSave(ctx context.Context) (n int, err error)
 			Columns: []string{paymenthistory.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -162,10 +156,7 @@ func (phu *PaymentHistoryUpdate) sqlSave(ctx context.Context) (n int, err error)
 			Columns: []string{paymenthistory.PaymentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: payment.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(payment.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -178,10 +169,7 @@ func (phu *PaymentHistoryUpdate) sqlSave(ctx context.Context) (n int, err error)
 			Columns: []string{paymenthistory.PaymentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: payment.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(payment.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -336,10 +324,7 @@ func (phuo *PaymentHistoryUpdateOne) sqlSave(ctx context.Context) (_node *Paymen
 			Columns: []string{paymenthistory.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -352,10 +337,7 @@ func (phuo *PaymentHistoryUpdateOne) sqlSave(ctx context.Context) (_node *Paymen
 			Columns: []string{paymenthistory.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -371,10 +353,7 @@ func (phuo *PaymentHistoryUpdateOne) sqlSave(ctx context.Context) (_node *Paymen
 			Columns: []string{paymenthistory.PaymentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: payment.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(payment.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -387,10 +366,7 @@ func (phuo *PaymentHistoryUpdateOne) sqlSave(ctx context.Context) (_node *Paymen
 			Columns: []string{paymenthistory.PaymentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: payment.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(payment.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

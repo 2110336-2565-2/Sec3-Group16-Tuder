@@ -236,10 +236,7 @@ func (tc *TutorCreate) createSpec() (*Tutor, *sqlgraph.CreateSpec) {
 			Columns: []string{tutor.IssueReportColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: issuereport.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(issuereport.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -255,10 +252,7 @@ func (tc *TutorCreate) createSpec() (*Tutor, *sqlgraph.CreateSpec) {
 			Columns: []string{tutor.CourseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(course.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -274,10 +268,7 @@ func (tc *TutorCreate) createSpec() (*Tutor, *sqlgraph.CreateSpec) {
 			Columns: []string{tutor.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -294,10 +285,7 @@ func (tc *TutorCreate) createSpec() (*Tutor, *sqlgraph.CreateSpec) {
 			Columns: []string{tutor.ScheduleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: schedule.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(schedule.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

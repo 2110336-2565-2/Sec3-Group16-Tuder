@@ -69,13 +69,18 @@ var (
 // Status defines the type for the "status" enum field.
 type Status string
 
+// StatusComingsoon is the default value of the Status enum.
+const DefaultStatus = StatusComingsoon
+
 // Status values.
 const (
-	StatusOngoing    Status = "ongoing"
-	StatusCompleted  Status = "completed"
-	StatusCancelling Status = "cancelling"
-	StatusRejected   Status = "rejected"
-	StatusCancelled  Status = "cancelled"
+	StatusComingsoon  Status = "comingsoon"
+	StatusOngoing     Status = "ongoing"
+	StatusVerifying   Status = "verifying"
+	StatusPending     Status = "pending"
+	StatusCompleted   Status = "completed"
+	StatusPosponed    Status = "posponed"
+	StatusConsidering Status = "considering"
 )
 
 func (s Status) String() string {
@@ -85,7 +90,7 @@ func (s Status) String() string {
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s Status) error {
 	switch s {
-	case StatusOngoing, StatusCompleted, StatusCancelling, StatusRejected, StatusCancelled:
+	case StatusComingsoon, StatusOngoing, StatusVerifying, StatusPending, StatusCompleted, StatusPosponed, StatusConsidering:
 		return nil
 	default:
 		return fmt.Errorf("appointment: invalid enum value for status field: %q", s)

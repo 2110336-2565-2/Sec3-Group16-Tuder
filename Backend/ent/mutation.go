@@ -9,6 +9,8 @@ import (
 	"sync"
 	"time"
 
+	"entgo.io/ent"
+	"entgo.io/ent/dialect/sql"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/appointment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/cancelrequest"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
@@ -23,9 +25,6 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/google/uuid"
-
-	"entgo.io/ent"
-	"entgo.io/ent/dialect/sql"
 )
 
 const (

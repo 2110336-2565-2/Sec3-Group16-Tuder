@@ -222,10 +222,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.StudentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: student.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(student.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -238,10 +235,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.StudentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: student.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(student.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -257,10 +251,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.CourseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(course.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -273,10 +264,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.CourseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(course.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -292,10 +280,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.AppointmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: appointment.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(appointment.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -308,10 +293,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.AppointmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: appointment.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(appointment.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -327,10 +309,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.AppointmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: appointment.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(appointment.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -346,10 +325,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.ScheduleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: schedule.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(schedule.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -362,10 +338,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.ScheduleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: schedule.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(schedule.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -381,10 +354,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.CancelRequestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: cancelrequest.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cancelrequest.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -397,10 +367,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.CancelRequestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: cancelrequest.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cancelrequest.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -416,10 +383,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.CancelRequestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: cancelrequest.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cancelrequest.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -666,10 +630,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.StudentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: student.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(student.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -682,10 +643,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.StudentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: student.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(student.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -701,10 +659,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.CourseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(course.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -717,10 +672,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.CourseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(course.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -736,10 +688,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.AppointmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: appointment.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(appointment.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -752,10 +701,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.AppointmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: appointment.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(appointment.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -771,10 +717,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.AppointmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: appointment.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(appointment.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -790,10 +733,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.ScheduleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: schedule.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(schedule.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -806,10 +746,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.ScheduleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: schedule.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(schedule.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -825,10 +762,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.CancelRequestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: cancelrequest.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cancelrequest.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -841,10 +775,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.CancelRequestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: cancelrequest.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cancelrequest.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -860,10 +791,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.CancelRequestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: cancelrequest.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cancelrequest.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

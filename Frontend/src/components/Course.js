@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 export default function Course(props){
 
-    const pathCourse = "/course-detail/" + props.course_id
+    const pathCourse = "/courses/" + props.course_id
 
     return (
         <>

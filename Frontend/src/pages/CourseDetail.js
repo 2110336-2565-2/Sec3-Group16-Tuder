@@ -52,6 +52,6 @@ export default function CourseDetail() {
 const Container = styled.div`
   margin-top: 3rem;
   margin-bottom: 3rem;
-  padding-left: 7%;
-  padding-right: 7%;
+  padding-left: 5%;
+  padding-right: 5%;
 `;

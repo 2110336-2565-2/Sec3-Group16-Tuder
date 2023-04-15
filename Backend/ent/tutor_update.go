@@ -267,10 +267,7 @@ func (tu *TutorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{tutor.IssueReportColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: issuereport.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(issuereport.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -283,10 +280,7 @@ func (tu *TutorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{tutor.IssueReportColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: issuereport.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(issuereport.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -302,10 +296,7 @@ func (tu *TutorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{tutor.IssueReportColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: issuereport.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(issuereport.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -321,10 +312,7 @@ func (tu *TutorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{tutor.CourseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(course.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -337,10 +325,7 @@ func (tu *TutorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{tutor.CourseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(course.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -356,10 +341,7 @@ func (tu *TutorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{tutor.CourseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(course.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -375,10 +357,7 @@ func (tu *TutorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{tutor.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -391,10 +370,7 @@ func (tu *TutorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{tutor.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -410,10 +386,7 @@ func (tu *TutorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{tutor.ScheduleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: schedule.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(schedule.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -426,10 +399,7 @@ func (tu *TutorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{tutor.ScheduleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: schedule.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(schedule.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -722,10 +692,7 @@ func (tuo *TutorUpdateOne) sqlSave(ctx context.Context) (_node *Tutor, err error
 			Columns: []string{tutor.IssueReportColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: issuereport.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(issuereport.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -738,10 +705,7 @@ func (tuo *TutorUpdateOne) sqlSave(ctx context.Context) (_node *Tutor, err error
 			Columns: []string{tutor.IssueReportColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: issuereport.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(issuereport.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -757,10 +721,7 @@ func (tuo *TutorUpdateOne) sqlSave(ctx context.Context) (_node *Tutor, err error
 			Columns: []string{tutor.IssueReportColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: issuereport.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(issuereport.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -776,10 +737,7 @@ func (tuo *TutorUpdateOne) sqlSave(ctx context.Context) (_node *Tutor, err error
 			Columns: []string{tutor.CourseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(course.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -792,10 +750,7 @@ func (tuo *TutorUpdateOne) sqlSave(ctx context.Context) (_node *Tutor, err error
 			Columns: []string{tutor.CourseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(course.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -811,10 +766,7 @@ func (tuo *TutorUpdateOne) sqlSave(ctx context.Context) (_node *Tutor, err error
 			Columns: []string{tutor.CourseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(course.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -830,10 +782,7 @@ func (tuo *TutorUpdateOne) sqlSave(ctx context.Context) (_node *Tutor, err error
 			Columns: []string{tutor.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -846,10 +795,7 @@ func (tuo *TutorUpdateOne) sqlSave(ctx context.Context) (_node *Tutor, err error
 			Columns: []string{tutor.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -865,10 +811,7 @@ func (tuo *TutorUpdateOne) sqlSave(ctx context.Context) (_node *Tutor, err error
 			Columns: []string{tutor.ScheduleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: schedule.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(schedule.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -881,10 +824,7 @@ func (tuo *TutorUpdateOne) sqlSave(ctx context.Context) (_node *Tutor, err error
 			Columns: []string{tutor.ScheduleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: schedule.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(schedule.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
