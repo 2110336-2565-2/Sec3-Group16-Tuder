@@ -3,21 +3,23 @@ import styled from "styled-components";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import TimeSelector from "../enrollment/TimeSelector";
+import PaymentModal from "../global/PaymentModal";
 import { getStudentID } from "../../utils/jwtGet";
 import { convertFrontendSchedulesToBackend } from "../../utils/profile/scheduleConverter";
 import { submitEnrollFormHandler } from "../../handlers/match/enrollHandler";
 
 export default function FormEnrollCourse({ course, courseSchedule }) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
   const studentID = getStudentID();
   const [totalHours, setTotalHours] = useState(0);
-  const [selectedSchedule, setSelectedSchedule] = useState({});
+  const [selectedSchedule, setSelectedSchedule] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   function handleSubmit(e) {
     e.preventDefault();
     if (isSubmitting) return;
     setIsSubmitting(true);
-    const loadingToast = toast.loading("Submitting...");
+    const paymentLoadingToast = toast.loading("Loading...");
     // Filter out the timeSlot that is not selected
     const filteredSchedule = selectedSchedule.map((day) => ({
       day: day.day,
@@ -25,6 +27,12 @@ export default function FormEnrollCourse({ course, courseSchedule }) {
     }));
     // Convert selectedSchedule to backend format
     const backendSchedule = convertFrontendSchedulesToBackend(filteredSchedule);
+    if (backendSchedule.length === 0) {
+      toast.dismiss(paymentLoadingToast);
+      toast.error("Please select at least one time slot");
+      setIsSubmitting(false);
+      return;
+    }
     // Create data to send to backend
     const data = {
       course_id: course.id,
@@ -32,22 +40,32 @@ export default function FormEnrollCourse({ course, courseSchedule }) {
       schedule: backendSchedule,
     };
     console.log(data);
-    submitEnrollFormHandler(data)
-      .then((res) => {
-        toast.dismiss(loadingToast);
-        toast.success("Enroll Success");
-        navigate("/");
-        setIsSubmitting(false);
-      })
-      .catch((err) => {
-        toast.dismiss(loadingToast);
-        toast.error("Enroll Failed");
-        setIsSubmitting(false);
-      });
+    toast.dismiss(paymentLoadingToast);
+    setIsModalOpen(true);
+
+    // submitEnrollFormHandler(data)
+    //   .then((res) => {
+    //     toast.dismiss(loadingToast);
+    //     toast.success("Enroll Success");
+    //     navigate("/");
+    //     setIsSubmitting(false);
+    //   })
+    //   .catch((err) => {
+    //     toast.dismiss(loadingToast);
+    //     toast.error("Enroll Failed");
+    //     setIsSubmitting(false);
+    //   });
   }
   console.log("courseSchedule: ", courseSchedule);
   return (
     <Container>
+      <PaymentModal
+        title={"Enroll - " + course.title}
+        isOpen={isModalOpen}
+        setIsOpen={setIsModalOpen}
+        courseID={course.id}
+        amount={totalHours * course.price_per_hour}
+      />
       <Form onSubmit={handleSubmit}>
         {courseSchedule.length > 0 ? (
           <TimeSelector
