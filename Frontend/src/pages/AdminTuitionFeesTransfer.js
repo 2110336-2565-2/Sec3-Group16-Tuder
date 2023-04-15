@@ -22,6 +22,7 @@ export default function AdminTuitionFeesTransfer() {
       "https://wp.technologyreview.com/wp-content/uploads/2021/03/AndrewNg-05.jpeg",
     student_name: "John Doe",
     tutor_name: "Jane Doe",
+    tutor_id: "123456789",
     subject: "Mathematics",
     topic: "Algebra",
     date: "June 2, 2002 11:00 - 12:00",
@@ -65,7 +66,7 @@ export default function AdminTuitionFeesTransfer() {
             </Table>
           </Card>
           <QRWrapper>
-            <QRPayment total_price={dummy["price_per_hour"]} />
+            <QRPayment amount={dummy["price_per_hour"]} tutorID={dummy["tutor_id"]} />
           </QRWrapper>
           <ButtonWrapper>
             <Button
