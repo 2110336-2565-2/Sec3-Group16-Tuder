@@ -62,6 +62,7 @@ export default function AdminTuitionFeeList() {
                 AppointmentID={item.appointmentID}
                 AppointmentBeginAt = {item.appointmentBeginAt}
                 AppointmentEndAt = {item.appointmentEndAt}
+                AppointmentStatus = {item.appointmentStatus}
                 MatchID = {item.matchID}
                 StudentID = {item.studentID}
                 TutorID = {item.tutorID}

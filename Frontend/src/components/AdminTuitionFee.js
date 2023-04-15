@@ -16,20 +16,24 @@ export default function AdminTuitionFee(props) {
           <ClassFlex>
 
           <ClassInfo>
-              <InfoTitle min_w = "45px">Title :</InfoTitle>
+              <InfoTitle min_w = "72px">Title :</InfoTitle>
               <InfoDesc>{props.Title}</InfoDesc>              
             </ClassInfo>
             <ClassInfo>
-              <InfoTitle min_w = "99px">Description :</InfoTitle>
-              <InfoDesc>{props.Subject}</InfoDesc>
+              <InfoTitle min_w = "72px">Student Name :</InfoTitle>
+              <InfoDesc>{props.Student_name}</InfoDesc>
             </ClassInfo>
             <ClassInfo>
-              <InfoTitle min_w = "72px">Contact :</InfoTitle>
-              <InfoDesc>{props.Topic}</InfoDesc>
+              <InfoTitle min_w = "72px">Tutor Name :</InfoTitle>
+              <InfoDesc>{props.Tutor_name}</InfoDesc>
             </ClassInfo>
             <ClassInfo>
-              <InfoTitle min_w = "112px">Report_Date :</InfoTitle>
-              <InfoDesc>{new Date(props.AppointmentBeginAt).toLocaleString(Timezone, DateFormat)}</InfoDesc>
+              <InfoTitle min_w = "72px">Status :</InfoTitle>
+              <InfoDesc>{new Date(props.AppointmentStatus).toLocaleString(Timezone, DateFormat)}</InfoDesc>
+            </ClassInfo>
+            <ClassInfo>
+              <InfoTitle min_w = "72px">End Date :</InfoTitle>
+              <InfoDesc>{new Date(props.AppointmentEndAt).toLocaleString(Timezone, DateFormat)}</InfoDesc>
             </ClassInfo>
       
 
