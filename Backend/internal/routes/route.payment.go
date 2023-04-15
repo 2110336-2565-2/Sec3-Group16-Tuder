@@ -15,4 +15,5 @@ func InitPaymentRoutes(client *ent.Client, e *echo.Group) {
 
 	e.POST("/payment/getQRCodeForCoursePayment", controllerPayment.GetQRCodeForCoursePayment)
 	e.POST("/payment/getQRCodeForTuitionFree", controllerPayment.GetQRCodeForTuitionFree)
+	e.POST("/payment/webhookChargeHandler", controllerPayment.WebhookChargeHandler)
 }

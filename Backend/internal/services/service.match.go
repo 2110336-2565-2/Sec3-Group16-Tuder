@@ -26,7 +26,6 @@ func (s *serviceMatch) CreateMatch(sr *schemas.SchemaCreateMatch) (*schemas.Sche
 		fmt.Println(err)
 		return nil, err
 	}
-	fmt.Println("create match")
 	match, err = s.repository.GetMatchByID(match.ID)
 	if err != nil {
 		fmt.Println(err)
@@ -41,7 +40,6 @@ func (s *serviceMatch) CreateMatch(sr *schemas.SchemaCreateMatch) (*schemas.Sche
 		Friday:    match.Edges.Schedule.Day5,
 		Saturday:  match.Edges.Schedule.Day6,
 	}
-	fmt.Println("end service")
 	return &schemas.SchemaMatch{
 		ID:           match.ID,
 		Student:      match.Edges.Student,

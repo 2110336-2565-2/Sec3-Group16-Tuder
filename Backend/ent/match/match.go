@@ -25,6 +25,8 @@ const (
 	EdgeSchedule = "schedule"
 	// EdgeCancelRequest holds the string denoting the cancel_request edge name in mutations.
 	EdgeCancelRequest = "cancel_request"
+	// EdgePayment holds the string denoting the payment edge name in mutations.
+	EdgePayment = "payment"
 	// Table holds the table name of the match in the database.
 	Table = "matches"
 	// StudentTable is the table that holds the student relation/edge.
@@ -62,6 +64,13 @@ const (
 	CancelRequestInverseTable = "cancel_requests"
 	// CancelRequestColumn is the table column denoting the cancel_request relation/edge.
 	CancelRequestColumn = "cancel_request_match"
+	// PaymentTable is the table that holds the payment relation/edge.
+	PaymentTable = "matches"
+	// PaymentInverseTable is the table name for the Payment entity.
+	// It exists in this package in order to avoid circular dependency with the "payment" package.
+	PaymentInverseTable = "payments"
+	// PaymentColumn is the table column denoting the payment relation/edge.
+	PaymentColumn = "payment_match"
 )
 
 // Columns holds all SQL columns for match fields.
@@ -74,6 +83,7 @@ var Columns = []string{
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"course_match",
+	"payment_match",
 	"schedule_match",
 	"student_match",
 }

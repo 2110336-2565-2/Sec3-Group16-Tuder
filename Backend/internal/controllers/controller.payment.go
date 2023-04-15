@@ -77,3 +77,33 @@ func (cR *controllerPayment) GetQRCodeForTuitionFree(c echo.Context) error {
 
 	return nil
 }
+
+func (cR *controllerPayment) WebhookChargeHandler(c echo.Context) error {
+	uR := &schema.SchemaChargeWebhook{}
+
+	if err := c.Bind(uR); err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: "invalid request payload",
+			Error:   err,
+		})
+	}
+
+	payment, err := cR.service.WebhookChargeHandler(uR)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: err.Error(),
+			Error:   err,
+		})
+	}
+
+	c.JSON(http.StatusOK, schema.SchemaResponses{
+		Success: true,
+		Message: "Payment created",
+		Data:    payment,
+	})
+
+	return nil
+}

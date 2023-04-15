@@ -3,6 +3,9 @@
 package payment
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -15,12 +18,22 @@ const (
 	FieldQrPictureURL = "qr_picture_url"
 	// FieldPaymentStatus holds the string denoting the payment_status field in the database.
 	FieldPaymentStatus = "payment_status"
-	// FieldCard holds the string denoting the card field in the database.
-	FieldCard = "card"
 	// FieldAmount holds the string denoting the amount field in the database.
 	FieldAmount = "amount"
+	// FieldCurrency holds the string denoting the currency field in the database.
+	FieldCurrency = "currency"
+	// FieldChargeID holds the string denoting the charge_id field in the database.
+	FieldChargeID = "charge_id"
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	FieldCreatedAt = "created_at"
+	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
+	FieldUpdatedAt = "updated_at"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
+	// EdgeMatch holds the string denoting the match edge name in mutations.
+	EdgeMatch = "match"
+	// EdgeAppointment holds the string denoting the appointment edge name in mutations.
+	EdgeAppointment = "appointment"
 	// EdgePaymentHistory holds the string denoting the payment_history edge name in mutations.
 	EdgePaymentHistory = "payment_history"
 	// Table holds the table name of the payment in the database.
@@ -32,6 +45,20 @@ const (
 	UserInverseTable = "users"
 	// UserColumn is the table column denoting the user relation/edge.
 	UserColumn = "user_payment"
+	// MatchTable is the table that holds the match relation/edge.
+	MatchTable = "matches"
+	// MatchInverseTable is the table name for the Match entity.
+	// It exists in this package in order to avoid circular dependency with the "match" package.
+	MatchInverseTable = "matches"
+	// MatchColumn is the table column denoting the match relation/edge.
+	MatchColumn = "payment_match"
+	// AppointmentTable is the table that holds the appointment relation/edge.
+	AppointmentTable = "appointments"
+	// AppointmentInverseTable is the table name for the Appointment entity.
+	// It exists in this package in order to avoid circular dependency with the "appointment" package.
+	AppointmentInverseTable = "appointments"
+	// AppointmentColumn is the table column denoting the appointment relation/edge.
+	AppointmentColumn = "payment_appointment"
 	// PaymentHistoryTable is the table that holds the payment_history relation/edge.
 	PaymentHistoryTable = "payment_histories"
 	// PaymentHistoryInverseTable is the table name for the PaymentHistory entity.
@@ -46,8 +73,11 @@ var Columns = []string{
 	FieldID,
 	FieldQrPictureURL,
 	FieldPaymentStatus,
-	FieldCard,
 	FieldAmount,
+	FieldCurrency,
+	FieldChargeID,
+	FieldCreatedAt,
+	FieldUpdatedAt,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "payments"
@@ -72,12 +102,43 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// PaymentStatusValidator is a validator for the "payment_status" field. It is called by the builders before save.
-	PaymentStatusValidator func(string) error
-	// CardValidator is a validator for the "card" field. It is called by the builders before save.
-	CardValidator func(string) error
 	// AmountValidator is a validator for the "amount" field. It is called by the builders before save.
 	AmountValidator func(int) error
+	// CurrencyValidator is a validator for the "currency" field. It is called by the builders before save.
+	CurrencyValidator func(string) error
+	// ChargeIDValidator is a validator for the "charge_id" field. It is called by the builders before save.
+	ChargeIDValidator func(string) error
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
+	DefaultCreatedAt func() time.Time
+	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
+	DefaultUpdatedAt func() time.Time
+	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
+	UpdateDefaultUpdatedAt func() time.Time
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
+
+// PaymentStatus defines the type for the "payment_status" enum field.
+type PaymentStatus string
+
+// PaymentStatus values.
+const (
+	PaymentStatusPending    PaymentStatus = "pending"
+	PaymentStatusSuccessful PaymentStatus = "successful"
+	PaymentStatusFailed     PaymentStatus = "failed"
+	PaymentStatusProcessing PaymentStatus = "processing"
+)
+
+func (ps PaymentStatus) String() string {
+	return string(ps)
+}
+
+// PaymentStatusValidator is a validator for the "payment_status" field enum values. It is called by the builders before save.
+func PaymentStatusValidator(ps PaymentStatus) error {
+	switch ps {
+	case PaymentStatusPending, PaymentStatusSuccessful, PaymentStatusFailed, PaymentStatusProcessing:
+		return nil
+	default:
+		return fmt.Errorf("payment: invalid enum value for payment_status field: %q", ps)
+	}
+}
