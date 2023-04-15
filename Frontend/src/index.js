@@ -28,6 +28,7 @@ import TutorReviews from "./pages/TutorReviews";
 import Enroll from "./pages/Enroll";
 import ClassDetail from "./pages/ClassDetail";
 import ClassList from "./pages/ClassList";
+import AdminTuitionFeesTransfer from './pages/AdminTuitionFeesTransfer';
 import { QueryClientProvider, QueryClient } from "react-query";
 
 Modal.setAppElement(document.getElementById("root"));
@@ -142,25 +143,13 @@ const router = createBrowserRouter([
         element: <AdminIssueReportList />,
       },
       {
-        path: "/courses/:id",
-        element: <CourseDetail />,
-      },
-      {
-        path: "/my-classes",
-        element: <ClassList />,
-      },
-      {
-        path: "/classes/:id",
-        element: <ClassDetail />,
-      },
-      {
-        path: "/admin-tuition-fee",
-        element: <AdminTuitionFeeList />,
-      },
-    ],
-  },
-]);
-const root = ReactDOM.createRoot(document.getElementById("root"));
+        path: "/course-detail/:id",
+        element: <CourseDetail />
+      }
+    ]
+  }
+])
+const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <>
     <QueryClientProvider client={queryClient}>

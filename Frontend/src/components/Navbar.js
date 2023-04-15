@@ -75,6 +75,14 @@ export default function Navbar() {
           </TuderLinkNav>
         </NavbarItem>
       );
+    } else if (content.title === "Sign Out") {
+      return (
+        <NavbarItem key="signOut">
+          <TuderButton type="red-button" onClick={signOutHandler} key={index}>
+            {content.title}
+          </TuderButton>
+        </NavbarItem>
+      );
     } else if (content.title === "Account") {
       const items = content.dropdown.map((item, index) => {
         if (item.title === "Profile") {
