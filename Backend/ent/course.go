@@ -33,6 +33,8 @@ type Course struct {
 	Level course.Level `json:"level,omitempty"`
 	// CoursePictureURL holds the value of the "course_picture_url" field.
 	CoursePictureURL *string `json:"course_picture_url,omitempty"`
+	// Status holds the value of the "status" field.
+	Status course.Status `json:"status,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CourseQuery when eager-loading is set.
 	Edges        CourseEdges `json:"edges"`
@@ -90,7 +92,7 @@ func (*Course) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case course.FieldEstimatedTime, course.FieldPricePerHour:
 			values[i] = new(sql.NullInt64)
-		case course.FieldTitle, course.FieldSubject, course.FieldTopic, course.FieldDescription, course.FieldLevel, course.FieldCoursePictureURL:
+		case course.FieldTitle, course.FieldSubject, course.FieldTopic, course.FieldDescription, course.FieldLevel, course.FieldCoursePictureURL, course.FieldStatus:
 			values[i] = new(sql.NullString)
 		case course.FieldID:
 			values[i] = new(uuid.UUID)
@@ -165,6 +167,12 @@ func (c *Course) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.CoursePictureURL = new(string)
 				*c.CoursePictureURL = value.String
+			}
+		case course.FieldStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
+			} else if value.Valid {
+				c.Status = course.Status(value.String)
 			}
 		case course.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -241,6 +249,9 @@ func (c *Course) String() string {
 		builder.WriteString("course_picture_url=")
 		builder.WriteString(*v)
 	}
+	builder.WriteString(", ")
+	builder.WriteString("status=")
+	builder.WriteString(fmt.Sprintf("%v", c.Status))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -18,6 +18,7 @@ type ServiceTutor interface {
 	UpdateTutorSchedule(scheduleUpdate *schemas.SchemaUpdateSchedule) (*schemas.SchemaRawSchedule, error)
 	DeleteTutor(tutorDelete *schemas.SchemaDeleteTutor) error
 	GetTutorReviews(tutorGet *schemas.SchemaGetReviews) (*schemas.SchemaGetReviewsResponse, error)
+	GetTutorCourses(tutorGet *schemas.SchemaGetCourses) ([]*schemas.CourseResponse, error)
 }
 
 type serviceTutor struct {
@@ -273,7 +274,6 @@ func (s *serviceTutor) GetTutorSchedule(scheduleRequest *schemas.SchemaGetSchedu
 func (s *serviceTutor) GetTutorReviews(reviewRequest *schemas.SchemaGetReviews) (*schemas.SchemaGetReviewsResponse, error) {
 	reviews, err := s.repository.GetReviews(reviewRequest)
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
@@ -295,7 +295,6 @@ func (s *serviceTutor) GetTutorReviews(reviewRequest *schemas.SchemaGetReviews) 
 			total_review += 1
 		}
 
-		// fmt.Println(groupedReviews)
 		score := float32(total_score) / float32(total_review)
 
 		reviewResponse := &schemas.SchemaGetReviewsResponse{
@@ -312,7 +311,7 @@ func (s *serviceTutor) GetTutorReviews(reviewRequest *schemas.SchemaGetReviews) 
 		}
 		tutor, err := s.repository.GetTutorByUsername(tutor_request)
 		if err != nil {
-			fmt.Println(err)
+
 			return nil, err
 		}
 		score := float32(total_score)
@@ -327,4 +326,37 @@ func (s *serviceTutor) GetTutorReviews(reviewRequest *schemas.SchemaGetReviews) 
 
 	}
 
+}
+
+func (s *serviceTutor) GetTutorCourses(tutorGet *schemas.SchemaGetCourses) ([]*schemas.CourseResponse, error) {
+	courses, err := s.repository.GetCourses(tutorGet)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	var coursesResponse []*schemas.CourseResponse
+
+	if len(courses) > 0 {
+		for _, course := range courses {
+			num_class := len(course.Edges.Match)
+			courseResponse := &schemas.CourseResponse{
+				ID:                 course.ID,
+				Title:              course.Title,
+				Subject:            course.Subject,
+				Topic:              course.Topic,
+				EstimatedTime:      course.EstimatedTime,
+				Level:              course.Level.String(),
+				Course_picture_url: *course.CoursePictureURL,
+				Status:             course.Status.String(),
+				NumOfClass:         num_class,
+			}
+			coursesResponse = append(coursesResponse, courseResponse)
+
+		}
+
+		return coursesResponse, nil
+	} else {
+		return coursesResponse, nil
+	}
 }

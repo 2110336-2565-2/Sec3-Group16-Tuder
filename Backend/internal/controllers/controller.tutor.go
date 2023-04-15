@@ -1,14 +1,14 @@
 package controllers
 
 import (
-	// "github.com/golang-jwt/jwt/v4"
-
+	"fmt"
 	"net/http"
 
 	"github.com/google/uuid"
 
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 	service "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/services"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 )
 
@@ -22,6 +22,7 @@ type ControllerTutor interface {
 	UpdateSchedule(c echo.Context) error
 	DeleteTutor(c echo.Context) error
 	GetTutorReviews(c echo.Context) error
+	GetTutorCourses(c echo.Context) error
 }
 
 type controllerTutor struct {
@@ -308,6 +309,58 @@ func (cR controllerTutor) GetTutorReviews(c echo.Context) (err error) {
 		Success: true,
 		Message: "Get Reviews successfully",
 		Data:    reviews,
+	})
+	return
+}
+
+func (cR controllerTutor) GetTutorCourses(c echo.Context) (err error) {
+
+	claim := c.Get("user").(*jwt.Token).Claims.(jwt.MapClaims)
+	username, ok := claim["username"].(string)
+	if !ok {
+		return fmt.Errorf("claim \"username\" does not exist")
+	}
+
+	r := &schema.SchemaGetCourses{
+		Username: username,
+	}
+	if err = c.Bind(r); err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: "invalid request payload",
+			Error:   err,
+		})
+		return fmt.Errorf("username from jwt token is invalid")
+	}
+
+	role, ok := claim["role"].(string)
+	if !ok {
+		return fmt.Errorf("claim \"role\" does not exist")
+	}
+
+	if role != "tutor" {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: "You are not a tutor",
+			Error:   err,
+		})
+		return
+	}
+
+	courses, err := cR.service.GetTutorCourses(r)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: err.Error(),
+			Error:   err,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, schema.SchemaResponses{
+		Success: true,
+		Message: "Get Courses successfully",
+		Data:    courses,
 	})
 	return
 }

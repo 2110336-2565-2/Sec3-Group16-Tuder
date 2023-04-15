@@ -97,3 +97,7 @@ type SchemaGetReviewsResponse struct {
 	TotalReview int               `json:"total_review"`
 	Reviews     []*ReviewResponse `json:"reviews"`
 }
+
+type SchemaGetCourses struct {
+	Username string `json:"username"`
+}
