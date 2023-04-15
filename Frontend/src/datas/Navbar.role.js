@@ -11,8 +11,8 @@ const navbarContent = [
         role: 'tutor',
         content:[
             {title: 'Home', link: '/'},
-            {title: 'My Courses', link: '/my-courses'},
-            {title: 'My Classes', link: '/my-classes'},
+            {title: 'My Courses', link: '/courses'},
+            {title: 'My Classes', link: '/classes'},
             {title: 'Account', dropdown:[
                 {title: 'Profile', link: '/profile'},
                 {title: 'Change Password', link: '/change-password'},
@@ -24,7 +24,7 @@ const navbarContent = [
         role: 'student',
         content:[
             {title: 'Home', link: '/'},
-            {title: 'My Classes', link: '/my-classes'},
+            {title: 'My Classes', link: '/classes'},
             {title: 'Account', dropdown:[
                 {title: 'Profile', link: '/profile'},
                 {title: 'Change Password', link: '/change-password'},

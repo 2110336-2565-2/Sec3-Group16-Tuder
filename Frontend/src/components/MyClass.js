@@ -1,7 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 
-export default function MyClass() {
+export default function MyClass(props) {
+    
 
     return (
     <Request>

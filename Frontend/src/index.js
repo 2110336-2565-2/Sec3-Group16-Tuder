@@ -64,7 +64,7 @@ const router = createBrowserRouter([
             element: <Profile />,
           },
           {
-            path: "my-reviews",
+            path: "reviews",
             element: <TutorReviews />,
           },
           {
@@ -145,7 +145,7 @@ const router = createBrowserRouter([
         element: <CourseDetail />,
       },
       {
-        path: "/my-classes",
+        path: "/classes",
         element: <ClassList />,
       },
       {
