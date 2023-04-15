@@ -13,7 +13,7 @@ var (
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "begin_at", Type: field.TypeTime},
 		{Name: "end_at", Type: field.TypeTime},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"ongoing", "completed", "cancelling", "rejected", "cancelled"}},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"comingsoon", "ongoing", "verifying", "pending", "completed", "posponed", "considering"}, Default: "comingsoon"},
 		{Name: "appointment_match", Type: field.TypeUUID, Nullable: true},
 	}
 	// AppointmentsTable holds the schema information for the "appointments" table.

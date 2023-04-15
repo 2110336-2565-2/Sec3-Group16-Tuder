@@ -11,6 +11,10 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/migrate"
 	"github.com/google/uuid"
 
+	"entgo.io/ent"
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/appointment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/cancelrequest"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
@@ -23,10 +27,6 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
-
-	"entgo.io/ent/dialect"
-	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // Client is the client that holds all ent builders.
@@ -83,6 +83,55 @@ func (c *Client) init() {
 	c.Student = NewStudentClient(c.config)
 	c.Tutor = NewTutorClient(c.config)
 	c.User = NewUserClient(c.config)
+}
+
+type (
+	// config is the configuration for the client and its builder.
+	config struct {
+		// driver used for executing database requests.
+		driver dialect.Driver
+		// debug enable a debug logging.
+		debug bool
+		// log used for logging on debug mode.
+		log func(...any)
+		// hooks to execute on mutations.
+		hooks *hooks
+		// interceptors to execute on queries.
+		inters *inters
+	}
+	// Option function to configure the client.
+	Option func(*config)
+)
+
+// options applies the options on the config object.
+func (c *config) options(opts ...Option) {
+	for _, opt := range opts {
+		opt(c)
+	}
+	if c.debug {
+		c.driver = dialect.Debug(c.driver, c.log)
+	}
+}
+
+// Debug enables debug logging on the ent.Driver.
+func Debug() Option {
+	return func(c *config) {
+		c.debug = true
+	}
+}
+
+// Log sets the logging function for debug mode.
+func Log(fn func(...any)) Option {
+	return func(c *config) {
+		c.log = fn
+	}
+}
+
+// Driver configures the client driver.
+func Driver(driver dialect.Driver) Option {
+	return func(c *config) {
+		c.driver = driver
+	}
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -187,35 +236,23 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.Appointment.Use(hooks...)
-	c.CancelRequest.Use(hooks...)
-	c.Course.Use(hooks...)
-	c.IssueReport.Use(hooks...)
-	c.Match.Use(hooks...)
-	c.Payment.Use(hooks...)
-	c.PaymentHistory.Use(hooks...)
-	c.Review.Use(hooks...)
-	c.Schedule.Use(hooks...)
-	c.Student.Use(hooks...)
-	c.Tutor.Use(hooks...)
-	c.User.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.Appointment, c.CancelRequest, c.Course, c.IssueReport, c.Match, c.Payment,
+		c.PaymentHistory, c.Review, c.Schedule, c.Student, c.Tutor, c.User,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.Appointment.Intercept(interceptors...)
-	c.CancelRequest.Intercept(interceptors...)
-	c.Course.Intercept(interceptors...)
-	c.IssueReport.Intercept(interceptors...)
-	c.Match.Intercept(interceptors...)
-	c.Payment.Intercept(interceptors...)
-	c.PaymentHistory.Intercept(interceptors...)
-	c.Review.Intercept(interceptors...)
-	c.Schedule.Intercept(interceptors...)
-	c.Student.Intercept(interceptors...)
-	c.Tutor.Intercept(interceptors...)
-	c.User.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.Appointment, c.CancelRequest, c.Course, c.IssueReport, c.Match, c.Payment,
+		c.PaymentHistory, c.Review, c.Schedule, c.Student, c.Tutor, c.User,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -2161,3 +2198,15 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 		return nil, fmt.Errorf("ent: unknown User mutation op: %q", m.Op())
 	}
 }
+
+// hooks and interceptors per client, for fast access.
+type (
+	hooks struct {
+		Appointment, CancelRequest, Course, IssueReport, Match, Payment, PaymentHistory,
+		Review, Schedule, Student, Tutor, User []ent.Hook
+	}
+	inters struct {
+		Appointment, CancelRequest, Course, IssueReport, Match, Payment, PaymentHistory,
+		Review, Schedule, Student, Tutor, User []ent.Interceptor
+	}
+)
