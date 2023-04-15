@@ -18,18 +18,18 @@ func NewControllerAppointment(service service.ServiceAppointment) *controllerApp
 }
 
 func (cR *controllerAppointment) GetAppointmentByID(c echo.Context) (err error) {
-	id, _ := uuid.Parse(c.Param("student_id"))
-	uR := &schema.SchemaGetAppointmentByID{
-		ID: id,
-	}
-
-	if err := c.Bind(&uR); err != nil {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaResponses{
 			Success: false,
-			Message: "invalid request payload",
+			Message: "invalid request id",
 			Data:    err.Error(),
 		})
 		return err
+	}
+
+	uR := &schema.SchemaGetAppointmentByID{
+		ID: id,
 	}
 
 	appointments, err := cR.service.GetAppointmentByID(uR)
@@ -98,7 +98,7 @@ func (cR *controllerAppointment) UpdateAppointmentStatus(c echo.Context) (err er
 		return
 	}
 
-	appointment, err := cR.service.UpdaAppointmentStatus(uR)
+	appointment, err := cR.service.UpdateAppointmentStatus(uR)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
 			Success: false,

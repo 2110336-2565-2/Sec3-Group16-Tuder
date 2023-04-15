@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import React from "react";
-import { getRole } from "../utils/jwtGet";
 import { useNavigate } from "react-router-dom";
 
 export default function ClassDetails(props) {

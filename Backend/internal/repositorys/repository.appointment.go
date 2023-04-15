@@ -33,7 +33,9 @@ func (r *repositoryAppointment) GetAppointmentByStudentID(sr *schemas.SchemaGetA
 	matches, err := r.client.Match.
 		Query().
 		Where(entMatch.HasStudentWith(entStudent.IDEQ(sr.ID))).
-		WithAppointment().
+		WithAppointment( func(tq *ent.AppointmentQuery) {
+			tq.Order(ent.Asc(appointment.FieldBeginAt))
+		}).
 		WithCourse(func(tq *ent.CourseQuery) {
 			tq.WithTutor(func(tq *ent.TutorQuery) {
 				tq.WithUser()
@@ -54,7 +56,6 @@ func (r *repositoryAppointment) GetAppointmentByStudentID(sr *schemas.SchemaGetA
 			Tutor_name:  match.Edges.Course.Edges.Tutor.Edges.User.Username,
 		})
 	}
-	fmt.Println("Student work")
 	return schemaAppointments, nil
 }
 
@@ -62,7 +63,9 @@ func (r *repositoryAppointment) GetAppointmentByTutorID(sr *schemas.SchemaGetApp
 	matches, err := r.client.Match.
 		Query().
 		Where(entMatch.HasCourseWith(entCourse.HasTutorWith(entTutor.IDEQ(sr.ID)))).
-		WithAppointment().
+		WithAppointment( func(tq *ent.AppointmentQuery) {
+			tq.Order(ent.Asc(appointment.FieldBeginAt))
+		}).
 		WithCourse(func(tq *ent.CourseQuery) {
 			tq.WithTutor(func(tq *ent.TutorQuery) {
 				tq.WithUser()
@@ -84,7 +87,6 @@ func (r *repositoryAppointment) GetAppointmentByTutorID(sr *schemas.SchemaGetApp
 			Tutor_name:  match.Edges.Course.Edges.Tutor.Edges.User.Username,
 		})
 	}
-	fmt.Println("Tutor work")
 	return schemaAppointments, nil
 }
 

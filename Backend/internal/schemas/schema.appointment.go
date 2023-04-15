@@ -7,7 +7,6 @@ import (
 
 type SchemaGetAppointmentByID struct {
 	ID   uuid.UUID `json:"id"`
-	Role string    `json:"role"`
 }
 
 type SchemaAppointmentFromID struct {

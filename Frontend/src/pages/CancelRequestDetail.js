@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import styled from "styled-components"
 import Footer from "../components/global/Footer.js";
 import { IsAdmin } from "../components/IsAuth.js";
-import CancelRequestInfo from "../components/cancelRequestInfo.js";
+import CancelRequestInfo from "../components/CancelRequestInfo.js";
 import {useQuery} from 'react-query';
 import { fetchCancellingRequestHandler } from '../handlers/cancelRequestHandler';
 import { useParams } from "react-router-dom";

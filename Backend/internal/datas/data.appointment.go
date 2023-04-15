@@ -14,8 +14,8 @@ import (
 func InsertAppointment(client *ent.Client, ctx context.Context) []*ent.Appointment {
 
 	// Create appointment
-	app1 := CreateApp(client, appointment.StatusOngoing, time.Now(), time.Now().Add(1*time.Hour))
-	app2 := CreateApp(client, appointment.StatusOngoing, time.Now(), time.Now().Add(1*time.Hour))
+	app1 := CreateApp(client, appointment.StatusComingsoon, time.Now(), time.Now().Add(1*time.Hour))
+	app2 := CreateApp(client, appointment.StatusComingsoon, time.Now(), time.Now().Add(1*time.Hour))
 	app3 := CreateApp(client, appointment.StatusOngoing, time.Now(), time.Now().Add(1*time.Hour))
 	app4 := CreateApp(client, appointment.StatusOngoing, time.Now(), time.Now().Add(1*time.Hour))
 

@@ -146,11 +146,16 @@ const router = createBrowserRouter([
       },
       {
         path: "/classes",
-        element: <ClassList />,
-      },
-      {
-        path: "/classes/:id",
-        element: <ClassDetail />,
+        children: [
+          {
+            index: true,
+            element: <ClassList />,
+          },
+          {
+            path: ":id",
+            element: <ClassDetail />,
+          },
+        ],
       },
     ],
   },

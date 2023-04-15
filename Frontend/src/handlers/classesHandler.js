@@ -1,6 +1,5 @@
-import api from './apiHandler';
+import api from "./apiHandler";
 
-
-export const fetchclassByStudentIdHandler = (student_id) => {
-    return api.get(`api/v1/appointment/${student_id}`)
-}
+export const fetchClassByStudentIdHandler = (student_id) => {
+  return api.get(`api/v1/appointment/${student_id}`);
+};

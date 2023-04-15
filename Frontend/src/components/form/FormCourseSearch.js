@@ -46,8 +46,8 @@ export default function CourseSearchForm(props) {
 
   const submitHandler = (e) => {
     e.preventDefault();
-      refetch();
-    window.scrollTo(0, document.getElementById("course").offsetTop-100);
+    refetch();
+    window.scrollTo(0, document.getElementById("course").offsetTop - 100);
   };
 
   if (isLoading) {

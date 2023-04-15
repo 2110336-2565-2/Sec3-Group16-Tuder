@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { getRole, getUserId } from "../../utils/jwtGet";
+import { getRole, getUserID } from "../../utils/jwtGet";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { submitCancelRequestHandler } from "../../handlers/cancelRequestHandler";
@@ -33,7 +33,7 @@ export default function UserCancelRequest() {
 
     const data = {
       matchId: matchId,
-      userId: getUserId(),
+      userId: getUserID(),
       title: formData.title,
       description: formData.description,
       img: formData.img.split(",")[1],
