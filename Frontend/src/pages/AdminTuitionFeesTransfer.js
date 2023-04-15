@@ -6,6 +6,7 @@ import Button from "../components/global/Button";
 import Footer from "../components/global/Footer";
 import { IsAdmin } from "../components/IsAuth";
 import { useNavigate, useLocation } from "react-router-dom";
+import { changeStatusHandler } from "../handlers/classesHandler";
 import { Timezone, DateFormat } from "../datas/DateFormat.js";
 
 export default function AdminTuitionFeesTransfer() {
@@ -43,7 +44,7 @@ export default function AdminTuitionFeesTransfer() {
   ];
   function paymentCallback(appointmentID) {
     // Change this to PUT /appointment/updatestatus/:appointmentID with status = "completed"
-    console.log("call back appointmentID: ", appointmentID).then((res) => {
+    changeStatusHandler(appointmentID, "completed").then((res) => {
       toast.success("Payment completed");
       navigate("/admin-tuition-fees");
     }).catch((err) => {
