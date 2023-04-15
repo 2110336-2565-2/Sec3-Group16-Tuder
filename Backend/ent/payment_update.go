@@ -6,10 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/appointment"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
@@ -51,14 +54,8 @@ func (pu *PaymentUpdate) ClearQrPictureURL() *PaymentUpdate {
 }
 
 // SetPaymentStatus sets the "payment_status" field.
-func (pu *PaymentUpdate) SetPaymentStatus(s string) *PaymentUpdate {
-	pu.mutation.SetPaymentStatus(s)
-	return pu
-}
-
-// SetCard sets the "card" field.
-func (pu *PaymentUpdate) SetCard(s string) *PaymentUpdate {
-	pu.mutation.SetCard(s)
+func (pu *PaymentUpdate) SetPaymentStatus(ps payment.PaymentStatus) *PaymentUpdate {
+	pu.mutation.SetPaymentStatus(ps)
 	return pu
 }
 
@@ -75,6 +72,24 @@ func (pu *PaymentUpdate) AddAmount(i int) *PaymentUpdate {
 	return pu
 }
 
+// SetCurrency sets the "currency" field.
+func (pu *PaymentUpdate) SetCurrency(s string) *PaymentUpdate {
+	pu.mutation.SetCurrency(s)
+	return pu
+}
+
+// SetChargeID sets the "charge_id" field.
+func (pu *PaymentUpdate) SetChargeID(s string) *PaymentUpdate {
+	pu.mutation.SetChargeID(s)
+	return pu
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (pu *PaymentUpdate) SetUpdatedAt(t time.Time) *PaymentUpdate {
+	pu.mutation.SetUpdatedAt(t)
+	return pu
+}
+
 // SetUserID sets the "user" edge to the User entity by ID.
 func (pu *PaymentUpdate) SetUserID(id uuid.UUID) *PaymentUpdate {
 	pu.mutation.SetUserID(id)
@@ -84,6 +99,44 @@ func (pu *PaymentUpdate) SetUserID(id uuid.UUID) *PaymentUpdate {
 // SetUser sets the "user" edge to the User entity.
 func (pu *PaymentUpdate) SetUser(u *User) *PaymentUpdate {
 	return pu.SetUserID(u.ID)
+}
+
+// SetMatchID sets the "match" edge to the Match entity by ID.
+func (pu *PaymentUpdate) SetMatchID(id uuid.UUID) *PaymentUpdate {
+	pu.mutation.SetMatchID(id)
+	return pu
+}
+
+// SetNillableMatchID sets the "match" edge to the Match entity by ID if the given value is not nil.
+func (pu *PaymentUpdate) SetNillableMatchID(id *uuid.UUID) *PaymentUpdate {
+	if id != nil {
+		pu = pu.SetMatchID(*id)
+	}
+	return pu
+}
+
+// SetMatch sets the "match" edge to the Match entity.
+func (pu *PaymentUpdate) SetMatch(m *Match) *PaymentUpdate {
+	return pu.SetMatchID(m.ID)
+}
+
+// SetAppointmentID sets the "appointment" edge to the Appointment entity by ID.
+func (pu *PaymentUpdate) SetAppointmentID(id uuid.UUID) *PaymentUpdate {
+	pu.mutation.SetAppointmentID(id)
+	return pu
+}
+
+// SetNillableAppointmentID sets the "appointment" edge to the Appointment entity by ID if the given value is not nil.
+func (pu *PaymentUpdate) SetNillableAppointmentID(id *uuid.UUID) *PaymentUpdate {
+	if id != nil {
+		pu = pu.SetAppointmentID(*id)
+	}
+	return pu
+}
+
+// SetAppointment sets the "appointment" edge to the Appointment entity.
+func (pu *PaymentUpdate) SetAppointment(a *Appointment) *PaymentUpdate {
+	return pu.SetAppointmentID(a.ID)
 }
 
 // AddPaymentHistoryIDs adds the "payment_history" edge to the PaymentHistory entity by IDs.
@@ -112,6 +165,18 @@ func (pu *PaymentUpdate) ClearUser() *PaymentUpdate {
 	return pu
 }
 
+// ClearMatch clears the "match" edge to the Match entity.
+func (pu *PaymentUpdate) ClearMatch() *PaymentUpdate {
+	pu.mutation.ClearMatch()
+	return pu
+}
+
+// ClearAppointment clears the "appointment" edge to the Appointment entity.
+func (pu *PaymentUpdate) ClearAppointment() *PaymentUpdate {
+	pu.mutation.ClearAppointment()
+	return pu
+}
+
 // ClearPaymentHistory clears all "payment_history" edges to the PaymentHistory entity.
 func (pu *PaymentUpdate) ClearPaymentHistory() *PaymentUpdate {
 	pu.mutation.ClearPaymentHistory()
@@ -135,6 +200,7 @@ func (pu *PaymentUpdate) RemovePaymentHistory(p ...*PaymentHistory) *PaymentUpda
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (pu *PaymentUpdate) Save(ctx context.Context) (int, error) {
+	pu.defaults()
 	return withHooks[int, PaymentMutation](ctx, pu.sqlSave, pu.mutation, pu.hooks)
 }
 
@@ -160,6 +226,14 @@ func (pu *PaymentUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (pu *PaymentUpdate) defaults() {
+	if _, ok := pu.mutation.UpdatedAt(); !ok {
+		v := payment.UpdateDefaultUpdatedAt()
+		pu.mutation.SetUpdatedAt(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (pu *PaymentUpdate) check() error {
 	if v, ok := pu.mutation.PaymentStatus(); ok {
@@ -167,14 +241,19 @@ func (pu *PaymentUpdate) check() error {
 			return &ValidationError{Name: "payment_status", err: fmt.Errorf(`ent: validator failed for field "Payment.payment_status": %w`, err)}
 		}
 	}
-	if v, ok := pu.mutation.Card(); ok {
-		if err := payment.CardValidator(v); err != nil {
-			return &ValidationError{Name: "card", err: fmt.Errorf(`ent: validator failed for field "Payment.card": %w`, err)}
-		}
-	}
 	if v, ok := pu.mutation.Amount(); ok {
 		if err := payment.AmountValidator(v); err != nil {
 			return &ValidationError{Name: "amount", err: fmt.Errorf(`ent: validator failed for field "Payment.amount": %w`, err)}
+		}
+	}
+	if v, ok := pu.mutation.Currency(); ok {
+		if err := payment.CurrencyValidator(v); err != nil {
+			return &ValidationError{Name: "currency", err: fmt.Errorf(`ent: validator failed for field "Payment.currency": %w`, err)}
+		}
+	}
+	if v, ok := pu.mutation.ChargeID(); ok {
+		if err := payment.ChargeIDValidator(v); err != nil {
+			return &ValidationError{Name: "charge_id", err: fmt.Errorf(`ent: validator failed for field "Payment.charge_id": %w`, err)}
 		}
 	}
 	if _, ok := pu.mutation.UserID(); pu.mutation.UserCleared() && !ok {
@@ -202,16 +281,22 @@ func (pu *PaymentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.ClearField(payment.FieldQrPictureURL, field.TypeString)
 	}
 	if value, ok := pu.mutation.PaymentStatus(); ok {
-		_spec.SetField(payment.FieldPaymentStatus, field.TypeString, value)
-	}
-	if value, ok := pu.mutation.Card(); ok {
-		_spec.SetField(payment.FieldCard, field.TypeString, value)
+		_spec.SetField(payment.FieldPaymentStatus, field.TypeEnum, value)
 	}
 	if value, ok := pu.mutation.Amount(); ok {
 		_spec.SetField(payment.FieldAmount, field.TypeInt, value)
 	}
 	if value, ok := pu.mutation.AddedAmount(); ok {
 		_spec.AddField(payment.FieldAmount, field.TypeInt, value)
+	}
+	if value, ok := pu.mutation.Currency(); ok {
+		_spec.SetField(payment.FieldCurrency, field.TypeString, value)
+	}
+	if value, ok := pu.mutation.ChargeID(); ok {
+		_spec.SetField(payment.FieldChargeID, field.TypeString, value)
+	}
+	if value, ok := pu.mutation.UpdatedAt(); ok {
+		_spec.SetField(payment.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if pu.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -235,6 +320,64 @@ func (pu *PaymentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if pu.mutation.MatchCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   payment.MatchTable,
+			Columns: []string{payment.MatchColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(match.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.MatchIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   payment.MatchTable,
+			Columns: []string{payment.MatchColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(match.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if pu.mutation.AppointmentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   payment.AppointmentTable,
+			Columns: []string{payment.AppointmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(appointment.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.AppointmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   payment.AppointmentTable,
+			Columns: []string{payment.AppointmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(appointment.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -328,14 +471,8 @@ func (puo *PaymentUpdateOne) ClearQrPictureURL() *PaymentUpdateOne {
 }
 
 // SetPaymentStatus sets the "payment_status" field.
-func (puo *PaymentUpdateOne) SetPaymentStatus(s string) *PaymentUpdateOne {
-	puo.mutation.SetPaymentStatus(s)
-	return puo
-}
-
-// SetCard sets the "card" field.
-func (puo *PaymentUpdateOne) SetCard(s string) *PaymentUpdateOne {
-	puo.mutation.SetCard(s)
+func (puo *PaymentUpdateOne) SetPaymentStatus(ps payment.PaymentStatus) *PaymentUpdateOne {
+	puo.mutation.SetPaymentStatus(ps)
 	return puo
 }
 
@@ -352,6 +489,24 @@ func (puo *PaymentUpdateOne) AddAmount(i int) *PaymentUpdateOne {
 	return puo
 }
 
+// SetCurrency sets the "currency" field.
+func (puo *PaymentUpdateOne) SetCurrency(s string) *PaymentUpdateOne {
+	puo.mutation.SetCurrency(s)
+	return puo
+}
+
+// SetChargeID sets the "charge_id" field.
+func (puo *PaymentUpdateOne) SetChargeID(s string) *PaymentUpdateOne {
+	puo.mutation.SetChargeID(s)
+	return puo
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (puo *PaymentUpdateOne) SetUpdatedAt(t time.Time) *PaymentUpdateOne {
+	puo.mutation.SetUpdatedAt(t)
+	return puo
+}
+
 // SetUserID sets the "user" edge to the User entity by ID.
 func (puo *PaymentUpdateOne) SetUserID(id uuid.UUID) *PaymentUpdateOne {
 	puo.mutation.SetUserID(id)
@@ -361,6 +516,44 @@ func (puo *PaymentUpdateOne) SetUserID(id uuid.UUID) *PaymentUpdateOne {
 // SetUser sets the "user" edge to the User entity.
 func (puo *PaymentUpdateOne) SetUser(u *User) *PaymentUpdateOne {
 	return puo.SetUserID(u.ID)
+}
+
+// SetMatchID sets the "match" edge to the Match entity by ID.
+func (puo *PaymentUpdateOne) SetMatchID(id uuid.UUID) *PaymentUpdateOne {
+	puo.mutation.SetMatchID(id)
+	return puo
+}
+
+// SetNillableMatchID sets the "match" edge to the Match entity by ID if the given value is not nil.
+func (puo *PaymentUpdateOne) SetNillableMatchID(id *uuid.UUID) *PaymentUpdateOne {
+	if id != nil {
+		puo = puo.SetMatchID(*id)
+	}
+	return puo
+}
+
+// SetMatch sets the "match" edge to the Match entity.
+func (puo *PaymentUpdateOne) SetMatch(m *Match) *PaymentUpdateOne {
+	return puo.SetMatchID(m.ID)
+}
+
+// SetAppointmentID sets the "appointment" edge to the Appointment entity by ID.
+func (puo *PaymentUpdateOne) SetAppointmentID(id uuid.UUID) *PaymentUpdateOne {
+	puo.mutation.SetAppointmentID(id)
+	return puo
+}
+
+// SetNillableAppointmentID sets the "appointment" edge to the Appointment entity by ID if the given value is not nil.
+func (puo *PaymentUpdateOne) SetNillableAppointmentID(id *uuid.UUID) *PaymentUpdateOne {
+	if id != nil {
+		puo = puo.SetAppointmentID(*id)
+	}
+	return puo
+}
+
+// SetAppointment sets the "appointment" edge to the Appointment entity.
+func (puo *PaymentUpdateOne) SetAppointment(a *Appointment) *PaymentUpdateOne {
+	return puo.SetAppointmentID(a.ID)
 }
 
 // AddPaymentHistoryIDs adds the "payment_history" edge to the PaymentHistory entity by IDs.
@@ -386,6 +579,18 @@ func (puo *PaymentUpdateOne) Mutation() *PaymentMutation {
 // ClearUser clears the "user" edge to the User entity.
 func (puo *PaymentUpdateOne) ClearUser() *PaymentUpdateOne {
 	puo.mutation.ClearUser()
+	return puo
+}
+
+// ClearMatch clears the "match" edge to the Match entity.
+func (puo *PaymentUpdateOne) ClearMatch() *PaymentUpdateOne {
+	puo.mutation.ClearMatch()
+	return puo
+}
+
+// ClearAppointment clears the "appointment" edge to the Appointment entity.
+func (puo *PaymentUpdateOne) ClearAppointment() *PaymentUpdateOne {
+	puo.mutation.ClearAppointment()
 	return puo
 }
 
@@ -425,6 +630,7 @@ func (puo *PaymentUpdateOne) Select(field string, fields ...string) *PaymentUpda
 
 // Save executes the query and returns the updated Payment entity.
 func (puo *PaymentUpdateOne) Save(ctx context.Context) (*Payment, error) {
+	puo.defaults()
 	return withHooks[*Payment, PaymentMutation](ctx, puo.sqlSave, puo.mutation, puo.hooks)
 }
 
@@ -450,6 +656,14 @@ func (puo *PaymentUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (puo *PaymentUpdateOne) defaults() {
+	if _, ok := puo.mutation.UpdatedAt(); !ok {
+		v := payment.UpdateDefaultUpdatedAt()
+		puo.mutation.SetUpdatedAt(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (puo *PaymentUpdateOne) check() error {
 	if v, ok := puo.mutation.PaymentStatus(); ok {
@@ -457,14 +671,19 @@ func (puo *PaymentUpdateOne) check() error {
 			return &ValidationError{Name: "payment_status", err: fmt.Errorf(`ent: validator failed for field "Payment.payment_status": %w`, err)}
 		}
 	}
-	if v, ok := puo.mutation.Card(); ok {
-		if err := payment.CardValidator(v); err != nil {
-			return &ValidationError{Name: "card", err: fmt.Errorf(`ent: validator failed for field "Payment.card": %w`, err)}
-		}
-	}
 	if v, ok := puo.mutation.Amount(); ok {
 		if err := payment.AmountValidator(v); err != nil {
 			return &ValidationError{Name: "amount", err: fmt.Errorf(`ent: validator failed for field "Payment.amount": %w`, err)}
+		}
+	}
+	if v, ok := puo.mutation.Currency(); ok {
+		if err := payment.CurrencyValidator(v); err != nil {
+			return &ValidationError{Name: "currency", err: fmt.Errorf(`ent: validator failed for field "Payment.currency": %w`, err)}
+		}
+	}
+	if v, ok := puo.mutation.ChargeID(); ok {
+		if err := payment.ChargeIDValidator(v); err != nil {
+			return &ValidationError{Name: "charge_id", err: fmt.Errorf(`ent: validator failed for field "Payment.charge_id": %w`, err)}
 		}
 	}
 	if _, ok := puo.mutation.UserID(); puo.mutation.UserCleared() && !ok {
@@ -509,16 +728,22 @@ func (puo *PaymentUpdateOne) sqlSave(ctx context.Context) (_node *Payment, err e
 		_spec.ClearField(payment.FieldQrPictureURL, field.TypeString)
 	}
 	if value, ok := puo.mutation.PaymentStatus(); ok {
-		_spec.SetField(payment.FieldPaymentStatus, field.TypeString, value)
-	}
-	if value, ok := puo.mutation.Card(); ok {
-		_spec.SetField(payment.FieldCard, field.TypeString, value)
+		_spec.SetField(payment.FieldPaymentStatus, field.TypeEnum, value)
 	}
 	if value, ok := puo.mutation.Amount(); ok {
 		_spec.SetField(payment.FieldAmount, field.TypeInt, value)
 	}
 	if value, ok := puo.mutation.AddedAmount(); ok {
 		_spec.AddField(payment.FieldAmount, field.TypeInt, value)
+	}
+	if value, ok := puo.mutation.Currency(); ok {
+		_spec.SetField(payment.FieldCurrency, field.TypeString, value)
+	}
+	if value, ok := puo.mutation.ChargeID(); ok {
+		_spec.SetField(payment.FieldChargeID, field.TypeString, value)
+	}
+	if value, ok := puo.mutation.UpdatedAt(); ok {
+		_spec.SetField(payment.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if puo.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -542,6 +767,64 @@ func (puo *PaymentUpdateOne) sqlSave(ctx context.Context) (_node *Payment, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if puo.mutation.MatchCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   payment.MatchTable,
+			Columns: []string{payment.MatchColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(match.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.MatchIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   payment.MatchTable,
+			Columns: []string{payment.MatchColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(match.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if puo.mutation.AppointmentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   payment.AppointmentTable,
+			Columns: []string{payment.AppointmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(appointment.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.AppointmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   payment.AppointmentTable,
+			Columns: []string{payment.AppointmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(appointment.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

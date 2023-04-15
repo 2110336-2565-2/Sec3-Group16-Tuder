@@ -15,6 +15,7 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/cancelrequest"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
@@ -33,6 +34,7 @@ type MatchQuery struct {
 	withAppointment   *AppointmentQuery
 	withSchedule      *ScheduleQuery
 	withCancelRequest *CancelRequestQuery
+	withPayment       *PaymentQuery
 	withFKs           bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -173,6 +175,28 @@ func (mq *MatchQuery) QueryCancelRequest() *CancelRequestQuery {
 			sqlgraph.From(match.Table, match.FieldID, selector),
 			sqlgraph.To(cancelrequest.Table, cancelrequest.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, match.CancelRequestTable, match.CancelRequestColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryPayment chains the current query on the "payment" edge.
+func (mq *MatchQuery) QueryPayment() *PaymentQuery {
+	query := (&PaymentClient{config: mq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := mq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := mq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(match.Table, match.FieldID, selector),
+			sqlgraph.To(payment.Table, payment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, match.PaymentTable, match.PaymentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
 		return fromU, nil
@@ -377,6 +401,7 @@ func (mq *MatchQuery) Clone() *MatchQuery {
 		withAppointment:   mq.withAppointment.Clone(),
 		withSchedule:      mq.withSchedule.Clone(),
 		withCancelRequest: mq.withCancelRequest.Clone(),
+		withPayment:       mq.withPayment.Clone(),
 		// clone intermediate query.
 		sql:  mq.sql.Clone(),
 		path: mq.path,
@@ -435,6 +460,17 @@ func (mq *MatchQuery) WithCancelRequest(opts ...func(*CancelRequestQuery)) *Matc
 		opt(query)
 	}
 	mq.withCancelRequest = query
+	return mq
+}
+
+// WithPayment tells the query-builder to eager-load the nodes that are connected to
+// the "payment" edge. The optional arguments are used to configure the query builder of the edge.
+func (mq *MatchQuery) WithPayment(opts ...func(*PaymentQuery)) *MatchQuery {
+	query := (&PaymentClient{config: mq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	mq.withPayment = query
 	return mq
 }
 
@@ -517,15 +553,16 @@ func (mq *MatchQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Match,
 		nodes       = []*Match{}
 		withFKs     = mq.withFKs
 		_spec       = mq.querySpec()
-		loadedTypes = [5]bool{
+		loadedTypes = [6]bool{
 			mq.withStudent != nil,
 			mq.withCourse != nil,
 			mq.withAppointment != nil,
 			mq.withSchedule != nil,
 			mq.withCancelRequest != nil,
+			mq.withPayment != nil,
 		}
 	)
-	if mq.withStudent != nil || mq.withCourse != nil || mq.withSchedule != nil {
+	if mq.withStudent != nil || mq.withCourse != nil || mq.withSchedule != nil || mq.withPayment != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -578,6 +615,12 @@ func (mq *MatchQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Match,
 		if err := mq.loadCancelRequest(ctx, query, nodes,
 			func(n *Match) { n.Edges.CancelRequest = []*CancelRequest{} },
 			func(n *Match, e *CancelRequest) { n.Edges.CancelRequest = append(n.Edges.CancelRequest, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := mq.withPayment; query != nil {
+		if err := mq.loadPayment(ctx, query, nodes, nil,
+			func(n *Match, e *Payment) { n.Edges.Payment = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -739,6 +782,38 @@ func (mq *MatchQuery) loadCancelRequest(ctx context.Context, query *CancelReques
 			return fmt.Errorf(`unexpected foreign-key "cancel_request_match" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
+	}
+	return nil
+}
+func (mq *MatchQuery) loadPayment(ctx context.Context, query *PaymentQuery, nodes []*Match, init func(*Match), assign func(*Match, *Payment)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Match)
+	for i := range nodes {
+		if nodes[i].payment_match == nil {
+			continue
+		}
+		fk := *nodes[i].payment_match
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(payment.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "payment_match" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }

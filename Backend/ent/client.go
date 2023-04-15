@@ -396,6 +396,22 @@ func (c *AppointmentClient) QueryMatch(a *Appointment) *MatchQuery {
 	return query
 }
 
+// QueryPayment queries the payment edge of a Appointment.
+func (c *AppointmentClient) QueryPayment(a *Appointment) *PaymentQuery {
+	query := (&PaymentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(appointment.Table, appointment.FieldID, id),
+			sqlgraph.To(payment.Table, payment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, appointment.PaymentTable, appointment.PaymentColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *AppointmentClient) Hooks() []Hook {
 	return c.hooks.Appointment
@@ -1028,6 +1044,22 @@ func (c *MatchClient) QueryCancelRequest(m *Match) *CancelRequestQuery {
 	return query
 }
 
+// QueryPayment queries the payment edge of a Match.
+func (c *MatchClient) QueryPayment(m *Match) *PaymentQuery {
+	query := (&PaymentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(match.Table, match.FieldID, id),
+			sqlgraph.To(payment.Table, payment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, match.PaymentTable, match.PaymentColumn),
+		)
+		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *MatchClient) Hooks() []Hook {
 	return c.hooks.Match
@@ -1155,6 +1187,38 @@ func (c *PaymentClient) QueryUser(pa *Payment) *UserQuery {
 			sqlgraph.From(payment.Table, payment.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, payment.UserTable, payment.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(pa.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryMatch queries the match edge of a Payment.
+func (c *PaymentClient) QueryMatch(pa *Payment) *MatchQuery {
+	query := (&MatchClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pa.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(payment.Table, payment.FieldID, id),
+			sqlgraph.To(match.Table, match.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, payment.MatchTable, payment.MatchColumn),
+		)
+		fromV = sqlgraph.Neighbors(pa.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAppointment queries the appointment edge of a Payment.
+func (c *PaymentClient) QueryAppointment(pa *Payment) *AppointmentQuery {
+	query := (&AppointmentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pa.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(payment.Table, payment.FieldID, id),
+			sqlgraph.To(appointment.Table, appointment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, payment.AppointmentTable, payment.AppointmentColumn),
 		)
 		fromV = sqlgraph.Neighbors(pa.driver.Dialect(), step)
 		return fromV, nil

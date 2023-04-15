@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/google/uuid"
@@ -26,6 +27,7 @@ type Match struct {
 	// The values are being populated by the MatchQuery when eager-loading is set.
 	Edges          MatchEdges `json:"edges"`
 	course_match   *uuid.UUID
+	payment_match  *uuid.UUID
 	schedule_match *uuid.UUID
 	student_match  *uuid.UUID
 }
@@ -42,9 +44,11 @@ type MatchEdges struct {
 	Schedule *Schedule `json:"schedule,omitempty"`
 	// CancelRequest holds the value of the cancel_request edge.
 	CancelRequest []*CancelRequest `json:"cancel_request,omitempty"`
+	// Payment holds the value of the payment edge.
+	Payment *Payment `json:"payment,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [6]bool
 }
 
 // StudentOrErr returns the Student value or an error if the edge
@@ -104,6 +108,19 @@ func (e MatchEdges) CancelRequestOrErr() ([]*CancelRequest, error) {
 	return nil, &NotLoadedError{edge: "cancel_request"}
 }
 
+// PaymentOrErr returns the Payment value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e MatchEdges) PaymentOrErr() (*Payment, error) {
+	if e.loadedTypes[5] {
+		if e.Payment == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: payment.Label}
+		}
+		return e.Payment, nil
+	}
+	return nil, &NotLoadedError{edge: "payment"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Match) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -115,9 +132,11 @@ func (*Match) scanValues(columns []string) ([]any, error) {
 			values[i] = new(uuid.UUID)
 		case match.ForeignKeys[0]: // course_match
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
-		case match.ForeignKeys[1]: // schedule_match
+		case match.ForeignKeys[1]: // payment_match
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
-		case match.ForeignKeys[2]: // student_match
+		case match.ForeignKeys[2]: // schedule_match
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case match.ForeignKeys[3]: // student_match
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Match", columns[i])
@@ -155,12 +174,19 @@ func (m *Match) assignValues(columns []string, values []any) error {
 			}
 		case match.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field payment_match", values[i])
+			} else if value.Valid {
+				m.payment_match = new(uuid.UUID)
+				*m.payment_match = *value.S.(*uuid.UUID)
+			}
+		case match.ForeignKeys[2]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field schedule_match", values[i])
 			} else if value.Valid {
 				m.schedule_match = new(uuid.UUID)
 				*m.schedule_match = *value.S.(*uuid.UUID)
 			}
-		case match.ForeignKeys[2]:
+		case match.ForeignKeys[3]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field student_match", values[i])
 			} else if value.Valid {
@@ -195,6 +221,11 @@ func (m *Match) QuerySchedule() *ScheduleQuery {
 // QueryCancelRequest queries the "cancel_request" edge of the Match entity.
 func (m *Match) QueryCancelRequest() *CancelRequestQuery {
 	return NewMatchClient(m.config).QueryCancelRequest(m)
+}
+
+// QueryPayment queries the "payment" edge of the Match entity.
+func (m *Match) QueryPayment() *PaymentQuery {
+	return NewMatchClient(m.config).QueryPayment(m)
 }
 
 // Update returns a builder for updating this Match.
