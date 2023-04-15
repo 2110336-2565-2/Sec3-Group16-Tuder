@@ -15,8 +15,8 @@ import (
 )
 
 type RepositoryAppointment interface {
-	GetAppointmentByStudentID(sr *schemas.SchemaGetAppointmentByID) ([]*schemas.SchemaAppointmentFromID, error)
-	GetAppointmentByTutorID(sr *schemas.SchemaGetAppointmentByID) ([]*schemas.SchemaAppointmentFromID, error)
+	GetMatchByStudentID(sr *schemas.SchemaGetMatchByID) ([]*schemas.SchemaMatchesFromID, error)
+	GetMatchByTutorID(sr *schemas.SchemaGetMatchByID) ([]*schemas.SchemaMatchesFromID, error)
 	UpdateAppointmentStatus(sr *schemas.SchemaUpdateAppointmentStatus) (*ent.Appointment, error)
 }
 
@@ -29,11 +29,13 @@ func NewRepositoryAppointment(c *ent.Client) *repositoryAppointment {
 	return &repositoryAppointment{client: c, ctx: context.Background()}
 }
 
-func (r *repositoryAppointment) GetAppointmentByStudentID(sr *schemas.SchemaGetAppointmentByID) ([]*schemas.SchemaAppointmentFromID, error) {
+func (r *repositoryAppointment) GetMatchByStudentID(sr *schemas.SchemaGetMatchByID) ([]*schemas.SchemaMatchesFromID, error) {
 	matches, err := r.client.Match.
 		Query().
 		Where(entMatch.HasStudentWith(entStudent.IDEQ(sr.ID))).
-		WithAppointment().
+		WithAppointment(func(tq *ent.AppointmentQuery) {
+			tq.Order(ent.Asc(appointment.FieldBeginAt))
+		}).
 		WithCourse(func(tq *ent.CourseQuery) {
 			tq.WithTutor(func(tq *ent.TutorQuery) {
 				tq.WithUser()
@@ -44,21 +46,32 @@ func (r *repositoryAppointment) GetAppointmentByStudentID(sr *schemas.SchemaGetA
 	if err != nil {
 		return nil, err
 	}
-	schemaAppointments := make([]*schemas.SchemaAppointmentFromID, 0)
+	schemaAppointments := make([]*schemas.SchemaMatchesFromID, 0)
 	for _, match := range matches {
-		schemaAppointments = append(schemaAppointments, &schemas.SchemaAppointmentFromID{
-			MatchID:     match.ID,
-			Appointment: match.Edges.Appointment,
-			Course:      match.Edges.Course,
-			Course_name: match.Edges.Course.Title,
-			Tutor_name:  match.Edges.Course.Edges.Tutor.Edges.User.Username,
+		remaining := 0
+		var upcoming_class time.Time
+		found_upcoming := false
+		for _, app := range match.Edges.Appointment {
+			if app.Status.String() == "comingsoon" {
+				remaining = remaining + 1
+				if found_upcoming == false {
+					upcoming_class = app.BeginAt
+					found_upcoming = true
+				}
+			}
+		}
+		schemaAppointments = append(schemaAppointments, &schemas.SchemaMatchesFromID{
+			MatchID:       match.ID,
+			CourseName:    match.Edges.Course.Title,
+			TutorName:     match.Edges.Course.Edges.Tutor.Edges.User.Username,
+			UpcomingClass: upcoming_class,
+			Remaining:     remaining,
 		})
 	}
-	fmt.Println("Student work")
 	return schemaAppointments, nil
 }
 
-func (r *repositoryAppointment) GetAppointmentByTutorID(sr *schemas.SchemaGetAppointmentByID) ([]*schemas.SchemaAppointmentFromID, error) {
+func (r *repositoryAppointment) GetMatchByTutorID(sr *schemas.SchemaGetMatchByID) ([]*schemas.SchemaMatchesFromID, error) {
 	matches, err := r.client.Match.
 		Query().
 		Where(entMatch.HasCourseWith(entCourse.HasTutorWith(entTutor.IDEQ(sr.ID)))).
@@ -73,18 +86,28 @@ func (r *repositoryAppointment) GetAppointmentByTutorID(sr *schemas.SchemaGetApp
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(matches)
-	schemaAppointments := make([]*schemas.SchemaAppointmentFromID, 0)
+	schemaAppointments := make([]*schemas.SchemaMatchesFromID, 0)
 	for _, match := range matches {
-		schemaAppointments = append(schemaAppointments, &schemas.SchemaAppointmentFromID{
-			MatchID:     match.ID,
-			Appointment: match.Edges.Appointment,
-			Course:      match.Edges.Course,
-			Course_name: match.Edges.Course.Title,
-			Tutor_name:  match.Edges.Course.Edges.Tutor.Edges.User.Username,
+		remaining := 0
+		var upcoming_class time.Time
+		found_upcoming := false
+		for _, app := range match.Edges.Appointment {
+			if app.Status.String() == "comingsoon" {
+				remaining = remaining + 1
+				if found_upcoming == false {
+					upcoming_class = app.BeginAt
+					found_upcoming = true
+				}
+			}
+		}
+		schemaAppointments = append(schemaAppointments, &schemas.SchemaMatchesFromID{
+			MatchID:       match.ID,
+			CourseName:    match.Edges.Course.Title,
+			TutorName:     match.Edges.Course.Edges.Tutor.Edges.User.Username,
+			UpcomingClass: upcoming_class,
+			Remaining:     remaining,
 		})
 	}
-	fmt.Println("Tutor work")
 	return schemaAppointments, nil
 }
 
