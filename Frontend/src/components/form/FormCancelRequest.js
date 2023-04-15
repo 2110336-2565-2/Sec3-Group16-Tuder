@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { getRole, getUserID } from "../../utils/jwtGet";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { submitCancelRequestHandler } from "../../handlers/cancelRequestHandler";
 import FileUploader from "../global/FileUploader";
 
 export default function UserCancelRequest() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -43,7 +44,7 @@ export default function UserCancelRequest() {
       .then((res) => {
         if (res.data.success) {
           toast.success("Success");
-          navigate("/");
+          navigate("/classes");
         }
       })
       .catch((err) => {
@@ -65,8 +66,8 @@ export default function UserCancelRequest() {
         name="img"
       />
       <Title>Course Cancellation & Refund</Title>
-      <SubTitle>ucourse name</SubTitle>
-      <SubTitle>ufirstname ulastname</SubTitle>
+      <SubTitle>{location.state.course_name}</SubTitle>
+      <SubTitle>{location.state.tutor_name}</SubTitle>
 
       <TopicSection>
         <Topic>Title</Topic>

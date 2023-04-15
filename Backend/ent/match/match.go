@@ -3,6 +3,7 @@
 package match
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -15,6 +16,8 @@ const (
 	FieldID = "id"
 	// FieldMatchCreatedAt holds the string denoting the match_created_at field in the database.
 	FieldMatchCreatedAt = "match_created_at"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
 	// EdgeStudent holds the string denoting the student edge name in mutations.
 	EdgeStudent = "student"
 	// EdgeCourse holds the string denoting the course edge name in mutations.
@@ -68,6 +71,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldMatchCreatedAt,
+	FieldStatus,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "matches"
@@ -99,3 +103,31 @@ var (
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
+
+// Status defines the type for the "status" enum field.
+type Status string
+
+// StatusEnrolled is the default value of the Status enum.
+const DefaultStatus = StatusEnrolled
+
+// Status values.
+const (
+	StatusEnrolled   Status = "enrolled"
+	StatusCompleted  Status = "completed"
+	StatusCancelling Status = "cancelling"
+	StatusCanceled   Status = "canceled"
+)
+
+func (s Status) String() string {
+	return string(s)
+}
+
+// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
+func StatusValidator(s Status) error {
+	switch s {
+	case StatusEnrolled, StatusCompleted, StatusCancelling, StatusCanceled:
+		return nil
+	default:
+		return fmt.Errorf("match: invalid enum value for status field: %q", s)
+	}
+}

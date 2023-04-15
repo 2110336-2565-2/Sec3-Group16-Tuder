@@ -10,6 +10,7 @@ export default function MyClass(props) {
   const tutor_name = props.data.tutor_name;
   const navigate = useNavigate();
   const remaining = props.data.remaining;
+  const status = props.data.status;
   // the first appointment in the array which is in state coming soon
   const upcoming =
     remaining != 0
@@ -39,6 +40,10 @@ export default function MyClass(props) {
             <ClassInfo>
               <InfoTitle min_w="105px">Remaining :</InfoTitle>
               <InfoDesc>{remaining} hrs</InfoDesc>
+            </ClassInfo>
+            <ClassInfo>
+              <InfoTitle min_w="105px">Status :</InfoTitle>
+              <InfoDesc>{status}</InfoDesc>
             </ClassInfo>
           </ClassFlex>
         </ClassInfoSection>

@@ -33,6 +33,20 @@ func (mu *MatchUpdate) Where(ps ...predicate.Match) *MatchUpdate {
 	return mu
 }
 
+// SetStatus sets the "status" field.
+func (mu *MatchUpdate) SetStatus(m match.Status) *MatchUpdate {
+	mu.mutation.SetStatus(m)
+	return mu
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (mu *MatchUpdate) SetNillableStatus(m *match.Status) *MatchUpdate {
+	if m != nil {
+		mu.SetStatus(*m)
+	}
+	return mu
+}
+
 // SetStudentID sets the "student" edge to the Student entity by ID.
 func (mu *MatchUpdate) SetStudentID(id uuid.UUID) *MatchUpdate {
 	mu.mutation.SetStudentID(id)
@@ -190,6 +204,11 @@ func (mu *MatchUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (mu *MatchUpdate) check() error {
+	if v, ok := mu.mutation.Status(); ok {
+		if err := match.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Match.status": %w`, err)}
+		}
+	}
 	if _, ok := mu.mutation.StudentID(); mu.mutation.StudentCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Match.student"`)
 	}
@@ -213,6 +232,9 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := mu.mutation.Status(); ok {
+		_spec.SetField(match.FieldStatus, field.TypeEnum, value)
 	}
 	if mu.mutation.StudentCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -411,6 +433,20 @@ type MatchUpdateOne struct {
 	mutation *MatchMutation
 }
 
+// SetStatus sets the "status" field.
+func (muo *MatchUpdateOne) SetStatus(m match.Status) *MatchUpdateOne {
+	muo.mutation.SetStatus(m)
+	return muo
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (muo *MatchUpdateOne) SetNillableStatus(m *match.Status) *MatchUpdateOne {
+	if m != nil {
+		muo.SetStatus(*m)
+	}
+	return muo
+}
+
 // SetStudentID sets the "student" edge to the Student entity by ID.
 func (muo *MatchUpdateOne) SetStudentID(id uuid.UUID) *MatchUpdateOne {
 	muo.mutation.SetStudentID(id)
@@ -581,6 +617,11 @@ func (muo *MatchUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (muo *MatchUpdateOne) check() error {
+	if v, ok := muo.mutation.Status(); ok {
+		if err := match.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Match.status": %w`, err)}
+		}
+	}
 	if _, ok := muo.mutation.StudentID(); muo.mutation.StudentCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Match.student"`)
 	}
@@ -621,6 +662,9 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := muo.mutation.Status(); ok {
+		_spec.SetField(match.FieldStatus, field.TypeEnum, value)
 	}
 	if muo.mutation.StudentCleared() {
 		edge := &sqlgraph.EdgeSpec{

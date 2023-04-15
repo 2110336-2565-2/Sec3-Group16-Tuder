@@ -24,6 +24,7 @@ type SchemaMatchesFromID struct {
 	UpcomingClass time.Time `json:"upcoming_class"`
 	Remaining     int       `json:"remaining"`
 	CoursePictureURL string `json:"course_picture_url"`
+	Status 	  string    `json:"status"`
 }
 
 type SchemaGetAppointmentByMatchID struct {

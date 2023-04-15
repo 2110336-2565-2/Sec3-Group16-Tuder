@@ -3,8 +3,8 @@ import styled from "styled-components";
 import { submitAudditing } from "../handlers/cancellingRequestHandler";
 import { toast } from "react-hot-toast";
 import { Timezone, DateFormat } from "../datas/DateFormat.js";
-
 export default function CancelRequest(props) {
+ 
   return (
     <Request state={props.status} status={props.status}>
       <ClassSection>
@@ -75,7 +75,7 @@ const Request = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;
-  background-color: #EBEBEB;
+  background-color: #ebebeb;
   color: #000000;
   border: 1px solid #dadada;
   min-height: 167px;
@@ -87,7 +87,7 @@ const Request = styled.div`
     box-shadow: 5px 6px 11px -3px rgba(0, 0, 0, 0.81);
     -webkit-box-shadow: 5px 6px 11px -7px rgba(0, 0, 0, 0.81);
     -moz-box-shadow: 5px 6px 11px -7px rgba(0, 0, 0, 0.81);
-    background-color: #EBEFEB;
+    background-color: #ebefeb;
   }
 `;
 

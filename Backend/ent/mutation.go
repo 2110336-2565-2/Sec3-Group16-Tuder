@@ -2841,6 +2841,7 @@ type MatchMutation struct {
 	typ                   string
 	id                    *uuid.UUID
 	match_created_at      *time.Time
+	status                *match.Status
 	clearedFields         map[string]struct{}
 	student               *uuid.UUID
 	clearedstudent        bool
@@ -2997,6 +2998,42 @@ func (m *MatchMutation) OldMatchCreatedAt(ctx context.Context) (v time.Time, err
 // ResetMatchCreatedAt resets all changes to the "match_created_at" field.
 func (m *MatchMutation) ResetMatchCreatedAt() {
 	m.match_created_at = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *MatchMutation) SetStatus(value match.Status) {
+	m.status = &value
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *MatchMutation) Status() (r match.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Match entity.
+// If the Match object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MatchMutation) OldStatus(ctx context.Context) (v match.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *MatchMutation) ResetStatus() {
+	m.status = nil
 }
 
 // SetStudentID sets the "student" edge to the Student entity by id.
@@ -3258,9 +3295,12 @@ func (m *MatchMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MatchMutation) Fields() []string {
-	fields := make([]string, 0, 1)
+	fields := make([]string, 0, 2)
 	if m.match_created_at != nil {
 		fields = append(fields, match.FieldMatchCreatedAt)
+	}
+	if m.status != nil {
+		fields = append(fields, match.FieldStatus)
 	}
 	return fields
 }
@@ -3272,6 +3312,8 @@ func (m *MatchMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case match.FieldMatchCreatedAt:
 		return m.MatchCreatedAt()
+	case match.FieldStatus:
+		return m.Status()
 	}
 	return nil, false
 }
@@ -3283,6 +3325,8 @@ func (m *MatchMutation) OldField(ctx context.Context, name string) (ent.Value, e
 	switch name {
 	case match.FieldMatchCreatedAt:
 		return m.OldMatchCreatedAt(ctx)
+	case match.FieldStatus:
+		return m.OldStatus(ctx)
 	}
 	return nil, fmt.Errorf("unknown Match field %s", name)
 }
@@ -3298,6 +3342,13 @@ func (m *MatchMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetMatchCreatedAt(v)
+		return nil
+	case match.FieldStatus:
+		v, ok := value.(match.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Match field %s", name)
@@ -3350,6 +3401,9 @@ func (m *MatchMutation) ResetField(name string) error {
 	switch name {
 	case match.FieldMatchCreatedAt:
 		m.ResetMatchCreatedAt()
+		return nil
+	case match.FieldStatus:
+		m.ResetStatus()
 		return nil
 	}
 	return fmt.Errorf("unknown Match field %s", name)

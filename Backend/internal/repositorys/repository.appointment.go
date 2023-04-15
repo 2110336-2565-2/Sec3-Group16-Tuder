@@ -56,7 +56,7 @@ func (r *repositoryAppointment) GetMatchByStudentID(sr *schemas.SchemaGetMatchBy
 		for _, app := range match.Edges.Appointment {
 			if app.Status.String() == "comingsoon" {
 				remaining = remaining + 1
-				if found_upcoming == false {
+				if !found_upcoming {
 					upcoming_class = app.BeginAt
 					found_upcoming = true
 				}
@@ -70,6 +70,7 @@ func (r *repositoryAppointment) GetMatchByStudentID(sr *schemas.SchemaGetMatchBy
 			UpcomingClass: upcoming_class,
 			Remaining:     remaining,
 			CoursePictureURL: *match.Edges.Course.CoursePictureURL,
+			Status:  	match.Status.String(),
 		})
 	}
 	return schemaAppointments, nil
@@ -100,7 +101,7 @@ func (r *repositoryAppointment) GetMatchByTutorID(sr *schemas.SchemaGetMatchByID
 		for _, app := range match.Edges.Appointment {
 			if app.Status.String() == "comingsoon" {
 				remaining = remaining + 1
-				if found_upcoming == false {
+				if !found_upcoming {
 					upcoming_class = app.BeginAt
 					found_upcoming = true
 				}
@@ -114,6 +115,7 @@ func (r *repositoryAppointment) GetMatchByTutorID(sr *schemas.SchemaGetMatchByID
 			UpcomingClass: upcoming_class,
 			Remaining:     remaining,
 			CoursePictureURL: *match.Edges.Course.CoursePictureURL,
+			Status:  	match.Status.String(),
 		})
 	}
 	return schemaAppointments, nil
@@ -130,6 +132,7 @@ func (r *repositoryAppointment) GetAppointmentByMatchID(sr *schemas.SchemaGetApp
 				})
 			})
 		}).
+		Order(ent.Asc(appointment.FieldBeginAt)).
 		All(r.ctx)
 
 	if err != nil {
@@ -184,6 +187,46 @@ func (r *repositoryAppointment) UpdateAppointmentStatus(sr *schemas.SchemaUpdate
 		}
 		return nil, fmt.Errorf("updating appointment status: %w", err)
 	}
+
+	// find match id from appointment
+	match, err := txc.Match.Query().Where(entMatch.HasAppointmentWith(entAppointment.IDEQ(sr.ID))).Only(r.ctx)
+	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+		return nil, fmt.Errorf("finding match id from appointment: %w", err)
+	}
+
+	// find all appointments from match
+	appointments, err := txc.Appointment.Query().Where(entAppointment.HasMatchWith(entMatch.IDEQ(match.ID))).All(r.ctx)
+	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+		return nil, fmt.Errorf("finding all appointments from match: %w", err)
+	}
+
+	state := true
+	for _, app := range appointments {
+		if app.Status.String() != "completed" {
+			state = false
+			break
+		}
+	}
+
+	if state {
+		// update match status
+		_, err = txc.Match.UpdateOneID(match.ID).SetStatus(entMatch.Status("completed")).Save(r.ctx)
+		if err != nil {
+			if rerr := tx.Rollback(); rerr != nil {
+				err = fmt.Errorf("%w: %v", err, rerr)
+			}
+			return nil, fmt.Errorf("updating match status: %w", err)
+		}
+	}
+
+
+
 	return appointment, tx.Commit()
 }
 

@@ -22,6 +22,8 @@ type Match struct {
 	ID uuid.UUID `json:"id,omitempty"`
 	// MatchCreatedAt holds the value of the "match_created_at" field.
 	MatchCreatedAt time.Time `json:"match_created_at,omitempty"`
+	// Status holds the value of the "status" field.
+	Status match.Status `json:"status,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MatchQuery when eager-loading is set.
 	Edges          MatchEdges `json:"edges"`
@@ -109,6 +111,8 @@ func (*Match) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case match.FieldStatus:
+			values[i] = new(sql.NullString)
 		case match.FieldMatchCreatedAt:
 			values[i] = new(sql.NullTime)
 		case match.FieldID:
@@ -145,6 +149,12 @@ func (m *Match) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field match_created_at", values[i])
 			} else if value.Valid {
 				m.MatchCreatedAt = value.Time
+			}
+		case match.FieldStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
+			} else if value.Valid {
+				m.Status = match.Status(value.String)
 			}
 		case match.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -222,6 +232,9 @@ func (m *Match) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", m.ID))
 	builder.WriteString("match_created_at=")
 	builder.WriteString(m.MatchCreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("status=")
+	builder.WriteString(fmt.Sprintf("%v", m.Status))
 	builder.WriteByte(')')
 	return builder.String()
 }

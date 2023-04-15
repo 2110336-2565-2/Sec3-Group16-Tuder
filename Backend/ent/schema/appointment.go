@@ -20,7 +20,7 @@ func (Appointment) Fields() []ent.Field {
 			Default(uuid.New).Unique().StorageKey("id").Immutable(),
 		field.Time("begin_at").Immutable(),
 		field.Time("end_at").Immutable(),
-		field.Enum("status").Values("comingsoon", "ongoing", "verifying", "pending", "completed", "posponed", "considering").Default("comingsoon"),
+		field.Enum("status").Values("comingsoon", "ongoing", "verifying", "pending", "completed", "postponed", "considering", "canceled").Default("comingsoon"),
 		// comingsoon -> future appointment
 		// ongoing -> currunt appointment
 		// verifying -> appointment which waiting for student's approval
@@ -28,6 +28,7 @@ func (Appointment) Fields() []ent.Field {
 		// completed -> completed appointmnet
 		// posponed -> appointment which student disapprove
 		// considering -> appointment which have conflivt between tutor and student, waiting for admin
+		// canceled -> appointment which canceled by student or tutor
 	}
 }
 
