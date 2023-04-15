@@ -43,9 +43,7 @@ export default function FormSignUp() {
     "Birth Date": setBirthDate,
     Role: setRole,
   };
-
   const setStatus = useState("waiting")[1];
-
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   async function submitHandler(e) {
@@ -54,7 +52,17 @@ export default function FormSignUp() {
     setIsSubmitting(true);
     const loadingToast = toast.loading("Signing up...");
     let birthdateISO = new Date(birthdate).toISOString();
-    const signUpData = {
+    const omiseData =
+      role === "tutor"
+        ? {
+            expiration_month: parseInt(expiryDate.split("/")[0].trim()),
+            expiration_year: parseInt(expiryDate.split("/")[1].trim()),
+            name: cardHolderName,
+            number: cardNumber,
+            security_code: cvv,
+          }
+        : null;
+    const studentSignUpData = {
       username: username,
       password: password,
       email: email,
@@ -68,25 +76,50 @@ export default function FormSignUp() {
       role: role,
       citizen_id: role === "tutor" ? citizenID : "",
       description: role === "tutor" ? description : "",
-      card_holder_name: role === "tutor" ? cardHolderName : "",
-      card_number: role === "tutor" ? cardNumber : "",
-      expiration_month: role === "tutor" ? parseInt(expiryDate.split("/")[0].trim()) : "",
-      expiration_year: role === "tutor" ? parseInt(expiryDate.split("/")[1].trim()) : "",
-      security_code: role === "tutor" ? cvv : "",
     };
     setStatus("submitting");
-    try {
-      await signUpHandler(signUpData, navigate);
-      toast.dismiss(loadingToast);
-      toast.success("Sign up successfully");
-      setStatus("success");
-      setIsSubmitting(false);
-    } catch (error) {
-      // Handle by do sth
-      toast.dismiss(loadingToast);
-      toast.error(error.message);
-      setStatus("error");
-      setIsSubmitting(false);
+    if (role === "tutor") {
+      Omise.setPublicKey(process.env.REACT_APP_OMISE_PUBLIC_KEY);
+      Omise.createToken("card", omiseData, (statusCode, response) => {
+        if (statusCode === 200) {
+          const tutorSignUpData = {
+            ...studentSignUpData,
+            omise_bank_token: response.id,
+          };
+          signUpHandler(tutorSignUpData, navigate)
+            .then(() => {
+              toast.dismiss(loadingToast);
+              toast.success("Sign up successfully");
+              setStatus("success");
+              setIsSubmitting(false);
+            })
+            .catch((error) => {
+              toast.dismiss(loadingToast);
+              toast.error(error.message);
+              setStatus("error");
+              setIsSubmitting(false);
+            });
+        } else {
+          toast.dismiss(loadingToast);
+          toast.error(response.message);
+          setStatus("error");
+          setIsSubmitting(false);
+        }
+      });
+    } else {
+      signUpHandler(studentSignUpData, navigate)
+        .then(() => {
+          toast.dismiss(loadingToast);
+          toast.success("Sign up successfully");
+          setStatus("success");
+          setIsSubmitting(false);
+        })
+        .catch((error) => {
+          toast.dismiss(loadingToast);
+          toast.error(error.message);
+          setStatus("error");
+          setIsSubmitting(false);
+        });
     }
   }
 
@@ -293,14 +326,14 @@ export default function FormSignUp() {
                     pattern="^(0[1-9]|1[0-2])\s\/\s[0-9]{4}$"
                     maxLength="9"
                     minLength="9"
-                    onChange={(e) =>{
-                        const formattedValue = e.target.value
+                    onChange={(e) => {
+                      const formattedValue = e.target.value
                         .replace(/\D/g, "") // Remove non-numeric characters
                         .replace(/^(\d{2})(\d{0,4})$/, "$1 / $2") // Format date as MM / YYYY
                         .trim() // Remove any leading/trailing spaces
                         .slice(0, 9); // Limit to 9 characters
-                        setExpiryDate(formattedValue);
-                        }}
+                      setExpiryDate(formattedValue);
+                    }}
                     required
                   />
                 </FormT.Component>

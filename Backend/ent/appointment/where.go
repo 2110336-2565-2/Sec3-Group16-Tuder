@@ -193,6 +193,33 @@ func HasMatchWith(preds ...predicate.Match) predicate.Appointment {
 	})
 }
 
+// HasPayment applies the HasEdge predicate on the "payment" edge.
+func HasPayment() predicate.Appointment {
+	return predicate.Appointment(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, PaymentTable, PaymentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPaymentWith applies the HasEdge predicate on the "payment" edge with a given conditions (other predicates).
+func HasPaymentWith(preds ...predicate.Payment) predicate.Appointment {
+	return predicate.Appointment(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(PaymentInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, PaymentTable, PaymentColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Appointment) predicate.Appointment {
 	return predicate.Appointment(func(s *sql.Selector) {

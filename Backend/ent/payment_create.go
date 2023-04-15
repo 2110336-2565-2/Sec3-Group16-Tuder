@@ -6,9 +6,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/appointment"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/paymenthistory"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
@@ -36,6 +39,58 @@ func (pc *PaymentCreate) SetNillableQrPictureURL(s *string) *PaymentCreate {
 	return pc
 }
 
+// SetPaymentStatus sets the "payment_status" field.
+func (pc *PaymentCreate) SetPaymentStatus(ps payment.PaymentStatus) *PaymentCreate {
+	pc.mutation.SetPaymentStatus(ps)
+	return pc
+}
+
+// SetAmount sets the "amount" field.
+func (pc *PaymentCreate) SetAmount(i int) *PaymentCreate {
+	pc.mutation.SetAmount(i)
+	return pc
+}
+
+// SetCurrency sets the "currency" field.
+func (pc *PaymentCreate) SetCurrency(s string) *PaymentCreate {
+	pc.mutation.SetCurrency(s)
+	return pc
+}
+
+// SetChargeID sets the "charge_id" field.
+func (pc *PaymentCreate) SetChargeID(s string) *PaymentCreate {
+	pc.mutation.SetChargeID(s)
+	return pc
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (pc *PaymentCreate) SetCreatedAt(t time.Time) *PaymentCreate {
+	pc.mutation.SetCreatedAt(t)
+	return pc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (pc *PaymentCreate) SetNillableCreatedAt(t *time.Time) *PaymentCreate {
+	if t != nil {
+		pc.SetCreatedAt(*t)
+	}
+	return pc
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (pc *PaymentCreate) SetUpdatedAt(t time.Time) *PaymentCreate {
+	pc.mutation.SetUpdatedAt(t)
+	return pc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (pc *PaymentCreate) SetNillableUpdatedAt(t *time.Time) *PaymentCreate {
+	if t != nil {
+		pc.SetUpdatedAt(*t)
+	}
+	return pc
+}
+
 // SetID sets the "id" field.
 func (pc *PaymentCreate) SetID(u uuid.UUID) *PaymentCreate {
 	pc.mutation.SetID(u)
@@ -59,6 +114,44 @@ func (pc *PaymentCreate) SetUserID(id uuid.UUID) *PaymentCreate {
 // SetUser sets the "user" edge to the User entity.
 func (pc *PaymentCreate) SetUser(u *User) *PaymentCreate {
 	return pc.SetUserID(u.ID)
+}
+
+// SetMatchID sets the "match" edge to the Match entity by ID.
+func (pc *PaymentCreate) SetMatchID(id uuid.UUID) *PaymentCreate {
+	pc.mutation.SetMatchID(id)
+	return pc
+}
+
+// SetNillableMatchID sets the "match" edge to the Match entity by ID if the given value is not nil.
+func (pc *PaymentCreate) SetNillableMatchID(id *uuid.UUID) *PaymentCreate {
+	if id != nil {
+		pc = pc.SetMatchID(*id)
+	}
+	return pc
+}
+
+// SetMatch sets the "match" edge to the Match entity.
+func (pc *PaymentCreate) SetMatch(m *Match) *PaymentCreate {
+	return pc.SetMatchID(m.ID)
+}
+
+// SetAppointmentID sets the "appointment" edge to the Appointment entity by ID.
+func (pc *PaymentCreate) SetAppointmentID(id uuid.UUID) *PaymentCreate {
+	pc.mutation.SetAppointmentID(id)
+	return pc
+}
+
+// SetNillableAppointmentID sets the "appointment" edge to the Appointment entity by ID if the given value is not nil.
+func (pc *PaymentCreate) SetNillableAppointmentID(id *uuid.UUID) *PaymentCreate {
+	if id != nil {
+		pc = pc.SetAppointmentID(*id)
+	}
+	return pc
+}
+
+// SetAppointment sets the "appointment" edge to the Appointment entity.
+func (pc *PaymentCreate) SetAppointment(a *Appointment) *PaymentCreate {
+	return pc.SetAppointmentID(a.ID)
 }
 
 // AddPaymentHistoryIDs adds the "payment_history" edge to the PaymentHistory entity by IDs.
@@ -111,6 +204,14 @@ func (pc *PaymentCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (pc *PaymentCreate) defaults() {
+	if _, ok := pc.mutation.CreatedAt(); !ok {
+		v := payment.DefaultCreatedAt()
+		pc.mutation.SetCreatedAt(v)
+	}
+	if _, ok := pc.mutation.UpdatedAt(); !ok {
+		v := payment.DefaultUpdatedAt()
+		pc.mutation.SetUpdatedAt(v)
+	}
 	if _, ok := pc.mutation.ID(); !ok {
 		v := payment.DefaultID()
 		pc.mutation.SetID(v)
@@ -119,6 +220,44 @@ func (pc *PaymentCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (pc *PaymentCreate) check() error {
+	if _, ok := pc.mutation.PaymentStatus(); !ok {
+		return &ValidationError{Name: "payment_status", err: errors.New(`ent: missing required field "Payment.payment_status"`)}
+	}
+	if v, ok := pc.mutation.PaymentStatus(); ok {
+		if err := payment.PaymentStatusValidator(v); err != nil {
+			return &ValidationError{Name: "payment_status", err: fmt.Errorf(`ent: validator failed for field "Payment.payment_status": %w`, err)}
+		}
+	}
+	if _, ok := pc.mutation.Amount(); !ok {
+		return &ValidationError{Name: "amount", err: errors.New(`ent: missing required field "Payment.amount"`)}
+	}
+	if v, ok := pc.mutation.Amount(); ok {
+		if err := payment.AmountValidator(v); err != nil {
+			return &ValidationError{Name: "amount", err: fmt.Errorf(`ent: validator failed for field "Payment.amount": %w`, err)}
+		}
+	}
+	if _, ok := pc.mutation.Currency(); !ok {
+		return &ValidationError{Name: "currency", err: errors.New(`ent: missing required field "Payment.currency"`)}
+	}
+	if v, ok := pc.mutation.Currency(); ok {
+		if err := payment.CurrencyValidator(v); err != nil {
+			return &ValidationError{Name: "currency", err: fmt.Errorf(`ent: validator failed for field "Payment.currency": %w`, err)}
+		}
+	}
+	if _, ok := pc.mutation.ChargeID(); !ok {
+		return &ValidationError{Name: "charge_id", err: errors.New(`ent: missing required field "Payment.charge_id"`)}
+	}
+	if v, ok := pc.mutation.ChargeID(); ok {
+		if err := payment.ChargeIDValidator(v); err != nil {
+			return &ValidationError{Name: "charge_id", err: fmt.Errorf(`ent: validator failed for field "Payment.charge_id": %w`, err)}
+		}
+	}
+	if _, ok := pc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Payment.created_at"`)}
+	}
+	if _, ok := pc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Payment.updated_at"`)}
+	}
 	if _, ok := pc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "Payment.user"`)}
 	}
@@ -161,6 +300,30 @@ func (pc *PaymentCreate) createSpec() (*Payment, *sqlgraph.CreateSpec) {
 		_spec.SetField(payment.FieldQrPictureURL, field.TypeString, value)
 		_node.QrPictureURL = &value
 	}
+	if value, ok := pc.mutation.PaymentStatus(); ok {
+		_spec.SetField(payment.FieldPaymentStatus, field.TypeEnum, value)
+		_node.PaymentStatus = value
+	}
+	if value, ok := pc.mutation.Amount(); ok {
+		_spec.SetField(payment.FieldAmount, field.TypeInt, value)
+		_node.Amount = value
+	}
+	if value, ok := pc.mutation.Currency(); ok {
+		_spec.SetField(payment.FieldCurrency, field.TypeString, value)
+		_node.Currency = value
+	}
+	if value, ok := pc.mutation.ChargeID(); ok {
+		_spec.SetField(payment.FieldChargeID, field.TypeString, value)
+		_node.ChargeID = value
+	}
+	if value, ok := pc.mutation.CreatedAt(); ok {
+		_spec.SetField(payment.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := pc.mutation.UpdatedAt(); ok {
+		_spec.SetField(payment.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
+	}
 	if nodes := pc.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -176,6 +339,38 @@ func (pc *PaymentCreate) createSpec() (*Payment, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.user_payment = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.MatchIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   payment.MatchTable,
+			Columns: []string{payment.MatchColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(match.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.AppointmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   payment.AppointmentTable,
+			Columns: []string{payment.AppointmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(appointment.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := pc.mutation.PaymentHistoryIDs(); len(nodes) > 0 {

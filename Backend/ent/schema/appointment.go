@@ -36,5 +36,8 @@ func (Appointment) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("match", Match.Type).
 			Unique(),
+		edge.From("payment", Payment.Type).
+			Ref("appointment").
+			Unique(),
 	}
 }
