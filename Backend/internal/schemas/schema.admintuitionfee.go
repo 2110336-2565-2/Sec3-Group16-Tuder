@@ -10,6 +10,7 @@ type SchemaAdminTuitionFee struct {
 	AppointmentID      uuid.UUID `json:"appointmentID"`
 	AppointmentBeginAt time.Time `json:"appointmentBeginAt"`
 	AppointmentEndAt   time.Time `json:"appointmentEndAt"`
+	AppointmentStatus  string    `json:"appointmentStatus"`
 	MatchID            uuid.UUID `json:"matchId"`
 	StudentID          uuid.UUID `json:"studentID"`
 	TutorID            uuid.UUID `json:"tutorID"`
@@ -19,7 +20,7 @@ type SchemaAdminTuitionFee struct {
 	Title              string    `json:"title"`
 	Subject            string    `json:"subject"`
 	Topic              string    `json:"topic"`
-	Img                []byte    `json:"img"`
+	Img                string    `json:"img"`
 
 	//Course_picture_url string    `json:"course_picture_url"`
 }

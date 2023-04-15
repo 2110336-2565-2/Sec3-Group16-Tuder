@@ -28,6 +28,7 @@ func (s *serviceAdminTuitionFee) PackToSchema(adminTuitionFees []*ent.Appointmen
 			AppointmentID:      Appointment.ID,
 			AppointmentBeginAt: Appointment.BeginAt,
 			AppointmentEndAt:   Appointment.EndAt,
+			AppointmentStatus:  Appointment.Status.String(),
 			MatchID:            Appointment.Edges.Match.ID,
 			StudentID:          Appointment.Edges.Match.Edges.Student.ID,
 			TutorID:            Appointment.Edges.Match.Edges.Course.Edges.Tutor.ID,
@@ -37,7 +38,7 @@ func (s *serviceAdminTuitionFee) PackToSchema(adminTuitionFees []*ent.Appointmen
 			Title:              Appointment.Edges.Match.Edges.Course.Title,
 			Subject:            Appointment.Edges.Match.Edges.Course.Subject,
 			Topic:              Appointment.Edges.Match.Edges.Course.Topic,
-			Img:                []byte(*Appointment.Edges.Match.Edges.Course.CoursePictureURL),
+			Img:                *Appointment.Edges.Match.Edges.Course.CoursePictureURL,
 		})
 	}
 	return adminTuitionFeeResponses

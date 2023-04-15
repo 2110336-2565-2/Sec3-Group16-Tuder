@@ -34,7 +34,7 @@ func (r *repositoryAdminTuitionFee) GetAdminTuitionFees() ([]*ent.Appointment, e
 				})
 			})
 		}).
-		Where(appointment.StatusEQ(appointment.StatusOngoing)).
+		Where(appointment.StatusEQ(appointment.StatusPending)).
 		All(r.ctx)
 	if err != nil {
 		return nil, errors.New("Appointment not found")
