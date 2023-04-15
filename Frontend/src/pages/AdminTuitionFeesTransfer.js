@@ -45,7 +45,7 @@ export default function AdminTuitionFeesTransfer() {
   function paymentCallback(appointmentID) {
     // Change this to PUT /appointment/updatestatus/:appointmentID with status = "completed"
     changeStatusHandler(appointmentID, "completed").then((res) => {
-      toast.success("Payment completed");
+      toast.success("Update status successfully");
       navigate("/admin-tuition-fees");
     }).catch((err) => {
       toast.error("Something went wrong");
