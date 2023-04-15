@@ -145,7 +145,28 @@ const router = createBrowserRouter([
       {
         path: "/course-detail/:id",
         element: <CourseDetail />
-      }
+      },
+      {
+        path: "/admin-tuition-fees",
+        element: <AdminTuitionFeeList />
+      },
+      {
+        path: "/admin-tuition-fees/:appointmentID",
+        element: <AdminTuitionFeesTransfer />
+      },
+      {
+        path: "/classes",
+        children: [
+          {
+            index: true,
+            element: <ClassList />,
+          },
+          {
+            path: ":id",
+            element: <ClassDetail />,
+          },
+        ],
+      },
     ]
   }
 ])

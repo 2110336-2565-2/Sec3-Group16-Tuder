@@ -54,7 +54,7 @@ export default function AdminTuitionFeeList() {
             <div
                key={item.appointmentID}
               onClick={(e) =>
-                navigate("/tuition-fees-transfer/" + item.appointmentID)
+                navigate("/admin-tuition-fees/" + item.appointmentID)
               }
               >
               <AdminTuitionFee
