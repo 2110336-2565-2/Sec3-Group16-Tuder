@@ -1,11 +1,12 @@
 import React from "react";
 import styled from "styled-components";
+import toast from "react-hot-toast";
 import QRPayment from "../components/global/QRPayment";
 import Button from "../components/global/Button";
 import Footer from "../components/global/Footer";
 import { IsAdmin } from "../components/IsAuth";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Timezone, DateFormat } from '../datas/DateFormat.js';
+import { Timezone, DateFormat } from "../datas/DateFormat.js";
 
 export default function AdminTuitionFeesTransfer() {
   function fieldNameToTitle(fieldName) {
@@ -16,8 +17,8 @@ export default function AdminTuitionFeesTransfer() {
   }
   // get current URL
   const location = useLocation();
-  const  item  = location.state.data
-  const locationPath = location.pathname
+  const item = location.state.data;
+  const locationPath = location.pathname;
   const navigate = useNavigate();
   const data = {
     course_title: item.title,
@@ -29,6 +30,7 @@ export default function AdminTuitionFeesTransfer() {
     topic: item.topic,
     date: new Date(item.appointmentEndAt).toLocaleString(Timezone, DateFormat),
     price_per_hour: item.price_per_hour,
+    appointmentID: item.appointmentID,
   };
 
   const tableContent = [
@@ -39,6 +41,16 @@ export default function AdminTuitionFeesTransfer() {
     "date",
     "price_per_hour",
   ];
+  function paymentCallback(appointmentID) {
+    // Change this to PUT /appointment/updatestatus/:appointmentID with status = "completed"
+    console.log("call back appointmentID: ", appointmentID).then((res) => {
+      toast.success("Payment completed");
+      navigate("/admin-tuition-fees");
+    }).catch((err) => {
+      toast.error("Something went wrong");
+    });
+    // ----------------------------------
+  }
   return (
     <>
       <IsAdmin />
@@ -68,13 +80,21 @@ export default function AdminTuitionFeesTransfer() {
             </Table>
           </Card>
           <QRWrapper>
-            <QRPayment amount={data["price_per_hour"]} tutorID={data["tutor_id"]} />
+            <QRPayment
+              amount={data["price_per_hour"]}
+              tutorID={data["tutor_id"]}
+              appointmentID={data["appointmentID"]}
+              callback={paymentCallback}
+              callbackData={data["appointmentID"]}
+            />
           </QRWrapper>
           <ButtonWrapper>
             <Button
               variance="cancel"
               onClick={() =>
-                navigate(locationPath.substring(0, locationPath.lastIndexOf("/")))
+                navigate(
+                  locationPath.substring(0, locationPath.lastIndexOf("/"))
+                )
               }
             >
               Back

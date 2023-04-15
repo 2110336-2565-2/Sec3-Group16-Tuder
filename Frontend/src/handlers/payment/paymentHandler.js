@@ -5,7 +5,7 @@ export const fetchQRCodeForCoursePayment = (data) => {
 }
 
 export const fetchQRCodeForTuitionFee = (data) => {
-    return api.post('api/v1/payment/getQRCodeForTuitionFee', data)
+    return api.post('api/v1/payment/getQRCodeForTuitionFree', data)
 }
 
 export const changePaymentStatus = (data) => {
