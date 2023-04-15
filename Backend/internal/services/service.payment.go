@@ -6,7 +6,8 @@ import (
 )
 
 type ServicePayment interface {
-	GetQRCode(sr *schemas.SchemaGetQRCode) (*schemas.SchemaQRCode, error)
+	GetQRCodeForCoursePayment(sr *schemas.SchemaGetQRCodeForCoursePayment) (*schemas.SchemaQRCode, error)
+	GetQRCodeForTuitionFree(sr *schemas.SchemaGetQRCodeForTuitionFree) (*schemas.SchemaQRCode, error)
 }
 
 type servicePayment struct {
@@ -18,8 +19,18 @@ func NewServicePayment(repository repository.RepositoryPayment) *servicePayment 
 }
 
 // GetQRCode gets QR code of a payment
-func (s *servicePayment) GetQRCode(sr *schemas.SchemaGetQRCode) (*schemas.SchemaQRCode, error) {
-	qrCode, err := s.repository.GetQRCode(sr)
+func (s *servicePayment) GetQRCodeForCoursePayment(sr *schemas.SchemaGetQRCodeForCoursePayment) (*schemas.SchemaQRCode, error) {
+	qrCode, err := s.repository.GetQRCodeForCoursePayment(sr)
+	if err != nil {
+		return nil, err
+	}
+	return &schemas.SchemaQRCode{
+		QrCodeUrl: qrCode,
+	}, nil
+}
+
+func (s *servicePayment) GetQRCodeForTuitionFree(sr *schemas.SchemaGetQRCodeForTuitionFree) (*schemas.SchemaQRCode, error) {
+	qrCode, err := s.repository.GetQRCodeForTuitionFree(sr)
 	if err != nil {
 		return nil, err
 	}

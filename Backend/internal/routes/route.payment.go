@@ -13,5 +13,6 @@ func InitPaymentRoutes(client *ent.Client, e *echo.Group) {
 	servicePayment := service.NewServicePayment(repoPayment)
 	controllerPayment := controller.NewControllerPayment(servicePayment)
 
-	e.POST("/payment/qrCode", controllerPayment.GetQRCode)
+	e.POST("/payment/getQRCodeForCoursePayment", controllerPayment.GetQRCodeForCoursePayment)
+	e.POST("/payment/getQRCodeForTuitionFree", controllerPayment.GetQRCodeForTuitionFree)
 }
