@@ -53,9 +53,9 @@ export default function AdminTuitionFeeList() {
           {data.map((item) => (
             <div
                key={item.appointmentID}
-              // onClick={(e) =>
-              //   navigate("/cancel-requests/" + item.AdminTuitionFeeId)
-              // }
+              onClick={(e) =>
+                navigate("/tuition-fees-transfer/" + item.appointmentID)
+              }
               >
               <AdminTuitionFee
                 key={item.appointmentID}
