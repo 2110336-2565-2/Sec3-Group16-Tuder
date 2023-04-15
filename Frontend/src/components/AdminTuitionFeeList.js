@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useQuery } from "react-query";
-import { fetchCancellingRequestsHandler } from "../handlers/cancellingRequestHandler";
+import { fetchAdminTuitionFeeHandler } from "../handlers/AdminTuitionFeeHandler";
 import { useDataContext } from "../pages/AdminTuitionFeeList";
 import AdminTuitionFee from "../components/AdminTuitionFee";
 import React from "react";
@@ -11,13 +11,14 @@ export default function AdminTuitionFeeList() {
   const navigate = useNavigate();
 
   const { isLoading, error } = useQuery(
-    "cancellingClass",
+    "tuitionfee",
     () => {
       fetchAdminTuitionFeeHandler()
         .then((res) => {
           if (res.data.success) {
-            if (res.data.data !== null) setData(res.data.data);
+            if (res.data.result !== null) setData(res.data.result);
           }
+          console.log(res.data)
         })
         .catch((err) => {
           console.log(err);
@@ -46,24 +47,30 @@ export default function AdminTuitionFeeList() {
 
   return (
     <Container>
-      <h1>Cancellation Requests</h1>
+      <h1>AdminTuitionFee Requests</h1>
       <RequestListPage>
         <RequestListcontent>
           {data.map((item) => (
             <div
-              // key={item.AdminTuitionFeeId}
+               key={item.appointmentID}
               // onClick={(e) =>
               //   navigate("/cancel-requests/" + item.AdminTuitionFeeId)
               // }
-            >
+              >
               <AdminTuitionFee
-                key={item.AdminTuitionFeeId}
-                title={item.title}
-                img={item.img_url}
-                student={item.student}
-                tutor={item.tutor}
-                date={item.date}
-
+                key={item.appointmentID}
+                AppointmentID={item.appointmentID}
+                AppointmentBeginAt = {item.appointmentBeginAt}
+                AppointmentEndAt = {item.appointmentEndAt}
+                MatchID = {item.matchID}
+                StudentID = {item.studentID}
+                TutorID = {item.tutorID}
+                Student_name = {item.student_name}
+                Tutor_name = {item.tutor_name}
+                Title={item.title}
+                Subject={item.subject}
+                Topic={item.topic}
+                Img={item.img}
               />
             </div>
           ))}

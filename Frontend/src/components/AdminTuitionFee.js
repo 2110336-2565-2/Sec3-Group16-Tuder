@@ -6,38 +6,33 @@ import { Timezone, DateFormat } from "../datas/DateFormat.js";
 
 export default function AdminTuitionFee(props) {
   return (
-    <Request status={props.status}>
+    <Request>
       <ClassSection>
         <GridSection>
-          <ClassImg src={props.img} alt="classImg" />
+          <ClassImg src={props.Img} alt="classImg" />
         </GridSection>
 
         <ClassInfoSection>
           <ClassFlex>
-            <ClassInfo>
-              <InfoTitle min_w="43px">Title :</InfoTitle>
-              <InfoDesc>{props.title}</InfoDesc>
-            </ClassInfo>
 
-            <ClassInfo>
-              <InfoTitle min_w="79px">Reporter :</InfoTitle>
-              <InfoDesc>{props.reporter}</InfoDesc>
+          <ClassInfo>
+              <InfoTitle min_w = "45px">Title :</InfoTitle>
+              <InfoDesc>{props.Title}</InfoDesc>              
             </ClassInfo>
             <ClassInfo>
-              <InfoTitle min_w="105px">Report Date :</InfoTitle>
-              <InfoDesc>
-                {new Date(props.report_date).toLocaleString(
-                  Timezone,
-                  DateFormat
-                )}
-              </InfoDesc>
+              <InfoTitle min_w = "99px">Description :</InfoTitle>
+              <InfoDesc>{props.Subject}</InfoDesc>
             </ClassInfo>
-            <ClassInfoButton>
-              <InfoTitle min_w="60px">Status :</InfoTitle>
-              <InfoDesc>
-                <StatusBlock state={props.status}>{props.status}</StatusBlock>
-              </InfoDesc>
-            </ClassInfoButton>
+            <ClassInfo>
+              <InfoTitle min_w = "72px">Contact :</InfoTitle>
+              <InfoDesc>{props.Topic}</InfoDesc>
+            </ClassInfo>
+            <ClassInfo>
+              <InfoTitle min_w = "112px">Report_Date :</InfoTitle>
+              <InfoDesc>{new Date(props.AppointmentID).toLocaleString(Timezone, DateFormat)}</InfoDesc>
+            </ClassInfo>
+      
+
           </ClassFlex>
         </ClassInfoSection>
       </ClassSection>
