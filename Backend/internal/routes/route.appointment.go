@@ -24,6 +24,7 @@ func InitAppointmentRoutes(client *ent.Client, e *echo.Group) {
 	})
 
 	e.GET("/matches/:id", controllerAppointment.GetMatchByID)
+	e.GET("/appointments/:match_id", controllerAppointment.GetAppointmentByMatchID)
 	// e.GET("/appointments", controllerAppointment.GetAppointments)
 	// e.PUT("/appointment/:id", controllerAppointment.UpdateAppointment)
 	// e.DELETE("/appointment/:id", controllerAppointment.DeleteAppointment)

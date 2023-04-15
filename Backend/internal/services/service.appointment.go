@@ -9,6 +9,7 @@ import (
 type ServiceAppointment interface {
 	GetMatchByID(sr *schemas.SchemaGetMatchByID) ([]*schemas.SchemaMatchesFromID, error)
 	UpdateAppointmentStatus(sr *schemas.SchemaUpdateAppointmentStatus) (*ent.Appointment, error)
+	GetAppointmentByMatchID(sr *schemas.SchemaGetAppointmentByMatchID) (*schemas.SchemaAppointmentsFromMatchID, error)
 }
 
 type serviceAppointment struct {
@@ -28,6 +29,16 @@ func (s *serviceAppointment) GetMatchByID(sr *schemas.SchemaGetMatchByID) ([]*sc
 	if err != nil {
 		return nil, err
 	}
+	return appointments, nil
+}
+
+func (s *serviceAppointment) GetAppointmentByMatchID(sr *schemas.SchemaGetAppointmentByMatchID) (*schemas.SchemaAppointmentsFromMatchID, error) {
+	appointments, err := s.repository.GetAppointmentByMatchID(sr)
+
+	if err != nil {
+		return nil, err
+	}
+
 	return appointments, nil
 }
 

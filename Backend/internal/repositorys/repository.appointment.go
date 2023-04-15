@@ -7,6 +7,7 @@ import (
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/appointment"
+	entAppointment "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/appointment"
 	entCourse "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	entMatch "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	entStudent "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
@@ -18,6 +19,7 @@ type RepositoryAppointment interface {
 	GetMatchByStudentID(sr *schemas.SchemaGetMatchByID) ([]*schemas.SchemaMatchesFromID, error)
 	GetMatchByTutorID(sr *schemas.SchemaGetMatchByID) ([]*schemas.SchemaMatchesFromID, error)
 	UpdateAppointmentStatus(sr *schemas.SchemaUpdateAppointmentStatus) (*ent.Appointment, error)
+	GetAppointmentByMatchID(sr *schemas.SchemaGetAppointmentByMatchID) (*schemas.SchemaAppointmentsFromMatchID, error)
 }
 
 type repositoryAppointment struct {
@@ -115,6 +117,53 @@ func (r *repositoryAppointment) GetMatchByTutorID(sr *schemas.SchemaGetMatchByID
 		})
 	}
 	return schemaAppointments, nil
+}
+
+func (r *repositoryAppointment) GetAppointmentByMatchID(sr *schemas.SchemaGetAppointmentByMatchID) (*schemas.SchemaAppointmentsFromMatchID, error) {
+	appointments, err := r.client.Appointment.
+		Query().
+		Where(entAppointment.HasMatchWith(entMatch.IDEQ(sr.MatchID))).
+		WithMatch(func(q *ent.MatchQuery) {
+			q.WithCourse(func(s *ent.CourseQuery) {
+				s.WithTutor(func(t *ent.TutorQuery) {
+					t.WithUser()
+				})
+			})
+		}).
+		All(r.ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(appointments) == 0 {
+		return nil, nil
+	}
+
+	schemaApps := make([]*schemas.SchemaAppointment, 0)
+	for _, app := range appointments {
+		schemaApps = append(schemaApps, &schemas.SchemaAppointment{
+			ID:      app.ID,
+			BeginAt: app.BeginAt,
+			EndAt:   app.EndAt,
+			Status:  app.Status.String(),
+		})
+	}
+
+	app := appointments[0]
+
+	tutorName := app.Edges.Match.Edges.Course.Edges.Tutor.Edges.User.FirstName + " " + app.Edges.Match.Edges.Course.Edges.Tutor.Edges.User.LastName
+	schemaAppointment := &schemas.SchemaAppointmentsFromMatchID{
+		CourseName:        app.Edges.Match.Edges.Course.Title,
+		TutorName:         tutorName,
+		CourseDescription: app.Edges.Match.Edges.Course.Description,
+		Level:             app.Edges.Match.Edges.Course.Level.String(),
+		EstimeateTime:     app.Edges.Match.Edges.Course.EstimatedTime,
+		CoursePictureURL:  *app.Edges.Match.Edges.Course.CoursePictureURL,
+		Appointments:      schemaApps,
+	}
+	fmt.Println(*schemaAppointment)
+	return schemaAppointment, nil
 }
 
 func (r *repositoryAppointment) UpdateAppointmentStatus(sr *schemas.SchemaUpdateAppointmentStatus) (*ent.Appointment, error) {

@@ -3,9 +3,15 @@ package schemas
 import (
 	"time"
 
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	"github.com/google/uuid"
 )
+
+type SchemaAppointment struct {
+	ID      uuid.UUID `json:"id"`
+	BeginAt time.Time `json:"begin_at"`
+	EndAt   time.Time `json:"end_at"`
+	Status  string    `json:"status"`
+}
 
 type SchemaGetMatchByID struct {
 	ID uuid.UUID `json:"id"`
@@ -25,10 +31,13 @@ type SchemaGetAppointmentByMatchID struct {
 }
 
 type SchemaAppointmentsFromMatchID struct {
-	CourseName        string             `json:"course_name"`
-	TutorName         string             `json:"tutor_name"`
-	CourseDescription string             `json:"course_description"`
-	Appointments      []*ent.Appointment `json:"appointments"`
+	CourseName        string               `json:"course_name"`
+	TutorName         string               `json:"tutor_name"`
+	CourseDescription string               `json:"course_description"`
+	Level             string               `json:"level"`
+	EstimeateTime     int                  `json:"estimate_time"`
+	CoursePictureURL  string               `json:"course_picture_url"`
+	Appointments      []*SchemaAppointment `json:"appointments"`
 }
 
 type SchemaUpdateAppointmentStatus struct {
