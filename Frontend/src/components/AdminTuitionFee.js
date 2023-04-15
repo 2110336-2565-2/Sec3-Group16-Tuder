@@ -4,40 +4,39 @@ import { submitAudditing } from "../handlers/cancellingRequestHandler";
 import { toast } from "react-hot-toast";
 import { Timezone, DateFormat } from "../datas/DateFormat.js";
 
-export default function CancelRequest(props) {
+export default function AdminTuitionFee(props) {
   return (
-    <Request state={props.status} status={props.status}>
+    <Request>
       <ClassSection>
         <GridSection>
-          <ClassImg src={props.img} alt="classImg" />
+          <ClassImg src={props.Img} alt="classImg" />
         </GridSection>
 
         <ClassInfoSection>
           <ClassFlex>
-            <ClassInfo>
-              <InfoTitle min_w="43px">Title :</InfoTitle>
-              <InfoDesc>{props.title}</InfoDesc>
-            </ClassInfo>
 
-            <ClassInfo>
-              <InfoTitle min_w="79px">Reporter :</InfoTitle>
-              <InfoDesc>{props.reporter}</InfoDesc>
+          <ClassInfo>
+              <InfoTitle min_w = "72px">Title :</InfoTitle>
+              <InfoDesc>{props.Title}</InfoDesc>              
             </ClassInfo>
             <ClassInfo>
-              <InfoTitle min_w="105px">Report Date :</InfoTitle>
-              <InfoDesc>
-                {new Date(props.report_date).toLocaleString(
-                  Timezone,
-                  DateFormat
-                )}
-              </InfoDesc>
+              <InfoTitle min_w = "72px">Student Name :</InfoTitle>
+              <InfoDesc>{props.Student_name}</InfoDesc>
             </ClassInfo>
-            <ClassInfoButton>
-              <InfoTitle min_w="60px">Status :</InfoTitle>
-              <InfoDesc>
-                <StatusBlock state={props.status}>{props.status}</StatusBlock>
-              </InfoDesc>
-            </ClassInfoButton>
+            <ClassInfo>
+              <InfoTitle min_w = "72px">Tutor Name :</InfoTitle>
+              <InfoDesc>{props.Tutor_name}</InfoDesc>
+            </ClassInfo>
+            <ClassInfo>
+              <InfoTitle min_w = "72px">Status :</InfoTitle>
+              <InfoDesc>{new Date(props.AppointmentStatus).toLocaleString(Timezone, DateFormat)}</InfoDesc>
+            </ClassInfo>
+            <ClassInfo>
+              <InfoTitle min_w = "72px">End Date :</InfoTitle>
+              <InfoDesc>{new Date(props.AppointmentEndAt).toLocaleString(Timezone, DateFormat)}</InfoDesc>
+            </ClassInfo>
+      
+
           </ClassFlex>
         </ClassInfoSection>
       </ClassSection>
@@ -75,25 +74,9 @@ const Request = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;
-  background-color: ${(props) => {
-    if (props.state === "rejected") {
-      return "#EBEBEB";
-    } else if (props.state === "approved") {
-      return "#EBEBEB";
-    } else {
-      return "#eb7b42";
-    }
-  }};
-  color: ${(props) => {
-    if (props.state === "rejected") {
-      return "#000000";
-    } else if (props.state === "approved") {
-      return "#000000";
-    } else {
-      return "#FFFFFF";
-    }
-  }};
+  background-color: #eb7b42;
   border: 1px solid #dadada;
+  color: white;
   min-height: 167px;
   gap: 20px;
   padding: 10px;
@@ -103,15 +86,7 @@ const Request = styled.div`
     box-shadow: 5px 6px 11px -3px rgba(0, 0, 0, 0.81);
     -webkit-box-shadow: 5px 6px 11px -7px rgba(0, 0, 0, 0.81);
     -moz-box-shadow: 5px 6px 11px -7px rgba(0, 0, 0, 0.81);
-    background-color: ${(props) => {
-      if (props.state === "rejected") {
-        return "#EBEFEB";
-      } else if (props.state === "approved") {
-        return "#EBEFEB";
-      } else {
-        return "#ee8e45";
-      }
-    }};
+    background-color: #ee8e45;
   }
 `;
 

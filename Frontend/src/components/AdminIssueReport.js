@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useLayoutEffect } from "react";
 import styled from "styled-components";
 import {
   submitSaveStateHandler,
@@ -28,42 +28,54 @@ export default function AdminIssueReport(props) {
         console.log(err);
       });
   };
-
-  const handlePrevState = () => {
+  
+  const handleComplete = () => {
+    console.log("complete")
     setStatusState((prevState) => {
       let newState;
-      if (prevState === "ongoing") {
-        newState = "rejected";
-      } else if (prevState === "rejected") {
+      if (prevState === "completed") {
+        newState = "ongoing";
+      }  else {
         newState = "completed";
-      } else if (prevState === "completed") {
-        newState = "ongoing";
-      } else {
-        newState = "ongoing";
       }
       return newState;
     });
   };
 
-  const handleNextState = () => {
+  const handleReject = () => {
+    console.log("reject")
     setStatusState((prevState) => {
       let newState;
-      if (prevState === "ongoing") {
-        newState = "completed";
-      } else if (prevState === "completed") {
+      if (prevState === "rejected") {
+        newState = "ongoing";
+      }  else {
         newState = "rejected";
-      } else if (prevState === "rejected") {
-        newState = "ongoing";
-      } else {
-        newState = "ongoing";
       }
       return newState;
     });
   };
 
-  useEffect(() => {
+  const firstUpdate = useRef(true);
+  useLayoutEffect(() => {
+    if (firstUpdate.current) {
+      firstUpdate.current = false;
+      return;
+    }
     handleSave();
-  }, [statusState]);
+
+  });
+
+  const isEnablebutton = () => {
+    if (statusState === "ongoing") {
+      return ;
+    }
+    return (
+        <DeleteButton disabled={statusState != "ongoing" ? false : true}
+          value="false" onClick={handleDelete} statusState = {statusState}>
+            Delete
+        </DeleteButton>
+      );
+  };
 
   const handleDelete = () => {
     const data = {
@@ -110,12 +122,12 @@ export default function AdminIssueReport(props) {
         <StateSection>
           <StateFlex>
             <StateInfo>
-              <PrevStateButton value="false" onClick={handlePrevState}>
-                Prev
-              </PrevStateButton>
-              <NextStateButton value="false" onClick={handleNextState}>
-                Next
-              </NextStateButton>
+              <CompleteButton value="false" onClick={handleComplete} statusState = {statusState}>
+                completed
+              </CompleteButton>
+              <RejectButton value="false" onClick={handleReject} statusState = {statusState}>
+                rejected
+              </RejectButton>
             </StateInfo>
             <StateInfo>
               <InfoTitle>Status :</InfoTitle>
@@ -126,10 +138,7 @@ export default function AdminIssueReport(props) {
               </InfoDesc>
             </StateInfo>
             <StateInfo>
-              <DeleteButton disabled={statusState != "ongoing" ? false : true}
-                value="false" onClick={handleDelete}>
-                Delete
-              </DeleteButton>
+              {isEnablebutton()}
             </StateInfo>
             
           </StateFlex>
@@ -144,9 +153,9 @@ const Request = styled.div`
     display: flex;
     flex-direction: row;
     justify-content: center;
-    background-color: #EB7B42;
+    background-color: #EBEBEB;
     border: 0.5px solid #DADADA ;
-    color: white;
+    color: #000;
     min-height: 167px;
     gap: 20px;
     padding: 10px;
@@ -215,10 +224,10 @@ const InfoDesc = styled.div`
     font-weight: 300;
 `
 
-const PrevStateButton = styled.button`
-  width: 80px;
+const CompleteButton = styled.button`
+  width: 95px;
   height: 35px;
-  border: 2px solid #ff7008;
+  border: 2px solid #10AA00;
   border-radius: 5px;
 
   font-family: "Lexend Deca";
@@ -227,21 +236,20 @@ const PrevStateButton = styled.button`
   font-size: 16px;
   line-height: 20px;
   text-align: center;
-  color: #FF7008;
-  background-color: #FFFFFF;
-
+  background-color: #009900;
+  color: #FFFFFF;
   &:hover {
-    background-color: #FF7008;
+    background-color: #10AA00;
     color: #ffffff;
   }
 
   cursor: pointer;
 `;
 
-const NextStateButton = styled.button`
-  width: 80px;
+const RejectButton = styled.button`
+  width: 95px;
   height: 35px;
-  border: 2px solid #ff7008;
+  border: 2px solid #FF0F39;
   border-radius: 5px;
 
   font-family: "Lexend Deca";
@@ -250,16 +258,17 @@ const NextStateButton = styled.button`
   font-size: 16px;
   line-height: 20px;
   text-align: center;
-  color: #FF7008;
-  background-color: #FFFFFF;
+  background-color: #FF0000;
+  color: #FFFFFF;
 
   &:hover {
-    background-color: #FF7008;
+    background-color: #FF0F39;
     color: #ffffff;
   }
 
   cursor: pointer;
 `;
+
 
 const DeleteButton = styled.button`
   width: 80px;
@@ -274,8 +283,20 @@ const DeleteButton = styled.button`
   font-size: 16px;
   line-height: 20px;
   text-align: center;
-  color: #ffffff;
-  background-color: #FF0000;
+  background-color: ${(props) => {
+    if (props.statusState === "ongoing") {
+        return "#D3D3D3";
+    } else {
+        return "#FF0000";
+    }
+  }};
+  color: ${(props) => {
+    if (props.statusState === "ongoing") {
+        return "#000000";
+    }else {
+        return "#FFFFFF";
+    }
+  }};
 
   &:hover {
     background-color: #FF2000;

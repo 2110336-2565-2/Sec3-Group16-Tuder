@@ -267,7 +267,7 @@ func (r *repositoryMatch) CreateAppointment(sr *schema.SchemaCreateAppointment) 
 			Create().
 			SetBeginAt(beginAt).
 			SetEndAt(endAt).
-			SetStatus("ongoing").
+			SetStatus("comingsoon").
 			Save(r.ctx)
 
 		if err != nil {

@@ -1,23 +1,24 @@
 import styled from "styled-components";
 import { useQuery } from "react-query";
-import { fetchCancellingRequestsHandler } from "../handlers/cancellingRequestHandler";
-import { useDataContext } from "../pages/CancelRequestList";
-import CancelRequest from "../components/CancelRequest";
+import { fetchAdminTuitionFeeHandler } from "../handlers/AdminTuitionFeeHandler";
+import { useDataContext } from "../pages/AdminTuitionFeeList";
+import AdminTuitionFee from "../components/AdminTuitionFee";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function CancelRequestList() {
+export default function AdminTuitionFeeList() {
   const { data, setData } = useDataContext();
   const navigate = useNavigate();
 
   const { isLoading, error } = useQuery(
-    "cancellingClass",
+    "tuitionfee",
     () => {
-      fetchCancellingRequestsHandler()
+      fetchAdminTuitionFeeHandler()
         .then((res) => {
           if (res.data.success) {
-            if (res.data.data !== null) setData(res.data.data);
+            if (res.data.result !== null) setData(res.data.result);
           }
+          console.log(res.data)
         })
         .catch((err) => {
           console.log(err);
@@ -46,23 +47,31 @@ export default function CancelRequestList() {
 
   return (
     <Container>
-      <h1>Cancellation Requests</h1>
+      <h1>AdminTuitionFee Requests</h1>
       <RequestListPage>
         <RequestListcontent>
           {data.map((item) => (
             <div
-              key={item.cancelRequestId}
+               key={item.appointmentID}
               onClick={(e) =>
-                navigate("/cancel-requests/" + item.cancelRequestId)
+                navigate("/tuition-fees-transfer/" + item.appointmentID)
               }
-            >
-              <CancelRequest
-                key={item.cancelRequestId}
-                title={item.title}
-                img={item.img_url}
-                reporter={item.reporter}
-                report_date={item.report_date}
-                status={item.status}
+              >
+              <AdminTuitionFee
+                key={item.appointmentID}
+                AppointmentID={item.appointmentID}
+                AppointmentBeginAt = {item.appointmentBeginAt}
+                AppointmentEndAt = {item.appointmentEndAt}
+                AppointmentStatus = {item.appointmentStatus}
+                MatchID = {item.matchID}
+                StudentID = {item.studentID}
+                TutorID = {item.tutorID}
+                Student_name = {item.student_name}
+                Tutor_name = {item.tutor_name}
+                Title={item.title}
+                Subject={item.subject}
+                Topic={item.topic}
+                Img={item.img}
               />
             </div>
           ))}

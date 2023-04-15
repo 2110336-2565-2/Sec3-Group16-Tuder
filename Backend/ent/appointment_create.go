@@ -41,6 +41,14 @@ func (ac *AppointmentCreate) SetStatus(a appointment.Status) *AppointmentCreate 
 	return ac
 }
 
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (ac *AppointmentCreate) SetNillableStatus(a *appointment.Status) *AppointmentCreate {
+	if a != nil {
+		ac.SetStatus(*a)
+	}
+	return ac
+}
+
 // SetID sets the "id" field.
 func (ac *AppointmentCreate) SetID(u uuid.UUID) *AppointmentCreate {
 	ac.mutation.SetID(u)
@@ -128,6 +136,10 @@ func (ac *AppointmentCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (ac *AppointmentCreate) defaults() {
+	if _, ok := ac.mutation.Status(); !ok {
+		v := appointment.DefaultStatus
+		ac.mutation.SetStatus(v)
+	}
 	if _, ok := ac.mutation.ID(); !ok {
 		v := appointment.DefaultID()
 		ac.mutation.SetID(v)

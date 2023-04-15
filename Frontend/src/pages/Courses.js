@@ -3,6 +3,8 @@ import CourseSearchForm from "../components/form/FormCourseSearch";
 import styled from "styled-components";
 import { Outlet } from "react-router";
 import React, { useState, createContext , useContext} from "react";
+import Home from "./Home"
+import Footer from "../components/global/Footer";
 const DataContext = createContext({
         
         data: [],
@@ -14,9 +16,9 @@ export const useDataContext = () => useContext(DataContext);
 export default function Courses(){
     const [data, setData] = useState([]);
     
-
     return (
         <DataContext.Provider value={{data, setData}}>
+            <Home />
             <CourseListPage>
                 <CenterTop><h1>Courses</h1></CenterTop>
                 <CourseSearchForm />
@@ -25,6 +27,7 @@ export default function Courses(){
                 </CourseList>
             </CourseListPage>
             <br></br>
+            <Footer />
         </DataContext.Provider>
         
     )
