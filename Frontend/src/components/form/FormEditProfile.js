@@ -14,7 +14,6 @@ import TimeSelector from "../profile/TimeSelector";
 
 export default function FormEditProfile({ user }) {
   const navigate = useNavigate();
-  console.log("user: ", user);
   const fields = user.role === "student" ? studentFields : tutorFields;
   const [isFileUploaderOpen, setIsFileUploaderOpen] = useState(false);
   const [formData, setFormData] = useState({ ...user });
@@ -25,7 +24,6 @@ export default function FormEditProfile({ user }) {
     if (isSubmitting) return;
     setIsSubmitting(true);
     const loadingToast = toast.loading("Submitting...");
-    console.log("edit profile");
     let compatibleFormData = { ...formData };
     // Convert some fields format to match the backend
     if (compatibleFormData.new_profile_picture) {
@@ -36,7 +34,6 @@ export default function FormEditProfile({ user }) {
     try {
       if (user.role === "student") {
         updateStudent(compatibleFormData).then((res) => {
-          console.log("res: ", res);
           navigate("/profile");
           toast.success("Profile updated successfully");
           toast.dismiss(loadingToast);
@@ -44,7 +41,6 @@ export default function FormEditProfile({ user }) {
         });
       } else if (user.role === "tutor") {
         updateTutor(compatibleFormData).then((res) => {
-          console.log("res: ", res);
           navigate("/profile");
           toast.success("Profile updated successfully");
           toast.dismiss(loadingToast);
@@ -52,10 +48,10 @@ export default function FormEditProfile({ user }) {
         });
       }
     } catch (error) {
-      console.log(error);
-      toast.error("Profile update failed");
-      toast.dismiss(loadingToast);
-      setIsSubmitting(false);
+        console.log(error);
+        toast.error("Profile update failed");
+        toast.dismiss(loadingToast);
+        setIsSubmitting(false);
     }
   };
 
@@ -65,7 +61,6 @@ export default function FormEditProfile({ user }) {
     if (e.target.name === "birthdate") {
       value = new Date(e.target.value).toISOString();
     } else if (e.target.name === "schedule") {
-      console.log("e.target.value: ", e.target.value);
       value = convertFrontendSchedulesToBackend(e.target.value);
     }
 
@@ -73,9 +68,6 @@ export default function FormEditProfile({ user }) {
       ...formData,
       [e.target.name]: value,
     });
-    // console.log("e.target.name: ", e.target.name);
-    // console.log("e.target.value: ", e.target.value);
-    console.log("formData: ", formData);
   };
 
   return (

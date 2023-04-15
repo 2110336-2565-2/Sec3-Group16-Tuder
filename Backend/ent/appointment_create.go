@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/appointment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/google/uuid"
 )
 
@@ -79,6 +80,25 @@ func (ac *AppointmentCreate) SetNillableMatchID(id *uuid.UUID) *AppointmentCreat
 // SetMatch sets the "match" edge to the Match entity.
 func (ac *AppointmentCreate) SetMatch(m *Match) *AppointmentCreate {
 	return ac.SetMatchID(m.ID)
+}
+
+// SetPaymentID sets the "payment" edge to the Payment entity by ID.
+func (ac *AppointmentCreate) SetPaymentID(id uuid.UUID) *AppointmentCreate {
+	ac.mutation.SetPaymentID(id)
+	return ac
+}
+
+// SetNillablePaymentID sets the "payment" edge to the Payment entity by ID if the given value is not nil.
+func (ac *AppointmentCreate) SetNillablePaymentID(id *uuid.UUID) *AppointmentCreate {
+	if id != nil {
+		ac = ac.SetPaymentID(*id)
+	}
+	return ac
+}
+
+// SetPayment sets the "payment" edge to the Payment entity.
+func (ac *AppointmentCreate) SetPayment(p *Payment) *AppointmentCreate {
+	return ac.SetPaymentID(p.ID)
 }
 
 // Mutation returns the AppointmentMutation object of the builder.
@@ -204,6 +224,23 @@ func (ac *AppointmentCreate) createSpec() (*Appointment, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.appointment_match = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.PaymentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   appointment.PaymentTable,
+			Columns: []string{appointment.PaymentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(payment.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.payment_appointment = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

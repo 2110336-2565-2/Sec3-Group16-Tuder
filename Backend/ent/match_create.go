@@ -14,6 +14,7 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/cancelrequest"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/google/uuid"
@@ -129,6 +130,25 @@ func (mc *MatchCreate) AddCancelRequest(c ...*CancelRequest) *MatchCreate {
 		ids[i] = c[i].ID
 	}
 	return mc.AddCancelRequestIDs(ids...)
+}
+
+// SetPaymentID sets the "payment" edge to the Payment entity by ID.
+func (mc *MatchCreate) SetPaymentID(id uuid.UUID) *MatchCreate {
+	mc.mutation.SetPaymentID(id)
+	return mc
+}
+
+// SetNillablePaymentID sets the "payment" edge to the Payment entity by ID if the given value is not nil.
+func (mc *MatchCreate) SetNillablePaymentID(id *uuid.UUID) *MatchCreate {
+	if id != nil {
+		mc = mc.SetPaymentID(*id)
+	}
+	return mc
+}
+
+// SetPayment sets the "payment" edge to the Payment entity.
+func (mc *MatchCreate) SetPayment(p *Payment) *MatchCreate {
+	return mc.SetPaymentID(p.ID)
 }
 
 // Mutation returns the MatchMutation object of the builder.
@@ -329,6 +349,23 @@ func (mc *MatchCreate) createSpec() (*Match, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := mc.mutation.PaymentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   match.PaymentTable,
+			Columns: []string{match.PaymentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(payment.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.payment_match = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

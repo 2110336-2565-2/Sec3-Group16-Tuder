@@ -48,14 +48,15 @@ export default function TimeSelector({
     // find the timeSlot that is selected
     const selectedTimeSlot = selectedSchedule
       .filter((day) => day.day === selectedDay)[0]
-      .timeSlot.filter((timeSlot) => timeSlot.from === from && timeSlot.to === to)[0];
+      .timeSlot.filter(
+        (timeSlot) => timeSlot.from === from && timeSlot.to === to
+      )[0];
     // change the isSelected property of the timeSlot
     selectedTimeSlot.isSelected = !selectedTimeSlot.isSelected;
     // set the selectedSchedule
     setSelectedSchedule([...selectedSchedule]);
     onChange(selectedSchedule);
   }
-  console.log(selectedSchedule, "selectedSchedule");
   return (
     <FormP.InputComponent width={width}>
       <Label>{label}</Label>
@@ -75,8 +76,8 @@ export default function TimeSelector({
           })}
         </DaySelector>
         <TimeSlotContainer>
-          {
-            //select schedule which day is selected
+          {selectedSchedule.filter((day) => day.day === selectedDay)[0].timeSlot
+            .length > 0 ? (
             selectedSchedule
               .filter((day) => day.day === selectedDay)[0]
               .timeSlot.map((time) => {
@@ -90,13 +91,19 @@ export default function TimeSelector({
                       <CheckBox
                         type="checkbox"
                         checked={time.isSelected}
-                        onChange={()=>handleCheckBoxChange(time.from, time.to)}
+                        onChange={() =>
+                          handleCheckBoxChange(time.from, time.to)
+                        }
                       />
                     </SlotWrapper>
                   </TimeSlot>
                 );
               })
-          }
+          ) : (
+            <TimeSlot>
+              <SlotWrapper>No time slot available</SlotWrapper>
+            </TimeSlot>
+          )}
         </TimeSlotContainer>
       </Container>
     </FormP.InputComponent>
@@ -163,8 +170,8 @@ const ClockIcon = styled(ClockCircleOutlined)`
 `;
 
 const CheckBox = styled.input`
-    margin-right: 5px;
-    accent-color: #EB7B42;
-    width: 15px;
-    height: 15px;
-`
+  margin-right: 5px;
+  accent-color: #eb7b42;
+  width: 15px;
+  height: 15px;
+`;

@@ -256,6 +256,33 @@ func HasCancelRequestWith(preds ...predicate.CancelRequest) predicate.Match {
 	})
 }
 
+// HasPayment applies the HasEdge predicate on the "payment" edge.
+func HasPayment() predicate.Match {
+	return predicate.Match(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, PaymentTable, PaymentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPaymentWith applies the HasEdge predicate on the "payment" edge with a given conditions (other predicates).
+func HasPaymentWith(preds ...predicate.Payment) predicate.Match {
+	return predicate.Match(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(PaymentInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, PaymentTable, PaymentColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Match) predicate.Match {
 	return predicate.Match(func(s *sql.Selector) {

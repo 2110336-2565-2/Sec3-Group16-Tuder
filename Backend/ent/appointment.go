@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/appointment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/google/uuid"
 )
 
@@ -26,17 +27,20 @@ type Appointment struct {
 	Status appointment.Status `json:"status,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AppointmentQuery when eager-loading is set.
-	Edges             AppointmentEdges `json:"edges"`
-	appointment_match *uuid.UUID
+	Edges               AppointmentEdges `json:"edges"`
+	appointment_match   *uuid.UUID
+	payment_appointment *uuid.UUID
 }
 
 // AppointmentEdges holds the relations/edges for other nodes in the graph.
 type AppointmentEdges struct {
 	// Match holds the value of the match edge.
 	Match *Match `json:"match,omitempty"`
+	// Payment holds the value of the payment edge.
+	Payment *Payment `json:"payment,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // MatchOrErr returns the Match value or an error if the edge
@@ -52,6 +56,19 @@ func (e AppointmentEdges) MatchOrErr() (*Match, error) {
 	return nil, &NotLoadedError{edge: "match"}
 }
 
+// PaymentOrErr returns the Payment value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e AppointmentEdges) PaymentOrErr() (*Payment, error) {
+	if e.loadedTypes[1] {
+		if e.Payment == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: payment.Label}
+		}
+		return e.Payment, nil
+	}
+	return nil, &NotLoadedError{edge: "payment"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Appointment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -64,6 +81,8 @@ func (*Appointment) scanValues(columns []string) ([]any, error) {
 		case appointment.FieldID:
 			values[i] = new(uuid.UUID)
 		case appointment.ForeignKeys[0]: // appointment_match
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case appointment.ForeignKeys[1]: // payment_appointment
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Appointment", columns[i])
@@ -111,6 +130,13 @@ func (a *Appointment) assignValues(columns []string, values []any) error {
 				a.appointment_match = new(uuid.UUID)
 				*a.appointment_match = *value.S.(*uuid.UUID)
 			}
+		case appointment.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field payment_appointment", values[i])
+			} else if value.Valid {
+				a.payment_appointment = new(uuid.UUID)
+				*a.payment_appointment = *value.S.(*uuid.UUID)
+			}
 		}
 	}
 	return nil
@@ -119,6 +145,11 @@ func (a *Appointment) assignValues(columns []string, values []any) error {
 // QueryMatch queries the "match" edge of the Appointment entity.
 func (a *Appointment) QueryMatch() *MatchQuery {
 	return NewAppointmentClient(a.config).QueryMatch(a)
+}
+
+// QueryPayment queries the "payment" edge of the Appointment entity.
+func (a *Appointment) QueryPayment() *PaymentQuery {
+	return NewAppointmentClient(a.config).QueryPayment(a)
 }
 
 // Update returns a builder for updating this Appointment.

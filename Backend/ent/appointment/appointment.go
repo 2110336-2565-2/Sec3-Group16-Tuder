@@ -21,6 +21,8 @@ const (
 	FieldStatus = "status"
 	// EdgeMatch holds the string denoting the match edge name in mutations.
 	EdgeMatch = "match"
+	// EdgePayment holds the string denoting the payment edge name in mutations.
+	EdgePayment = "payment"
 	// Table holds the table name of the appointment in the database.
 	Table = "appointments"
 	// MatchTable is the table that holds the match relation/edge.
@@ -30,6 +32,13 @@ const (
 	MatchInverseTable = "matches"
 	// MatchColumn is the table column denoting the match relation/edge.
 	MatchColumn = "appointment_match"
+	// PaymentTable is the table that holds the payment relation/edge.
+	PaymentTable = "appointments"
+	// PaymentInverseTable is the table name for the Payment entity.
+	// It exists in this package in order to avoid circular dependency with the "payment" package.
+	PaymentInverseTable = "payments"
+	// PaymentColumn is the table column denoting the payment relation/edge.
+	PaymentColumn = "payment_appointment"
 )
 
 // Columns holds all SQL columns for appointment fields.
@@ -44,6 +53,7 @@ var Columns = []string{
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"appointment_match",
+	"payment_appointment",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

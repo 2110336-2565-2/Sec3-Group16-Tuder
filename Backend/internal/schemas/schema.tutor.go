@@ -97,3 +97,8 @@ type SchemaGetReviewsResponse struct {
 	TotalReview int               `json:"total_review"`
 	Reviews     []*ReviewResponse `json:"reviews"`
 }
+
+type SchemaCreateOmiseCustomer struct {
+	Email          string `json:"email"`
+	OmiseBankToken string `json:"omise_bank_token"`
+}
