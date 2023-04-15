@@ -150,10 +150,7 @@ func (phc *PaymentHistoryCreate) createSpec() (*PaymentHistory, *sqlgraph.Create
 			Columns: []string{paymenthistory.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -170,10 +167,7 @@ func (phc *PaymentHistoryCreate) createSpec() (*PaymentHistory, *sqlgraph.Create
 			Columns: []string{paymenthistory.PaymentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: payment.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(payment.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

@@ -49,5 +49,8 @@ func (Match) Edges() []ent.Edge {
 			Required(),
 		edge.From("cancel_request", CancelRequest.Type).
 			Ref("match"),
+		edge.From("payment", Payment.Type).
+			Ref("match").
+			Unique(),
 	}
 }

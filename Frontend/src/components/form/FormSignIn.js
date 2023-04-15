@@ -9,30 +9,30 @@ import { toast } from 'react-hot-toast';
 export default function FormSignIn(props){
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const  setStatus = useState('waiting')[1];
+    const  [status, setStatus] = useState('waiting');
     const  handleRole = useDataContext()[1];
-    
     const navigate = useNavigate();
-
 
     async function submitHandler(e){
         e.preventDefault();
+        if (status === 'submitting') return;
+        setStatus('submitting')
+        const loadingToast = toast.loading("Signing in...");
         const signInData = {
             username,
             password,
         }
-        setStatus('submitting')
         try{
             await signInHandler(signInData, navigate)
 
             // update role in state
             handleRole.handleRole();
             toast.success('Signed in')
+            toast.dismiss(loadingToast);
             setStatus('success')
         } catch (error){
-
             // Handle by do sth
-
+            toast.dismiss(loadingToast);
             toast.error(error.message)
             setStatus('error');
         }

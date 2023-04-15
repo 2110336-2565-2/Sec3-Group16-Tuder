@@ -6,7 +6,6 @@ import AdminIssueReport from "../components/AdminIssueReport";
 import React, { useState } from "react";
 
 export default function AdminIssueReportList() {
-  //const { data, setData } = useDataContext();
   const [ item, setItem ] = useState([]);
 
   function deleteIssue(id) {
@@ -14,7 +13,6 @@ export default function AdminIssueReportList() {
       setItem(prevNotes => prevNotes.filter(issueItem => issueItem.issuereport_id  !== id));
     } catch (error) {
       console.error("Error deleting issue report:", error);
-      // display error message to user or perform some other error handling
     }
     
   }

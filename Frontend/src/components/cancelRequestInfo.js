@@ -11,7 +11,7 @@ export default function CancelRequestInfo(props){
     const navigate = useNavigate();
 
     const handleBack = () => {
-        navigate('/cancel-request-list');
+        navigate('/cancel-requests');
     }
 
     const handleSubmit = (e) => {
@@ -26,7 +26,7 @@ export default function CancelRequestInfo(props){
         submitAudittingHandler(data).then((res) => {
             if(res.data.success){
                 toast.success('Success');
-                navigate('/cancel-request-list');
+                navigate('/cancel-requests');
             }
             else{
                 toast.error('Error');
@@ -56,7 +56,7 @@ export default function CancelRequestInfo(props){
                     <Title>
                         {props.title}
                     </Title>
-                    <Image src={props.img_url} />
+                    <Image src={props.img} />
                     <ReportInfoSection>
                         <Reporter>
                             Reporter: {props.reporter}

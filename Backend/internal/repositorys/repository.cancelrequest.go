@@ -10,6 +10,7 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/cancelrequest"
 	match "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	user "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
+	utils "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 	"github.com/google/uuid"
 
 	schemas "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -173,12 +174,18 @@ func (r *repositoryCancelRequest) CancelRequest(sc *schemas.SchemaCancelRequest)
 		return nil, errors.New("user is not a student or tutor of the match")
 	}
 
+	// create image url
+	imgURL := fmt.Sprintf("%s/%s", sc.MatchID.String(), sc.UserID.String())
+
+	// upload image to s3
+	imgURL, err = utils.GenerateProfilePictureURL(sc.Img, imgURL, "ProfilePicture")
+
 	// create new class cancel request
 	ccr, err = txc.CancelRequest.
 		Create().
 		SetMatchID(m.ID).
 		SetStatus(cancelrequest.StatusPending).
-		SetImgURL(sc.ImgURL).
+		SetImgURL(imgURL).
 		SetTitle(sc.Title).
 		SetDescription(sc.Description).
 		SetUserID(u.ID).

@@ -4,11 +4,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+	"os"
+
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	entUser "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
+	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 	"github.com/google/uuid"
+	"github.com/omise/omise-go"
+	"github.com/omise/omise-go/operations"
 )
 
 var (
@@ -73,7 +79,7 @@ func (r repositoryRegister) RegisterUser(sr *schemas.SchemaRegister) (*ent.User,
 		SetBirthDate(sr.Birthdate).
 		SetGender(sr.Gender).
 		SetRole(entUser.Role(sr.Role)).
-		SetProfilePictureURL("https://se2-tuder.s3.us-west-1.amazonaws.com/user-icon-vector-people-icon-profile-vector-icon-person-illustration-business-user-icon-users-group-symbol-male-user-symbol-700-223068886.jpg"). // default profile picture
+		SetProfilePictureURL("https://se2-tuder.s3.us-west-1.amazonaws.com/ProfilePicture/Default.jpg"). // default profile picture
 		Save(r.ctx)
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
@@ -90,6 +96,7 @@ func (r repositoryRegister) RegisterUser(sr *schemas.SchemaRegister) (*ent.User,
 			Save(r.ctx)
 	case "tutor":
 		// create a schedule with default value: available all day, everyday
+		customerID, _ := r.CreateOmiseCustomer(&schema.SchemaCreateOmiseCustomer{Email: sr.Email, OmiseBankToken: sr.OmiseBankToken})
 		var schedule *ent.Schedule
 		schedule, err = txc.Schedule.
 			Create().
@@ -102,12 +109,13 @@ func (r repositoryRegister) RegisterUser(sr *schemas.SchemaRegister) (*ent.User,
 			SetDay5(AllDayAvailable).
 			SetDay6(AllDayAvailable).
 			Save(r.ctx)
-		 
+
 		_, err = txc.Tutor.
 			Create().
 			SetUser(newUser).
 			SetDescription(sr.Description).
-			SetOmiseBankToken("").
+			SetOmiseBankToken(sr.OmiseBankToken).
+			SetOmiseCustomerID(customerID).
 			SetCitizenID(sr.CitizenID).
 			SetSchedule(schedule).
 			Save(r.ctx)
@@ -122,4 +130,27 @@ func (r repositoryRegister) RegisterUser(sr *schemas.SchemaRegister) (*ent.User,
 	}
 
 	return newUser, tx.Commit()
+}
+
+func (r *repositoryRegister) CreateOmiseCustomer(sr *schema.SchemaCreateOmiseCustomer) (string, error) {
+	omisePublicKey := os.Getenv("OMISE_PUBLIC_KEY")
+	omiseSecretKey := os.Getenv("OMISE_SECRET_KEY")
+
+	client, err := omise.NewClient(omisePublicKey, omiseSecretKey)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// create a customer
+	customer, createCustomer := &omise.Customer{}, &operations.CreateCustomer{
+		Email: sr.Email,
+		Card:  sr.OmiseBankToken,
+	}
+
+	if e := client.Do(customer, createCustomer); e != nil {
+		log.Fatal(e)
+	}
+
+	return customer.ID, nil
 }

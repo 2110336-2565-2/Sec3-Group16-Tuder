@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/appointment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/google/uuid"
 )
 
@@ -37,6 +38,14 @@ func (ac *AppointmentCreate) SetEndAt(t time.Time) *AppointmentCreate {
 // SetStatus sets the "status" field.
 func (ac *AppointmentCreate) SetStatus(a appointment.Status) *AppointmentCreate {
 	ac.mutation.SetStatus(a)
+	return ac
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (ac *AppointmentCreate) SetNillableStatus(a *appointment.Status) *AppointmentCreate {
+	if a != nil {
+		ac.SetStatus(*a)
+	}
 	return ac
 }
 
@@ -71,6 +80,25 @@ func (ac *AppointmentCreate) SetNillableMatchID(id *uuid.UUID) *AppointmentCreat
 // SetMatch sets the "match" edge to the Match entity.
 func (ac *AppointmentCreate) SetMatch(m *Match) *AppointmentCreate {
 	return ac.SetMatchID(m.ID)
+}
+
+// SetPaymentID sets the "payment" edge to the Payment entity by ID.
+func (ac *AppointmentCreate) SetPaymentID(id uuid.UUID) *AppointmentCreate {
+	ac.mutation.SetPaymentID(id)
+	return ac
+}
+
+// SetNillablePaymentID sets the "payment" edge to the Payment entity by ID if the given value is not nil.
+func (ac *AppointmentCreate) SetNillablePaymentID(id *uuid.UUID) *AppointmentCreate {
+	if id != nil {
+		ac = ac.SetPaymentID(*id)
+	}
+	return ac
+}
+
+// SetPayment sets the "payment" edge to the Payment entity.
+func (ac *AppointmentCreate) SetPayment(p *Payment) *AppointmentCreate {
+	return ac.SetPaymentID(p.ID)
 }
 
 // Mutation returns the AppointmentMutation object of the builder.
@@ -108,6 +136,10 @@ func (ac *AppointmentCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (ac *AppointmentCreate) defaults() {
+	if _, ok := ac.mutation.Status(); !ok {
+		v := appointment.DefaultStatus
+		ac.mutation.SetStatus(v)
+	}
 	if _, ok := ac.mutation.ID(); !ok {
 		v := appointment.DefaultID()
 		ac.mutation.SetID(v)
@@ -185,16 +217,30 @@ func (ac *AppointmentCreate) createSpec() (*Appointment, *sqlgraph.CreateSpec) {
 			Columns: []string{appointment.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: match.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(match.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.appointment_match = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.PaymentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   appointment.PaymentTable,
+			Columns: []string{appointment.PaymentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(payment.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.payment_appointment = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
