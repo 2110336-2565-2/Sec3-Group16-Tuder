@@ -5,6 +5,7 @@ import Button from "../components/global/Button";
 import Footer from "../components/global/Footer";
 import { IsAdmin } from "../components/IsAuth";
 import { useNavigate, useLocation } from "react-router-dom";
+import { Timezone, DateFormat } from '../datas/DateFormat.js';
 
 export default function AdminTuitionFeesTransfer() {
   function fieldNameToTitle(fieldName) {
@@ -14,19 +15,20 @@ export default function AdminTuitionFeesTransfer() {
       .join(" ");
   }
   // get current URL
-  const location = useLocation().pathname;
+  const location = useLocation();
+  const  item  = location.state.data
+  const locationPath = location.pathname
   const navigate = useNavigate();
-  const dummy = {
-    course_title: "Sci+Math 5_2",
-    course_picture:
-      "https://wp.technologyreview.com/wp-content/uploads/2021/03/AndrewNg-05.jpeg",
-    student_name: "John Doe",
-    tutor_name: "Jane Doe",
-    tutor_id: "123456789",
-    subject: "Mathematics",
-    topic: "Algebra",
-    date: "June 2, 2002 11:00 - 12:00",
-    price_per_hour: 300,
+  const data = {
+    course_title: item.title,
+    course_picture: item.img,
+    student_name: item.student_name,
+    tutor_name: item.tutor_name,
+    tutor_id: item.tutorID,
+    subject: item.subject,
+    topic: item.topic,
+    date: new Date(item.appointmentEndAt).toLocaleString(Timezone, DateFormat),
+    price_per_hour: item.price_per_hour,
   };
 
   const tableContent = [
@@ -42,10 +44,10 @@ export default function AdminTuitionFeesTransfer() {
       <IsAdmin />
       <Container>
         <Wrapper>
-          <Title>Tuition Fee - {dummy.course_title}</Title>
+          <Title>Tuition Fee - {data.course_title}</Title>
           <Card>
             <ImageWrapper>
-              <Image src={dummy.course_picture} />
+              <Image src={data.course_picture} />
             </ImageWrapper>
             <Table>
               <thead>
@@ -59,20 +61,20 @@ export default function AdminTuitionFeesTransfer() {
                     <Td>
                       <FieldName>{fieldNameToTitle(item)}</FieldName>
                     </Td>
-                    <Td>{dummy[item]}</Td>
+                    <Td>{data[item]}</Td>
                   </Tr>
                 ))}
               </tbody>
             </Table>
           </Card>
           <QRWrapper>
-            <QRPayment amount={dummy["price_per_hour"]} tutorID={dummy["tutor_id"]} />
+            <QRPayment amount={data["price_per_hour"]} tutorID={data["tutor_id"]} />
           </QRWrapper>
           <ButtonWrapper>
             <Button
               variance="cancel"
               onClick={() =>
-                navigate(location.substring(0, location.lastIndexOf("/")))
+                navigate(locationPath.substring(0, locationPath.lastIndexOf("/")))
               }
             >
               Back
