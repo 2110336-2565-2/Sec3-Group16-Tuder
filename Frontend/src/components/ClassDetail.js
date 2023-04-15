@@ -1,14 +1,50 @@
 import styled from "styled-components";
 import React from "react";
-import { getRole } from "../utils/jwtGet";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { Timezone, DateFormat } from "../datas/DateFormat";
+import { changeStatusHandler } from "../handlers/classesHandler";
+import { toast } from "react-hot-toast";
 
 export default function ClassDetails(props) {
   const data = props.classDetail;
   const navigate = useNavigate();
 
+  const { id } = useParams();
   const handleCancel = () => {
-    navigate("/cancel-request/" + data.id);
+    navigate("/cancel-request/" + id, {
+      state: { course_name: data.course_name, tutor_name: data.tutor_name },
+    });
+  };
+
+  var timeLeft =
+    data.appointments !== undefined
+      ? data.appointments.filter((appointment) => {
+          return appointment.status === "comingsoon";
+        })
+      : 0;
+
+  const attend = (e, id) => {
+    e.preventDefault();
+    changeStatusHandler(id, "completed").then((res) => {
+      if (res.data.success) {
+        toast.success("Attendded");
+        window.location.reload();
+      } else {
+        toast.error("Failed Attended");
+      }
+    });
+  };
+
+  const postpone = (e, id) => {
+    e.preventDefault();
+    changeStatusHandler(id, "postponed").then((res) => {
+      if (res.data.success) {
+        toast.success("Postponed");
+        window.location.reload();
+      } else {
+        toast.error("Failed Postponed");
+      }
+    });
   };
 
   return (
@@ -22,13 +58,10 @@ export default function ClassDetails(props) {
         <GridContent>
           <DetailContent>
             <Detailrow fsize="30px" fweight="700">
-              {data.title}
+              {data.course_name}
             </Detailrow>
             <Detailrow mgtop="1rem" fsize="16px" fweight="400">
-              {data.ReviewCount} review(s)
-            </Detailrow>
-            <Detailrow mgtop="1rem" fsize="16px" fweight="400">
-              Tutor : {`${data.TutorFirstname} ${data.TutorLastname}`}
+              Tutor : {data.tutor_name}
             </Detailrow>
             <Detailrow mgtop="1rem" fsize="16px" fweight="400">
               Level : {data.level}
@@ -37,11 +70,10 @@ export default function ClassDetails(props) {
               Description :
             </Detailrow>
             <Detailrow mgtop="0.2rem" fsize="16px" fweight="400">
-              {data.description}
+              {data.course_description}
             </Detailrow>
             <Detailrow mgtop="1rem" fsize="16px" fweight="400">
-              Estimate time left : {data.estimate_time} / {data.estimate_time}{" "}
-              hrs
+              Estimate time left : {timeLeft.length} / {data.estimate_time} hrs
             </Detailrow>
           </DetailContent>
         </GridContent>
@@ -51,41 +83,90 @@ export default function ClassDetails(props) {
           <AppointmentTitle>Appointment</AppointmentTitle>
 
           {/* // add for loop here */}
-          <Grid>
-            <GridLeft>
-              <AppointmentDetail>
-                <AppointmentDetailRow>
-                  <AppointmentDetailTitle>Time Slot:</AppointmentDetailTitle>
-                  <AppointmentDetailContent>Hee</AppointmentDetailContent>
-                </AppointmentDetailRow>
-                <AppointmentDetailRow>
-                  <AppointmentDetailTitle>Status:</AppointmentDetailTitle>
-                  <AppointmentDetailContent>Ongoing</AppointmentDetailContent>
-                </AppointmentDetailRow>
-              </AppointmentDetail>
-            </GridLeft>
-            <GridRight>
-              <Button>Cancel</Button>
-            </GridRight>
-          </Grid>
-
-          <Grid>
-            <GridLeft>
-              <AppointmentDetail>
-                <AppointmentDetailRow>
-                  <AppointmentDetailTitle>Time Slot:</AppointmentDetailTitle>
-                  <AppointmentDetailContent>Hee</AppointmentDetailContent>
-                </AppointmentDetailRow>
-                <AppointmentDetailRow>
-                  <AppointmentDetailTitle>Status</AppointmentDetailTitle>
-                  <AppointmentDetailContent>Ongoing</AppointmentDetailContent>
-                </AppointmentDetailRow>
-              </AppointmentDetail>
-            </GridLeft>
-            <GridRight>
-              <Button>Cancel</Button>
-            </GridRight>
-          </Grid>
+          {data.appointments !== undefined ? (
+            data.appointments.map((app) => {
+              if (app.status === "verifying") {
+                return (
+                  <Grid key={app.id}>
+                    <GridLeft>
+                      <AppointmentDetail>
+                        <AppointmentDetailRow>
+                          <AppointmentDetailTitle>
+                            Time Slot:
+                          </AppointmentDetailTitle>
+                          <AppointmentDetailContent>
+                            {new Date(app.begin_at).toLocaleString(
+                              Timezone,
+                              DateFormat
+                            )}{" "}
+                            {" - "}{" "}
+                            {new Date(app.end_at).toLocaleString(
+                              Timezone,
+                              DateFormat
+                            )}
+                          </AppointmentDetailContent>
+                        </AppointmentDetailRow>
+                        <AppointmentDetailRow>
+                          <AppointmentDetailTitle>
+                            Status:
+                          </AppointmentDetailTitle>
+                          <AppointmentDetailContent>
+                            {app.status}
+                          </AppointmentDetailContent>
+                        </AppointmentDetailRow>
+                      </AppointmentDetail>
+                    </GridLeft>
+                    <GridRight>
+                      <Button onClick={(e) => attend(e, app.id)}>
+                        {" "}
+                        Attend Class
+                      </Button>
+                      <Button onClick={(e) => postpone(e, app.id)}>
+                        {" "}
+                        Postpone Class
+                      </Button>
+                    </GridRight>
+                  </Grid>
+                );
+              } else {
+                return (
+                  <Grid key={app.id}>
+                    <GridLeft>
+                      <AppointmentDetail>
+                        <AppointmentDetailRow>
+                          <AppointmentDetailTitle>
+                            Time Slot:
+                          </AppointmentDetailTitle>
+                          <AppointmentDetailContent>
+                            {new Date(app.begin_at).toLocaleString(
+                              Timezone,
+                              DateFormat
+                            )}{" "}
+                            {" - "}{" "}
+                            {new Date(app.end_at).toLocaleString(
+                              Timezone,
+                              DateFormat
+                            )}
+                          </AppointmentDetailContent>
+                        </AppointmentDetailRow>
+                        <AppointmentDetailRow>
+                          <AppointmentDetailTitle>
+                            Status:
+                          </AppointmentDetailTitle>
+                          <AppointmentDetailContent>
+                            {app.status}
+                          </AppointmentDetailContent>
+                        </AppointmentDetailRow>
+                      </AppointmentDetail>
+                    </GridLeft>
+                    <GridRight></GridRight>
+                  </Grid>
+                );
+              }
+            })
+          ) : (
+            <div></div>
+          )}
         </AppointmentContent>
       </AppointmentRow>
       <CancelButtonSection>

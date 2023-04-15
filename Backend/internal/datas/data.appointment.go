@@ -14,10 +14,10 @@ import (
 func InsertAppointment(client *ent.Client, ctx context.Context) []*ent.Appointment {
 
 	// Create appointment
-	app1 := CreateApp(client, appointment.StatusPending, time.Now().Add(1*time.Hour), time.Now().Add(2*time.Hour))
-	app2 := CreateApp(client, appointment.StatusPending, time.Now().Add(400*time.Hour), time.Now().Add(401*time.Hour))
-	app3 := CreateApp(client, appointment.StatusPending, time.Now().Add(0*time.Hour), time.Now().Add(1*time.Hour))
-	app4 := CreateApp(client, appointment.StatusPending, time.Now().Add(20*time.Hour), time.Now().Add(21*time.Hour))
+	app1 := CreateApp(client, appointment.StatusComingsoon, time.Now(), time.Now().Add(1*time.Hour))
+	app2 := CreateApp(client, appointment.StatusComingsoon, time.Now(), time.Now().Add(1*time.Hour))
+	app3 := CreateApp(client, appointment.StatusOngoing, time.Now(), time.Now().Add(1*time.Hour))
+	app4 := CreateApp(client, appointment.StatusOngoing, time.Now(), time.Now().Add(1*time.Hour))
 
 	app, err := client.Appointment.CreateBulk(app1, app2, app3, app4).Save(ctx)
 

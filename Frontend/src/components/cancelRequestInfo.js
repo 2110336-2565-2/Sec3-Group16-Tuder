@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Timezone, DateFormat } from '../datas/DateFormat.js';
 import { useNavigate } from 'react-router-dom';
-import { submitAudittingHandler } from '../handlers/cancellingRequestHandler';
+import { submitAudittingHandler } from '../handlers/cancellingRequestHandler.js';
 import { toast } from 'react-hot-toast';
 
 export default function CancelRequestInfo(props){
