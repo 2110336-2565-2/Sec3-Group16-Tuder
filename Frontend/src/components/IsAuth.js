@@ -78,8 +78,9 @@ export function IsUser({children}) {
     if( (role.role === "student" || role.role === "tutor")){
         return children;
     }else{
-        alert("Please Login to access this page")
+        alert("Unauthorized Access, Please Login again");
         window.location.href = "/sign-in";
+      
         return
     }
 }
@@ -101,23 +102,4 @@ export function IsEnroll({children}) {
         return
     }
 }
-
-export function IsStudentOrTutor({children}) {
-    const [role, handleRole] = useDataContext();
-
-    if(!verify()){
-        alert("credit expired, please login again")
-        window.location.href = "/sign-in";
-        return
-    }
-
-    if( role.role === "student" || role.role === "tutor"){
-        return children;
-    }else{
-        alert("Unauthorized Access, Please Login again")
-        window.location.href = "/sign-in";
-        return
-    }
-}
-
 

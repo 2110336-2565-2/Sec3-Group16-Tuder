@@ -13,7 +13,7 @@ var (
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "begin_at", Type: field.TypeTime},
 		{Name: "end_at", Type: field.TypeTime},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"comingsoon", "ongoing", "verifying", "pending", "completed", "posponed", "considering"}, Default: "comingsoon"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"comingsoon", "ongoing", "verifying", "pending", "completed", "postponed", "considering", "canceled"}, Default: "comingsoon"},
 		{Name: "appointment_match", Type: field.TypeUUID, Nullable: true},
 		{Name: "payment_appointment", Type: field.TypeUUID, Unique: true, Nullable: true},
 	}
@@ -123,6 +123,7 @@ var (
 	MatchesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "match_created_at", Type: field.TypeTime},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"enrolled", "completed", "cancelling", "canceled"}, Default: "enrolled"},
 		{Name: "course_match", Type: field.TypeUUID},
 		{Name: "payment_match", Type: field.TypeUUID, Unique: true, Nullable: true},
 		{Name: "schedule_match", Type: field.TypeUUID, Unique: true},
@@ -136,25 +137,25 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "matches_courses_match",
-				Columns:    []*schema.Column{MatchesColumns[2]},
+				Columns:    []*schema.Column{MatchesColumns[3]},
 				RefColumns: []*schema.Column{CoursesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "matches_payments_match",
-				Columns:    []*schema.Column{MatchesColumns[3]},
+				Columns:    []*schema.Column{MatchesColumns[4]},
 				RefColumns: []*schema.Column{PaymentsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "matches_schedules_match",
-				Columns:    []*schema.Column{MatchesColumns[4]},
+				Columns:    []*schema.Column{MatchesColumns[5]},
 				RefColumns: []*schema.Column{SchedulesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "matches_students_match",
-				Columns:    []*schema.Column{MatchesColumns[5]},
+				Columns:    []*schema.Column{MatchesColumns[6]},
 				RefColumns: []*schema.Column{StudentsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

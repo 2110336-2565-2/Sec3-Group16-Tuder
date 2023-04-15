@@ -43,7 +43,7 @@ export default function TutorInfo({ user, isOwner, othersUsername }) {
           <InfoContent>{user.description}</InfoContent>
         </InfoWrapper>
       </InfoContainter>
-      {isOwner ? <Button onClick={()=>navigate('my-reviews')} >My Reviews</Button> : <Button onClick={()=>navigate(`/tutors/${othersUsername}/reviews`)} >Read Reviews</Button>}
+      {isOwner ? <Button onClick={()=>navigate('reviews')} >My Reviews</Button> : <Button onClick={()=>navigate(`/tutors/${othersUsername}/reviews`)} >Read Reviews</Button>}
     </Container>
   );
 }

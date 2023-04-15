@@ -41,6 +41,20 @@ func (mc *MatchCreate) SetNillableMatchCreatedAt(t *time.Time) *MatchCreate {
 	return mc
 }
 
+// SetStatus sets the "status" field.
+func (mc *MatchCreate) SetStatus(m match.Status) *MatchCreate {
+	mc.mutation.SetStatus(m)
+	return mc
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (mc *MatchCreate) SetNillableStatus(m *match.Status) *MatchCreate {
+	if m != nil {
+		mc.SetStatus(*m)
+	}
+	return mc
+}
+
 // SetID sets the "id" field.
 func (mc *MatchCreate) SetID(u uuid.UUID) *MatchCreate {
 	mc.mutation.SetID(u)
@@ -176,6 +190,10 @@ func (mc *MatchCreate) defaults() {
 		v := match.DefaultMatchCreatedAt()
 		mc.mutation.SetMatchCreatedAt(v)
 	}
+	if _, ok := mc.mutation.Status(); !ok {
+		v := match.DefaultStatus
+		mc.mutation.SetStatus(v)
+	}
 	if _, ok := mc.mutation.ID(); !ok {
 		v := match.DefaultID()
 		mc.mutation.SetID(v)
@@ -186,6 +204,14 @@ func (mc *MatchCreate) defaults() {
 func (mc *MatchCreate) check() error {
 	if _, ok := mc.mutation.MatchCreatedAt(); !ok {
 		return &ValidationError{Name: "match_created_at", err: errors.New(`ent: missing required field "Match.match_created_at"`)}
+	}
+	if _, ok := mc.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Match.status"`)}
+	}
+	if v, ok := mc.mutation.Status(); ok {
+		if err := match.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Match.status": %w`, err)}
+		}
 	}
 	if _, ok := mc.mutation.StudentID(); !ok {
 		return &ValidationError{Name: "student", err: errors.New(`ent: missing required edge "Match.student"`)}
@@ -237,6 +263,10 @@ func (mc *MatchCreate) createSpec() (*Match, *sqlgraph.CreateSpec) {
 	if value, ok := mc.mutation.MatchCreatedAt(); ok {
 		_spec.SetField(match.FieldMatchCreatedAt, field.TypeTime, value)
 		_node.MatchCreatedAt = value
+	}
+	if value, ok := mc.mutation.Status(); ok {
+		_spec.SetField(match.FieldStatus, field.TypeEnum, value)
+		_node.Status = value
 	}
 	if nodes := mc.mutation.StudentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

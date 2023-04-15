@@ -1,49 +1,61 @@
 import React from "react";
+import { useNavigate } from "react-router";
 import styled from "styled-components";
 
-export default function MyClass() {
+import { Timezone, DateFormat } from "../datas/DateFormat.js";
 
-    return (
+export default function MyClass(props) {
+  const course_picture_url = props.data.course_picture_url;
+  const course_name = props.data.course_name;
+  const tutor_name = props.data.tutor_name;
+  const navigate = useNavigate();
+  const remaining = props.data.remaining;
+  const status = props.data.status;
+  // the first appointment in the array which is in state coming soon
+  const upcoming =
+    remaining != 0
+      ? new Date(props.data.upcoming_class).toLocaleString(Timezone, DateFormat)
+      : "No Upcoming Class";
+
+  return (
     <Request>
-        <ClassSection>
-          <GridSection>
-            <ClassImg src="" alt="classImg" />
-          </GridSection>
-  
-          <ClassInfoSection>
-            <ClassFlex>
-              <ClassInfo>
-                <h3>Class Name</h3>
-              </ClassInfo>
-              <ClassInfo>
-                <InfoTitle min_w="43px">Tutor :</InfoTitle>
-                <InfoDesc>veveve</InfoDesc>
-              </ClassInfo>
-  
-              <ClassInfo>
-                <InfoTitle min_w="79px">Upcoming Class :</InfoTitle>
-                <InfoDesc>vevev</InfoDesc>
-              </ClassInfo>
-              <ClassInfo>
-                <InfoTitle min_w="105px">Remaining :</InfoTitle>
-                <InfoDesc>
-                  vwev
-                </InfoDesc>
-              </ClassInfo>
-              <ClassInfoButton>
-                <InfoTitle min_w="60px">Status :</InfoTitle>
-                <InfoDesc>
-                  ongoing
-                </InfoDesc>
-              </ClassInfoButton>
-            </ClassFlex>
-          </ClassInfoSection>
-        </ClassSection>
+      <ClassSection>
         <GridSection>
-            {/* put button in here */}
+          <ClassImg src={course_picture_url} alt="classImg" />
         </GridSection>
+
+        <ClassInfoSection>
+          <ClassFlex>
+            <ClassInfo>
+              <h3>{course_name}</h3>
+            </ClassInfo>
+            <ClassInfo>
+              <InfoTitle min_w="43px">Tutor :</InfoTitle>
+              <InfoDesc>{tutor_name}</InfoDesc>
+            </ClassInfo>
+            <ClassInfo>
+              <InfoTitle min_w="79px">Upcoming Class :</InfoTitle>
+              <InfoDesc>{upcoming}</InfoDesc>
+            </ClassInfo>
+            <ClassInfo>
+              <InfoTitle min_w="105px">Remaining :</InfoTitle>
+              <InfoDesc>{remaining} hrs</InfoDesc>
+            </ClassInfo>
+            <ClassInfo>
+              <InfoTitle min_w="105px">Status :</InfoTitle>
+              <InfoDesc>{status}</InfoDesc>
+            </ClassInfo>
+          </ClassFlex>
+        </ClassInfoSection>
+      </ClassSection>
+      <GridSection>
+        {/* put button in here */}
+        <Button onClick={(e) => navigate(`/classes/${props.data.match_id}`)}>
+          View Info
+        </Button>
+      </GridSection>
     </Request>
-    );
+  );
 }
 
 const Request = styled.div`
@@ -57,7 +69,8 @@ const Request = styled.div`
   gap: 20px;
   padding: 10px;
   border-radius: 10px;
-`
+  margin: 10px;
+`;
 
 const ClassSection = styled.div`
   display: grid;
@@ -122,4 +135,20 @@ const InfoDesc = styled.div`
   display: flex;
   font-size: 14px;
   font-weight: 300;
+`;
+
+const Button = styled.button`
+  border: 2px solid #ff8008;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: 400;
+  cursor: pointer;
+  background-color: #ff7008;
+
+  &:hover {
+    background-color: #ff8009;
+    border: 2px solid #ff8008;
+    color: #ffffff;
+  }
 `;

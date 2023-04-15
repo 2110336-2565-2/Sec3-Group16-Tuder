@@ -108,6 +108,8 @@ export default function QRPayment({
           if(courseID){
             callback({...callbackData,
               payment_id: paymentID,});
+          } else if(tutorID){
+            callback(callbackData);
           }
         })
         .catch((err) => {

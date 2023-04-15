@@ -66,7 +66,7 @@ const router = createBrowserRouter([
             element: <Profile />,
           },
           {
-            path: "my-reviews",
+            path: "reviews",
             element: <TutorReviews />,
           },
           {

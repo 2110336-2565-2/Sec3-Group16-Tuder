@@ -1,19 +1,28 @@
-import React from "react";
-import { IsStudentOrTutor } from "../components/IsAuth";
+import React, { useState, createContext, useContext } from "react";
+import { IsUser } from "../components/IsAuth";
 import styled from "styled-components";
 import ClassComponentList from "../components/ClassComponentList";
 
+const DataContext = createContext({
+  data: [],
+  setData: () => {},
+});
+
+export const useDataContext = () => useContext(DataContext);
 export default function ClassList() {
+  const [data, setData] = useState([]);
   return (
     <>
-        <IsStudentOrTutor />
-        <ContainerWithHeight margintop="25px">
+      <IsUser>
+        <DataContext.Provider value={{ data, setData }}>
+          <ContainerWithHeight margintop="25px">
             <ClassComponentList />
-        </ContainerWithHeight>
+          </ContainerWithHeight>
+        </DataContext.Provider>
+      </IsUser>
     </>
   );
 }
-
 
 const ContainerWithHeight = styled.div`
   display: flex;
