@@ -243,10 +243,7 @@ func (crc *CancelRequestCreate) createSpec() (*CancelRequest, *sqlgraph.CreateSp
 			Columns: []string{cancelrequest.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: match.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(match.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -263,10 +260,7 @@ func (crc *CancelRequestCreate) createSpec() (*CancelRequest, *sqlgraph.CreateSp
 			Columns: []string{cancelrequest.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

@@ -36,6 +36,24 @@ func (pc *PaymentCreate) SetNillableQrPictureURL(s *string) *PaymentCreate {
 	return pc
 }
 
+// SetPaymentStatus sets the "payment_status" field.
+func (pc *PaymentCreate) SetPaymentStatus(s string) *PaymentCreate {
+	pc.mutation.SetPaymentStatus(s)
+	return pc
+}
+
+// SetCard sets the "card" field.
+func (pc *PaymentCreate) SetCard(s string) *PaymentCreate {
+	pc.mutation.SetCard(s)
+	return pc
+}
+
+// SetAmount sets the "amount" field.
+func (pc *PaymentCreate) SetAmount(i int) *PaymentCreate {
+	pc.mutation.SetAmount(i)
+	return pc
+}
+
 // SetID sets the "id" field.
 func (pc *PaymentCreate) SetID(u uuid.UUID) *PaymentCreate {
 	pc.mutation.SetID(u)
@@ -119,6 +137,30 @@ func (pc *PaymentCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (pc *PaymentCreate) check() error {
+	if _, ok := pc.mutation.PaymentStatus(); !ok {
+		return &ValidationError{Name: "payment_status", err: errors.New(`ent: missing required field "Payment.payment_status"`)}
+	}
+	if v, ok := pc.mutation.PaymentStatus(); ok {
+		if err := payment.PaymentStatusValidator(v); err != nil {
+			return &ValidationError{Name: "payment_status", err: fmt.Errorf(`ent: validator failed for field "Payment.payment_status": %w`, err)}
+		}
+	}
+	if _, ok := pc.mutation.Card(); !ok {
+		return &ValidationError{Name: "card", err: errors.New(`ent: missing required field "Payment.card"`)}
+	}
+	if v, ok := pc.mutation.Card(); ok {
+		if err := payment.CardValidator(v); err != nil {
+			return &ValidationError{Name: "card", err: fmt.Errorf(`ent: validator failed for field "Payment.card": %w`, err)}
+		}
+	}
+	if _, ok := pc.mutation.Amount(); !ok {
+		return &ValidationError{Name: "amount", err: errors.New(`ent: missing required field "Payment.amount"`)}
+	}
+	if v, ok := pc.mutation.Amount(); ok {
+		if err := payment.AmountValidator(v); err != nil {
+			return &ValidationError{Name: "amount", err: fmt.Errorf(`ent: validator failed for field "Payment.amount": %w`, err)}
+		}
+	}
 	if _, ok := pc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "Payment.user"`)}
 	}
@@ -161,6 +203,18 @@ func (pc *PaymentCreate) createSpec() (*Payment, *sqlgraph.CreateSpec) {
 		_spec.SetField(payment.FieldQrPictureURL, field.TypeString, value)
 		_node.QrPictureURL = &value
 	}
+	if value, ok := pc.mutation.PaymentStatus(); ok {
+		_spec.SetField(payment.FieldPaymentStatus, field.TypeString, value)
+		_node.PaymentStatus = value
+	}
+	if value, ok := pc.mutation.Card(); ok {
+		_spec.SetField(payment.FieldCard, field.TypeString, value)
+		_node.Card = value
+	}
+	if value, ok := pc.mutation.Amount(); ok {
+		_spec.SetField(payment.FieldAmount, field.TypeInt, value)
+		_node.Amount = value
+	}
 	if nodes := pc.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -169,10 +223,7 @@ func (pc *PaymentCreate) createSpec() (*Payment, *sqlgraph.CreateSpec) {
 			Columns: []string{payment.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -189,10 +240,7 @@ func (pc *PaymentCreate) createSpec() (*Payment, *sqlgraph.CreateSpec) {
 			Columns: []string{payment.PaymentHistoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: paymenthistory.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(paymenthistory.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

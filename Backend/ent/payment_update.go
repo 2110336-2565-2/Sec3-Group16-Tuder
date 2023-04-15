@@ -50,6 +50,31 @@ func (pu *PaymentUpdate) ClearQrPictureURL() *PaymentUpdate {
 	return pu
 }
 
+// SetPaymentStatus sets the "payment_status" field.
+func (pu *PaymentUpdate) SetPaymentStatus(s string) *PaymentUpdate {
+	pu.mutation.SetPaymentStatus(s)
+	return pu
+}
+
+// SetCard sets the "card" field.
+func (pu *PaymentUpdate) SetCard(s string) *PaymentUpdate {
+	pu.mutation.SetCard(s)
+	return pu
+}
+
+// SetAmount sets the "amount" field.
+func (pu *PaymentUpdate) SetAmount(i int) *PaymentUpdate {
+	pu.mutation.ResetAmount()
+	pu.mutation.SetAmount(i)
+	return pu
+}
+
+// AddAmount adds i to the "amount" field.
+func (pu *PaymentUpdate) AddAmount(i int) *PaymentUpdate {
+	pu.mutation.AddAmount(i)
+	return pu
+}
+
 // SetUserID sets the "user" edge to the User entity by ID.
 func (pu *PaymentUpdate) SetUserID(id uuid.UUID) *PaymentUpdate {
 	pu.mutation.SetUserID(id)
@@ -137,6 +162,21 @@ func (pu *PaymentUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (pu *PaymentUpdate) check() error {
+	if v, ok := pu.mutation.PaymentStatus(); ok {
+		if err := payment.PaymentStatusValidator(v); err != nil {
+			return &ValidationError{Name: "payment_status", err: fmt.Errorf(`ent: validator failed for field "Payment.payment_status": %w`, err)}
+		}
+	}
+	if v, ok := pu.mutation.Card(); ok {
+		if err := payment.CardValidator(v); err != nil {
+			return &ValidationError{Name: "card", err: fmt.Errorf(`ent: validator failed for field "Payment.card": %w`, err)}
+		}
+	}
+	if v, ok := pu.mutation.Amount(); ok {
+		if err := payment.AmountValidator(v); err != nil {
+			return &ValidationError{Name: "amount", err: fmt.Errorf(`ent: validator failed for field "Payment.amount": %w`, err)}
+		}
+	}
 	if _, ok := pu.mutation.UserID(); pu.mutation.UserCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Payment.user"`)
 	}
@@ -161,6 +201,18 @@ func (pu *PaymentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if pu.mutation.QrPictureURLCleared() {
 		_spec.ClearField(payment.FieldQrPictureURL, field.TypeString)
 	}
+	if value, ok := pu.mutation.PaymentStatus(); ok {
+		_spec.SetField(payment.FieldPaymentStatus, field.TypeString, value)
+	}
+	if value, ok := pu.mutation.Card(); ok {
+		_spec.SetField(payment.FieldCard, field.TypeString, value)
+	}
+	if value, ok := pu.mutation.Amount(); ok {
+		_spec.SetField(payment.FieldAmount, field.TypeInt, value)
+	}
+	if value, ok := pu.mutation.AddedAmount(); ok {
+		_spec.AddField(payment.FieldAmount, field.TypeInt, value)
+	}
 	if pu.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -169,10 +221,7 @@ func (pu *PaymentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{payment.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -185,10 +234,7 @@ func (pu *PaymentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{payment.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -204,10 +250,7 @@ func (pu *PaymentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{payment.PaymentHistoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: paymenthistory.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(paymenthistory.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -220,10 +263,7 @@ func (pu *PaymentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{payment.PaymentHistoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: paymenthistory.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(paymenthistory.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -239,10 +279,7 @@ func (pu *PaymentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{payment.PaymentHistoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: paymenthistory.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(paymenthistory.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -287,6 +324,31 @@ func (puo *PaymentUpdateOne) SetNillableQrPictureURL(s *string) *PaymentUpdateOn
 // ClearQrPictureURL clears the value of the "qr_picture_url" field.
 func (puo *PaymentUpdateOne) ClearQrPictureURL() *PaymentUpdateOne {
 	puo.mutation.ClearQrPictureURL()
+	return puo
+}
+
+// SetPaymentStatus sets the "payment_status" field.
+func (puo *PaymentUpdateOne) SetPaymentStatus(s string) *PaymentUpdateOne {
+	puo.mutation.SetPaymentStatus(s)
+	return puo
+}
+
+// SetCard sets the "card" field.
+func (puo *PaymentUpdateOne) SetCard(s string) *PaymentUpdateOne {
+	puo.mutation.SetCard(s)
+	return puo
+}
+
+// SetAmount sets the "amount" field.
+func (puo *PaymentUpdateOne) SetAmount(i int) *PaymentUpdateOne {
+	puo.mutation.ResetAmount()
+	puo.mutation.SetAmount(i)
+	return puo
+}
+
+// AddAmount adds i to the "amount" field.
+func (puo *PaymentUpdateOne) AddAmount(i int) *PaymentUpdateOne {
+	puo.mutation.AddAmount(i)
 	return puo
 }
 
@@ -390,6 +452,21 @@ func (puo *PaymentUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (puo *PaymentUpdateOne) check() error {
+	if v, ok := puo.mutation.PaymentStatus(); ok {
+		if err := payment.PaymentStatusValidator(v); err != nil {
+			return &ValidationError{Name: "payment_status", err: fmt.Errorf(`ent: validator failed for field "Payment.payment_status": %w`, err)}
+		}
+	}
+	if v, ok := puo.mutation.Card(); ok {
+		if err := payment.CardValidator(v); err != nil {
+			return &ValidationError{Name: "card", err: fmt.Errorf(`ent: validator failed for field "Payment.card": %w`, err)}
+		}
+	}
+	if v, ok := puo.mutation.Amount(); ok {
+		if err := payment.AmountValidator(v); err != nil {
+			return &ValidationError{Name: "amount", err: fmt.Errorf(`ent: validator failed for field "Payment.amount": %w`, err)}
+		}
+	}
 	if _, ok := puo.mutation.UserID(); puo.mutation.UserCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Payment.user"`)
 	}
@@ -431,6 +508,18 @@ func (puo *PaymentUpdateOne) sqlSave(ctx context.Context) (_node *Payment, err e
 	if puo.mutation.QrPictureURLCleared() {
 		_spec.ClearField(payment.FieldQrPictureURL, field.TypeString)
 	}
+	if value, ok := puo.mutation.PaymentStatus(); ok {
+		_spec.SetField(payment.FieldPaymentStatus, field.TypeString, value)
+	}
+	if value, ok := puo.mutation.Card(); ok {
+		_spec.SetField(payment.FieldCard, field.TypeString, value)
+	}
+	if value, ok := puo.mutation.Amount(); ok {
+		_spec.SetField(payment.FieldAmount, field.TypeInt, value)
+	}
+	if value, ok := puo.mutation.AddedAmount(); ok {
+		_spec.AddField(payment.FieldAmount, field.TypeInt, value)
+	}
 	if puo.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -439,10 +528,7 @@ func (puo *PaymentUpdateOne) sqlSave(ctx context.Context) (_node *Payment, err e
 			Columns: []string{payment.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -455,10 +541,7 @@ func (puo *PaymentUpdateOne) sqlSave(ctx context.Context) (_node *Payment, err e
 			Columns: []string{payment.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -474,10 +557,7 @@ func (puo *PaymentUpdateOne) sqlSave(ctx context.Context) (_node *Payment, err e
 			Columns: []string{payment.PaymentHistoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: paymenthistory.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(paymenthistory.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -490,10 +570,7 @@ func (puo *PaymentUpdateOne) sqlSave(ctx context.Context) (_node *Payment, err e
 			Columns: []string{payment.PaymentHistoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: paymenthistory.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(paymenthistory.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -509,10 +586,7 @@ func (puo *PaymentUpdateOne) sqlSave(ctx context.Context) (_node *Payment, err e
 			Columns: []string{payment.PaymentHistoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: paymenthistory.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(paymenthistory.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

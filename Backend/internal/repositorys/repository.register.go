@@ -79,7 +79,7 @@ func (r repositoryRegister) RegisterUser(sr *schemas.SchemaRegister) (*ent.User,
 		SetBirthDate(sr.Birthdate).
 		SetGender(sr.Gender).
 		SetRole(entUser.Role(sr.Role)).
-		SetProfilePictureURL("https://se2-tuder.s3.us-west-1.amazonaws.com/user-icon-vector-people-icon-profile-vector-icon-person-illustration-business-user-icon-users-group-symbol-male-user-symbol-700-223068886.jpg"). // default profile picture
+		SetProfilePictureURL("https://se2-tuder.s3.us-west-1.amazonaws.com/ProfilePicture/Default.jpg"). // default profile picture
 		Save(r.ctx)
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
@@ -96,6 +96,7 @@ func (r repositoryRegister) RegisterUser(sr *schemas.SchemaRegister) (*ent.User,
 			Save(r.ctx)
 	case "tutor":
 		// create a schedule with default value: available all day, everyday
+		customerID, _ := r.CreateOmiseCustomer(&schema.SchemaCreateOmiseCustomer{Email: sr.Email, OmiseBankToken: sr.OmiseBankToken})
 		var schedule *ent.Schedule
 		schedule, err = txc.Schedule.
 			Create().
@@ -114,6 +115,7 @@ func (r repositoryRegister) RegisterUser(sr *schemas.SchemaRegister) (*ent.User,
 			SetUser(newUser).
 			SetDescription(sr.Description).
 			SetOmiseBankToken(sr.OmiseBankToken).
+			SetOmiseCustomerID(customerID).
 			SetCitizenID(sr.CitizenID).
 			SetSchedule(schedule).
 			Save(r.ctx)
@@ -127,12 +129,10 @@ func (r repositoryRegister) RegisterUser(sr *schemas.SchemaRegister) (*ent.User,
 		return nil, err
 	}
 
-	r.CreateOmiseCustomer(&schema.SchemaCreateOmiseCustomer{Email: sr.Email, OmiseBankToken: sr.OmiseBankToken})
-
 	return newUser, tx.Commit()
 }
 
-func (r *repositoryRegister) CreateOmiseCustomer(sr *schema.SchemaCreateOmiseCustomer) (err error) {
+func (r *repositoryRegister) CreateOmiseCustomer(sr *schema.SchemaCreateOmiseCustomer) (string, error) {
 	omisePublicKey := os.Getenv("OMISE_PUBLIC_KEY")
 	omiseSecretKey := os.Getenv("OMISE_SECRET_KEY")
 
@@ -152,5 +152,5 @@ func (r *repositoryRegister) CreateOmiseCustomer(sr *schema.SchemaCreateOmiseCus
 		log.Fatal(e)
 	}
 
-	return nil
+	return customer.ID, nil
 }

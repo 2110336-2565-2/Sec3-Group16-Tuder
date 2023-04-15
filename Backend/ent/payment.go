@@ -19,6 +19,12 @@ type Payment struct {
 	ID uuid.UUID `json:"id,omitempty"`
 	// QrPictureURL holds the value of the "qr_picture_url" field.
 	QrPictureURL *string `json:"qr_picture_url,omitempty"`
+	// PaymentStatus holds the value of the "payment_status" field.
+	PaymentStatus string `json:"payment_status,omitempty"`
+	// Card holds the value of the "card" field.
+	Card string `json:"card,omitempty"`
+	// Amount holds the value of the "amount" field.
+	Amount int `json:"amount,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PaymentQuery when eager-loading is set.
 	Edges        PaymentEdges `json:"edges"`
@@ -63,7 +69,9 @@ func (*Payment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case payment.FieldQrPictureURL:
+		case payment.FieldAmount:
+			values[i] = new(sql.NullInt64)
+		case payment.FieldQrPictureURL, payment.FieldPaymentStatus, payment.FieldCard:
 			values[i] = new(sql.NullString)
 		case payment.FieldID:
 			values[i] = new(uuid.UUID)
@@ -96,6 +104,24 @@ func (pa *Payment) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				pa.QrPictureURL = new(string)
 				*pa.QrPictureURL = value.String
+			}
+		case payment.FieldPaymentStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field payment_status", values[i])
+			} else if value.Valid {
+				pa.PaymentStatus = value.String
+			}
+		case payment.FieldCard:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field card", values[i])
+			} else if value.Valid {
+				pa.Card = value.String
+			}
+		case payment.FieldAmount:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field amount", values[i])
+			} else if value.Valid {
+				pa.Amount = int(value.Int64)
 			}
 		case payment.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -146,6 +172,15 @@ func (pa *Payment) String() string {
 		builder.WriteString("qr_picture_url=")
 		builder.WriteString(*v)
 	}
+	builder.WriteString(", ")
+	builder.WriteString("payment_status=")
+	builder.WriteString(pa.PaymentStatus)
+	builder.WriteString(", ")
+	builder.WriteString("card=")
+	builder.WriteString(pa.Card)
+	builder.WriteString(", ")
+	builder.WriteString("amount=")
+	builder.WriteString(fmt.Sprintf("%v", pa.Amount))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -20,6 +20,9 @@ func (Payment) Fields() []ent.Field {
 			Default(uuid.New).Unique().StorageKey("id").Immutable(),
 		// field.String("user_id").NotEmpty().Unique(),
 		field.String("qr_picture_url").Optional().Nillable(),
+		field.String("payment_status").NotEmpty(),
+		field.String("card").NotEmpty(),
+		field.Int("amount").Positive(),
 	}
 }
 

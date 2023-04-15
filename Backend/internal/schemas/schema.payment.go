@@ -10,9 +10,14 @@ type SchemaQRCode struct {
 	QrCodeUrl string `json:"qr_code_url"`
 }
 
-type SchemaGetQRCode struct {
+type SchemaGetQRCodeForCoursePayment struct {
 	Course_id uuid.UUID `json:"course_id"`
 	Amount    int       `json:"amount" validate:"required"`
+}
+
+type SchemaGetQRCodeForTuitionFree struct {
+	Tutor_id uuid.UUID `json:"tutor_id"`
+	Amount   int       `json:"amount" validate:"required"`
 }
 
 type Card struct {

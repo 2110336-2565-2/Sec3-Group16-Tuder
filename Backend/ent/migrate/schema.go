@@ -150,6 +150,9 @@ var (
 	PaymentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "qr_picture_url", Type: field.TypeString, Nullable: true},
+		{Name: "payment_status", Type: field.TypeString},
+		{Name: "card", Type: field.TypeString},
+		{Name: "amount", Type: field.TypeInt},
 		{Name: "user_payment", Type: field.TypeUUID},
 	}
 	// PaymentsTable holds the schema information for the "payments" table.
@@ -160,7 +163,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "payments_users_payment",
-				Columns:    []*schema.Column{PaymentsColumns[2]},
+				Columns:    []*schema.Column{PaymentsColumns[5]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -247,6 +250,7 @@ var (
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "omise_bank_token", Type: field.TypeString, Nullable: true},
 		{Name: "citizen_id", Type: field.TypeString, Unique: true},
+		{Name: "omise_customer_id", Type: field.TypeString, Nullable: true},
 		{Name: "schedule_tutor", Type: field.TypeUUID, Unique: true},
 		{Name: "user_tutor", Type: field.TypeUUID, Unique: true},
 	}
@@ -258,13 +262,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "tutors_schedules_tutor",
-				Columns:    []*schema.Column{TutorsColumns[4]},
+				Columns:    []*schema.Column{TutorsColumns[5]},
 				RefColumns: []*schema.Column{SchedulesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "tutors_users_tutor",
-				Columns:    []*schema.Column{TutorsColumns[5]},
+				Columns:    []*schema.Column{TutorsColumns[6]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

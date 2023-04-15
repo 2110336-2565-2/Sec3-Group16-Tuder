@@ -17,8 +17,8 @@ func NewControllerPayment(service service.ServicePayment) *controllerPayment {
 }
 
 // GetQRCode gets QR code of a payment
-func (cR *controllerPayment) GetQRCode(c echo.Context) error {
-	uR := &schema.SchemaGetQRCode{}
+func (cR *controllerPayment) GetQRCodeForCoursePayment(c echo.Context) error {
+	uR := &schema.SchemaGetQRCodeForCoursePayment{}
 
 	if err := c.Bind(uR); err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
@@ -28,7 +28,38 @@ func (cR *controllerPayment) GetQRCode(c echo.Context) error {
 		})
 	}
 
-	qrCode, err := cR.service.GetQRCode(uR)
+	qrCode, err := cR.service.GetQRCodeForCoursePayment(uR)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: err.Error(),
+			Error:   err,
+		})
+	}
+
+	c.JSON(http.StatusOK, schema.SchemaResponses{
+		Success: true,
+		Message: "QR code retrieved",
+		Data:    qrCode,
+	})
+
+	return nil
+}
+
+// GetQRCode gets QR code of a payment
+func (cR *controllerPayment) GetQRCodeForTuitionFree(c echo.Context) error {
+	uR := &schema.SchemaGetQRCodeForTuitionFree{}
+
+	if err := c.Bind(uR); err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: "invalid request payload",
+			Error:   err,
+		})
+	}
+
+	qrCode, err := cR.service.GetQRCodeForTuitionFree(uR)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
