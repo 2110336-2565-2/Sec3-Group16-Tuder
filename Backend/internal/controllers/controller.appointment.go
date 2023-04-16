@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -53,7 +52,6 @@ func (cR *controllerAppointment) GetMatchByID(c echo.Context) (err error) {
 
 func (cR *controllerAppointment) GetAppointmentByMatchID(c echo.Context) (err error) {
 	matchID, _ := uuid.Parse(c.Param("match_id"))
-	fmt.Println(matchID)
 	uR := &schema.SchemaGetAppointmentByMatchID{
 		MatchID: matchID,
 	}
@@ -78,7 +76,6 @@ func (cR *controllerAppointment) GetAppointmentByMatchID(c echo.Context) (err er
 
 func (cR *controllerAppointment) UpdateAppointmentStatus(c echo.Context) (err error) {
 	id, _ := uuid.Parse(c.Param("id"))
-	// fmt.Println(id)
 	uR := &schema.SchemaUpdateAppointmentStatus{
 		ID: id,
 	}

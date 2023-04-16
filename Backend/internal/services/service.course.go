@@ -1,8 +1,6 @@
 package services
 
 import (
-	"fmt"
-
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
@@ -117,8 +115,6 @@ func (s *serviceCourse) CourseSearchService(searchContent *schemas.CourseSearch)
 		searchResult = s.Union([][]*schemas.CourseSearchResult{titleResult, subjectSearch, topicSearch, tutorSearch, daySearch})
 	}
 
-	// fmt.Println(daySearch)
-
 	return searchResult, nil
 }
 
@@ -128,7 +124,7 @@ func (s *serviceCourse) CourseSearchByTutor(searchContent *schemas.CourseSearch)
 	}
 	courses, err := s.repository.SearchByTutorRepository(searchContent)
 	if err != nil {
-		fmt.Println(err)
+
 		return nil, err
 	}
 	courseResponses := s.PackToSchema(courses)
@@ -141,7 +137,6 @@ func (s *serviceCourse) CourseSearchByTitle(searchContent *schemas.CourseSearch)
 	}
 	courses, err := s.repository.SearchByTitleRepository(searchContent)
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 	courseResponses := s.PackToSchema(courses)
@@ -154,7 +149,7 @@ func (s *serviceCourse) CourseSearchByDay(searchContent *schemas.CourseSearch) (
 	}
 	courses, err := s.repository.SearchByDayRepository(searchContent)
 	if err != nil {
-		fmt.Println(err)
+
 		return nil, err
 	}
 	courseResponses := s.PackToSchema(courses)
@@ -167,7 +162,6 @@ func (s *serviceCourse) CourseSearchByTopic(searchContent *schemas.CourseSearch)
 	}
 	courses, err := s.repository.SearchByTopicRepository(searchContent)
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 	courseResponses := s.PackToSchema(courses)
@@ -180,7 +174,6 @@ func (s *serviceCourse) CourseSearchBySubject(searchContent *schemas.CourseSearc
 	}
 	courses, err := s.repository.SearchBySucjectRepository(searchContent)
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 	courseResponses := s.PackToSchema(courses)
@@ -190,7 +183,7 @@ func (s *serviceCourse) CourseSearchBySubject(searchContent *schemas.CourseSearc
 func (s *serviceCourse) GetCourses() ([]*schemas.CourseSearchResult, error) {
 	courses, err := s.repository.GetCourses()
 	if err != nil {
-		fmt.Println(err)
+
 		return nil, err
 	}
 	courseResponses := s.PackToSchema(courses)

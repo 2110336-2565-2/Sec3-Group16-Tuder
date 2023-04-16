@@ -3,6 +3,8 @@ package repositorys
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
@@ -10,7 +12,6 @@ import (
 	entStudent "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 	"github.com/google/uuid"
-	"time"
 )
 
 type RepositoryReview interface {
@@ -35,7 +36,7 @@ func (r repositoryReview) CreateReview(sR *schema.SchemaCreateReview) (*ent.Revi
 	//create translation
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("starting a transaction: %v", err)
+		return nil, fmt.Errorf("failed to start a transaction: %v", err)
 	}
 
 	// wrap client
@@ -52,9 +53,9 @@ func (r repositoryReview) CreateReview(sR *schema.SchemaCreateReview) (*ent.Revi
 		}).Only(r.ctx)
 	if len(student.Edges.Match) <= 0 {
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			err = fmt.Errorf("failed to rollback transaction: %w", err)
 		}
-		return nil, fmt.Errorf("the student never enroll this course")
+		return nil, fmt.Errorf("the student has not enrolled in this course")
 	}
 
 	// if all criterion passed, create a review
@@ -68,19 +69,25 @@ func (r repositoryReview) CreateReview(sR *schema.SchemaCreateReview) (*ent.Revi
 		Save(r.ctx)
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			err = fmt.Errorf("failed to rollback transaction: %w", err)
 		}
-		return nil, fmt.Errorf("an error occurs at creating a Review: %v", err)
+		return nil, fmt.Errorf("failed to create review: %v", err)
+	}
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
-	return review, tx.Commit()
+	return review, nil
 }
 
 func (r repositoryReview) GetReviews(courseId uuid.UUID) ([]*ent.Review, error) {
 	reviews, err := r.client.Review.Query().Where(
 		review.HasCourseWith(course.IDEQ(courseId)),
 	).All(r.ctx)
-	return reviews, err
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve reviews for course %s: %v", courseId.String(), err)
+	}
+	return reviews, nil
 }
 
 func (r repositoryReview) GetCourseWithReviewsById(courseId uuid.UUID) (*ent.Course, error) {
@@ -88,5 +95,8 @@ func (r repositoryReview) GetCourseWithReviewsById(courseId uuid.UUID) (*ent.Cou
 		Where(course.IDEQ(courseId)).
 		WithReview().
 		Only(r.ctx)
-	return c, err
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve course with reviews for course id %s: %v", courseId.String(), err)
+	}
+	return c, nil
 }
