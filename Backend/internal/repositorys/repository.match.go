@@ -53,6 +53,10 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 		return nil, err
 	}
 
+	if course.Status != "open" {
+		return nil, fmt.Errorf("course is not open")
+	}
+
 	student, err := txc.Student.
 		Query().
 		Where(student.IDEQ(sr.Student_id)).

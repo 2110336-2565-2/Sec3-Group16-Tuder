@@ -13,6 +13,7 @@ type CourseSearchResult struct {
 	Estimate_time      int       `json:"estimate_time"`
 	Price_per_hour     int       `json:"price_per_hour"`
 	Course_picture_url string    `json:"course_picture_url"`
+	CourseStatus       string    `json:"course_status"`
 }
 
 type CourseSearch struct {
@@ -30,6 +31,7 @@ type SchemaCourse struct {
 	ReviewCount        int
 	Reviews            []Review
 	Tutor_id           uuid.UUID `json:"tutor_id"`
+	TutorUsername      string
 	TutorFirstname     string
 	TutorLastname      string
 	Subject            string `json:"subject"`
@@ -39,6 +41,7 @@ type SchemaCourse struct {
 	Estimate_time      int    `json:"estimate_time"`
 	Price_per_hour     int    `json:"price_per_hour"`
 	Course_picture_url string `json:"course_picture_url"`
+	CourseStatus       string `json:"course_status"`
 }
 
 type SchemaGetCourse struct {

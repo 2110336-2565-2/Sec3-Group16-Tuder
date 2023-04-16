@@ -210,6 +210,7 @@ func (s *serviceCourse) GetCourseByID(sr *schemas.SchemaGetCourse) (*schemas.Sch
 		ReviewCount:        count,
 		Reviews:            []schemas.Review{},
 		Tutor_id:           course.Edges.Tutor.ID,
+		TutorUsername:      course.Edges.Tutor.Edges.User.Username,
 		TutorFirstname:     course.Edges.Tutor.Edges.User.FirstName,
 		TutorLastname:      course.Edges.Tutor.Edges.User.LastName,
 		Subject:            course.Subject,
@@ -219,6 +220,7 @@ func (s *serviceCourse) GetCourseByID(sr *schemas.SchemaGetCourse) (*schemas.Sch
 		Estimate_time:      course.EstimatedTime,
 		Price_per_hour:     course.PricePerHour,
 		Course_picture_url: *course.CoursePictureURL,
+		CourseStatus:       course.Status.String(),
 	}
 	// append ent.Review to sG
 	for _, r := range course.Edges.Review {
@@ -247,6 +249,7 @@ func (s *serviceCourse) CreateCourse(sr *schemas.SchemaCreateCourse) (*schemas.S
 		Price_per_hour:     course.PricePerHour,
 		Course_picture_url: *course.CoursePictureURL,
 		Level:              course.Level.String(),
+		CourseStatus:       course.Status.String(),
 	}
 	return courseResponse, nil
 }
