@@ -5,7 +5,7 @@ on:
     branches:
       - docker-file
 jobs:
-  initialize the application:
+  initialize-the-application:
     runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
