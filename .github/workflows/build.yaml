@@ -9,11 +9,32 @@ env:
   <<: ${{ vars }}
 
 jobs:
+  env:
+    runs-on: ubuntu-latest
+    outputs:
+      env: ${{ steps.import-env.outputs.result }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Import environment variables from a file
+      id: import-env
+      uses: actions/github-script@v2
+      with:
+        script: |
+          const env = parseEnv(`${process.env.GITHUB_WORKSPACE}/dev.env`);
+          Object.entries(env).forEach(x => core.exportVariable(...x)); // current job-level env
+          return env;
+
+    - name: Print environment variable
+      run: echo $ABC
+      env: ${{ fromJson(steps.import-env.outputs.result) }} # step-level env
+
   initialize-the-application:
     runs-on: ubuntu-latest
+    needs: [env]
+
     steps:
-      - name: Print Environment Variables
-        run: env
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
