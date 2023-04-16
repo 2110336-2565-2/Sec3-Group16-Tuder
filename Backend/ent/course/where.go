@@ -534,6 +534,26 @@ func CoursePictureURLContainsFold(v string) predicate.Course {
 	return predicate.Course(sql.FieldContainsFold(FieldCoursePictureURL, v))
 }
 
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v Status) predicate.Course {
+	return predicate.Course(sql.FieldEQ(FieldStatus, v))
+}
+
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v Status) predicate.Course {
+	return predicate.Course(sql.FieldNEQ(FieldStatus, v))
+}
+
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...Status) predicate.Course {
+	return predicate.Course(sql.FieldIn(FieldStatus, vs...))
+}
+
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...Status) predicate.Course {
+	return predicate.Course(sql.FieldNotIn(FieldStatus, vs...))
+}
+
 // HasReview applies the HasEdge predicate on the "review" edge.
 func HasReview() predicate.Course {
 	return predicate.Course(func(s *sql.Selector) {

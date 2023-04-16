@@ -23,6 +23,7 @@ import UserCancelRequest from "./pages/UserCancelRequest";
 import CancelRequestDetail from "./pages/CancelRequestDetail";
 import AdminIssueReportList from "./pages/AdminIssueReportList";
 import AdminTuitionFeeList from "./pages/AdminTuitionFeeList";
+import TutorCourses from './pages/TutorCourses';
 import CourseDetail from "./pages/CourseDetail";
 import TutorReviews from "./pages/TutorReviews";
 import Enroll from "./pages/Enroll";
@@ -146,6 +147,10 @@ const router = createBrowserRouter([
       {
         path: "/courses/:id",
         element: <CourseDetail />
+      },
+      {
+        path: "/courses",
+        element: <TutorCourses />
       },
       {
         path: "/admin-tuition-fees",

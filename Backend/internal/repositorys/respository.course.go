@@ -10,6 +10,9 @@ import (
 	entTutor "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	entUser "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
+
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
+	"github.com/google/uuid"
 )
 
 type RepositoryCourse interface {
@@ -24,6 +27,7 @@ type RepositoryCourse interface {
 	SearchByTutorRepository(sr *schema.CourseSearch) ([]*ent.Course, error)
 	SearchByDayRepository(sr *schema.CourseSearch) ([]*ent.Course, error)
 	checkTimeAvailable(d [24]bool) bool
+	UpdateCourseStatus(sr *schema.SchemaUpdateCourseStatus) (*ent.Course, error)
 }
 
 type repositoryCourse struct {
@@ -209,9 +213,15 @@ func (r *repositoryCourse) CreateCourse(sr *schema.SchemaCreateCourse) (*ent.Cou
 		}
 		return nil, fmt.Errorf("getting tutor: %w", err)
 	}
+
+	// create image url
+	imgURL := fmt.Sprintf("%s/%s/%s", sr.Tutor_id, sr.Title, uuid.New())
+
+	imgURL, _ = utils.GenerateProfilePictureURL(sr.Course_picture, imgURL, "ProfilePicture")
+
 	// create a new course
 	course, err := txc.Course.Create().
-		SetCoursePictureURL(sr.Course_picture_url).
+		SetCoursePictureURL(imgURL).
 		SetSubject(sr.Subject).
 		SetDescription(sr.Description).
 		SetPricePerHour(sr.Price_per_hour).
@@ -221,6 +231,7 @@ func (r *repositoryCourse) CreateCourse(sr *schema.SchemaCreateCourse) (*ent.Cou
 		SetTopic(sr.Topic).
 		SetEstimatedTime(sr.Estimate_time).
 		Save(r.ctx)
+
 	course.Edges.Tutor = tutor
 
 	if err != nil {
@@ -249,9 +260,14 @@ func (r *repositoryCourse) UpdateCourse(sr *schema.SchemaUpdateCourse) (*ent.Cou
 		return nil, fmt.Errorf("getting tutor: %w", err)
 	}
 
+	imgURL := fmt.Sprintf("%s/%s/%s", sr.Tutor_id, sr.Title, uuid.New())
+	if sr.Course_picture != nil {
+		imgURL, _ = utils.GenerateProfilePictureURL(sr.Course_picture, imgURL, "ProfilePicture")
+	}
+
 	// update a course
 	course, err := txc.Course.UpdateOneID(sr.ID).
-		SetCoursePictureURL(sr.Course_picture_url).
+		SetCoursePictureURL(imgURL).
 		SetSubject(sr.Subject).
 		SetDescription(sr.Description).
 		SetPricePerHour(sr.Price_per_hour).
@@ -289,4 +305,33 @@ func (r *repositoryCourse) DeleteCourse(sr *schema.SchemaDeleteCourse) error {
 		return fmt.Errorf("deleting course: %w", err)
 	}
 	return tx.Commit()
+}
+
+func (r *repositoryCourse) UpdateCourseStatus(sr *schema.SchemaUpdateCourseStatus) (*ent.Course, error) {
+	// create a transaction
+	tx, err := r.client.Tx(r.ctx)
+	if err != nil {
+		return nil, fmt.Errorf("starting a transaction: %w", err)
+	}
+	// wrap the client with the transaction
+	txc := tx.Client()
+
+	status := sr.Status
+	// update a course
+	if status == "open" {
+		status = "closed"
+	} else {
+		status = "open"
+	}
+
+	course, err := txc.Course.UpdateOneID(sr.ID).
+		SetStatus(entCourse.Status(status)).
+		Save(r.ctx)
+	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+		return nil, fmt.Errorf("updating course: %w", err)
+	}
+	return course, tx.Commit()
 }

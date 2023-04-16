@@ -121,6 +121,20 @@ func (cu *CourseUpdate) ClearCoursePictureURL() *CourseUpdate {
 	return cu
 }
 
+// SetStatus sets the "status" field.
+func (cu *CourseUpdate) SetStatus(c course.Status) *CourseUpdate {
+	cu.mutation.SetStatus(c)
+	return cu
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (cu *CourseUpdate) SetNillableStatus(c *course.Status) *CourseUpdate {
+	if c != nil {
+		cu.SetStatus(*c)
+	}
+	return cu
+}
+
 // AddReviewIDs adds the "review" edge to the Review entity by IDs.
 func (cu *CourseUpdate) AddReviewIDs(ids ...uuid.UUID) *CourseUpdate {
 	cu.mutation.AddReviewIDs(ids...)
@@ -274,6 +288,11 @@ func (cu *CourseUpdate) check() error {
 			return &ValidationError{Name: "level", err: fmt.Errorf(`ent: validator failed for field "Course.level": %w`, err)}
 		}
 	}
+	if v, ok := cu.mutation.Status(); ok {
+		if err := course.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Course.status": %w`, err)}
+		}
+	}
 	if _, ok := cu.mutation.TutorID(); cu.mutation.TutorCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Course.tutor"`)
 	}
@@ -327,6 +346,9 @@ func (cu *CourseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if cu.mutation.CoursePictureURLCleared() {
 		_spec.ClearField(course.FieldCoursePictureURL, field.TypeString)
+	}
+	if value, ok := cu.mutation.Status(); ok {
+		_spec.SetField(course.FieldStatus, field.TypeEnum, value)
 	}
 	if cu.mutation.ReviewCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -557,6 +579,20 @@ func (cuo *CourseUpdateOne) ClearCoursePictureURL() *CourseUpdateOne {
 	return cuo
 }
 
+// SetStatus sets the "status" field.
+func (cuo *CourseUpdateOne) SetStatus(c course.Status) *CourseUpdateOne {
+	cuo.mutation.SetStatus(c)
+	return cuo
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (cuo *CourseUpdateOne) SetNillableStatus(c *course.Status) *CourseUpdateOne {
+	if c != nil {
+		cuo.SetStatus(*c)
+	}
+	return cuo
+}
+
 // AddReviewIDs adds the "review" edge to the Review entity by IDs.
 func (cuo *CourseUpdateOne) AddReviewIDs(ids ...uuid.UUID) *CourseUpdateOne {
 	cuo.mutation.AddReviewIDs(ids...)
@@ -723,6 +759,11 @@ func (cuo *CourseUpdateOne) check() error {
 			return &ValidationError{Name: "level", err: fmt.Errorf(`ent: validator failed for field "Course.level": %w`, err)}
 		}
 	}
+	if v, ok := cuo.mutation.Status(); ok {
+		if err := course.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Course.status": %w`, err)}
+		}
+	}
 	if _, ok := cuo.mutation.TutorID(); cuo.mutation.TutorCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Course.tutor"`)
 	}
@@ -793,6 +834,9 @@ func (cuo *CourseUpdateOne) sqlSave(ctx context.Context) (_node *Course, err err
 	}
 	if cuo.mutation.CoursePictureURLCleared() {
 		_spec.ClearField(course.FieldCoursePictureURL, field.TypeString)
+	}
+	if value, ok := cuo.mutation.Status(); ok {
+		_spec.SetField(course.FieldStatus, field.TypeEnum, value)
 	}
 	if cuo.mutation.ReviewCleared() {
 		edge := &sqlgraph.EdgeSpec{
