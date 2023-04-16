@@ -8,6 +8,7 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	entMatch "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
+	entPayment "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/google/uuid"
@@ -52,6 +53,10 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 		return nil, err
 	}
 
+	if course.Status != "open" {
+		return nil, fmt.Errorf("course is not open")
+	}
+
 	student, err := txc.Student.
 		Query().
 		Where(student.IDEQ(sr.Student_id)).
@@ -92,6 +97,22 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 		return nil, err
 	}
 
+	//Check if payment exist
+	payment, err := txc.Payment.
+		Query().
+		Where(entPayment.IDEQ(sr.Payment_id)).
+		Only(r.ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// fmt.Println("Create Course: %w", course)
+	// fmt.Println("Create Student: %w", student)
+	// fmt.Println("Create Schedule: %w", schedule)
+	// fmt.Println("Create Appointment: %w", appointments)
+	// fmt.Println("Create Payment: %w", payment)
+
 	//Create Match
 	match, err := txc.Match.
 		Create().
@@ -99,6 +120,7 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 		AddAppointment(appointments...).
 		SetStudent(student).
 		SetScheduleID(schedule.ID).
+		SetPaymentID(payment.ID).
 		Save(r.ctx)
 
 	if err != nil {
@@ -255,7 +277,7 @@ func (r *repositoryMatch) CreateAppointment(sr *schema.SchemaCreateAppointment) 
 			Create().
 			SetBeginAt(beginAt).
 			SetEndAt(endAt).
-			SetStatus("ongoing").
+			SetStatus("comingsoon").
 			Save(r.ctx)
 
 		if err != nil {

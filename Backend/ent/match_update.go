@@ -14,6 +14,7 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/cancelrequest"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
@@ -30,6 +31,20 @@ type MatchUpdate struct {
 // Where appends a list predicates to the MatchUpdate builder.
 func (mu *MatchUpdate) Where(ps ...predicate.Match) *MatchUpdate {
 	mu.mutation.Where(ps...)
+	return mu
+}
+
+// SetStatus sets the "status" field.
+func (mu *MatchUpdate) SetStatus(m match.Status) *MatchUpdate {
+	mu.mutation.SetStatus(m)
+	return mu
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (mu *MatchUpdate) SetNillableStatus(m *match.Status) *MatchUpdate {
+	if m != nil {
+		mu.SetStatus(*m)
+	}
 	return mu
 }
 
@@ -94,6 +109,25 @@ func (mu *MatchUpdate) AddCancelRequest(c ...*CancelRequest) *MatchUpdate {
 		ids[i] = c[i].ID
 	}
 	return mu.AddCancelRequestIDs(ids...)
+}
+
+// SetPaymentID sets the "payment" edge to the Payment entity by ID.
+func (mu *MatchUpdate) SetPaymentID(id uuid.UUID) *MatchUpdate {
+	mu.mutation.SetPaymentID(id)
+	return mu
+}
+
+// SetNillablePaymentID sets the "payment" edge to the Payment entity by ID if the given value is not nil.
+func (mu *MatchUpdate) SetNillablePaymentID(id *uuid.UUID) *MatchUpdate {
+	if id != nil {
+		mu = mu.SetPaymentID(*id)
+	}
+	return mu
+}
+
+// SetPayment sets the "payment" edge to the Payment entity.
+func (mu *MatchUpdate) SetPayment(p *Payment) *MatchUpdate {
+	return mu.SetPaymentID(p.ID)
 }
 
 // Mutation returns the MatchMutation object of the builder.
@@ -161,6 +195,12 @@ func (mu *MatchUpdate) RemoveCancelRequest(c ...*CancelRequest) *MatchUpdate {
 	return mu.RemoveCancelRequestIDs(ids...)
 }
 
+// ClearPayment clears the "payment" edge to the Payment entity.
+func (mu *MatchUpdate) ClearPayment() *MatchUpdate {
+	mu.mutation.ClearPayment()
+	return mu
+}
+
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (mu *MatchUpdate) Save(ctx context.Context) (int, error) {
 	return withHooks[int, MatchMutation](ctx, mu.sqlSave, mu.mutation, mu.hooks)
@@ -190,6 +230,11 @@ func (mu *MatchUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (mu *MatchUpdate) check() error {
+	if v, ok := mu.mutation.Status(); ok {
+		if err := match.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Match.status": %w`, err)}
+		}
+	}
 	if _, ok := mu.mutation.StudentID(); mu.mutation.StudentCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Match.student"`)
 	}
@@ -214,6 +259,9 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := mu.mutation.Status(); ok {
+		_spec.SetField(match.FieldStatus, field.TypeEnum, value)
+	}
 	if mu.mutation.StudentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -222,10 +270,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.StudentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: student.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(student.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -238,10 +283,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.StudentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: student.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(student.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -257,10 +299,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.CourseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(course.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -273,10 +312,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.CourseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(course.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -292,10 +328,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.AppointmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: appointment.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(appointment.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -308,10 +341,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.AppointmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: appointment.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(appointment.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -327,10 +357,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.AppointmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: appointment.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(appointment.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -346,10 +373,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.ScheduleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: schedule.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(schedule.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -362,10 +386,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.ScheduleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: schedule.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(schedule.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -381,10 +402,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.CancelRequestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: cancelrequest.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cancelrequest.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -397,10 +415,7 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.CancelRequestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: cancelrequest.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cancelrequest.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -416,10 +431,36 @@ func (mu *MatchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{match.CancelRequestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: cancelrequest.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cancelrequest.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if mu.mutation.PaymentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   match.PaymentTable,
+			Columns: []string{match.PaymentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(payment.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mu.mutation.PaymentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   match.PaymentTable,
+			Columns: []string{match.PaymentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(payment.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -445,6 +486,20 @@ type MatchUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *MatchMutation
+}
+
+// SetStatus sets the "status" field.
+func (muo *MatchUpdateOne) SetStatus(m match.Status) *MatchUpdateOne {
+	muo.mutation.SetStatus(m)
+	return muo
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (muo *MatchUpdateOne) SetNillableStatus(m *match.Status) *MatchUpdateOne {
+	if m != nil {
+		muo.SetStatus(*m)
+	}
+	return muo
 }
 
 // SetStudentID sets the "student" edge to the Student entity by ID.
@@ -508,6 +563,25 @@ func (muo *MatchUpdateOne) AddCancelRequest(c ...*CancelRequest) *MatchUpdateOne
 		ids[i] = c[i].ID
 	}
 	return muo.AddCancelRequestIDs(ids...)
+}
+
+// SetPaymentID sets the "payment" edge to the Payment entity by ID.
+func (muo *MatchUpdateOne) SetPaymentID(id uuid.UUID) *MatchUpdateOne {
+	muo.mutation.SetPaymentID(id)
+	return muo
+}
+
+// SetNillablePaymentID sets the "payment" edge to the Payment entity by ID if the given value is not nil.
+func (muo *MatchUpdateOne) SetNillablePaymentID(id *uuid.UUID) *MatchUpdateOne {
+	if id != nil {
+		muo = muo.SetPaymentID(*id)
+	}
+	return muo
+}
+
+// SetPayment sets the "payment" edge to the Payment entity.
+func (muo *MatchUpdateOne) SetPayment(p *Payment) *MatchUpdateOne {
+	return muo.SetPaymentID(p.ID)
 }
 
 // Mutation returns the MatchMutation object of the builder.
@@ -575,6 +649,12 @@ func (muo *MatchUpdateOne) RemoveCancelRequest(c ...*CancelRequest) *MatchUpdate
 	return muo.RemoveCancelRequestIDs(ids...)
 }
 
+// ClearPayment clears the "payment" edge to the Payment entity.
+func (muo *MatchUpdateOne) ClearPayment() *MatchUpdateOne {
+	muo.mutation.ClearPayment()
+	return muo
+}
+
 // Where appends a list predicates to the MatchUpdate builder.
 func (muo *MatchUpdateOne) Where(ps ...predicate.Match) *MatchUpdateOne {
 	muo.mutation.Where(ps...)
@@ -617,6 +697,11 @@ func (muo *MatchUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (muo *MatchUpdateOne) check() error {
+	if v, ok := muo.mutation.Status(); ok {
+		if err := match.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Match.status": %w`, err)}
+		}
+	}
 	if _, ok := muo.mutation.StudentID(); muo.mutation.StudentCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Match.student"`)
 	}
@@ -658,6 +743,9 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			}
 		}
 	}
+	if value, ok := muo.mutation.Status(); ok {
+		_spec.SetField(match.FieldStatus, field.TypeEnum, value)
+	}
 	if muo.mutation.StudentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -666,10 +754,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.StudentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: student.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(student.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -682,10 +767,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.StudentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: student.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(student.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -701,10 +783,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.CourseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(course.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -717,10 +796,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.CourseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(course.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -736,10 +812,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.AppointmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: appointment.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(appointment.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -752,10 +825,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.AppointmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: appointment.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(appointment.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -771,10 +841,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.AppointmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: appointment.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(appointment.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -790,10 +857,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.ScheduleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: schedule.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(schedule.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -806,10 +870,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.ScheduleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: schedule.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(schedule.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -825,10 +886,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.CancelRequestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: cancelrequest.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cancelrequest.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -841,10 +899,7 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.CancelRequestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: cancelrequest.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cancelrequest.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -860,10 +915,36 @@ func (muo *MatchUpdateOne) sqlSave(ctx context.Context) (_node *Match, err error
 			Columns: []string{match.CancelRequestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: cancelrequest.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cancelrequest.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if muo.mutation.PaymentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   match.PaymentTable,
+			Columns: []string{match.PaymentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(payment.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := muo.mutation.PaymentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   match.PaymentTable,
+			Columns: []string{match.PaymentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(payment.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

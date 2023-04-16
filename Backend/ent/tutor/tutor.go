@@ -17,6 +17,8 @@ const (
 	FieldOmiseBankToken = "omise_bank_token"
 	// FieldCitizenID holds the string denoting the citizen_id field in the database.
 	FieldCitizenID = "citizen_id"
+	// FieldOmiseCustomerID holds the string denoting the omise_customer_id field in the database.
+	FieldOmiseCustomerID = "omise_customer_id"
 	// EdgeIssueReport holds the string denoting the issue_report edge name in mutations.
 	EdgeIssueReport = "issue_report"
 	// EdgeCourse holds the string denoting the course edge name in mutations.
@@ -63,6 +65,7 @@ var Columns = []string{
 	FieldDescription,
 	FieldOmiseBankToken,
 	FieldCitizenID,
+	FieldOmiseCustomerID,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "tutors"

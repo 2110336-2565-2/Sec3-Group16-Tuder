@@ -17,14 +17,10 @@ export default function EditProfile() {
     if (role === "student") {
       getStudentByUsername(username).then((res) => {
         setUser({...res.data.data, "role": role});
-        console.log("res.data.data: ", res.data.data);
-        console.log("student",user)
       });
     } else if (role === "tutor") {
       getTutorByUsername(username).then((res) => {
         setUser({...res.data.data, "role": role});
-        console.log("res.data.data: ", res.data.data);
-        console.log("tutor",user)
       });
     }
   }, []);

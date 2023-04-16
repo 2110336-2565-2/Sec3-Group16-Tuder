@@ -24,6 +24,8 @@ type Tutor struct {
 	OmiseBankToken *string `json:"omise_bank_token,omitempty"`
 	// CitizenID holds the value of the "citizen_id" field.
 	CitizenID string `json:"citizen_id,omitempty"`
+	// OmiseCustomerID holds the value of the "omise_customer_id" field.
+	OmiseCustomerID *string `json:"omise_customer_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TutorQuery when eager-loading is set.
 	Edges          TutorEdges `json:"edges"`
@@ -95,7 +97,7 @@ func (*Tutor) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case tutor.FieldDescription, tutor.FieldOmiseBankToken, tutor.FieldCitizenID:
+		case tutor.FieldDescription, tutor.FieldOmiseBankToken, tutor.FieldCitizenID, tutor.FieldOmiseCustomerID:
 			values[i] = new(sql.NullString)
 		case tutor.FieldID:
 			values[i] = new(uuid.UUID)
@@ -143,6 +145,13 @@ func (t *Tutor) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field citizen_id", values[i])
 			} else if value.Valid {
 				t.CitizenID = value.String
+			}
+		case tutor.FieldOmiseCustomerID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field omise_customer_id", values[i])
+			} else if value.Valid {
+				t.OmiseCustomerID = new(string)
+				*t.OmiseCustomerID = value.String
 			}
 		case tutor.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -218,6 +227,11 @@ func (t *Tutor) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("citizen_id=")
 	builder.WriteString(t.CitizenID)
+	builder.WriteString(", ")
+	if v := t.OmiseCustomerID; v != nil {
+		builder.WriteString("omise_customer_id=")
+		builder.WriteString(*v)
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -14,6 +14,7 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/cancelrequest"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/student"
 	"github.com/google/uuid"
@@ -36,6 +37,20 @@ func (mc *MatchCreate) SetMatchCreatedAt(t time.Time) *MatchCreate {
 func (mc *MatchCreate) SetNillableMatchCreatedAt(t *time.Time) *MatchCreate {
 	if t != nil {
 		mc.SetMatchCreatedAt(*t)
+	}
+	return mc
+}
+
+// SetStatus sets the "status" field.
+func (mc *MatchCreate) SetStatus(m match.Status) *MatchCreate {
+	mc.mutation.SetStatus(m)
+	return mc
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (mc *MatchCreate) SetNillableStatus(m *match.Status) *MatchCreate {
+	if m != nil {
+		mc.SetStatus(*m)
 	}
 	return mc
 }
@@ -117,6 +132,25 @@ func (mc *MatchCreate) AddCancelRequest(c ...*CancelRequest) *MatchCreate {
 	return mc.AddCancelRequestIDs(ids...)
 }
 
+// SetPaymentID sets the "payment" edge to the Payment entity by ID.
+func (mc *MatchCreate) SetPaymentID(id uuid.UUID) *MatchCreate {
+	mc.mutation.SetPaymentID(id)
+	return mc
+}
+
+// SetNillablePaymentID sets the "payment" edge to the Payment entity by ID if the given value is not nil.
+func (mc *MatchCreate) SetNillablePaymentID(id *uuid.UUID) *MatchCreate {
+	if id != nil {
+		mc = mc.SetPaymentID(*id)
+	}
+	return mc
+}
+
+// SetPayment sets the "payment" edge to the Payment entity.
+func (mc *MatchCreate) SetPayment(p *Payment) *MatchCreate {
+	return mc.SetPaymentID(p.ID)
+}
+
 // Mutation returns the MatchMutation object of the builder.
 func (mc *MatchCreate) Mutation() *MatchMutation {
 	return mc.mutation
@@ -156,6 +190,10 @@ func (mc *MatchCreate) defaults() {
 		v := match.DefaultMatchCreatedAt()
 		mc.mutation.SetMatchCreatedAt(v)
 	}
+	if _, ok := mc.mutation.Status(); !ok {
+		v := match.DefaultStatus
+		mc.mutation.SetStatus(v)
+	}
 	if _, ok := mc.mutation.ID(); !ok {
 		v := match.DefaultID()
 		mc.mutation.SetID(v)
@@ -166,6 +204,14 @@ func (mc *MatchCreate) defaults() {
 func (mc *MatchCreate) check() error {
 	if _, ok := mc.mutation.MatchCreatedAt(); !ok {
 		return &ValidationError{Name: "match_created_at", err: errors.New(`ent: missing required field "Match.match_created_at"`)}
+	}
+	if _, ok := mc.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Match.status"`)}
+	}
+	if v, ok := mc.mutation.Status(); ok {
+		if err := match.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Match.status": %w`, err)}
+		}
 	}
 	if _, ok := mc.mutation.StudentID(); !ok {
 		return &ValidationError{Name: "student", err: errors.New(`ent: missing required edge "Match.student"`)}
@@ -218,6 +264,10 @@ func (mc *MatchCreate) createSpec() (*Match, *sqlgraph.CreateSpec) {
 		_spec.SetField(match.FieldMatchCreatedAt, field.TypeTime, value)
 		_node.MatchCreatedAt = value
 	}
+	if value, ok := mc.mutation.Status(); ok {
+		_spec.SetField(match.FieldStatus, field.TypeEnum, value)
+		_node.Status = value
+	}
 	if nodes := mc.mutation.StudentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -226,10 +276,7 @@ func (mc *MatchCreate) createSpec() (*Match, *sqlgraph.CreateSpec) {
 			Columns: []string{match.StudentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: student.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(student.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -246,10 +293,7 @@ func (mc *MatchCreate) createSpec() (*Match, *sqlgraph.CreateSpec) {
 			Columns: []string{match.CourseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: course.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(course.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -266,10 +310,7 @@ func (mc *MatchCreate) createSpec() (*Match, *sqlgraph.CreateSpec) {
 			Columns: []string{match.AppointmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: appointment.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(appointment.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -285,10 +326,7 @@ func (mc *MatchCreate) createSpec() (*Match, *sqlgraph.CreateSpec) {
 			Columns: []string{match.ScheduleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: schedule.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(schedule.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -305,15 +343,29 @@ func (mc *MatchCreate) createSpec() (*Match, *sqlgraph.CreateSpec) {
 			Columns: []string{match.CancelRequestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: cancelrequest.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cancelrequest.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := mc.mutation.PaymentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   match.PaymentTable,
+			Columns: []string{match.PaymentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(payment.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.payment_match = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

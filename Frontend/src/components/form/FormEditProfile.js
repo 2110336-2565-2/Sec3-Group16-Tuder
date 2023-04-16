@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { FormP } from "../profile/ProfileStyle";
 import { convertFrontendSchedulesToBackend } from "../../utils/profile/scheduleConverter";
@@ -13,34 +14,44 @@ import TimeSelector from "../profile/TimeSelector";
 
 export default function FormEditProfile({ user }) {
   const navigate = useNavigate();
-  console.log("user: ", user);
   const fields = user.role === "student" ? studentFields : tutorFields;
   const [isFileUploaderOpen, setIsFileUploaderOpen] = useState(false);
   const [formData, setFormData] = useState({ ...user });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const submitHandler = (e) => {
     e.preventDefault();
-    console.log("edit profile");
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    const loadingToast = toast.loading("Submitting...");
     let compatibleFormData = { ...formData };
     // Convert some fields format to match the backend
     if (compatibleFormData.new_profile_picture) {
-      compatibleFormData.new_profile_picture = compatibleFormData.new_profile_picture.split(',')[1];
-      console.log("compatibleFormData",compatibleFormData);
+      compatibleFormData.new_profile_picture =
+        compatibleFormData.new_profile_picture.split(",")[1];
+      console.log("compatibleFormData", compatibleFormData);
     }
     try {
       if (user.role === "student") {
         updateStudent(compatibleFormData).then((res) => {
-          console.log("res: ", res);
           navigate("/profile");
+          toast.success("Profile updated successfully");
+          toast.dismiss(loadingToast);
+          setIsSubmitting(false);
         });
       } else if (user.role === "tutor") {
         updateTutor(compatibleFormData).then((res) => {
-          console.log("res: ", res);
           navigate("/profile");
+          toast.success("Profile updated successfully");
+          toast.dismiss(loadingToast);
+          setIsSubmitting(false);
         });
       }
     } catch (error) {
-      console.log(error);
+        console.log(error);
+        toast.error("Profile update failed");
+        toast.dismiss(loadingToast);
+        setIsSubmitting(false);
     }
   };
 
@@ -50,17 +61,13 @@ export default function FormEditProfile({ user }) {
     if (e.target.name === "birthdate") {
       value = new Date(e.target.value).toISOString();
     } else if (e.target.name === "schedule") {
-      console.log("e.target.value: ", e.target.value);
       value = convertFrontendSchedulesToBackend(e.target.value);
     }
-    
+
     setFormData({
       ...formData,
       [e.target.name]: value,
     });
-    // console.log("e.target.name: ", e.target.name);
-    // console.log("e.target.value: ", e.target.value);
-    console.log("formData: ", formData);
   };
 
   return (
@@ -69,6 +76,7 @@ export default function FormEditProfile({ user }) {
         isOpen={isFileUploaderOpen}
         setIsOpen={setIsFileUploaderOpen}
         handleChange={handleChange}
+        name="new_profile_picture"
       />
       <Title>Edit Profile</Title>
       <FormP.ProfilePictureWrapper onClick={() => setIsFileUploaderOpen(true)}>
@@ -155,7 +163,10 @@ export default function FormEditProfile({ user }) {
         })}
       </FormP.FormContainer>
       <ButtonSection>
-        <Button type="cancel" onClick={() => navigate("/profile")}>
+        <Button type="cancel" onClick={() => {
+          toast.dismiss()
+          navigate("/profile")
+          }}>
           Cancel
         </Button>
         <Button type="submit">Save</Button>

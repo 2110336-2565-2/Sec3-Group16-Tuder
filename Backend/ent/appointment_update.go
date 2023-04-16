@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/appointment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
 	"github.com/google/uuid"
 )
@@ -35,6 +36,14 @@ func (au *AppointmentUpdate) SetStatus(a appointment.Status) *AppointmentUpdate 
 	return au
 }
 
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (au *AppointmentUpdate) SetNillableStatus(a *appointment.Status) *AppointmentUpdate {
+	if a != nil {
+		au.SetStatus(*a)
+	}
+	return au
+}
+
 // SetMatchID sets the "match" edge to the Match entity by ID.
 func (au *AppointmentUpdate) SetMatchID(id uuid.UUID) *AppointmentUpdate {
 	au.mutation.SetMatchID(id)
@@ -54,6 +63,25 @@ func (au *AppointmentUpdate) SetMatch(m *Match) *AppointmentUpdate {
 	return au.SetMatchID(m.ID)
 }
 
+// SetPaymentID sets the "payment" edge to the Payment entity by ID.
+func (au *AppointmentUpdate) SetPaymentID(id uuid.UUID) *AppointmentUpdate {
+	au.mutation.SetPaymentID(id)
+	return au
+}
+
+// SetNillablePaymentID sets the "payment" edge to the Payment entity by ID if the given value is not nil.
+func (au *AppointmentUpdate) SetNillablePaymentID(id *uuid.UUID) *AppointmentUpdate {
+	if id != nil {
+		au = au.SetPaymentID(*id)
+	}
+	return au
+}
+
+// SetPayment sets the "payment" edge to the Payment entity.
+func (au *AppointmentUpdate) SetPayment(p *Payment) *AppointmentUpdate {
+	return au.SetPaymentID(p.ID)
+}
+
 // Mutation returns the AppointmentMutation object of the builder.
 func (au *AppointmentUpdate) Mutation() *AppointmentMutation {
 	return au.mutation
@@ -62,6 +90,12 @@ func (au *AppointmentUpdate) Mutation() *AppointmentMutation {
 // ClearMatch clears the "match" edge to the Match entity.
 func (au *AppointmentUpdate) ClearMatch() *AppointmentUpdate {
 	au.mutation.ClearMatch()
+	return au
+}
+
+// ClearPayment clears the "payment" edge to the Payment entity.
+func (au *AppointmentUpdate) ClearPayment() *AppointmentUpdate {
+	au.mutation.ClearPayment()
 	return au
 }
 
@@ -125,10 +159,7 @@ func (au *AppointmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{appointment.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: match.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(match.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -141,10 +172,36 @@ func (au *AppointmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{appointment.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: match.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(match.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.PaymentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   appointment.PaymentTable,
+			Columns: []string{appointment.PaymentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(payment.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.PaymentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   appointment.PaymentTable,
+			Columns: []string{appointment.PaymentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(payment.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -178,6 +235,14 @@ func (auo *AppointmentUpdateOne) SetStatus(a appointment.Status) *AppointmentUpd
 	return auo
 }
 
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (auo *AppointmentUpdateOne) SetNillableStatus(a *appointment.Status) *AppointmentUpdateOne {
+	if a != nil {
+		auo.SetStatus(*a)
+	}
+	return auo
+}
+
 // SetMatchID sets the "match" edge to the Match entity by ID.
 func (auo *AppointmentUpdateOne) SetMatchID(id uuid.UUID) *AppointmentUpdateOne {
 	auo.mutation.SetMatchID(id)
@@ -197,6 +262,25 @@ func (auo *AppointmentUpdateOne) SetMatch(m *Match) *AppointmentUpdateOne {
 	return auo.SetMatchID(m.ID)
 }
 
+// SetPaymentID sets the "payment" edge to the Payment entity by ID.
+func (auo *AppointmentUpdateOne) SetPaymentID(id uuid.UUID) *AppointmentUpdateOne {
+	auo.mutation.SetPaymentID(id)
+	return auo
+}
+
+// SetNillablePaymentID sets the "payment" edge to the Payment entity by ID if the given value is not nil.
+func (auo *AppointmentUpdateOne) SetNillablePaymentID(id *uuid.UUID) *AppointmentUpdateOne {
+	if id != nil {
+		auo = auo.SetPaymentID(*id)
+	}
+	return auo
+}
+
+// SetPayment sets the "payment" edge to the Payment entity.
+func (auo *AppointmentUpdateOne) SetPayment(p *Payment) *AppointmentUpdateOne {
+	return auo.SetPaymentID(p.ID)
+}
+
 // Mutation returns the AppointmentMutation object of the builder.
 func (auo *AppointmentUpdateOne) Mutation() *AppointmentMutation {
 	return auo.mutation
@@ -205,6 +289,12 @@ func (auo *AppointmentUpdateOne) Mutation() *AppointmentMutation {
 // ClearMatch clears the "match" edge to the Match entity.
 func (auo *AppointmentUpdateOne) ClearMatch() *AppointmentUpdateOne {
 	auo.mutation.ClearMatch()
+	return auo
+}
+
+// ClearPayment clears the "payment" edge to the Payment entity.
+func (auo *AppointmentUpdateOne) ClearPayment() *AppointmentUpdateOne {
+	auo.mutation.ClearPayment()
 	return auo
 }
 
@@ -298,10 +388,7 @@ func (auo *AppointmentUpdateOne) sqlSave(ctx context.Context) (_node *Appointmen
 			Columns: []string{appointment.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: match.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(match.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -314,10 +401,36 @@ func (auo *AppointmentUpdateOne) sqlSave(ctx context.Context) (_node *Appointmen
 			Columns: []string{appointment.MatchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: match.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(match.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.PaymentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   appointment.PaymentTable,
+			Columns: []string{appointment.PaymentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(payment.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.PaymentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   appointment.PaymentTable,
+			Columns: []string{appointment.PaymentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(payment.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

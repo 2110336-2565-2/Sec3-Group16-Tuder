@@ -14,7 +14,8 @@ export const confirm = (message, handleConfirm) => {
                     </Button>
                     <Button variance="submit" onClick={()=>{
                         handleConfirm()
-                        toast.dismiss(t.id)}
+                        // dismiss all toasts
+                        toast.dismiss()}
                         }>
                         Discard
                     </Button>

@@ -35,3 +35,8 @@ type SchemaReportResponse struct {
 	Message string               `json:"message"`
 	Data    []*SchemaIssueReport `json:"result"`
 }
+type SchemaAdminTuitionFeeResponse struct {
+	Success bool                     `json:"success"`
+	Message string                   `json:"message"`
+	Data    []*SchemaAdminTuitionFee `json:"result"`
+}

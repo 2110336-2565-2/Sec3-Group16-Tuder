@@ -29,6 +29,8 @@ const (
 	FieldLevel = "level"
 	// FieldCoursePictureURL holds the string denoting the course_picture_url field in the database.
 	FieldCoursePictureURL = "course_picture_url"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
 	// EdgeReview holds the string denoting the review edge name in mutations.
 	EdgeReview = "review"
 	// EdgeMatch holds the string denoting the match edge name in mutations.
@@ -69,6 +71,7 @@ var Columns = []string{
 	FieldPricePerHour,
 	FieldLevel,
 	FieldCoursePictureURL,
+	FieldStatus,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "courses"
@@ -143,5 +146,31 @@ func LevelValidator(l Level) error {
 		return nil
 	default:
 		return fmt.Errorf("course: invalid enum value for level field: %q", l)
+	}
+}
+
+// Status defines the type for the "status" enum field.
+type Status string
+
+// StatusOpen is the default value of the Status enum.
+const DefaultStatus = StatusOpen
+
+// Status values.
+const (
+	StatusOpen   Status = "open"
+	StatusClosed Status = "closed"
+)
+
+func (s Status) String() string {
+	return string(s)
+}
+
+// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
+func StatusValidator(s Status) error {
+	switch s {
+	case StatusOpen, StatusClosed:
+		return nil
+	default:
+		return fmt.Errorf("course: invalid enum value for status field: %q", s)
 	}
 }

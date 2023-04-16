@@ -26,6 +26,7 @@ type RepositoryTutor interface {
 	UpdateSchedule(sr *schema.SchemaUpdateSchedule) (*ent.Schedule, error)
 	GetSchedule(sr *schema.SchemaGetSchedule) (*ent.Schedule, error)
 	GetReviews(sr *schema.SchemaGetReviews) ([]*ent.Review, error)
+	GetCourses(sr *schema.SchemaGetCourses) ([]*ent.Course, error)
 }
 
 type repositoryTutor struct {
@@ -348,4 +349,21 @@ func (r *repositoryTutor) GetReviews(sr *schema.SchemaGetReviews) ([]*ent.Review
 	}
 
 	return reviews, nil
+}
+
+func (r *repositoryTutor) GetCourses(sr *schema.SchemaGetCourses) ([]*ent.Course, error) {
+	courses, err := r.client.Course.Query().
+		Where(
+			entCourse.HasTutorWith(
+				entTutor.HasUserWith(entUser.UsernameEQ(sr.Username)),
+			),
+		).
+		WithMatch().
+		All(r.ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return courses, nil
 }

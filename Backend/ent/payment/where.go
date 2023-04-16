@@ -3,6 +3,8 @@
 package payment
 
 import (
+	"time"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
@@ -57,6 +59,31 @@ func IDLTE(id uuid.UUID) predicate.Payment {
 // QrPictureURL applies equality check predicate on the "qr_picture_url" field. It's identical to QrPictureURLEQ.
 func QrPictureURL(v string) predicate.Payment {
 	return predicate.Payment(sql.FieldEQ(FieldQrPictureURL, v))
+}
+
+// Amount applies equality check predicate on the "amount" field. It's identical to AmountEQ.
+func Amount(v int) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldAmount, v))
+}
+
+// Currency applies equality check predicate on the "currency" field. It's identical to CurrencyEQ.
+func Currency(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldCurrency, v))
+}
+
+// ChargeID applies equality check predicate on the "charge_id" field. It's identical to ChargeIDEQ.
+func ChargeID(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldChargeID, v))
+}
+
+// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
+func CreatedAt(v time.Time) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldCreatedAt, v))
+}
+
+// UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
+func UpdatedAt(v time.Time) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
 // QrPictureURLEQ applies the EQ predicate on the "qr_picture_url" field.
@@ -134,6 +161,276 @@ func QrPictureURLContainsFold(v string) predicate.Payment {
 	return predicate.Payment(sql.FieldContainsFold(FieldQrPictureURL, v))
 }
 
+// PaymentStatusEQ applies the EQ predicate on the "payment_status" field.
+func PaymentStatusEQ(v PaymentStatus) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldPaymentStatus, v))
+}
+
+// PaymentStatusNEQ applies the NEQ predicate on the "payment_status" field.
+func PaymentStatusNEQ(v PaymentStatus) predicate.Payment {
+	return predicate.Payment(sql.FieldNEQ(FieldPaymentStatus, v))
+}
+
+// PaymentStatusIn applies the In predicate on the "payment_status" field.
+func PaymentStatusIn(vs ...PaymentStatus) predicate.Payment {
+	return predicate.Payment(sql.FieldIn(FieldPaymentStatus, vs...))
+}
+
+// PaymentStatusNotIn applies the NotIn predicate on the "payment_status" field.
+func PaymentStatusNotIn(vs ...PaymentStatus) predicate.Payment {
+	return predicate.Payment(sql.FieldNotIn(FieldPaymentStatus, vs...))
+}
+
+// AmountEQ applies the EQ predicate on the "amount" field.
+func AmountEQ(v int) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldAmount, v))
+}
+
+// AmountNEQ applies the NEQ predicate on the "amount" field.
+func AmountNEQ(v int) predicate.Payment {
+	return predicate.Payment(sql.FieldNEQ(FieldAmount, v))
+}
+
+// AmountIn applies the In predicate on the "amount" field.
+func AmountIn(vs ...int) predicate.Payment {
+	return predicate.Payment(sql.FieldIn(FieldAmount, vs...))
+}
+
+// AmountNotIn applies the NotIn predicate on the "amount" field.
+func AmountNotIn(vs ...int) predicate.Payment {
+	return predicate.Payment(sql.FieldNotIn(FieldAmount, vs...))
+}
+
+// AmountGT applies the GT predicate on the "amount" field.
+func AmountGT(v int) predicate.Payment {
+	return predicate.Payment(sql.FieldGT(FieldAmount, v))
+}
+
+// AmountGTE applies the GTE predicate on the "amount" field.
+func AmountGTE(v int) predicate.Payment {
+	return predicate.Payment(sql.FieldGTE(FieldAmount, v))
+}
+
+// AmountLT applies the LT predicate on the "amount" field.
+func AmountLT(v int) predicate.Payment {
+	return predicate.Payment(sql.FieldLT(FieldAmount, v))
+}
+
+// AmountLTE applies the LTE predicate on the "amount" field.
+func AmountLTE(v int) predicate.Payment {
+	return predicate.Payment(sql.FieldLTE(FieldAmount, v))
+}
+
+// CurrencyEQ applies the EQ predicate on the "currency" field.
+func CurrencyEQ(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldCurrency, v))
+}
+
+// CurrencyNEQ applies the NEQ predicate on the "currency" field.
+func CurrencyNEQ(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldNEQ(FieldCurrency, v))
+}
+
+// CurrencyIn applies the In predicate on the "currency" field.
+func CurrencyIn(vs ...string) predicate.Payment {
+	return predicate.Payment(sql.FieldIn(FieldCurrency, vs...))
+}
+
+// CurrencyNotIn applies the NotIn predicate on the "currency" field.
+func CurrencyNotIn(vs ...string) predicate.Payment {
+	return predicate.Payment(sql.FieldNotIn(FieldCurrency, vs...))
+}
+
+// CurrencyGT applies the GT predicate on the "currency" field.
+func CurrencyGT(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldGT(FieldCurrency, v))
+}
+
+// CurrencyGTE applies the GTE predicate on the "currency" field.
+func CurrencyGTE(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldGTE(FieldCurrency, v))
+}
+
+// CurrencyLT applies the LT predicate on the "currency" field.
+func CurrencyLT(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldLT(FieldCurrency, v))
+}
+
+// CurrencyLTE applies the LTE predicate on the "currency" field.
+func CurrencyLTE(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldLTE(FieldCurrency, v))
+}
+
+// CurrencyContains applies the Contains predicate on the "currency" field.
+func CurrencyContains(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldContains(FieldCurrency, v))
+}
+
+// CurrencyHasPrefix applies the HasPrefix predicate on the "currency" field.
+func CurrencyHasPrefix(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldHasPrefix(FieldCurrency, v))
+}
+
+// CurrencyHasSuffix applies the HasSuffix predicate on the "currency" field.
+func CurrencyHasSuffix(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldHasSuffix(FieldCurrency, v))
+}
+
+// CurrencyEqualFold applies the EqualFold predicate on the "currency" field.
+func CurrencyEqualFold(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldEqualFold(FieldCurrency, v))
+}
+
+// CurrencyContainsFold applies the ContainsFold predicate on the "currency" field.
+func CurrencyContainsFold(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldContainsFold(FieldCurrency, v))
+}
+
+// ChargeIDEQ applies the EQ predicate on the "charge_id" field.
+func ChargeIDEQ(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldChargeID, v))
+}
+
+// ChargeIDNEQ applies the NEQ predicate on the "charge_id" field.
+func ChargeIDNEQ(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldNEQ(FieldChargeID, v))
+}
+
+// ChargeIDIn applies the In predicate on the "charge_id" field.
+func ChargeIDIn(vs ...string) predicate.Payment {
+	return predicate.Payment(sql.FieldIn(FieldChargeID, vs...))
+}
+
+// ChargeIDNotIn applies the NotIn predicate on the "charge_id" field.
+func ChargeIDNotIn(vs ...string) predicate.Payment {
+	return predicate.Payment(sql.FieldNotIn(FieldChargeID, vs...))
+}
+
+// ChargeIDGT applies the GT predicate on the "charge_id" field.
+func ChargeIDGT(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldGT(FieldChargeID, v))
+}
+
+// ChargeIDGTE applies the GTE predicate on the "charge_id" field.
+func ChargeIDGTE(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldGTE(FieldChargeID, v))
+}
+
+// ChargeIDLT applies the LT predicate on the "charge_id" field.
+func ChargeIDLT(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldLT(FieldChargeID, v))
+}
+
+// ChargeIDLTE applies the LTE predicate on the "charge_id" field.
+func ChargeIDLTE(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldLTE(FieldChargeID, v))
+}
+
+// ChargeIDContains applies the Contains predicate on the "charge_id" field.
+func ChargeIDContains(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldContains(FieldChargeID, v))
+}
+
+// ChargeIDHasPrefix applies the HasPrefix predicate on the "charge_id" field.
+func ChargeIDHasPrefix(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldHasPrefix(FieldChargeID, v))
+}
+
+// ChargeIDHasSuffix applies the HasSuffix predicate on the "charge_id" field.
+func ChargeIDHasSuffix(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldHasSuffix(FieldChargeID, v))
+}
+
+// ChargeIDEqualFold applies the EqualFold predicate on the "charge_id" field.
+func ChargeIDEqualFold(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldEqualFold(FieldChargeID, v))
+}
+
+// ChargeIDContainsFold applies the ContainsFold predicate on the "charge_id" field.
+func ChargeIDContainsFold(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldContainsFold(FieldChargeID, v))
+}
+
+// CreatedAtEQ applies the EQ predicate on the "created_at" field.
+func CreatedAtEQ(v time.Time) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldCreatedAt, v))
+}
+
+// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
+func CreatedAtNEQ(v time.Time) predicate.Payment {
+	return predicate.Payment(sql.FieldNEQ(FieldCreatedAt, v))
+}
+
+// CreatedAtIn applies the In predicate on the "created_at" field.
+func CreatedAtIn(vs ...time.Time) predicate.Payment {
+	return predicate.Payment(sql.FieldIn(FieldCreatedAt, vs...))
+}
+
+// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
+func CreatedAtNotIn(vs ...time.Time) predicate.Payment {
+	return predicate.Payment(sql.FieldNotIn(FieldCreatedAt, vs...))
+}
+
+// CreatedAtGT applies the GT predicate on the "created_at" field.
+func CreatedAtGT(v time.Time) predicate.Payment {
+	return predicate.Payment(sql.FieldGT(FieldCreatedAt, v))
+}
+
+// CreatedAtGTE applies the GTE predicate on the "created_at" field.
+func CreatedAtGTE(v time.Time) predicate.Payment {
+	return predicate.Payment(sql.FieldGTE(FieldCreatedAt, v))
+}
+
+// CreatedAtLT applies the LT predicate on the "created_at" field.
+func CreatedAtLT(v time.Time) predicate.Payment {
+	return predicate.Payment(sql.FieldLT(FieldCreatedAt, v))
+}
+
+// CreatedAtLTE applies the LTE predicate on the "created_at" field.
+func CreatedAtLTE(v time.Time) predicate.Payment {
+	return predicate.Payment(sql.FieldLTE(FieldCreatedAt, v))
+}
+
+// UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
+func UpdatedAtEQ(v time.Time) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
+func UpdatedAtNEQ(v time.Time) predicate.Payment {
+	return predicate.Payment(sql.FieldNEQ(FieldUpdatedAt, v))
+}
+
+// UpdatedAtIn applies the In predicate on the "updated_at" field.
+func UpdatedAtIn(vs ...time.Time) predicate.Payment {
+	return predicate.Payment(sql.FieldIn(FieldUpdatedAt, vs...))
+}
+
+// UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
+func UpdatedAtNotIn(vs ...time.Time) predicate.Payment {
+	return predicate.Payment(sql.FieldNotIn(FieldUpdatedAt, vs...))
+}
+
+// UpdatedAtGT applies the GT predicate on the "updated_at" field.
+func UpdatedAtGT(v time.Time) predicate.Payment {
+	return predicate.Payment(sql.FieldGT(FieldUpdatedAt, v))
+}
+
+// UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
+func UpdatedAtGTE(v time.Time) predicate.Payment {
+	return predicate.Payment(sql.FieldGTE(FieldUpdatedAt, v))
+}
+
+// UpdatedAtLT applies the LT predicate on the "updated_at" field.
+func UpdatedAtLT(v time.Time) predicate.Payment {
+	return predicate.Payment(sql.FieldLT(FieldUpdatedAt, v))
+}
+
+// UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
+func UpdatedAtLTE(v time.Time) predicate.Payment {
+	return predicate.Payment(sql.FieldLTE(FieldUpdatedAt, v))
+}
+
 // HasUser applies the HasEdge predicate on the "user" edge.
 func HasUser() predicate.Payment {
 	return predicate.Payment(func(s *sql.Selector) {
@@ -152,6 +449,60 @@ func HasUserWith(preds ...predicate.User) predicate.Payment {
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(UserInverseTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasMatch applies the HasEdge predicate on the "match" edge.
+func HasMatch() predicate.Payment {
+	return predicate.Payment(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, MatchTable, MatchColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasMatchWith applies the HasEdge predicate on the "match" edge with a given conditions (other predicates).
+func HasMatchWith(preds ...predicate.Match) predicate.Payment {
+	return predicate.Payment(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(MatchInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, MatchTable, MatchColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasAppointment applies the HasEdge predicate on the "appointment" edge.
+func HasAppointment() predicate.Payment {
+	return predicate.Payment(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, AppointmentTable, AppointmentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAppointmentWith applies the HasEdge predicate on the "appointment" edge with a given conditions (other predicates).
+func HasAppointmentWith(preds ...predicate.Appointment) predicate.Payment {
+	return predicate.Payment(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(AppointmentInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, AppointmentTable, AppointmentColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
