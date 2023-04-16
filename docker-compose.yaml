@@ -1,9 +1,12 @@
 version: '3.7'
 
+networks:
+  tuder: {}
+
 services:
   database:
     image: postgres:15
-    restart: unless-stopped
+    restart: always 
     volumes:
       - database-storage:/var/lib/postgresql/data
     environment:
@@ -12,6 +15,58 @@ services:
       POSTGRES_USER: user
     ports:
       - 5432:5432
+    networks:
+      - tuder
+
+  frontend:
+    build: ./Frontend
+    restart: always
+    ports:
+      - 3000:3000
+    depends_on:
+      - backend
+    env_file:
+      - ./Frontend/.env
+    environment:
+      PORT: ${PORT}
+      REACT_APP_API_URL: ${REACT_APP_API_URL}
+      REACT_APP_OMISE_PUBLIC_KEY: ${REACT_APP_OMISE_PUBLIC_KEY}
+    networks:
+      - tuder
+
+
+  backend:
+    build: ./Backend
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - database
+    env_file:
+      - ./Backend/.env
+    environment:
+      MODE: ${MODE}
+      SERVER_PORT: ${SERVER_PORT}
+      SERVER_HOST: ${SERVER_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_PORT: ${DB_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_MINUTES: ${JWT_EXPIRES_MINUTES}
+      FRONTEND_URL: ${FRONTEND_URL}
+      AWS_REGION: ${AWS_REGION}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      OMISE_PUBLIC_KEY: ${OMISE_PUBLIC_KEY}
+      OMISE_SECRET_KEY: ${OMISE_SECRET_KEY}
+    
+    networks:
+      - tuder
+
+    
 
 volumes:
   database-storage:
+
+

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"log"
 	"os"
 
@@ -15,7 +14,7 @@ import (
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	// "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/appointment"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/migrate"
+
 	repository "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/datas"
@@ -71,13 +70,13 @@ func main() {
 
 	defer client.Close()
 
-	if err := client.Schema.Create(context.Background(),
-		migrate.WithGlobalUniqueID(true),
-		migrate.WithDropIndex(true),
-		migrate.WithDropColumn(true),
-	); err != nil {
-		log.Fatalf("failed creating schema resources: %v", err)
-	}
+	// if err := client.Schema.Create(context.Background(),
+	// 	migrate.WithGlobalUniqueID(true),
+	// 	migrate.WithDropIndex(true),
+	// 	migrate.WithDropColumn(true),
+	// ); err != nil {
+	// 	log.Fatalf("failed creating schema resources: %v", err)
+	// }
 
 	// test data for development
 	if os.Getenv("MODE") == "dev" {

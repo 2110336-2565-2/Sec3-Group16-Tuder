@@ -1,0 +1,21 @@
+# Use a Golang base image with the specified version
+FROM golang:1.20.3
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the local directory to the working directory inside the container
+COPY . .
+
+RUN go generate ./ent
+
+# Build the Go application
+RUN go build -o main .
+
+# Expose the port on which the application will run
+EXPOSE 8080
+
+# Set the command to run the application
+CMD ["./main"]
+
+# CMD go run server.go
