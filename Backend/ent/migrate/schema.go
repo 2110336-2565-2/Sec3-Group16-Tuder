@@ -79,6 +79,7 @@ var (
 		{Name: "price_per_hour", Type: field.TypeInt},
 		{Name: "level", Type: field.TypeEnum, Nullable: true, Enums: []string{"Grade1", "Grade2", "Grade3", "Grade4", "Grade5", "Grade6", "Grade7", "Grade8", "Grade9", "Grade10", "Grade11", "Grade12"}},
 		{Name: "course_picture_url", Type: field.TypeString, Nullable: true},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"open", "closed"}, Default: "open"},
 		{Name: "tutor_course", Type: field.TypeUUID},
 	}
 	// CoursesTable holds the schema information for the "courses" table.
@@ -89,7 +90,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "courses_tutors_course",
-				Columns:    []*schema.Column{CoursesColumns[9]},
+				Columns:    []*schema.Column{CoursesColumns[10]},
 				RefColumns: []*schema.Column{TutorsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -143,19 +144,19 @@ var (
 			},
 			{
 				Symbol:     "matches_payments_match",
-				Columns:    []*schema.Column{MatchesColumns[3]},
+				Columns:    []*schema.Column{MatchesColumns[4]},
 				RefColumns: []*schema.Column{PaymentsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "matches_schedules_match",
-				Columns:    []*schema.Column{MatchesColumns[4]},
+				Columns:    []*schema.Column{MatchesColumns[5]},
 				RefColumns: []*schema.Column{SchedulesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "matches_students_match",
-				Columns:    []*schema.Column{MatchesColumns[5]},
+				Columns:    []*schema.Column{MatchesColumns[6]},
 				RefColumns: []*schema.Column{StudentsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

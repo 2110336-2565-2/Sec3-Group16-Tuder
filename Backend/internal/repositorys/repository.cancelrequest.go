@@ -196,7 +196,7 @@ func (r *repositoryCancelRequest) CancelRequest(sc *schemas.SchemaCancelRequest)
 
 
 	// create image url
-	imgURL := fmt.Sprintf("%s/%s", sc.MatchID.String(), sc.UserID.String())
+	imgURL := fmt.Sprintf("%s/%s/%s", sc.MatchID.String(), sc.UserID.String(), uuid.New())
 
 	// upload image to s3
 	imgURL, err = utils.GenerateProfilePictureURL(sc.Img, imgURL, "ProfilePicture")
@@ -223,7 +223,16 @@ func (r *repositoryCancelRequest) CancelRequest(sc *schemas.SchemaCancelRequest)
 
 func (r *repositoryCancelRequest) AuditRequest(sc *schemas.SchemaCancelRequestApprove) error {
 
-	ccr, err := r.client.CancelRequest.
+	// create a transaction
+	tx, err := r.client.Tx(r.ctx)
+	if err != nil {
+		return fmt.Errorf("starting a transaction: %w", err)
+	}
+
+	// wrap the client with the transaction
+	txc := tx.Client()
+
+	ccr, err := txc.CancelRequest.
 		Query().
 		Where(cancelrequest.IDEQ(sc.CancelRequestID)).
 		Only(r.ctx)
@@ -240,7 +249,7 @@ func (r *repositoryCancelRequest) AuditRequest(sc *schemas.SchemaCancelRequestAp
 		status = cancelrequest.StatusApproved
 		appStatus := appointment.StatusCanceled
 		// cancel all appointments of the match
-		_, err = r.client.Appointment.
+		_, err = txc.Appointment.
 			Update().
 			Where(
 				appointment.HasMatchWith(
@@ -250,8 +259,13 @@ func (r *repositoryCancelRequest) AuditRequest(sc *schemas.SchemaCancelRequestAp
 			SetStatus(appStatus).
 			Save(r.ctx)
 		if err != nil {
+			if rerr := tx.Rollback(); rerr != nil {
+				return fmt.Errorf("%w: %v", err, rerr)
+			}
 			return err
 		}
+		
+	
 		mStatus = match.StatusCanceled
 	} else {
 		status = cancelrequest.StatusRejected
@@ -259,18 +273,36 @@ func (r *repositoryCancelRequest) AuditRequest(sc *schemas.SchemaCancelRequestAp
 	}
 
 	if ccr.Status == cancelrequest.StatusApproved {
-		return errors.New("cancel request is already approved")
+		err = errors.New("cancel request is already approved")
+
+		if err != nil {
+			if rerr := tx.Rollback(); rerr != nil {
+				return fmt.Errorf("%w: %v", err, rerr)
+			}
+			return err
+		}
 	}
 	if ccr.Status == cancelrequest.StatusRejected {
-		return errors.New("cancel request is already rejected")
+		err = errors.New("cancel request is already rejected")
+		
+		if err != nil {
+			if rerr := tx.Rollback(); rerr != nil {
+				return fmt.Errorf("%w: %v", err, rerr)
+			}
+			return err
+		}
 	}
 
-	_, err = r.client.CancelRequest.
+	_, err = txc.CancelRequest.
 		UpdateOne(ccr).
 		SetStatus(status).
 		Save(r.ctx)
 
+	
 	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			return fmt.Errorf("%w: %v", err, rerr)
+		}
 		return err
 	}
 
@@ -280,11 +312,15 @@ func (r *repositoryCancelRequest) AuditRequest(sc *schemas.SchemaCancelRequestAp
 		UpdateOneID(sc.MatchID).
 		SetStatus(mStatus).
 		Save(r.ctx)
+	
 	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			return fmt.Errorf("%w: %v", err, rerr)
+		}
 		return err
 	}
 	
-	return nil
+	return tx.Commit()
 }
 
 // func (r *repositoryClass) AcknowledgeClassCancellation(s *schemas.SchemaUserAcknowledge) error {

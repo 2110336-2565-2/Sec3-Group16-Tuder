@@ -58,21 +58,7 @@ export default function FormEnrollCourse({ course, courseSchedule }) {
     toast.dismiss(paymentLoadingToast);
     setIsModalOpen(true);
     setIsSubmitting(false);
-
-    // submitEnrollFormHandler(data)
-    //   .then((res) => {
-    //     toast.dismiss(loadingToast);
-    //     toast.success("Enroll Success");
-    //     navigate("/");
-    //     setIsSubmitting(false);
-    //   })
-    //   .catch((err) => {
-    //     toast.dismiss(loadingToast);
-    //     toast.error("Enroll Failed");
-    //     setIsSubmitting(false);
-    //   });
   }
-  console.log("courseSchedule: ", courseSchedule);
   return (
     <Container>
       <PaymentModal

@@ -16,6 +16,7 @@ export default function CancelRequestInfo(props) {
     const data = {
       cancelRequestId: props.cancelRequestId,
       approve: e.target.value === "true",
+      matchId: props.matchId,
     };
 
     submitAudittingHandler(data)
@@ -29,6 +30,7 @@ export default function CancelRequestInfo(props) {
       })
       .catch((err) => {
         console.log(err);
+        toast.error("Error" + err.response.data.message);
       });
   };
 

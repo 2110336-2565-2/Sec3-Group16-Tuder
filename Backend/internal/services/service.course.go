@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
@@ -23,6 +24,7 @@ type ServiceCourse interface {
 	CourseSearchByDay(searchContent *schemas.CourseSearch) ([]*schemas.CourseSearchResult, error)
 	Intercept(l [][]*schemas.CourseSearchResult) []*schemas.CourseSearchResult
 	PackToSchema(course []*ent.Course) []*schemas.CourseSearchResult
+	UpdateCourseStatus(sr *schemas.SchemaUpdateCourseStatus) (*schemas.SchemaUpdateCourseStatusResponse, error)
 }
 
 type serviceCourse struct {
@@ -208,6 +210,7 @@ func (s *serviceCourse) GetCourseByID(sr *schemas.SchemaGetCourse) (*schemas.Sch
 		ReviewCount:        count,
 		Reviews:            []schemas.Review{},
 		Tutor_id:           course.Edges.Tutor.ID,
+		TutorUsername:      course.Edges.Tutor.Edges.User.Username,
 		TutorFirstname:     course.Edges.Tutor.Edges.User.FirstName,
 		TutorLastname:      course.Edges.Tutor.Edges.User.LastName,
 		Subject:            course.Subject,
@@ -217,6 +220,7 @@ func (s *serviceCourse) GetCourseByID(sr *schemas.SchemaGetCourse) (*schemas.Sch
 		Estimate_time:      course.EstimatedTime,
 		Price_per_hour:     course.PricePerHour,
 		Course_picture_url: *course.CoursePictureURL,
+		CourseStatus:       course.Status.String(),
 	}
 	// append ent.Review to sG
 	for _, r := range course.Edges.Review {
@@ -245,6 +249,7 @@ func (s *serviceCourse) CreateCourse(sr *schemas.SchemaCreateCourse) (*schemas.S
 		Price_per_hour:     course.PricePerHour,
 		Course_picture_url: *course.CoursePictureURL,
 		Level:              course.Level.String(),
+		CourseStatus:       course.Status.String(),
 	}
 	return courseResponse, nil
 }
@@ -275,4 +280,17 @@ func (s *serviceCourse) DeleteCourse(sr *schemas.SchemaDeleteCourse) error {
 		return err
 	}
 	return nil
+}
+
+func (s *serviceCourse) UpdateCourseStatus(sr *schemas.SchemaUpdateCourseStatus) (*schemas.SchemaUpdateCourseStatusResponse, error) {
+	course, err := s.repository.UpdateCourseStatus(sr)
+	if err != nil {
+		return nil, err
+	}
+	courseResponse := &schemas.SchemaUpdateCourseStatusResponse{
+		ID:     course.ID,
+		Title:  course.Title,
+		Status: course.Status.String(),
+	}
+	return courseResponse, nil
 }

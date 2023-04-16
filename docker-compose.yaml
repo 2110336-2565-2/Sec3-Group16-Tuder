@@ -22,7 +22,7 @@ services:
     build: ./Frontend
     restart: always
     ports:
-      - 3000:3000
+      - 3000:${PORT}
     depends_on:
       - backend
     env_file:
@@ -39,7 +39,7 @@ services:
     build: ./Backend
     restart: always
     ports:
-      - 8080:8080
+      - 8080:${SERVER_PORT}
     depends_on:
       - database
     env_file:

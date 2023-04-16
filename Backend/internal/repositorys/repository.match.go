@@ -53,6 +53,10 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 		return nil, err
 	}
 
+	if course.Status != "open" {
+		return nil, fmt.Errorf("course is not open")
+	}
+
 	student, err := txc.Student.
 		Query().
 		Where(student.IDEQ(sr.Student_id)).
@@ -102,6 +106,12 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 	if err != nil {
 		return nil, err
 	}
+
+	// fmt.Println("Create Course: %w", course)
+	// fmt.Println("Create Student: %w", student)
+	// fmt.Println("Create Schedule: %w", schedule)
+	// fmt.Println("Create Appointment: %w", appointments)
+	// fmt.Println("Create Payment: %w", payment)
 
 	//Create Match
 	match, err := txc.Match.
