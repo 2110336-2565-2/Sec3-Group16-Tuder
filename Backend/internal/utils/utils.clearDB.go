@@ -21,6 +21,7 @@ func NukeDB() {
 	// create a connection string
 	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=disable\n",
 		user, password, dbname, host, dbport)
+	fmt.Println(connStr)
 	// roughly connect to postgres
 	db, err := sql.Open("postgres",
 		connStr)

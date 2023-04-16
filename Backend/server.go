@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"entgo.io/ent/entc/integration/ent/migrate"
 	"log"
 	"os"
 
@@ -70,13 +72,13 @@ func main() {
 
 	defer client.Close()
 
-	// if err := client.Schema.Create(context.Background(),
-	// 	migrate.WithGlobalUniqueID(true),
-	// 	migrate.WithDropIndex(true),
-	// 	migrate.WithDropColumn(true),
-	// ); err != nil {
-	// 	log.Fatalf("failed creating schema resources: %v", err)
-	// }
+	if err := client.Schema.Create(context.Background(),
+		migrate.WithGlobalUniqueID(true),
+		migrate.WithDropIndex(true),
+		migrate.WithDropColumn(true),
+	); err != nil {
+		log.Fatalf("failed creating schema resources: %v", err)
+	}
 
 	// test data for development
 	if os.Getenv("MODE") == "dev" {

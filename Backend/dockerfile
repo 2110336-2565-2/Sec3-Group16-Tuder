@@ -9,13 +9,13 @@ COPY . .
 
 RUN go generate ./ent
 
-# Build the Go application
-RUN go build -o main .
+## Build the Go application
+#RUN go build -o main .
+#
+## Expose the port on which the application will run
+#EXPOSE 8080
+#
+## Set the command to run the application
+#CMD ["./main"]
 
-# Expose the port on which the application will run
-EXPOSE 8080
-
-# Set the command to run the application
-CMD ["./main"]
-
-# CMD go run server.go
+CMD go run server.go

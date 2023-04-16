@@ -26,7 +26,7 @@ services:
     depends_on:
       - backend
     env_file:
-      - ./Frontend/.env
+      - Frontend/.env
     environment:
       PORT: ${PORT}
       REACT_APP_API_URL: ${REACT_APP_API_URL}

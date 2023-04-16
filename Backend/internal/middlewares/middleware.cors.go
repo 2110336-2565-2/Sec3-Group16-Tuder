@@ -1,9 +1,8 @@
 package middlewares
 
 import (
-	"os"
-
 	"net/http"
+	"os"
 
 	"github.com/labstack/echo/v4"
 )
