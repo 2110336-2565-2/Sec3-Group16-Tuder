@@ -10,6 +10,9 @@ import (
 	entTutor "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	entUser "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
+
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
+	"github.com/google/uuid"
 )
 
 type RepositoryCourse interface {
@@ -210,9 +213,15 @@ func (r *repositoryCourse) CreateCourse(sr *schema.SchemaCreateCourse) (*ent.Cou
 		}
 		return nil, fmt.Errorf("getting tutor: %w", err)
 	}
+
+	// create image url
+	imgURL := fmt.Sprintf("%s/%s/%s", sr.Tutor_id, sr.Title, uuid.New())
+
+	imgURL, _ = utils.GenerateProfilePictureURL(sr.Course_picture, imgURL, "ProfilePicture")
+
 	// create a new course
 	course, err := txc.Course.Create().
-		SetCoursePictureURL(sr.Course_picture_url).
+		SetCoursePictureURL(imgURL).
 		SetSubject(sr.Subject).
 		SetDescription(sr.Description).
 		SetPricePerHour(sr.Price_per_hour).
@@ -222,6 +231,7 @@ func (r *repositoryCourse) CreateCourse(sr *schema.SchemaCreateCourse) (*ent.Cou
 		SetTopic(sr.Topic).
 		SetEstimatedTime(sr.Estimate_time).
 		Save(r.ctx)
+
 	course.Edges.Tutor = tutor
 
 	if err != nil {
@@ -250,9 +260,14 @@ func (r *repositoryCourse) UpdateCourse(sr *schema.SchemaUpdateCourse) (*ent.Cou
 		return nil, fmt.Errorf("getting tutor: %w", err)
 	}
 
+	imgURL := fmt.Sprintf("%s/%s/%s", sr.Tutor_id, sr.Title, uuid.New())
+	if sr.Course_picture != nil {
+		imgURL, _ = utils.GenerateProfilePictureURL(sr.Course_picture, imgURL, "ProfilePicture")
+	}
+
 	// update a course
 	course, err := txc.Course.UpdateOneID(sr.ID).
-		SetCoursePictureURL(sr.Course_picture_url).
+		SetCoursePictureURL(imgURL).
 		SetSubject(sr.Subject).
 		SetDescription(sr.Description).
 		SetPricePerHour(sr.Price_per_hour).
