@@ -77,17 +77,22 @@ export default function TimeSelector({
     }
     const mergedTimeSlot = getMergedTimeSlot(timeSlot, timeSlotToAdd);
     // Add new time slot to available time
+    let newAvailableTime = availableTime;
     for (let i = 0; i < availableTime.length; i++) {
       if (availableTime[i].day === selectedDay) {
-        setAvailableTime([
-          ...availableTime.slice(0, i),
-          { ...availableTime[i], timeSlot: mergedTimeSlot },
-          ...availableTime.slice(i + 1),
-        ]);
+        newAvailableTime = [
+          ...newAvailableTime.slice(0, i),
+          {
+            ...newAvailableTime[i],
+            timeSlot: mergedTimeSlot,
+          },
+          ...newAvailableTime.slice(i + 1),
+        ];
         break;
       }
     }
-    const e = { target: { name: name, value: availableTime } };
+    setAvailableTime(newAvailableTime);
+    const e = { target: { name: name, value: newAvailableTime } };
     onChange(e);
     setTimeSlotToAdd({ from: null, to: null });
   };
@@ -116,23 +121,24 @@ export default function TimeSelector({
   }, [selectedDay, availableTime]);
 
   const handleDeleteOnClick = (from, to) => {
-    console.log(from, to);
+    let newAvailableTime = availableTime;
     // Remove time slot from available time
     for (let i = 0; i < availableTime.length; i++) {
       if (availableTime[i].day === selectedDay) {
-        setAvailableTime([
-          ...availableTime.slice(0, i),
+        newAvailableTime = [
+          ...newAvailableTime.slice(0, i),
           {
-            ...availableTime[i],
-            timeSlot: availableTime[i].timeSlot.filter(
+            ...newAvailableTime[i],
+            timeSlot: newAvailableTime[i].timeSlot.filter(
               (time) => time.from !== from && time.to !== to
             ),
           },
-          ...availableTime.slice(i + 1),
-        ]);
+          ...newAvailableTime.slice(i + 1),
+        ];
         break;
       }
-    }const e = { target: { name: name, value: availableTime } };
+    }setAvailableTime(newAvailableTime);
+    const e = { target: { name: name, value: newAvailableTime } };
     onChange(e);
   };
 
