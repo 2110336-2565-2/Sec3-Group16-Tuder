@@ -8,25 +8,25 @@ jobs:
   initialize-the-application:
     runs-on: ubuntu-latest
     env:
-      MODE: ${vars.MODE}
-      SERVER_PORT: ${vars.SERVER_PORT}
-      SERVER_HOST: ${vars.SERVER_HOST}
-      DB_USER: ${vars.DB_USER}
-      DB_PASSWORD: ${vars.DB_PASSWORD}
-      DB_NAME: ${vars.DB_NAME}
-      DB_PORT: ${vars.DB_PORT}
-      JWT_SECRET: ${vars.JWT_SECRET}
-      JWT_EXPIRES_MINUTES: ${vars.JWT_EXPIRES_MINUTES}
-      FRONTEND_URL: ${vars.FRONTEND_URL}
-      AWS_REGION: ${vars.AWS_REGION}
-      AWS_ACCESS_KEY_ID: ${vars.AWS_ACCESS_KEY_ID}
-      AWS_SECRET_ACCESS_KEY: ${vars.AWS_SECRET_ACCESS_KEY}
-      OMISE_PUBLIC_KEY: ${vars.OMISE_PUBLIC_KEY}
-      OMISE_SECRET_KEY: ${vars.OMISE_SECRET_KEY}
+      MODE: ${{vars.MODE}}
+      SERVER_PORT: ${{vars.SERVER_PORT}}
+      SERVER_HOST: ${{vars.SERVER_HOST}}
+      DB_USER: ${{vars.DB_USER}}
+      DB_PASSWORD: ${{vars.DB_PASSWORD}}
+      DB_NAME: ${{vars.DB_NAME}}
+      DB_PORT: ${{vars.DB_PORT}}
+      JWT_SECRET: ${{vars.JWT_SECRET}}
+      JWT_EXPIRES_MINUTES: ${{vars.JWT_EXPIRES_MINUTES}}
+      FRONTEND_URL: ${{vars.FRONTEND_URL}}
+      AWS_REGION: ${{vars.AWS_REGION}}
+      AWS_ACCESS_KEY_ID: ${{vars.AWS_ACCESS_KEY_ID}}
+      AWS_SECRET_ACCESS_KEY: ${{vars.AWS_SECRET_ACCESS_KEY}}
+      OMISE_PUBLIC_KEY: ${{vars.OMISE_PUBLIC_KEY}}
+      OMISE_SECRET_KEY: ${{vars.OMISE_SECRET_KEY}}
         #  -------------------
-      PORT: ${vars.PORT}
-      REACT_APP_API_URL: ${vars.REACT_APP_API_URL}
-      REACT_APP_OMISE_PUBLIC_KEY: ${vars.REACT_APP_OMISE_PUBLIC_KEY}
+      PORT: ${{vars.PORT}}
+      REACT_APP_API_URL: ${{vars.REACT_APP_API_URL}}
+      REACT_APP_OMISE_PUBLIC_KEY: ${{vars.REACT_APP_OMISE_PUBLIC_KEY}}
 
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
@@ -41,24 +41,24 @@ jobs:
           ls ${{ github.workspace }}
       - name: Print all env
         run: |
-          echo ${{ env.MODE }}
-          echo ${{ env.SERVER_PORT }}
-          echo ${{ env.SERVER_HOST }}
-          echo ${{ env.DB_USER }}
-          echo ${{ env.DB_PASSWORD }}
-          echo ${{ env.DB_NAME }}
-          echo ${{ env.DB_PORT }}
-          echo ${{ env.JWT_SECRET }}
-          echo ${{ env.JWT_EXPIRES_MINUTES }}
-          echo ${{ env.FRONTEND_URL }}
-          echo ${{ env.AWS_REGION }}
-          echo ${{ env.AWS_ACCESS_KEY_ID }}
-          echo ${{ env.AWS_SECRET_ACCESS_KEY }}
-          echo ${{ env.OMISE_PUBLIC_KEY }}
-          echo ${{ env.OMISE_SECRET_KEY }}
-          echo ${{ env.PORT }}
-          echo ${{ env.REACT_APP_API_URL }}
-          echo ${{ env.REACT_APP_OMISE_PUBLIC_KEY }}
+          echo $MODE
+          echo $SERVER_PORT
+          echo $SERVER_HOST
+          echo $DB_USER
+          echo $DB_PASSWORD
+          echo $DB_NAME
+          echo $DB_PORT
+          echo $JWT_SECRET
+          echo $JWT_EXPIRES_MINUTES
+          echo $FRONTEND_URL
+          echo $AWS_REGION
+          echo $AWS_ACCESS_KEY_ID
+          echo $AWS_SECRET_ACCESS_KEY
+          echo $OMISE_PUBLIC_KEY
+          echo $OMISE_SECRET_KEY
+          echo $PORT
+          echo $REACT_APP_API_URL
+          echo $REACT_APP_OMISE_PUBLIC_KEY
       - run: echo "🍏 This job's status is ${{ job.status }}."
       # pull from git
       - name: Pull from git
