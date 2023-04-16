@@ -42,6 +42,7 @@ func NewRepositoryCourse(c *ent.Client) *repositoryCourse {
 func (r *repositoryCourse) GetCourses() ([]*ent.Course, error) {
 	courses, err := r.client.Course.
 		Query().
+		Where(entCourse.StatusEQ("open")).
 		WithTutor(func(q *ent.TutorQuery) {
 			q.WithUser()
 		}).
@@ -60,7 +61,9 @@ func (r repositoryCourse) SearchByTitleRepository(sr *schema.CourseSearch) ([]*e
 		WithTutor(func(q *ent.TutorQuery) {
 			q.WithUser()
 		}).
-		Where(entCourse.TitleContains(sr.Title)).
+		Where(
+			entCourse.TitleContains(sr.Title),
+			entCourse.StatusEQ("open")).
 		All(r.ctx)
 
 	if err != nil {
@@ -86,6 +89,7 @@ func (r repositoryCourse) SearchByDayRepository(sr *schema.CourseSearch) ([]*ent
 		WithTutor(func(q *ent.TutorQuery) {
 			q.WithSchedule().WithUser()
 		}).
+		Where(entCourse.StatusEQ("open")).
 		All(r.ctx)
 
 	if err != nil {
@@ -142,7 +146,7 @@ func (r repositoryCourse) SearchByTutorRepository(sr *schema.CourseSearch) ([]*e
 		WithTutor(func(q *ent.TutorQuery) {
 			q.WithUser()
 		}).
-		Where(entCourse.HasTutorWith(entTutor.HasUserWith(entUser.UsernameContains(sr.Tutor_name)))).
+		Where(entCourse.StatusEQ("open"), entCourse.HasTutorWith(entTutor.HasUserWith(entUser.UsernameContains(sr.Tutor_name)))).
 		All(r.ctx)
 
 	if err != nil {
@@ -157,7 +161,7 @@ func (r repositoryCourse) SearchByTopicRepository(sr *schema.CourseSearch) ([]*e
 		WithTutor(func(q *ent.TutorQuery) {
 			q.WithUser()
 		}).
-		Where(entCourse.TopicContains(sr.Topic)).
+		Where(entCourse.StatusEQ("open"), entCourse.TopicContains(sr.Topic)).
 		All(r.ctx)
 
 	if err != nil {
@@ -172,7 +176,7 @@ func (r repositoryCourse) SearchBySucjectRepository(sr *schema.CourseSearch) ([]
 		WithTutor(func(q *ent.TutorQuery) {
 			q.WithUser()
 		}).
-		Where(entCourse.SubjectContains(sr.Subject)).
+		Where(entCourse.StatusEQ("open"), entCourse.SubjectContains(sr.Subject)).
 		All(r.ctx)
 
 	if err != nil {
@@ -215,9 +219,11 @@ func (r *repositoryCourse) CreateCourse(sr *schema.SchemaCreateCourse) (*ent.Cou
 	}
 
 	// create image url
-	imgURL := fmt.Sprintf("%s/%s/%s", sr.Tutor_id, sr.Title, uuid.New())
 
-	imgURL, _ = utils.GenerateProfilePictureURL(sr.Course_picture, imgURL, "ProfilePicture")
+	imgURL := fmt.Sprintf("%s/%s/%s", sr.Tutor_id, sr.Title, uuid.New())
+	if sr.Course_picture != nil {
+		imgURL, _ = utils.GenerateProfilePictureURL(sr.Course_picture, imgURL, "ProfilePicture")
+	}
 
 	// create a new course
 	course, err := txc.Course.Create().
@@ -232,14 +238,15 @@ func (r *repositoryCourse) CreateCourse(sr *schema.SchemaCreateCourse) (*ent.Cou
 		SetEstimatedTime(sr.Estimate_time).
 		Save(r.ctx)
 
-	course.Edges.Tutor = tutor
-
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
 			err = fmt.Errorf("%w: %v", err, rerr)
 		}
 		return nil, fmt.Errorf("creating course: %w", err)
 	}
+
+	course.Edges.Tutor = tutor
+
 	return course, tx.Commit()
 }
 
