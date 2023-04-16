@@ -39,6 +39,26 @@ jobs:
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
+      - name: Print all env
+        run: |
+          echo ${{ env.MODE }}
+          echo ${{ env.SERVER_PORT }}
+          echo ${{ env.SERVER_HOST }}
+          echo ${{ env.DB_USER }}
+          echo ${{ env.DB_PASSWORD }}
+          echo ${{ env.DB_NAME }}
+          echo ${{ env.DB_PORT }}
+          echo ${{ env.JWT_SECRET }}
+          echo ${{ env.JWT_EXPIRES_MINUTES }}
+          echo ${{ env.FRONTEND_URL }}
+          echo ${{ env.AWS_REGION }}
+          echo ${{ env.AWS_ACCESS_KEY_ID }}
+          echo ${{ env.AWS_SECRET_ACCESS_KEY }}
+          echo ${{ env.OMISE_PUBLIC_KEY }}
+          echo ${{ env.OMISE_SECRET_KEY }}
+          echo ${{ env.PORT }}
+          echo ${{ env.REACT_APP_API_URL }}
+          echo ${{ env.REACT_APP_OMISE_PUBLIC_KEY }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
       # pull from git
       - name: Pull from git
