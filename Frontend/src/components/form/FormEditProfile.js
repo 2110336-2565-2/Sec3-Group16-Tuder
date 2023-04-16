@@ -29,7 +29,6 @@ export default function FormEditProfile({ user }) {
     if (compatibleFormData.new_profile_picture) {
       compatibleFormData.new_profile_picture =
         compatibleFormData.new_profile_picture.split(",")[1];
-      console.log("compatibleFormData", compatibleFormData);
     }
     try {
       if (user.role === "student") {
@@ -48,7 +47,6 @@ export default function FormEditProfile({ user }) {
         });
       }
     } catch (error) {
-        console.log(error);
         toast.error("Profile update failed");
         toast.dismiss(loadingToast);
         setIsSubmitting(false);
