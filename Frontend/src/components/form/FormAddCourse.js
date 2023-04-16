@@ -9,7 +9,6 @@ import FileUploader from "../global/FileUploader";
 export default function FormAddcourse() {
 
     const navigate = useNavigate();
-    const location = useLocation();
 
     const [formData, setFormData] = useState({
         title: "",
@@ -41,7 +40,7 @@ export default function FormAddcourse() {
             title: formData.title,
             subject: formData.subject,
             topic: formData.topic,
-            estimated_time: parseInt(formData.estimated_time),
+            estimate_time: parseInt(formData.estimated_time),
             description: formData.description,
             price_per_hour: parseInt(formData.price_per_hour),
             level: formData.level,
@@ -52,7 +51,8 @@ export default function FormAddcourse() {
             .then((res) => {
                 if (res.data.success) {
                     toast.success("Create course successfully");
-                    navigate("/");
+                    console.log(res.data.data)
+                    navigate("/courses");
                 }
             })
             .catch((err) => {
@@ -69,95 +69,132 @@ export default function FormAddcourse() {
     var price_per_hour = formData.price_per_hour;
     var level = formData.level;
     var course_picture_url = formData.course_picture_url;
-
-    return (
-        <AddCourseRequest>
-            <FileUploader
-                isOpen={isFileUploaderOpen}
-                setIsOpen={setIsFileUploaderOpen}
-                handleChange={handleChange}
+    const showPic = ()=>{
+        if (formData.course_picture_url){
+            return (
+                <RequestPicture type="normal"
                 name="course_picture_url"
-            />
-            <Title>New Course</Title>
-            <TopicSection>
-                <Topic>Title</Topic>
-                <RequestTitle
-                type="text"
-                name="title"
-                value={title}
-                onChange={handleChange}
-                />
-            </TopicSection>
-            <TopicSection>
-                <Topic>Subject</Topic>
-                <RequestTitle
-                type="text"
-                name="subject"
-                value={subject}
-                onChange={handleChange}
-                />
-            </TopicSection>
-            <TopicSection>
-                <Topic>Topic</Topic>
-                <RequestTitle
-                type="text"
-                name="topic"
-                value={topic}
-                onChange={handleChange}
-                />
-            </TopicSection>
-            <TopicSection>
-                <Topic>estimated_time</Topic>
-                <RequestTitle
-                type="number"
-                name="estimated_time"
-                value={estimated_time}
-                onChange={handleChange}
-                />
-            </TopicSection>
-            <TopicSection>
-                <Topic>Description</Topic>
-                <RequestTitle
-                type="text"
-                name="description"
-                value={description}
-                onChange={handleChange}
-                />
-            </TopicSection>
-            <TopicSection>
-                <Topic>Price per hour</Topic>
-                <RequestTitle
-                type="number"
-                name="price_per_hour"
-                value={price_per_hour}
-                onChange={handleChange}
-                />
-            </TopicSection>
-            <TopicSection>
-                <Topic>Level</Topic>
-                <RequestTitle
-                type="text"
-                name="level"
-                value={level}
-                onChange={handleChange}
-                />
-            </TopicSection>
-            <TopicSection>
-                <Topic>Picture</Topic>
-                
-                <RequestPicture
-                name="course_picture_url"
-                src={formData.course_picture_url ? formData.course_picture_url : defaultImgUrl}
+                src={formData.course_picture_url}
                 onClick={() => setIsFileUploaderOpen(true)}
                 />
-            </TopicSection>
-            <ButtonSection>
-                <CancelButton onClick={() => navigate("/")}>
-                Cancel
-                </CancelButton>
-                <SubmitButton onClick={handleSubmit}>Submit</SubmitButton>
-            </ButtonSection>
-        </AddCourseRequest>
+            )
+        }else{
+            return(
+                <RequestPicture type="default"
+                name="course_picture_url"
+                src={defaultImgUrl}
+                onClick={() => setIsFileUploaderOpen(true)}
+                />
+            )
+        }
+    }
+    return (
+        <form onSubmit={handleSubmit}>
+            <AddCourseRequest>
+                <FileUploader
+                    isOpen={isFileUploaderOpen}
+                    setIsOpen={setIsFileUploaderOpen}
+                    handleChange={handleChange}
+                    name="course_picture_url"
+                />
+                <Title>New Course</Title>
+                <TopicSection>
+                    <Topic>Title</Topic>
+                    <RequestTitle
+                    type="text"
+                    name="title"
+                    value={title}
+                    onChange={handleChange}
+                    required
+                    />
+                </TopicSection>
+                <TopicSection>
+                    <Topic>Subject</Topic>
+                    <RequestTitle
+                    type="text"
+                    name="subject"
+                    value={subject}
+                    onChange={handleChange}
+                    required
+                    />
+                </TopicSection>
+                <TopicSection>
+                    <Topic>Topic</Topic>
+                    <RequestTitle
+                    type="text"
+                    name="topic"
+                    value={topic}
+                    onChange={handleChange}
+                    required
+                    />
+                </TopicSection>
+                <TopicSection>
+                    <Topic>estimated_time</Topic>
+                    <RequestTitle
+                    type="number"
+                    name="estimated_time"
+                    value={estimated_time}
+                    onChange={handleChange}
+                    required
+                    />
+                </TopicSection>
+                <TopicSection>
+                    <Topic>Description</Topic>
+                    <RequestTitle
+                    type="text"
+                    name="description"
+                    value={description}
+                    onChange={handleChange}
+                    required
+                    />
+                </TopicSection>
+                <TopicSection>
+                    <Topic>Price per hour</Topic>
+                    <RequestTitle
+                    type="number"
+                    name="price_per_hour"
+                    value={price_per_hour}
+                    onChange={handleChange}
+                    required
+                    />
+                </TopicSection>
+                <TopicSection>
+                    <Topic>Level</Topic>
+                    <RequestSelect
+                    type="text"
+                    name="level"
+                    value={level}
+                    onChange={handleChange}
+                    required
+                    >
+                        <RequestOption value="">Please Select Level</RequestOption>
+                        <RequestOption value="Grade1">Grade1</RequestOption>
+                        <RequestOption value="Grade2">Grade2</RequestOption>
+                        <RequestOption value="Grade3">Grade3</RequestOption>
+                        <RequestOption value="Grade4">Grade4</RequestOption>
+                        <RequestOption value="Grade5">Grade5</RequestOption>
+                        <RequestOption value="Grade6">Grade6</RequestOption>
+                        <RequestOption value="Grade7">Grade7</RequestOption>
+                        <RequestOption value="Grade8">Grade8</RequestOption>
+                        <RequestOption value="Grade9">Grade9</RequestOption>
+                        <RequestOption value="Grade10">Grade10</RequestOption>
+                        <RequestOption value="Grade11">Grade11</RequestOption>
+                        <RequestOption value="Grade12">Grade12</RequestOption>
+
+                    </RequestSelect>
+                </TopicSection>
+                <PicSection>
+                    <Topic>Picture</Topic>
+                    {showPic()}
+                </PicSection>
+                <ButtonSection>
+                    <CancelButton type="button" onClick={() => navigate("/courses")}>
+                    Cancel
+                    </CancelButton>
+                    <SubmitButton type="submit">Submit</SubmitButton>
+                </ButtonSection>
+            </AddCourseRequest>
+        </form>
     );
 }
 
@@ -199,6 +236,15 @@ const TopicSection = styled.div`
   top: 311px;
 `;
 
+const PicSection = styled.div`
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  left: 220px;
+  top: 311px;
+`;
+
 const Topic = styled.div`
   font-family: "Lexend Deca";
   font-style: normal;
@@ -220,8 +266,8 @@ const RequestTitle = styled.input`
 `;
 
 const RequestPicture = styled.img`
-  width: 40px;
-  height: 40px;
+  width: ${(props)=>props.type==="normal"?"500px":"40px"};
+  height: ${(props)=>props.type==="normal"?"400px":"40px"};
 `;
 
 const ButtonSection = styled.div`
@@ -275,3 +321,19 @@ const SubmitButton = styled.button`
     color: #ffffff;
   }
 `;
+
+const RequestSelect = styled.select`
+  border: 2px solid #858585;
+  border-radius: 5px;
+
+  width: 100%;
+  height: 100%;
+  font-size: 20px;
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 500;
+`;
+const RequestOption = styled.option`
+    color: black;
+    background: white;
+`

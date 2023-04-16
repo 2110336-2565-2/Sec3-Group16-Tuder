@@ -96,7 +96,7 @@ const ItemSection = styled.div`
 `;
 
 const CourseImg = styled.img`
-  max-width: 216px;
+  width: 216px;
   height: 148px;
   margin: auto;
   border-radius: 10px;
