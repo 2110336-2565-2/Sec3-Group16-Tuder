@@ -26,11 +26,11 @@ services:
     depends_on:
       - backend
     env_file:
-      - Frontend/.env
-    environment:
-      PORT: ${PORT}
-      REACT_APP_API_URL: ${REACT_APP_API_URL}
-      REACT_APP_OMISE_PUBLIC_KEY: ${REACT_APP_OMISE_PUBLIC_KEY}
+      - ./Frontend/.env
+    # environment:
+    #   PORT: ${PORT}
+    #   REACT_APP_API_URL: ${REACT_APP_API_URL}
+    #   REACT_APP_OMISE_PUBLIC_KEY: ${REACT_APP_OMISE_PUBLIC_KEY}
     networks:
       - tuder
 
@@ -44,22 +44,22 @@ services:
       - database
     env_file:
       - ./Backend/.env
-    environment:
-      MODE: ${MODE}
-      SERVER_PORT: ${SERVER_PORT}
-      SERVER_HOST: ${SERVER_HOST}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DB_NAME}
-      DB_PORT: ${DB_PORT}
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_EXPIRES_MINUTES: ${JWT_EXPIRES_MINUTES}
-      FRONTEND_URL: ${FRONTEND_URL}
-      AWS_REGION: ${AWS_REGION}
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-      OMISE_PUBLIC_KEY: ${OMISE_PUBLIC_KEY}
-      OMISE_SECRET_KEY: ${OMISE_SECRET_KEY}
+    # environment:
+    #   MODE: ${MODE}
+    #   SERVER_PORT: ${SERVER_PORT}
+    #   SERVER_HOST: ${SERVER_HOST}
+    #   DB_USER: ${DB_USER}
+    #   DB_PASSWORD: ${DB_PASSWORD}
+    #   DB_NAME: ${DB_NAME}
+    #   DB_PORT: ${DB_PORT}
+    #   JWT_SECRET: ${JWT_SECRET}
+    #   JWT_EXPIRES_MINUTES: ${JWT_EXPIRES_MINUTES}
+    #   FRONTEND_URL: ${FRONTEND_URL}
+    #   AWS_REGION: ${AWS_REGION}
+    #   AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+    #   AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+    #   OMISE_PUBLIC_KEY: ${OMISE_PUBLIC_KEY}
+    #   OMISE_SECRET_KEY: ${OMISE_SECRET_KEY}
     
     networks:
       - tuder
