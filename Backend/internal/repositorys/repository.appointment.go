@@ -164,8 +164,8 @@ func (r *repositoryAppointment) GetAppointmentByMatchID(sr *schemas.SchemaGetApp
 		EstimeateTime:     app.Edges.Match.Edges.Course.EstimatedTime,
 		CoursePictureURL:  *app.Edges.Match.Edges.Course.CoursePictureURL,
 		Appointments:      schemaApps,
+		Status : app.Edges.Match.Status.String(),
 	}
-	fmt.Println(*schemaAppointment)
 	return schemaAppointment, nil
 }
 

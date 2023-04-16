@@ -32,11 +32,13 @@ export default function Review() {
     fetchCourseHandler(courseID)
       .then((res) => {
         setCourse(res.data.data);
-        fetchTutorHandler(res.data.data.tutor_id).then((res) => {
-          setTutor(res.data.data);
-        }).catch((err) => {
-          setError(true);
-        });
+        fetchTutorHandler(res.data.data.tutor_id)
+          .then((res) => {
+            setTutor(res.data.data);
+          })
+          .catch((err) => {
+            setError(true);
+          });
       })
       .catch((err) => {
         setError(true);
@@ -79,47 +81,48 @@ export default function Review() {
     );
   } else {
     return (
-      <Container>
-        <IsStudent />
-        <Form onSubmit={handleSubmit}>
-          <Topic>Course Review</Topic>
-          <Detail>
-            {course.title}
-            <br />
-            {tutor.firstname + " " + tutor.lastname}
-          </Detail>
-          <RatingSection>
-            <Rating onClick={handleRatingClick} initialValue={rating} />
-            <StarCount>{rating} stars</StarCount>
-          </RatingSection>
-          <TextInput
-            type="textArea"
-            label="Description"
-            id="review_msg"
-            name="review_msg"
-            value={reviewMsg}
-            onChange={(e) => setReviewMsg(e.target.value)}
-            width="100%"
-          />
-          <ButtonSection>
-            <Button
-              variance="cancel"
-              type="button"
-              onClick={() =>
-                confirm("Are you sure you want to discard this form?", () =>
-                  navigate("/")
-                )
-              }
-            >
-              Cancel
-            </Button>
-            <Button variance="submit" type="submit">
-              Send
-            </Button>
-          </ButtonSection>
-        </Form>
-        <Footer />
-      </Container>
+      <IsStudent>
+        <Container>
+          <Form onSubmit={handleSubmit}>
+            <Topic>Course Review</Topic>
+            <Detail>
+              {course.title}
+              <br />
+              {tutor.firstname + " " + tutor.lastname}
+            </Detail>
+            <RatingSection>
+              <Rating onClick={handleRatingClick} initialValue={rating} />
+              <StarCount>{rating} stars</StarCount>
+            </RatingSection>
+            <TextInput
+              type="textArea"
+              label="Description"
+              id="review_msg"
+              name="review_msg"
+              value={reviewMsg}
+              onChange={(e) => setReviewMsg(e.target.value)}
+              width="100%"
+            />
+            <ButtonSection>
+              <Button
+                variance="cancel"
+                type="button"
+                onClick={() =>
+                  confirm("Are you sure you want to discard this form?", () =>
+                    navigate("/")
+                  )
+                }
+              >
+                Cancel
+              </Button>
+              <Button variance="submit" type="submit">
+                Send
+              </Button>
+            </ButtonSection>
+          </Form>
+          <Footer />
+        </Container>
+      </IsStudent>
     );
   }
 }

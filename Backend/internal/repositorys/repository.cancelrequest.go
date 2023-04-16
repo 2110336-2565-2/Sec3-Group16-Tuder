@@ -162,12 +162,13 @@ func (r *repositoryCancelRequest) CancelRequest(sc *schemas.SchemaCancelRequest)
 		}
 	}
 
+	fmt.Println(sc)
 	// check if student is a student of the match
-	if m.Edges.Student.Edges.User.Role.String() == sc.ReporterRole.String() {
+	if user.RoleStudent.String() == sc.ReporterRole.String() {
 		if m.Edges.Student.Edges.User.ID != u.ID {
 			return nil, errors.New("user is not a student of the match")
 		}
-	} else if m.Edges.Student.Edges.User.Role.String() == sc.ReporterRole.String() {
+	} else if user.RoleTutor.String() == sc.ReporterRole.String() {
 		if m.Edges.Course.Edges.Tutor.Edges.User.ID != u.ID {
 			return nil, errors.New("user is not a tutor of the match")
 		}

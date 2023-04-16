@@ -4,7 +4,6 @@ import {verify} from "../utils/jwtGet";
 export function IsTutor({children}) {
     const [role, handleRole] = useDataContext();
     if(!verify()){
-        alert("credit expired, please login again")
         window.location.href = "/sign-in";
         return
     }
@@ -12,7 +11,6 @@ export function IsTutor({children}) {
     if( role.role === "tutor"){
         return children;
     }else{
-        alert("Unauthorized Access, Please Login again")
         window.location.href = "/sign-in";
         return
     }
@@ -22,7 +20,6 @@ export function IsStudent({children}) {
     const [role, handleRole] = useDataContext();
 
     if(!verify()){
-        alert("credit expired, please login again")
         window.location.href = "/sign-in";
         return
     }
@@ -30,7 +27,6 @@ export function IsStudent({children}) {
     if( role.role === "student"){
         return children;
     }else{
-        alert("Unauthorized Access, Please Login again")
         window.location.href = "/sign-in";
         return
     }
@@ -40,14 +36,12 @@ export function IsAdmin({children}) {
     const [role, handleRole] = useDataContext();
 
     if(!verify()){
-        alert("credit expired, please login again")
         window.location.href = "/sign-in";
         return
     }
     if(role.role === "admin"){
         return children;
     }else{
-        alert("Unauthorized Access, Please Login again")
         window.location.href = "/sign-in";
         return
     }
@@ -70,7 +64,6 @@ export function IsUser({children}) {
     const [role, handleRole] = useDataContext();
 
     if(!verify()){
-        alert("credit expired, please login again")
         window.location.href = "/sign-in";
         return
     }
@@ -78,7 +71,6 @@ export function IsUser({children}) {
     if( (role.role === "student" || role.role === "tutor")){
         return children;
     }else{
-        alert("Unauthorized Access, Please Login again");
         window.location.href = "/sign-in";
       
         return
@@ -97,7 +89,6 @@ export function IsEnroll({children}) {
     if( role.role === "student"){
         return children;
     }else{
-        alert("Unauthorized Access, You don't have permission to enroll this course")
         window.location.href = "/";
         return
     }

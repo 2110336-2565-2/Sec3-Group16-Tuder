@@ -33,6 +33,29 @@ export default function TutorReviews() {
       });
   }, []);
   // ---------------------------------------------
+
+  const child = (
+    <>
+      <TitleWrapper>
+        <Title>
+          {isOwner
+            ? "My Reviews"
+            : reviews.tutor_firstname + " " + reviews.tutor_lastname}
+        </Title>
+      </TitleWrapper>
+      {reviews.total_review > 0 ? (
+        <Reviews reviews={reviews} />
+      ) : (
+        <NoReviewContainer>
+          <p>No review yet.</p>
+        </NoReviewContainer>
+      )}
+      <Footer />
+    </>
+  );
+
+  //
+
   if (error) {
     return (
       <>
@@ -42,24 +65,7 @@ export default function TutorReviews() {
     );
   } else {
     return (
-      <Container>
-        {isOwner ? <IsTutor /> : null}
-        <TitleWrapper>
-          <Title>
-            {isOwner
-              ? "My Reviews"
-              : reviews.tutor_firstname + " " + reviews.tutor_lastname}
-          </Title>
-        </TitleWrapper>
-        {reviews.total_review > 0 ? (
-          <Reviews reviews={reviews} />
-        ) : (
-          <NoReviewContainer>
-            <p>No review yet.</p>
-          </NoReviewContainer>
-        )}
-        <Footer />
-      </Container>
+      <Container>{isOwner ? <IsTutor>{child}</IsTutor> : { child }}</Container>
     );
   }
 }

@@ -36,7 +36,6 @@ const navbarContent = [
         role: 'admin',
         content:[
             {title: 'Home', link: '/'},
-            {title: 'Teachers', link: '/teachers'},
             {title: 'Tuition-fees', link: '/admin-tuition-fees'},
             {title: 'Report List', link: '/issuereports'},
             {title: 'Cancel-Request List', link: '/cancel-requests'},
