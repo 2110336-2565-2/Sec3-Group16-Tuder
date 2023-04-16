@@ -2,7 +2,8 @@ name: Tuder GitHub Actions
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on: 
   push:
-    - docker-file
+    branches:
+      - docker-file
 jobs:
   initialize the application:
     runs-on: ubuntu-latest
