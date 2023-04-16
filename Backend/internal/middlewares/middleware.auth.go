@@ -56,6 +56,58 @@ func (a *authMiddleware) AdminMiddleware(next echo.HandlerFunc) echo.HandlerFunc
 	}
 }
 
+func (a *authMiddleware) StudentMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		token, ok := c.Get("user").(*jwt.Token) // by default token is stored under `user` key
+		if !ok {
+			return c.JSON(401, &schemas.SchemaErrorResponse{
+				Success: false,
+				Message: "JWT token missing or invalid",
+			})
+		}
+		claims, ok := token.Claims.(jwt.MapClaims) // by default claims is of type `jwt.MapClaims`
+		if !ok {
+			return c.JSON(401, &schemas.SchemaErrorResponse{
+				Success: false,
+				Message: "failed to cast claims as jwt.MapClaims",
+			})
+		}
+		if claims["role"] == "student" {
+			return next(c)
+		}
+		return c.JSON(401, &schemas.SchemaErrorResponse{
+			Success: false,
+			Message: "user unauthorized",
+		})
+	}
+}
+
+func (a *authMiddleware) TutorMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		token, ok := c.Get("user").(*jwt.Token) // by default token is stored under `user` key
+		if !ok {
+			return c.JSON(401, &schemas.SchemaErrorResponse{
+				Success: false,
+				Message: "JWT token missing or invalid",
+			})
+		}
+		claims, ok := token.Claims.(jwt.MapClaims) // by default claims is of type `jwt.MapClaims`
+		if !ok {
+			return c.JSON(401, &schemas.SchemaErrorResponse{
+				Success: false,
+				Message: "failed to cast claims as jwt.MapClaims",
+			})
+		}
+		if claims["role"] == "tutor" {
+			return next(c)
+		}
+		return c.JSON(401, &schemas.SchemaErrorResponse{
+			Success: false,
+			Message: "user unauthorized",
+		})
+	}
+}
+
 //
 //func (m *authMiddleware) JWT(next echo.HandlerFunc) echo.HandlerFunc {
 //	return func(c echo.Context) error {
