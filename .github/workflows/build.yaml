@@ -18,11 +18,11 @@ jobs:
       JWT_SECRET: ${{vars.JWT_SECRET}}
       JWT_EXPIRES_MINUTES: ${{vars.JWT_EXPIRES_MINUTES}}
       FRONTEND_URL: ${{vars.FRONTEND_URL}}
-      AWS_REGION: ${{vars.AWS_REGION}}
-      AWS_ACCESS_KEY_ID: ${{vars.AWS_ACCESS_KEY_ID}}
-      AWS_SECRET_ACCESS_KEY: ${{vars.AWS_SECRET_ACCESS_KEY}}
-      OMISE_PUBLIC_KEY: ${{vars.OMISE_PUBLIC_KEY}}
-      OMISE_SECRET_KEY: ${{vars.OMISE_SECRET_KEY}}
+      AWS_REGION: ${{secrets.AWS_REGION}}
+      AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+      AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+      OMISE_PUBLIC_KEY: ${{secrets.OMISE_PUBLIC_KEY}}
+      OMISE_SECRET_KEY: ${{secrets.OMISE_SECRET_KEY}}
         #  -------------------
       PORT: ${{vars.PORT}}
       REACT_APP_API_URL: ${{vars.REACT_APP_API_URL}}
