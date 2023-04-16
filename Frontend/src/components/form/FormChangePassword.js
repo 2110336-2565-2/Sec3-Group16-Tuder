@@ -24,8 +24,8 @@ export default function FormChangePassword(){
         try{
             await checkPasswordHandler(checkPasswordData, navigate);
             toast.success('Correct Password');
-        } catch (error){
-            console.log(error);
+        } catch (err){
+            console.log(err);
             toast.error('Wrong Password');
         }
     }

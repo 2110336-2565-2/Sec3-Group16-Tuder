@@ -30,7 +30,6 @@ export default function Enroll() {
         setError(true);
       });
   }, [courseID]);
-  console.log(course, "course");
   if (error) {
     return (
       <>

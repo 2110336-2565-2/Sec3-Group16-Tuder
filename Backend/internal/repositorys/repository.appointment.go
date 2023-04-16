@@ -64,13 +64,13 @@ func (r *repositoryAppointment) GetMatchByStudentID(sr *schemas.SchemaGetMatchBy
 		}
 		tutorName := match.Edges.Course.Edges.Tutor.Edges.User.FirstName + " " + match.Edges.Course.Edges.Tutor.Edges.User.LastName
 		schemaAppointments = append(schemaAppointments, &schemas.SchemaMatchesFromID{
-			MatchID:       match.ID,
-			CourseName:    match.Edges.Course.Title,
-			TutorName:     tutorName,
-			UpcomingClass: upcoming_class,
-			Remaining:     remaining,
+			MatchID:          match.ID,
+			CourseName:       match.Edges.Course.Title,
+			TutorName:        tutorName,
+			UpcomingClass:    upcoming_class,
+			Remaining:        remaining,
 			CoursePictureURL: *match.Edges.Course.CoursePictureURL,
-			Status:  	match.Status.String(),
+			Status:           match.Status.String(),
 		})
 	}
 	return schemaAppointments, nil
@@ -80,7 +80,7 @@ func (r *repositoryAppointment) GetMatchByTutorID(sr *schemas.SchemaGetMatchByID
 	matches, err := r.client.Match.
 		Query().
 		Where(entMatch.HasCourseWith(entCourse.HasTutorWith(entTutor.IDEQ(sr.ID)))).
-		WithAppointment( func(tq *ent.AppointmentQuery) {
+		WithAppointment(func(tq *ent.AppointmentQuery) {
 			tq.Order(ent.Asc(appointment.FieldBeginAt))
 		}).
 		WithCourse(func(tq *ent.CourseQuery) {
@@ -109,13 +109,13 @@ func (r *repositoryAppointment) GetMatchByTutorID(sr *schemas.SchemaGetMatchByID
 		}
 		tutorName := match.Edges.Course.Edges.Tutor.Edges.User.FirstName + " " + match.Edges.Course.Edges.Tutor.Edges.User.LastName
 		schemaAppointments = append(schemaAppointments, &schemas.SchemaMatchesFromID{
-			MatchID:       match.ID,
-			CourseName:    match.Edges.Course.Title,
-			TutorName:     tutorName,
-			UpcomingClass: upcoming_class,
-			Remaining:     remaining,
+			MatchID:          match.ID,
+			CourseName:       match.Edges.Course.Title,
+			TutorName:        tutorName,
+			UpcomingClass:    upcoming_class,
+			Remaining:        remaining,
 			CoursePictureURL: *match.Edges.Course.CoursePictureURL,
-			Status:  	match.Status.String(),
+			Status:           match.Status.String(),
 		})
 	}
 	return schemaAppointments, nil
@@ -173,28 +173,32 @@ func (r *repositoryAppointment) UpdateAppointmentStatus(sr *schemas.SchemaUpdate
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("starting a transaction: %w", err)
+		return nil, fmt.Errorf("failed to start transaction: %w", err)
 	}
 	txc := tx.Client()
 
 	appointment, err := txc.Appointment.UpdateOneID(sr.ID).
 		SetStatus(appointment.Status(sr.Status)).
 		Save(r.ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update appointment status: %w", err)
+	}
 
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
 			err = fmt.Errorf("%w: %v", err, rerr)
 		}
-		return nil, fmt.Errorf("updating appointment status: %w", err)
+		return nil, fmt.Errorf("failed to update appointment status: %w", err)
 	}
 
 	// find match id from appointment
 	match, err := txc.Match.Query().Where(entMatch.HasAppointmentWith(entAppointment.IDEQ(sr.ID))).Only(r.ctx)
+
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
 			err = fmt.Errorf("%w: %v", err, rerr)
 		}
-		return nil, fmt.Errorf("finding match id from appointment: %w", err)
+		return nil, fmt.Errorf("failed to find match id from appointment: %w", err)
 	}
 
 	// find all appointments from match
@@ -203,7 +207,7 @@ func (r *repositoryAppointment) UpdateAppointmentStatus(sr *schemas.SchemaUpdate
 		if rerr := tx.Rollback(); rerr != nil {
 			err = fmt.Errorf("%w: %v", err, rerr)
 		}
-		return nil, fmt.Errorf("finding all appointments from match: %w", err)
+		return nil, fmt.Errorf("failed to find all appointments from match: %w", err)
 	}
 
 	state := true
@@ -221,13 +225,14 @@ func (r *repositoryAppointment) UpdateAppointmentStatus(sr *schemas.SchemaUpdate
 			if rerr := tx.Rollback(); rerr != nil {
 				err = fmt.Errorf("%w: %v", err, rerr)
 			}
-			return nil, fmt.Errorf("updating match status: %w", err)
+			return nil, fmt.Errorf("failed to updating match status: %w", err)
 		}
 	}
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
 
-
-
-	return appointment, tx.Commit()
+	return appointment, nil
 }
 
 func (r *repositoryAppointment) AutoUpdateAppointmentStatus() {

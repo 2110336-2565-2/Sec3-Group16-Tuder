@@ -26,7 +26,6 @@ export default function UserCancelRequest() {
       ...formData,
       [event.target.name]: event.target.value,
     });
-    console.log(formData);
   };
 
   const handleSubmit = (event) => {

@@ -1,7 +1,7 @@
 import React, { useEffect,useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components"
-
+import { toast } from "react-hot-toast";
 import Error from "../components/global/Error.js";
 import Footer from "../components/global/Footer.js";
 import Button from "../components/global/Button.js";
@@ -25,7 +25,7 @@ export default function TutorCourses(){
             })
             .catch((err) => {
                 console.log(err)
-                console.log("Tutor not found");
+                toast.error("Something went wrong");
                 setError(true);
             });
 

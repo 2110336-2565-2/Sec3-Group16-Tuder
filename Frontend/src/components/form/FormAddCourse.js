@@ -29,7 +29,6 @@ export default function FormAddcourse() {
         ...formData,
         [event.target.name]: event.target.value,
         });
-        console.log(formData);
     };
 
     const handleSubmit = (event) => {
@@ -46,18 +45,18 @@ export default function FormAddcourse() {
             level: formData.level,
             course_picture: formData.course_picture_url.split(",")[1],
         };
-        console.log(data)
         addCourseHandler(data)
             .then((res) => {
                 if (res.data.success) {
                     toast.success("Create course successfully");
-                    console.log(res.data.data)
                     navigate("/courses");
+                }else{
+                    toast.error("Fail to create course");
                 }
             })
             .catch((err) => {
                 console.log(err);
-                toast.error(err.response.data.message);
+                toast.error("Something went wrong");
             });
     };
 

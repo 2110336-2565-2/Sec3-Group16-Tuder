@@ -2,7 +2,8 @@ package repositorys
 
 import (
 	"context"
-	"errors"
+	"fmt"
+
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	entUser "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	schema "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -31,7 +32,7 @@ func (r *repositoryLogin) Login(l *schema.SchemaLogin) (*ent.User, error) {
 		Only(r.ctx)
 
 	if err != nil {
-		return nil, errors.New("the username isn't match")
+		return nil, fmt.Errorf("failed to retrieve user: %w", err)
 	}
 
 	return user, nil

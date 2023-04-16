@@ -14,7 +14,6 @@ export default function CourseReviews() {
   const { courseID } = useParams();
 
   useEffect(() => {
-    console.log(courseID);
     getCourseReviewHandler(courseID)
       .then((res) => {
         setReviews(res.data.data);

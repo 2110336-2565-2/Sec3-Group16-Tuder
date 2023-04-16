@@ -2,7 +2,7 @@ package repositorys
 
 import (
 	"context"
-	"errors"
+
 	"fmt"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
@@ -49,7 +49,7 @@ func (r *repositoryCourse) GetCourses() ([]*ent.Course, error) {
 		All(r.ctx)
 
 	if err != nil {
-		return nil, errors.New("Course not found")
+		return nil, fmt.Errorf("error getting courses: %w", err)
 	}
 
 	return courses, nil
@@ -67,7 +67,7 @@ func (r repositoryCourse) SearchByTitleRepository(sr *schema.CourseSearch) ([]*e
 		All(r.ctx)
 
 	if err != nil {
-		return nil, errors.New("Course not found")
+		return nil, fmt.Errorf("error searching courses: %w", err)
 	}
 	return courses, nil
 }
@@ -93,8 +93,9 @@ func (r repositoryCourse) SearchByDayRepository(sr *schema.CourseSearch) ([]*ent
 		All(r.ctx)
 
 	if err != nil {
-		return nil, errors.New("Course not found")
+		return nil, fmt.Errorf("failed to get courses: %w", err)
 	}
+
 	var matched_courses []*ent.Course
 	for _, course := range courses {
 		state := true
@@ -150,7 +151,7 @@ func (r repositoryCourse) SearchByTutorRepository(sr *schema.CourseSearch) ([]*e
 		All(r.ctx)
 
 	if err != nil {
-		return nil, errors.New("Course not found")
+		return nil, fmt.Errorf("failed to search courses by tutor: %w", err)
 	}
 	return courses, nil
 }
@@ -165,7 +166,7 @@ func (r repositoryCourse) SearchByTopicRepository(sr *schema.CourseSearch) ([]*e
 		All(r.ctx)
 
 	if err != nil {
-		return nil, errors.New("Course not found")
+		return nil, fmt.Errorf("failed to search courses by tutor: %w", err)
 	}
 	return courses, nil
 }
@@ -180,7 +181,7 @@ func (r repositoryCourse) SearchBySucjectRepository(sr *schema.CourseSearch) ([]
 		All(r.ctx)
 
 	if err != nil {
-		return nil, errors.New("Course not found")
+		return nil, fmt.Errorf("failed to search courses by topic: %w", err)
 	}
 	return courses, nil
 }
@@ -196,7 +197,7 @@ func (r *repositoryCourse) GetCourseByID(sr *schema.SchemaGetCourse) (*ent.Cours
 		Only(r.ctx)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get course by ID: %w", err)
 	}
 	return course, nil
 }
@@ -205,7 +206,7 @@ func (r *repositoryCourse) CreateCourse(sr *schema.SchemaCreateCourse) (*ent.Cou
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("starting a transaction: %w", err)
+		return nil, fmt.Errorf("failed to start transaction: %w", err)
 	}
 	// wrap the client with the transaction
 	txc := tx.Client()
@@ -213,9 +214,9 @@ func (r *repositoryCourse) CreateCourse(sr *schema.SchemaCreateCourse) (*ent.Cou
 
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			err = fmt.Errorf("failed to rollback transaction: %w: %v", err, rerr)
 		}
-		return nil, fmt.Errorf("getting tutor: %w", err)
+		return nil, fmt.Errorf("failed to get tutor: %w", err)
 	}
 
 	// create image url
@@ -240,21 +241,23 @@ func (r *repositoryCourse) CreateCourse(sr *schema.SchemaCreateCourse) (*ent.Cou
 
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			err = fmt.Errorf("failed to rollback transaction: %w: %v", err, rerr)
 		}
-		return nil, fmt.Errorf("creating course: %w", err)
+		return nil, fmt.Errorf("failed to create course: %w", err)
 	}
 
 	course.Edges.Tutor = tutor
-
-	return course, tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+	return course, nil
 }
 
 func (r *repositoryCourse) UpdateCourse(sr *schema.SchemaUpdateCourse) (*ent.Course, error) {
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("starting a transaction: %w", err)
+		return nil, fmt.Errorf("failed to start transaction: %w", err)
 	}
 	// wrap the client with the transaction
 	txc := tx.Client()
@@ -262,9 +265,9 @@ func (r *repositoryCourse) UpdateCourse(sr *schema.SchemaUpdateCourse) (*ent.Cou
 
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			err = fmt.Errorf("failed to rollback transaction: %w: %v", err, rerr)
 		}
-		return nil, fmt.Errorf("getting tutor: %w", err)
+		return nil, fmt.Errorf("failed to update course: %w", err)
 	}
 
 	imgURL := fmt.Sprintf("%s/%s/%s", sr.Tutor_id, sr.Title, uuid.New())
@@ -287,18 +290,21 @@ func (r *repositoryCourse) UpdateCourse(sr *schema.SchemaUpdateCourse) (*ent.Cou
 	course.Edges.Tutor = tutor
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			err = fmt.Errorf("failed to rollback transaction: %w: %v", err, rerr)
 		}
-		return nil, fmt.Errorf("updating course: %w", err)
+		return nil, fmt.Errorf("failed to create course: %w", err)
 	}
-	return course, tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+	return course, nil
 }
 
 func (r *repositoryCourse) DeleteCourse(sr *schema.SchemaDeleteCourse) error {
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
-		return fmt.Errorf("starting a transaction: %w", err)
+		return fmt.Errorf("failed to start transaction: %w", err)
 	}
 	// wrap the client with the transaction
 	txc := tx.Client()
@@ -307,18 +313,21 @@ func (r *repositoryCourse) DeleteCourse(sr *schema.SchemaDeleteCourse) error {
 	err = txc.Course.DeleteOneID(sr.ID).Exec(r.ctx)
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			err = fmt.Errorf("failed to rollback transaction: %w: %v", err, rerr)
 		}
-		return fmt.Errorf("deleting course: %w", err)
+		return fmt.Errorf("failed to delete course: %w", err)
 	}
-	return tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+	return nil
 }
 
 func (r *repositoryCourse) UpdateCourseStatus(sr *schema.SchemaUpdateCourseStatus) (*ent.Course, error) {
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("starting a transaction: %w", err)
+		return nil, fmt.Errorf("failed to start transaction: %w", err)
 	}
 	// wrap the client with the transaction
 	txc := tx.Client()
@@ -336,9 +345,12 @@ func (r *repositoryCourse) UpdateCourseStatus(sr *schema.SchemaUpdateCourseStatu
 		Save(r.ctx)
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			err = fmt.Errorf("failed to rollback transaction: %w: %v", err, rerr)
 		}
-		return nil, fmt.Errorf("updating course: %w", err)
+		return nil, fmt.Errorf("failed to update course status: %w", err)
 	}
-	return course, tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+	return course, nil
 }

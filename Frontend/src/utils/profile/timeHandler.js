@@ -38,7 +38,6 @@ export const getMergedTimeSlot = (timeSlot, timeSlotToAdd) => {
     let j = mergedTimeSlot.length - 1;
     while (j > 0) {
       let i = j - 1;
-      console.log("i",mergedTimeSlot[i],"j",mergedTimeSlot);
       if (mergedTimeSlot[j].from == mergedTimeSlot[i].to) {
         mergedTimeSlot[i].to = mergedTimeSlot[j].to;
         // Remove the overlapped time slot

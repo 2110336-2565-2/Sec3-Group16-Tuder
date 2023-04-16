@@ -5,7 +5,7 @@ import CourseDetails from "../components/CourseDetails.js";
 import { useParams } from "react-router-dom";
 import { useQuery } from "react-query";
 import { fetchCourseByIdHandler } from "../handlers/searchCourseHandler.js";
-
+import { toast } from "react-hot-toast";
 export default function CourseDetail() {
   const [data, setData] = useState({});
   const { id } = useParams();
@@ -20,6 +20,7 @@ export default function CourseDetail() {
         })
         .catch((err) => {
           console.log(err);
+          toast.error("Something went wrong");
         });
     },
     {

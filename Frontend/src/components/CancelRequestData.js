@@ -24,11 +24,14 @@ export default function CancelRequestInfo(props) {
         if (res.data.success) {
           toast.success("Success");
           navigate("/cancel-requests");
+        }else{
+          toast.error("Error");
         }
       })
       .catch((err) => {
         console.log(err);
-        toast.error("Error" + err.response.data.message);
+        toast.error("Something went wrong");
+ 
       });
   };
 

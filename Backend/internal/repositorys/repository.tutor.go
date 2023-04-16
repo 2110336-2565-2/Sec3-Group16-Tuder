@@ -46,7 +46,7 @@ func (r *repositoryTutor) GetTutorByUsername(sr *schema.SchemaGetTutor) (*ent.Tu
 		WithUser().
 		Only(r.ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get tutor by username: %w", err)
 	}
 	return tutor, nil
 }
@@ -60,7 +60,7 @@ func (r *repositoryTutor) GetTutorScheduleByCourseId(sr *schema.SchemaGetTutorSc
 		Only(r.ctx)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to query course with ID %d: %w", sr.Course_id, err)
 	}
 
 	//Get Schedules by tutor id
@@ -70,7 +70,7 @@ func (r *repositoryTutor) GetTutorScheduleByCourseId(sr *schema.SchemaGetTutorSc
 		Only(r.ctx)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get tutor schedule for course with ID %d: %w", sr.Course_id, err)
 	}
 	return schedule, nil
 }
@@ -81,8 +81,7 @@ func (r *repositoryTutor) GetTutorByID(sr *schema.SchemaGetTutorByID) (*ent.Tuto
 		WithUser().
 		Only(r.ctx)
 	if err != nil {
-		fmt.Println("Broken here", err)
-		return nil, err
+		return nil, fmt.Errorf("failed to get tutor with ID %d: %w", sr.ID, err)
 	}
 	return tutor, nil
 }
@@ -93,7 +92,7 @@ func (r *repositoryTutor) GetTutors() ([]*ent.Tutor, error) {
 		WithUser().
 		All(r.ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get tutors: %w", err)
 	}
 	return tutor, nil
 }
@@ -103,7 +102,7 @@ func (r *repositoryTutor) CreateTutor(sr *schema.SchemaCreateTutor) (*ent.Tutor,
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("starting a transaction: %w", err)
+		return nil, fmt.Errorf("failed to start a transaction: %w", err)
 	}
 	// wrap the client with the transaction
 	txc := tx.Client()
@@ -120,9 +119,9 @@ func (r *repositoryTutor) CreateTutor(sr *schema.SchemaCreateTutor) (*ent.Tutor,
 
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			err = fmt.Errorf("%w, failed to rollback transaction: %v", err, rerr)
 		}
-		return nil, err
+		return nil, fmt.Errorf("failed to create user: %w", err)
 	}
 
 	tutor, err := txc.Tutor.
@@ -135,12 +134,16 @@ func (r *repositoryTutor) CreateTutor(sr *schema.SchemaCreateTutor) (*ent.Tutor,
 
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			err = fmt.Errorf("%w, failed to rollback transaction: %v", err, rerr)
 		}
-		return nil, err
+		return nil, fmt.Errorf("failed to create tutor: %w", err)
 	}
 
-	return tutor, tx.Commit()
+	if err = tx.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	return tutor, nil
 }
 
 func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor, error) {
@@ -148,7 +151,7 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("starting a transaction: %w", err)
+		return nil, fmt.Errorf("failed to start transaction: %w", err)
 	}
 	// wrap the client with the transaction
 	txc := tx.Client()
@@ -160,13 +163,15 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 	if err != nil {
 		// rollback
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			err = fmt.Errorf("failed to rollback transaction: %w: %v", err, rerr)
 		}
+		return nil, fmt.Errorf("failed to query user by username: %w", err)
 	}
+
 	tutor := user.Edges.Tutor
 	temp, _ := txc.Tutor.Query().Where(entTutor.IDEQ(tutor.ID)).WithSchedule().Only(r.ctx)
 	schedule := temp.Edges.Schedule
-	
+
 	profilePictureURL := *user.ProfilePictureURL
 	if sr.ProfilePicture != nil {
 		profilePictureURL, _ = utils.GenerateProfilePictureURL(sr.ProfilePicture, sr.Username, "ProfilePicture")
@@ -184,8 +189,9 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 		Save(r.ctx)
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			err = fmt.Errorf("failed to rollback transaction: %w: %v", err, rerr)
 		}
+		return nil, fmt.Errorf("failed to update user: %w", err)
 	}
 
 	tutor, err = txc.Tutor.
@@ -196,9 +202,9 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			err = fmt.Errorf("failed to rollback transaction: %w: %v", err, rerr)
 		}
-		return nil, err
+		return nil, fmt.Errorf("failed to update tutor: %w", err)
 	}
 	ata := sr.Schedule.AvailableTimeArrays()
 	if sr.Schedule != nil {
@@ -217,14 +223,20 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 	// reload tutor->user
 	tutor.Edges.User = user
 	schedule.Edges.Tutor = tutor
-	return tutor, tx.Commit()
+
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	return tutor, nil
+
 }
 
 func (r *repositoryTutor) DeleteTutor(sr *schema.SchemaDeleteTutor) error {
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
-		return fmt.Errorf("starting a transaction: %w", err)
+		return fmt.Errorf("failed to start a transaction: %w", err)
 	}
 	// wrap the client with the transaction
 	txc := tx.Client()
@@ -235,18 +247,18 @@ func (r *repositoryTutor) DeleteTutor(sr *schema.SchemaDeleteTutor) error {
 
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			return fmt.Errorf("failed to rollback transaction: %w", rerr)
 		}
-		return err
+		return fmt.Errorf("failed to delete tutor: %w", err)
 	}
 
 	err = txc.User.DeleteOneID(sr.ID).Exec(r.ctx)
 
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			return fmt.Errorf("failed to rollback transaction: %w", rerr)
 		}
-		return err
+		return fmt.Errorf("failed to delete tutor: %w", err)
 	}
 
 	return nil
@@ -256,7 +268,7 @@ func (r *repositoryTutor) UpdateSchedule(sr *schema.SchemaUpdateSchedule) (*ent.
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("starting a transaction: %w", err)
+		return nil, fmt.Errorf("failed to start a transaction: %w", err)
 	}
 	// wrap the client with the transaction
 	txc := tx.Client()
@@ -267,20 +279,19 @@ func (r *repositoryTutor) UpdateSchedule(sr *schema.SchemaUpdateSchedule) (*ent.
 		Only(r.ctx)
 
 	if err != nil {
-		// rollback
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			return nil, fmt.Errorf("failed to rollback transaction: %w: %v", err, rerr)
 		}
+		return nil, fmt.Errorf("failed to query user: %w", err)
 	}
-
 
 	// load schedule
 	oldschedule, err := user.Edges.Tutor.QuerySchedule().Only(r.ctx)
 	if err != nil {
-		// rollback
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			return nil, fmt.Errorf("failed to rollback transaction: %w: %v", err, rerr)
 		}
+		return nil, fmt.Errorf("failed to load schedule: %w", err)
 	}
 	// update schedule
 	ata := sr.Schedule.AvailableTimeArrays()
@@ -293,13 +304,19 @@ func (r *repositoryTutor) UpdateSchedule(sr *schema.SchemaUpdateSchedule) (*ent.
 		SetDay5(ata[5]).
 		SetDay6(ata[6]).
 		Save(r.ctx)
+
 	if err != nil {
-		// rollback
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			return nil, fmt.Errorf("failed to rollback transaction: %w: %v", err, rerr)
 		}
+		return nil, fmt.Errorf("failed to update schedule: %w", err)
 	}
-	return schedule, err
+
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	return schedule, nil
 }
 
 func (r *repositoryTutor) GetSchedule(sr *schema.SchemaGetSchedule) (*ent.Schedule, error) {
@@ -308,26 +325,17 @@ func (r *repositoryTutor) GetSchedule(sr *schema.SchemaGetSchedule) (*ent.Schedu
 		WithTutor().
 		Only(r.ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to query user: %w", err)
 	}
 	schedule, err := user.Edges.Tutor.QuerySchedule().
 		Only(r.ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get tutor schedule: %w", err)
 	}
 	return schedule, nil
 }
 
 func (r *repositoryTutor) GetReviews(sr *schema.SchemaGetReviews) ([]*ent.Review, error) {
-	// user, err := r.client.User.Query().
-	// 	Where(entUser.IDEQ(sr.ID)).
-	// 	WithTutor(func(q *ent.TutorQuery) {
-	// 		q.WithCourse(func(q *ent.CourseQuery) {
-	// 			q.WithReview()
-	// 		})
-	// 	}).
-	// 	All(r.ctx)
-
 	reviews, err := r.client.Review.Query().
 		Where(
 			entReview.HasCourseWith(
@@ -345,7 +353,7 @@ func (r *repositoryTutor) GetReviews(sr *schema.SchemaGetReviews) ([]*ent.Review
 		All(r.ctx)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get tutor reviews: %w", err)
 	}
 
 	return reviews, nil
@@ -362,7 +370,7 @@ func (r *repositoryTutor) GetCourses(sr *schema.SchemaGetCourses) ([]*ent.Course
 		All(r.ctx)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get tutor courses: %w", err)
 	}
 
 	return courses, nil

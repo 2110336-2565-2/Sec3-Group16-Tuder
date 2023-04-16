@@ -2,7 +2,6 @@ package repositorys
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
@@ -33,7 +32,7 @@ func (r *repositoryIssueReport) GetIssueReports() ([]*ent.IssueReport, error) {
 		All(r.ctx)
 
 	if err != nil {
-		return nil, errors.New("Issue report not found")
+		return nil, fmt.Errorf("failed to retrieve issue reports: %w", err)
 	}
 
 	return issueReports, nil
@@ -43,7 +42,7 @@ func (r *repositoryIssueReport) CreateIssueReport(sr *schema.SchemaCreateIssueRe
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("starting a transaction: %w", err)
+		return nil, fmt.Errorf("failed to start a transaction: %w", err)
 	}
 	txc := tx.Client()
 	contact := "No contact"
@@ -61,16 +60,19 @@ func (r *repositoryIssueReport) CreateIssueReport(sr *schema.SchemaCreateIssueRe
 		if rerr := tx.Rollback(); rerr != nil {
 			err = fmt.Errorf("%w: %v", err, rerr)
 		}
-		return nil, fmt.Errorf("creating issue report: %w", err)
+		return nil, fmt.Errorf("failed to create issue report: %w", err)
 	}
-	return issueReport, tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+	return issueReport, nil
 }
 
 func (r *repositoryIssueReport) UpdateIssueReport(sr *schema.SchemaUpdateIssueReport) (*ent.IssueReport, error) {
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("starting a transaction: %w", err)
+		return nil, fmt.Errorf("failed to start a transaction: %w", err)
 	}
 	txc := tx.Client()
 	contact := "No contact"
@@ -90,16 +92,19 @@ func (r *repositoryIssueReport) UpdateIssueReport(sr *schema.SchemaUpdateIssueRe
 		if rerr := tx.Rollback(); rerr != nil {
 			err = fmt.Errorf("%w: %v", err, rerr)
 		}
-		return nil, fmt.Errorf("updating issue report: %w", err)
+		return nil, fmt.Errorf("failed to update issue report: %w", err)
 	}
-	return issueReport, tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+	return issueReport, nil
 }
 
 func (r *repositoryIssueReport) UpdateIssueReportStatus(sr *schema.SchemaUpdateIssueReportStatus) (*ent.IssueReport, error) {
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("starting a transaction: %w", err)
+		return nil, fmt.Errorf("failed to start a transaction: %w", err)
 	}
 	txc := tx.Client()
 
@@ -111,16 +116,19 @@ func (r *repositoryIssueReport) UpdateIssueReportStatus(sr *schema.SchemaUpdateI
 		if rerr := tx.Rollback(); rerr != nil {
 			err = fmt.Errorf("%w: %v", err, rerr)
 		}
-		return nil, fmt.Errorf("updating issue report status: %w", err)
+		return nil, fmt.Errorf("failed to update issue report status: %w", err)
 	}
-	return issueReport, tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+	return issueReport, nil
 }
 
 func (r *repositoryIssueReport) DeleteIssueReport(sr *schema.SchemaDeleteIssueReport) error {
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
-		return fmt.Errorf("starting a transaction: %w", err)
+		return fmt.Errorf("failed to start a transaction: %w", err)
 	}
 	// wrap the client with the transaction
 	txc := tx.Client()
@@ -129,10 +137,12 @@ func (r *repositoryIssueReport) DeleteIssueReport(sr *schema.SchemaDeleteIssueRe
 	err = txc.IssueReport.DeleteOneID(sr.ID).Exec(r.ctx)
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			fmt.Println("No issue report with this id")
 			err = fmt.Errorf("%w: %v", err, rerr)
 		}
-		return fmt.Errorf("deleting Issue report: %w", err)
+		return fmt.Errorf("failed to delete Issue report: %w", err)
 	}
-	return tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+	return nil
 }

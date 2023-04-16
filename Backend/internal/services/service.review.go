@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+
 	repository "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
@@ -24,8 +25,7 @@ func NewServiceReview(r repository.RepositoryReview) *serviceReview {
 }
 
 func (s serviceReview) ReviewService(r *schemas.SchemaCreateReview) (*schemas.SchemaCreateReviewResponse, error) {
-	fmt.Println(r)
-	// 1. check if the rating is valid (between 0, 5)
+
 	if r.Rating < 0 || r.Rating > 5 {
 		return nil, fmt.Errorf("invalid Rating")
 	}

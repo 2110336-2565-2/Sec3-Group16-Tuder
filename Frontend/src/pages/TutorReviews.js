@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-hot-toast";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import useUsername from "../hooks/useUsername.js";
@@ -20,8 +21,6 @@ export default function TutorReviews() {
   const username = isOwner ? myUsername : othersUsername;
 
   const [reviews, setReviews] = useState({});
-
-  // console.log("username: ", username);
   useEffect(() => {
     const res = fetchTutorReviews(username)
       .then((res) => {
@@ -29,6 +28,7 @@ export default function TutorReviews() {
       })
       .catch((err) => {
         console.log("Tutor not found");
+        toast.error("Something went wrong");
         setError(true);
       });
   }, []);

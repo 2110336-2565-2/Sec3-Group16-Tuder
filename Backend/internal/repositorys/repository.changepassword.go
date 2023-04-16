@@ -2,6 +2,7 @@ package repositorys
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
@@ -32,14 +33,14 @@ func (r *repositoryChangePassword) ChangePassword(sc *schemas.SchemaChangePasswo
 		Where(user.UsernameEQ(sc.Username)).
 		Only(r.ctx)
 	if err != nil {
-		return err
+		return fmt.Errorf("error getting user: %w", err)
 	}
 
 	// validate password
 
 	passwordValidator := utils.PasswordValidator(user.Username, user.Email, user.FirstName, user.LastName)
 	if err := passwordValidator.Validate(sc.Password); err != nil {
-		return err
+		return fmt.Errorf("invalid password: %w", err)
 	}
 
 	hashedPassword, _ := utils.HashPassword(sc.Password)
@@ -48,7 +49,7 @@ func (r *repositoryChangePassword) ChangePassword(sc *schemas.SchemaChangePasswo
 		SetPassword(hashedPassword).
 		Save(r.ctx)
 	if err != nil {
-		return err
+		return fmt.Errorf("error saving password: %w", err)
 	}
 	return nil
 }
@@ -60,7 +61,7 @@ func (r *repositoryChangePassword) CheckPassword(sc *schemas.SchemaCheckPassword
 		Only(r.ctx)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error getting user: %w", err)
 	}
 
 	return user, nil

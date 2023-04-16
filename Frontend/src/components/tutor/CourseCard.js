@@ -4,6 +4,7 @@ import Button from "../global/Button.js";
 import { changeStatus } from "../../handlers/changeCourseStatus.js";
 import { confirm } from "../global/ConfirmToast.js";
 import { Link } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 export default function CourseCard({course,buttonStatus,setEventTrigger}) {
 
@@ -18,7 +19,7 @@ export default function CourseCard({course,buttonStatus,setEventTrigger}) {
             })
             .catch((err) => {
                 console.log(err)
-                console.log("course not found");
+                toast.error("Something went wrong");
             });
       };
 
