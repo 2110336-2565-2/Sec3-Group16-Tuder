@@ -110,6 +110,8 @@ export default function QRPayment({
               payment_id: paymentID,});
           } else if(tutorID){
             callback(callbackData);
+          }else{
+            toast.error("Error");
           }
         })
         .catch((err) => {

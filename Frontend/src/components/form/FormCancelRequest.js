@@ -26,7 +26,6 @@ export default function UserCancelRequest() {
       ...formData,
       [event.target.name]: event.target.value,
     });
-    console.log(formData);
   };
 
   const handleSubmit = (event) => {
@@ -45,11 +44,13 @@ export default function UserCancelRequest() {
         if (res.data.success) {
           toast.success("Success");
           navigate("/classes");
+        }else{
+          toast.error("Error");
         }
       })
       .catch((err) => {
         console.log(err);
-        toast.error(err.response.data.message);
+        toast.error("Something went wrong");
       });
   };
 

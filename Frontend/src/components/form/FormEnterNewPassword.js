@@ -25,8 +25,8 @@ export default function FormEnterNewPassword(){
         try{
             await changePasswordHandler(changePasswordData, navigate);
             toast.success('Change Password Successfully');
-        } catch (error){
-            console.log(error);
+        } catch (err){
+            console.log(err);
             toast.error('New Password and Confirm Password are not the same');
         }
     }

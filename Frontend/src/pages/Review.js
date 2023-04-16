@@ -20,8 +20,6 @@ export default function Review() {
   const [error, setError] = useState(false);
   const studentID = getUserID();
   const { courseID } = useParams();
-  console.log(studentID);
-  console.log(courseID);
   const [rating, setRating] = useState(0);
   const [reviewMsg, setReviewMsg] = useState("");
   const navigate = useNavigate();

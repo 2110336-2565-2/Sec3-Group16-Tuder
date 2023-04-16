@@ -6,7 +6,7 @@ import { useQuery } from "react-query";
 import { IsUser } from "../components/IsAuth";
 import ClassDetails from "../components/ClassDetail";
 import { fetchClassDetailById } from "../handlers/classesHandler";
-
+import { toast } from "react-hot-toast";
 export default function ClassDetail() {
   const { id } = useParams();
   const [data, setData] = useState({});
@@ -22,6 +22,7 @@ export default function ClassDetail() {
         })
         .catch((err) => {
           console.log(err);
+          toast.error("Something went wrong");
         });
     },
     {

@@ -5,7 +5,7 @@ import { useDataContext } from "../pages/CancelRequestList";
 import CancelRequest from "../components/CancelRequest";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-
+import { toast } from "react-hot-toast";
 export default function CancelRequestList() {
   const { data, setData } = useDataContext();
   const navigate = useNavigate();
@@ -23,6 +23,7 @@ export default function CancelRequestList() {
         })
         .catch((err) => {
           console.log(err);
+          toast.error("Something went wrong");
         });
     },
     {

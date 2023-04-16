@@ -116,7 +116,6 @@ export default function TimeSelector({
   }, [selectedDay, availableTime]);
 
   const handleDeleteOnClick = (from, to) => {
-    console.log(from, to);
     // Remove time slot from available time
     for (let i = 0; i < availableTime.length; i++) {
       if (availableTime[i].day === selectedDay) {
