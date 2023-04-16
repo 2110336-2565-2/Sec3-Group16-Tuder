@@ -160,7 +160,8 @@ const Wrapper = styled.div`
   border-radius: 50px 50px 0px 0px;
   background-color: white;
   margin-top: 10px;
-  width: 100%;
+  min-height: 50vh;
+  width: 90%;
 `;
 
 const MiddleSection = styled.div`
