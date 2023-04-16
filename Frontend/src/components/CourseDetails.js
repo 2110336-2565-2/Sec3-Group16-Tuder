@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 
 export default function CourseDetails(props) {
   const data = props.courseDetail;
+  const tutor_url = "/tutors/" + data.TutorUsername;
   const course_url = "/courses/" + data.id + "/reviews"
   const button = () => {
     if (getRole() !== "admin" && getRole() !== "tutor") {
@@ -43,7 +44,8 @@ export default function CourseDetails(props) {
               </InRowWithStar>
             </Detailrow>
             <Detailrow mgtop="1rem" fsize="16px" fweight="400">
-              Tutor : {`${data.TutorFirstname} ${data.TutorLastname}`}
+              Tutor :&nbsp;
+              <LinkTutor to={tutor_url}>{`${data.TutorFirstname} ${data.TutorLastname}`}</LinkTutor>
             </Detailrow>
             <Detailrow mgtop="1rem" fsize="16px" fweight="400">
               Level : {data.level}
@@ -71,6 +73,10 @@ export default function CourseDetails(props) {
 }
 
 const LinkReview = styled(Link)`
+  color: black;
+`
+
+const LinkTutor = styled(Link)`
   color: black;
 `
 
