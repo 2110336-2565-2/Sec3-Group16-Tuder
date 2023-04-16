@@ -39,6 +39,7 @@ func NewRepositoryTutor(c *ent.Client) *repositoryTutor {
 }
 
 func (r *repositoryTutor) GetTutorByUsername(sr *schema.SchemaGetTutor) (*ent.Tutor, error) {
+
 	tutor, err := r.client.Tutor.
 		Query().
 		Where(entTutor.HasUserWith(entUser.UsernameEQ(sr.Username))).
@@ -163,7 +164,9 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 		}
 	}
 	tutor := user.Edges.Tutor
-
+	temp, _ := txc.Tutor.Query().Where(entTutor.IDEQ(tutor.ID)).WithSchedule().Only(r.ctx)
+	schedule := temp.Edges.Schedule
+	
 	profilePictureURL := *user.ProfilePictureURL
 	if sr.ProfilePicture != nil {
 		profilePictureURL, _ = utils.GenerateProfilePictureURL(sr.ProfilePicture, sr.Username, "ProfilePicture")
@@ -197,21 +200,23 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 		}
 		return nil, err
 	}
-
-	// update schedule
-	// query for schedule
-	var schedule, _ = tutor.QuerySchedule().Only(r.ctx)
+	ata := sr.Schedule.AvailableTimeArrays()
 	if sr.Schedule != nil {
-		schedule, err = r.UpdateSchedule(&schema.SchemaUpdateSchedule{
-			Username: sr.Username,
-			Schedule: sr.Schedule,
-		})
+		schedule, err = txc.Schedule.UpdateOne(schedule).
+			SetDay0(ata[0]).
+			SetDay1(ata[1]).
+			SetDay2(ata[2]).
+			SetDay3(ata[3]).
+			SetDay4(ata[4]).
+			SetDay5(ata[5]).
+			SetDay6(ata[6]).
+			Save(r.ctx)
+
 	}
 
 	// reload tutor->user
 	tutor.Edges.User = user
-	tutor.Edges.Schedule = schedule
-	fmt.Println("pass")
+	schedule.Edges.Tutor = tutor
 	return tutor, tx.Commit()
 }
 
@@ -260,25 +265,26 @@ func (r *repositoryTutor) UpdateSchedule(sr *schema.SchemaUpdateSchedule) (*ent.
 		Where(entUser.UsernameEQ(sr.Username)).
 		WithTutor().
 		Only(r.ctx)
+
 	if err != nil {
 		// rollback
 		if rerr := tx.Rollback(); rerr != nil {
 			err = fmt.Errorf("%w: %v", err, rerr)
 		}
 	}
+
 
 	// load schedule
-	user.Edges.Tutor.Edges.Schedule, err = user.Edges.Tutor.QuerySchedule().Only(r.ctx)
+	oldschedule, err := user.Edges.Tutor.QuerySchedule().Only(r.ctx)
 	if err != nil {
 		// rollback
 		if rerr := tx.Rollback(); rerr != nil {
 			err = fmt.Errorf("%w: %v", err, rerr)
 		}
 	}
-
 	// update schedule
 	ata := sr.Schedule.AvailableTimeArrays()
-	schedule, err := txc.Schedule.UpdateOne(user.Edges.Tutor.Edges.Schedule).
+	schedule, err := txc.Schedule.UpdateOne(oldschedule).
 		SetDay0(ata[0]).
 		SetDay1(ata[1]).
 		SetDay2(ata[2]).

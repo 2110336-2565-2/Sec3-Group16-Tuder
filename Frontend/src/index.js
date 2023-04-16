@@ -31,6 +31,7 @@ import ClassDetail from "./pages/ClassDetail";
 import ClassList from "./pages/ClassList";
 import AdminTuitionFeesTransfer from './pages/AdminTuitionFeesTransfer';
 import { QueryClientProvider, QueryClient } from "react-query";
+import AddCourse from "./pages/AddCourse";
 
 Modal.setAppElement(document.getElementById("root"));
 
@@ -172,6 +173,10 @@ const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: "/add-course",
+        element: <AddCourse />,
+      }
     ]
   }
 ])
