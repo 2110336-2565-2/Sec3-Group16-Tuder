@@ -73,7 +73,7 @@ export default function ClassDetails(props) {
               {data.course_description}
             </Detailrow>
             <Detailrow mgtop="1rem" fsize="16px" fweight="400">
-              Estimate time left : {timeLeft.length} / {data.estimate_time} hrs
+              Estimate time left : {timeLeft.length} hrs
             </Detailrow>
           </DetailContent>
         </GridContent>

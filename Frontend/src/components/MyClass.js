@@ -17,6 +17,16 @@ export default function MyClass(props) {
       ? new Date(props.data.upcoming_class).toLocaleString(Timezone, DateFormat)
       : "No Upcoming Class";
 
+  var button = null;
+  if (status !== "canceled" && status !== "cancelling") {
+    button = (
+      <Button onClick={(e) => navigate(`/classes/${props.data.match_id}`)}>
+        View Info
+      </Button>
+    );
+  }
+
+
   return (
     <Request>
       <ClassSection>
@@ -50,9 +60,8 @@ export default function MyClass(props) {
       </ClassSection>
       <GridSection>
         {/* put button in here */}
-        <Button onClick={(e) => navigate(`/classes/${props.data.match_id}`)}>
-          View Info
-        </Button>
+
+        {button}
       </GridSection>
     </Request>
   );
