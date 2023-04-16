@@ -3,6 +3,7 @@ import styled from "styled-components";
 import Button from "../global/Button.js";
 import { changeStatus } from "../../handlers/changeCourseStatus.js";
 import { confirm } from "../global/ConfirmToast.js";
+import { Link } from "react-router-dom";
 
 export default function CourseCard({course,buttonStatus,setEventTrigger}) {
 
@@ -27,7 +28,7 @@ export default function CourseCard({course,buttonStatus,setEventTrigger}) {
 
 
     return (
-    <Request>
+    <Request to="">
         <CourseSection>
           <ItemSection>
             <CourseImg src={course.course_picture_url} alt="CourseImg" />
@@ -69,7 +70,9 @@ export default function CourseCard({course,buttonStatus,setEventTrigger}) {
     );
 }
 
-const Request = styled.div`
+const Request = styled(Link)`
+  text-decoration: none;
+  color:black;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -96,7 +99,7 @@ const ItemSection = styled.div`
 `;
 
 const CourseImg = styled.img`
-  max-width: 216px;
+  width: 216px;
   height: 148px;
   margin: auto;
   border-radius: 10px;
