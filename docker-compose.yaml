@@ -22,15 +22,15 @@ services:
     build: ./Frontend
     restart: always
     ports:
-      - 3000:${vars.PORT}
+      - 3000:${PORT}
     depends_on:
       - backend
     # env_file:
     #   - ./Frontend/.env
     environment:
-      PORT: ${vars.PORT}
-      REACT_APP_API_URL: ${vars.REACT_APP_API_URL}
-      REACT_APP_OMISE_PUBLIC_KEY: ${vars.REACT_APP_OMISE_PUBLIC_KEY}
+      PORT: ${PORT}
+      REACT_APP_API_URL: ${REACT_APP_API_URL}
+      REACT_APP_OMISE_PUBLIC_KEY: ${REACT_APP_OMISE_PUBLIC_KEY}
     networks:
       - tuder
 
@@ -39,27 +39,27 @@ services:
     build: ./Backend
     restart: always
     ports:
-      - 8080:${vars.SERVER_PORT}
+      - 8080:${SERVER_PORT}
     depends_on:
       - database
     # env_file:
     #   - ./Backend/.env
     environment:
-      MODE: ${vars.MODE}
-      SERVER_PORT: ${vars.SERVER_PORT}
-      SERVER_HOST: ${vars.SERVER_HOST}
-      DB_USER: ${vars.DB_USER}
-      DB_PASSWORD: ${vars.DB_PASSWORD}
-      DB_NAME: ${vars.DB_NAME}
-      DB_PORT: ${vars.DB_PORT}
-      JWT_SECRET: ${vars.JWT_SECRET}
-      JWT_EXPIRES_MINUTES: ${vars.JWT_EXPIRES_MINUTES}
-      FRONTEND_URL: ${vars.FRONTEND_URL}
-      AWS_REGION: ${vars.AWS_REGION}
-      AWS_ACCESS_KEY_ID: ${vars.AWS_ACCESS_KEY_ID}
-      AWS_SECRET_ACCESS_KEY: ${vars.AWS_SECRET_ACCESS_KEY}
-      OMISE_PUBLIC_KEY: ${vars.OMISE_PUBLIC_KEY}
-      OMISE_SECRET_KEY: ${vars.OMISE_SECRET_KEY}
+      MODE: ${MODE}
+      SERVER_PORT: ${SERVER_PORT}
+      SERVER_HOST: ${SERVER_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_PORT: ${DB_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_MINUTES: ${JWT_EXPIRES_MINUTES}
+      FRONTEND_URL: ${FRONTEND_URL}
+      AWS_REGION: ${AWS_REGION}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      OMISE_PUBLIC_KEY: ${OMISE_PUBLIC_KEY}
+      OMISE_SECRET_KEY: ${OMISE_SECRET_KEY}
     
     networks:
       - tuder

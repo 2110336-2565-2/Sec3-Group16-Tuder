@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - docker-file
+env:
+  <<: *github-env
+
 jobs:
   initialize-the-application:
     runs-on: ubuntu-latest
