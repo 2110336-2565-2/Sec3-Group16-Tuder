@@ -304,7 +304,7 @@ func (r *repositoryCourse) UpdateCourseStatus(sr *schema.SchemaUpdateCourseStatu
 	status := sr.Status
 	// update a course
 	if status == "open" {
-		status = "close"
+		status = "closed"
 	} else {
 		status = "open"
 	}
