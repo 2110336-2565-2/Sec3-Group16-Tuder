@@ -7,6 +7,7 @@ import (
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
+	entCourse "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	entMatch "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	entPayment "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
@@ -19,6 +20,7 @@ import (
 type RepositoryMatch interface {
 	CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match, error)
 	GetMatchByID(id uuid.UUID) (*ent.Match, error)
+	GetMatchByCourseID(sr *schema.SchemaGetMatchByCourseID) ([]*ent.Match, error)
 }
 
 type repositoryMatch struct {
@@ -331,4 +333,28 @@ func (r *repositoryMatch) GetMatchByID(id uuid.UUID) (*ent.Match, error) {
 	}
 
 	return match, nil
+}
+
+func (r *repositoryMatch) GetMatchByCourseID(sr *schema.SchemaGetMatchByCourseID) ([]*ent.Match, error) {
+	matches, err := r.client.Match.
+		Query().
+		Where(entMatch.HasCourseWith(entCourse.IDEQ(sr.ID))).
+		WithCourse(func(q *ent.CourseQuery) {
+			q.WithTutor()
+		}).
+		WithAppointment().
+		WithStudent(func(q *ent.StudentQuery) {
+			q.WithUser()
+		}).
+		All(r.ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if matches[0].Edges.Course.Edges.Tutor.ID != sr.TutorID {
+		return nil, fmt.Errorf("course is not belong to tutor")
+	}
+
+	return matches, nil
 }

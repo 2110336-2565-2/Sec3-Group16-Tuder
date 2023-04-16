@@ -54,3 +54,41 @@ func (cR *controllerMatch) CreateMatch(c echo.Context) (err error) {
 	})
 	return
 }
+
+func (cR *controllerMatch) GetMatchByCourseID(c echo.Context) (err error) {
+	courseId, err := uuid.Parse(c.Param("id"))
+	claim := c.Get("user").(*jwt.Token).Claims.(jwt.MapClaims)
+	tutor_id_claim, ok := claim["tutorid"].(string)
+
+	if !ok {
+		return fmt.Errorf("claim \"username\" does not exist")
+	}
+	tutor_id, _ := uuid.Parse(tutor_id_claim)
+	uR := &schema.SchemaGetMatchByCourseID{
+		ID:      courseId,
+		TutorID: tutor_id,
+	}
+	if err = c.Bind(uR); err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: "invalid request payload",
+			Error:   err,
+		})
+		return err
+	}
+	matches, err := cR.service.GetMatchByCourseID(uR)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, schema.SchemaErrorResponse{
+			Success: false,
+			Message: err.Error(),
+			Error:   err,
+		})
+		return err
+	}
+	c.JSON(http.StatusOK, schema.SchemaResponses{
+		Success: true,
+		Message: "Get match by course id successfully",
+		Data:    matches,
+	})
+	return
+}

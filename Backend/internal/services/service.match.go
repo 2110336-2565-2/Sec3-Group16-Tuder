@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"time"
 
 	repository "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -9,6 +10,7 @@ import (
 
 type ServiceMatch interface {
 	CreateMatch(sr *schemas.SchemaCreateMatch) (*schemas.SchemaMatch, error)
+	GetMatchByCourseID(sr *schemas.SchemaGetMatchByCourseID) ([]*schemas.SchemaGetMatchByCourseIDResponse, error)
 }
 
 type serviceMatch struct {
@@ -47,4 +49,38 @@ func (s *serviceMatch) CreateMatch(sr *schemas.SchemaCreateMatch) (*schemas.Sche
 		Schedule:     *rawSchedule,
 		Appointments: match.Edges.Appointment,
 	}, nil
+}
+
+func (s *serviceMatch) GetMatchByCourseID(sr *schemas.SchemaGetMatchByCourseID) ([]*schemas.SchemaGetMatchByCourseIDResponse, error) {
+	matches, err := s.repository.GetMatchByCourseID(sr)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	var response []*schemas.SchemaGetMatchByCourseIDResponse
+	for _, match := range matches {
+		remaining := 0
+		var upcoming_class time.Time
+		found_upcoming := false
+		for _, app := range match.Edges.Appointment {
+			if app.Status.String() == "comingsoon" {
+				remaining = remaining + 1
+				if !found_upcoming {
+					upcoming_class = app.BeginAt
+					found_upcoming = true
+				}
+			}
+		}
+		response = append(response, &schemas.SchemaGetMatchByCourseIDResponse{
+			Course_ID:           match.ID,
+			StudentUsername:     match.Edges.Student.Edges.User.Username,
+			StudentFirstname:    match.Edges.Student.Edges.User.FirstName,
+			StudentLastname:     match.Edges.Student.Edges.User.LastName,
+			Student_picture_url: *match.Edges.Student.Edges.User.ProfilePictureURL,
+			UpcomingClass:       upcoming_class,
+			Remaining:           remaining,
+			Status:              match.Status.String(),
+		})
+	}
+	return response, nil
 }
