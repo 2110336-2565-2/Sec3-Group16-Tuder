@@ -14,18 +14,19 @@ type Match struct {
 	ent.Schema
 }
 
-// func (Match) Mixin() []ent.Mixin {
-// 	return []ent.Mixin{
-// 		UserMixin{},
-// 	}
-// }
-
 // Fields of the Todo.
 func (Match) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).Unique().StorageKey("id").Immutable(),
 		field.Time("match_created_at").Default(time.Now).Immutable(),
+		field.Enum("status").Values("enrolled", "completed", "cancelling", "canceled").Default("enrolled"),
+		// enrolled -> student enrolled course
+		// completed -> student completed course
+		// cancelling -> student request to cancel course
+		// canceled -> student cancel course
+		
+
 	}
 }
 
@@ -49,5 +50,8 @@ func (Match) Edges() []ent.Edge {
 			Required(),
 		edge.From("cancel_request", CancelRequest.Type).
 			Ref("match"),
+		edge.From("payment", Payment.Type).
+			Ref("match").
+			Unique(),
 	}
 }

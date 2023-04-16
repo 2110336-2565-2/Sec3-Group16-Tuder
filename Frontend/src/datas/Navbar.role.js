@@ -11,8 +11,8 @@ const navbarContent = [
         role: 'tutor',
         content:[
             {title: 'Home', link: '/'},
-            {title: 'My Courses', link: '/my-courses'},
-            {title: 'My Classes', link: '/my-classes'},
+            {title: 'My Courses', link: '/courses'},
+            {title: 'My Classes', link: '/classes'},
             {title: 'Account', dropdown:[
                 {title: 'Profile', link: '/profile'},
                 {title: 'Change Password', link: '/change-password'},
@@ -24,7 +24,7 @@ const navbarContent = [
         role: 'student',
         content:[
             {title: 'Home', link: '/'},
-            {title: 'My Classes', link: '/my-classes'},
+            {title: 'My Classes', link: '/classes'},
             {title: 'Account', dropdown:[
                 {title: 'Profile', link: '/profile'},
                 {title: 'Change Password', link: '/change-password'},
@@ -36,10 +36,10 @@ const navbarContent = [
         role: 'admin',
         content:[
             {title: 'Home', link: '/'},
-            {title: 'Courses', link: '/courses'},
             {title: 'Teachers', link: '/teachers'},
+            {title: 'Tuition-fees', link: '/admin-tuition-fees'},
             {title: 'Report List', link: '/issuereports'},
-            {title: 'Cancel-Request List', link: '/cancel-request-list'},
+            {title: 'Cancel-Request List', link: '/cancel-requests'},
             {title: 'Sign Out', link: '/'},
         ]
     }

@@ -16,7 +16,6 @@ export default async function signInHandler(signInData, navigate){
             localStorage.setItem('jwtToken', token); 
             window.dispatchEvent(new Event("storage"));
             
-            console.log(res); 
             navigate('/')
             
             }

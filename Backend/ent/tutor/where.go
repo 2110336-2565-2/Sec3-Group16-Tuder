@@ -69,6 +69,11 @@ func CitizenID(v string) predicate.Tutor {
 	return predicate.Tutor(sql.FieldEQ(FieldCitizenID, v))
 }
 
+// OmiseCustomerID applies equality check predicate on the "omise_customer_id" field. It's identical to OmiseCustomerIDEQ.
+func OmiseCustomerID(v string) predicate.Tutor {
+	return predicate.Tutor(sql.FieldEQ(FieldOmiseCustomerID, v))
+}
+
 // DescriptionEQ applies the EQ predicate on the "description" field.
 func DescriptionEQ(v string) predicate.Tutor {
 	return predicate.Tutor(sql.FieldEQ(FieldDescription, v))
@@ -282,6 +287,81 @@ func CitizenIDEqualFold(v string) predicate.Tutor {
 // CitizenIDContainsFold applies the ContainsFold predicate on the "citizen_id" field.
 func CitizenIDContainsFold(v string) predicate.Tutor {
 	return predicate.Tutor(sql.FieldContainsFold(FieldCitizenID, v))
+}
+
+// OmiseCustomerIDEQ applies the EQ predicate on the "omise_customer_id" field.
+func OmiseCustomerIDEQ(v string) predicate.Tutor {
+	return predicate.Tutor(sql.FieldEQ(FieldOmiseCustomerID, v))
+}
+
+// OmiseCustomerIDNEQ applies the NEQ predicate on the "omise_customer_id" field.
+func OmiseCustomerIDNEQ(v string) predicate.Tutor {
+	return predicate.Tutor(sql.FieldNEQ(FieldOmiseCustomerID, v))
+}
+
+// OmiseCustomerIDIn applies the In predicate on the "omise_customer_id" field.
+func OmiseCustomerIDIn(vs ...string) predicate.Tutor {
+	return predicate.Tutor(sql.FieldIn(FieldOmiseCustomerID, vs...))
+}
+
+// OmiseCustomerIDNotIn applies the NotIn predicate on the "omise_customer_id" field.
+func OmiseCustomerIDNotIn(vs ...string) predicate.Tutor {
+	return predicate.Tutor(sql.FieldNotIn(FieldOmiseCustomerID, vs...))
+}
+
+// OmiseCustomerIDGT applies the GT predicate on the "omise_customer_id" field.
+func OmiseCustomerIDGT(v string) predicate.Tutor {
+	return predicate.Tutor(sql.FieldGT(FieldOmiseCustomerID, v))
+}
+
+// OmiseCustomerIDGTE applies the GTE predicate on the "omise_customer_id" field.
+func OmiseCustomerIDGTE(v string) predicate.Tutor {
+	return predicate.Tutor(sql.FieldGTE(FieldOmiseCustomerID, v))
+}
+
+// OmiseCustomerIDLT applies the LT predicate on the "omise_customer_id" field.
+func OmiseCustomerIDLT(v string) predicate.Tutor {
+	return predicate.Tutor(sql.FieldLT(FieldOmiseCustomerID, v))
+}
+
+// OmiseCustomerIDLTE applies the LTE predicate on the "omise_customer_id" field.
+func OmiseCustomerIDLTE(v string) predicate.Tutor {
+	return predicate.Tutor(sql.FieldLTE(FieldOmiseCustomerID, v))
+}
+
+// OmiseCustomerIDContains applies the Contains predicate on the "omise_customer_id" field.
+func OmiseCustomerIDContains(v string) predicate.Tutor {
+	return predicate.Tutor(sql.FieldContains(FieldOmiseCustomerID, v))
+}
+
+// OmiseCustomerIDHasPrefix applies the HasPrefix predicate on the "omise_customer_id" field.
+func OmiseCustomerIDHasPrefix(v string) predicate.Tutor {
+	return predicate.Tutor(sql.FieldHasPrefix(FieldOmiseCustomerID, v))
+}
+
+// OmiseCustomerIDHasSuffix applies the HasSuffix predicate on the "omise_customer_id" field.
+func OmiseCustomerIDHasSuffix(v string) predicate.Tutor {
+	return predicate.Tutor(sql.FieldHasSuffix(FieldOmiseCustomerID, v))
+}
+
+// OmiseCustomerIDIsNil applies the IsNil predicate on the "omise_customer_id" field.
+func OmiseCustomerIDIsNil() predicate.Tutor {
+	return predicate.Tutor(sql.FieldIsNull(FieldOmiseCustomerID))
+}
+
+// OmiseCustomerIDNotNil applies the NotNil predicate on the "omise_customer_id" field.
+func OmiseCustomerIDNotNil() predicate.Tutor {
+	return predicate.Tutor(sql.FieldNotNull(FieldOmiseCustomerID))
+}
+
+// OmiseCustomerIDEqualFold applies the EqualFold predicate on the "omise_customer_id" field.
+func OmiseCustomerIDEqualFold(v string) predicate.Tutor {
+	return predicate.Tutor(sql.FieldEqualFold(FieldOmiseCustomerID, v))
+}
+
+// OmiseCustomerIDContainsFold applies the ContainsFold predicate on the "omise_customer_id" field.
+func OmiseCustomerIDContainsFold(v string) predicate.Tutor {
+	return predicate.Tutor(sql.FieldContainsFold(FieldOmiseCustomerID, v))
 }
 
 // HasIssueReport applies the HasEdge predicate on the "issue_report" edge.

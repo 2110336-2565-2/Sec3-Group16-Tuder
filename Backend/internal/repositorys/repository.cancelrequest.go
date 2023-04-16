@@ -7,9 +7,11 @@ import (
 	"fmt"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
+	appointment "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/appointment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/cancelrequest"
 	match "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
 	user "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
+	utils "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 	"github.com/google/uuid"
 
 	schemas "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -173,12 +175,38 @@ func (r *repositoryCancelRequest) CancelRequest(sc *schemas.SchemaCancelRequest)
 		return nil, errors.New("user is not a student or tutor of the match")
 	}
 
+
+	// cancelling match status
+	_, err = txc.Match.
+		Update().
+		Where(
+			match.IDEQ(m.ID),
+		).
+		SetStatus(match.StatusCancelling).
+		Save(r.ctx)
+	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: %v", err, rerr)
+		}
+		return nil, err
+	}
+
+
+
+
+
+	// create image url
+	imgURL := fmt.Sprintf("%s/%s/%s", sc.MatchID.String(), sc.UserID.String(), uuid.New())
+
+	// upload image to s3
+	imgURL, err = utils.GenerateProfilePictureURL(sc.Img, imgURL, "ProfilePicture")
+
 	// create new class cancel request
 	ccr, err = txc.CancelRequest.
 		Create().
 		SetMatchID(m.ID).
 		SetStatus(cancelrequest.StatusPending).
-		SetImgURL(sc.ImgURL).
+		SetImgURL(imgURL).
 		SetTitle(sc.Title).
 		SetDescription(sc.Description).
 		SetUserID(u.ID).
@@ -195,7 +223,16 @@ func (r *repositoryCancelRequest) CancelRequest(sc *schemas.SchemaCancelRequest)
 
 func (r *repositoryCancelRequest) AuditRequest(sc *schemas.SchemaCancelRequestApprove) error {
 
-	ccr, err := r.client.CancelRequest.
+	// create a transaction
+	tx, err := r.client.Tx(r.ctx)
+	if err != nil {
+		return fmt.Errorf("starting a transaction: %w", err)
+	}
+
+	// wrap the client with the transaction
+	txc := tx.Client()
+
+	ccr, err := txc.CancelRequest.
 		Query().
 		Where(cancelrequest.IDEQ(sc.CancelRequestID)).
 		Only(r.ctx)
@@ -205,31 +242,85 @@ func (r *repositoryCancelRequest) AuditRequest(sc *schemas.SchemaCancelRequestAp
 	}
 
 	approve := sc.Approve
-
+	
 	status := cancelrequest.StatusPending
+	mStatus := match.StatusCancelling
 	if approve {
 		status = cancelrequest.StatusApproved
+		appStatus := appointment.StatusCanceled
+		// cancel all appointments of the match
+		_, err = txc.Appointment.
+			Update().
+			Where(
+				appointment.HasMatchWith(
+					match.IDEQ(sc.MatchID),
+				),
+			).
+			SetStatus(appStatus).
+			Save(r.ctx)
+		if err != nil {
+			if rerr := tx.Rollback(); rerr != nil {
+				return fmt.Errorf("%w: %v", err, rerr)
+			}
+			return err
+		}
+		
+	
+		mStatus = match.StatusCanceled
 	} else {
 		status = cancelrequest.StatusRejected
+		mStatus = match.StatusEnrolled
 	}
 
 	if ccr.Status == cancelrequest.StatusApproved {
-		return errors.New("cancel request is already approved")
+		err = errors.New("cancel request is already approved")
+
+		if err != nil {
+			if rerr := tx.Rollback(); rerr != nil {
+				return fmt.Errorf("%w: %v", err, rerr)
+			}
+			return err
+		}
 	}
 	if ccr.Status == cancelrequest.StatusRejected {
-		return errors.New("cancel request is already rejected")
+		err = errors.New("cancel request is already rejected")
+		
+		if err != nil {
+			if rerr := tx.Rollback(); rerr != nil {
+				return fmt.Errorf("%w: %v", err, rerr)
+			}
+			return err
+		}
 	}
 
-	_, err = r.client.CancelRequest.
+	_, err = txc.CancelRequest.
 		UpdateOne(ccr).
 		SetStatus(status).
 		Save(r.ctx)
 
+	
 	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			return fmt.Errorf("%w: %v", err, rerr)
+		}
 		return err
 	}
 
-	return nil
+
+	// cancel match
+	_, err = r.client.Match.
+		UpdateOneID(sc.MatchID).
+		SetStatus(mStatus).
+		Save(r.ctx)
+	
+	if err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			return fmt.Errorf("%w: %v", err, rerr)
+		}
+		return err
+	}
+	
+	return tx.Commit()
 }
 
 // func (r *repositoryClass) AcknowledgeClassCancellation(s *schemas.SchemaUserAcknowledge) error {

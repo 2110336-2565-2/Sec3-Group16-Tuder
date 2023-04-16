@@ -78,13 +78,28 @@ export function IsUser({children}) {
     if( (role.role === "student" || role.role === "tutor")){
         return children;
     }else{
-        alert("Please Login to access this page")
+        alert("Unauthorized Access, Please Login again");
         window.location.href = "/sign-in";
+      
         return
     }
 }
 
+export function IsEnroll({children}) {
+    const [role, handleRole] = useDataContext();
 
+    if(!verify()){
+        alert("You need to login to enroll this course")
+        window.location.href = "/sign-in";
+        return
+    }
 
-
+    if( role.role === "student"){
+        return children;
+    }else{
+        alert("Unauthorized Access, You don't have permission to enroll this course")
+        window.location.href = "/";
+        return
+    }
+}
 

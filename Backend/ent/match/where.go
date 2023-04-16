@@ -101,6 +101,26 @@ func MatchCreatedAtLTE(v time.Time) predicate.Match {
 	return predicate.Match(sql.FieldLTE(FieldMatchCreatedAt, v))
 }
 
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v Status) predicate.Match {
+	return predicate.Match(sql.FieldEQ(FieldStatus, v))
+}
+
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v Status) predicate.Match {
+	return predicate.Match(sql.FieldNEQ(FieldStatus, v))
+}
+
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...Status) predicate.Match {
+	return predicate.Match(sql.FieldIn(FieldStatus, vs...))
+}
+
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...Status) predicate.Match {
+	return predicate.Match(sql.FieldNotIn(FieldStatus, vs...))
+}
+
 // HasStudent applies the HasEdge predicate on the "student" edge.
 func HasStudent() predicate.Match {
 	return predicate.Match(func(s *sql.Selector) {
@@ -227,6 +247,33 @@ func HasCancelRequestWith(preds ...predicate.CancelRequest) predicate.Match {
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(CancelRequestInverseTable, FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, CancelRequestTable, CancelRequestColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasPayment applies the HasEdge predicate on the "payment" edge.
+func HasPayment() predicate.Match {
+	return predicate.Match(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, PaymentTable, PaymentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPaymentWith applies the HasEdge predicate on the "payment" edge with a given conditions (other predicates).
+func HasPaymentWith(preds ...predicate.Payment) predicate.Match {
+	return predicate.Match(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(PaymentInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, PaymentTable, PaymentColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

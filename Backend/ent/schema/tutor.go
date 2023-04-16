@@ -28,6 +28,7 @@ func (Tutor) Fields() []ent.Field {
 		field.String("description").Optional().Nillable(),
 		field.String("omise_bank_token").Optional().Nillable(),
 		field.String("citizen_id").NotEmpty().Unique(),
+		field.String("omise_customer_id").Optional().Nillable(),
 	}
 }
 

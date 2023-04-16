@@ -13,8 +13,9 @@ var (
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "begin_at", Type: field.TypeTime},
 		{Name: "end_at", Type: field.TypeTime},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"ongoing", "completed", "cancelling", "rejected", "cancelled"}},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"comingsoon", "ongoing", "verifying", "pending", "completed", "postponed", "considering", "canceled"}, Default: "comingsoon"},
 		{Name: "appointment_match", Type: field.TypeUUID, Nullable: true},
+		{Name: "payment_appointment", Type: field.TypeUUID, Unique: true, Nullable: true},
 	}
 	// AppointmentsTable holds the schema information for the "appointments" table.
 	AppointmentsTable = &schema.Table{
@@ -26,6 +27,12 @@ var (
 				Symbol:     "appointments_matches_match",
 				Columns:    []*schema.Column{AppointmentsColumns[4]},
 				RefColumns: []*schema.Column{MatchesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "appointments_payments_appointment",
+				Columns:    []*schema.Column{AppointmentsColumns[5]},
+				RefColumns: []*schema.Column{PaymentsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -117,7 +124,9 @@ var (
 	MatchesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "match_created_at", Type: field.TypeTime},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"enrolled", "completed", "cancelling", "canceled"}, Default: "enrolled"},
 		{Name: "course_match", Type: field.TypeUUID},
+		{Name: "payment_match", Type: field.TypeUUID, Unique: true, Nullable: true},
 		{Name: "schedule_match", Type: field.TypeUUID, Unique: true},
 		{Name: "student_match", Type: field.TypeUUID},
 	}
@@ -129,19 +138,25 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "matches_courses_match",
-				Columns:    []*schema.Column{MatchesColumns[2]},
+				Columns:    []*schema.Column{MatchesColumns[3]},
 				RefColumns: []*schema.Column{CoursesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
+				Symbol:     "matches_payments_match",
+				Columns:    []*schema.Column{MatchesColumns[4]},
+				RefColumns: []*schema.Column{PaymentsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
 				Symbol:     "matches_schedules_match",
-				Columns:    []*schema.Column{MatchesColumns[3]},
+				Columns:    []*schema.Column{MatchesColumns[5]},
 				RefColumns: []*schema.Column{SchedulesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "matches_students_match",
-				Columns:    []*schema.Column{MatchesColumns[4]},
+				Columns:    []*schema.Column{MatchesColumns[6]},
 				RefColumns: []*schema.Column{StudentsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -151,6 +166,12 @@ var (
 	PaymentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "qr_picture_url", Type: field.TypeString, Nullable: true},
+		{Name: "payment_status", Type: field.TypeEnum, Enums: []string{"pending", "successful", "failed", "processing"}},
+		{Name: "amount", Type: field.TypeInt},
+		{Name: "currency", Type: field.TypeString},
+		{Name: "charge_id", Type: field.TypeString, Unique: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "user_payment", Type: field.TypeUUID},
 	}
 	// PaymentsTable holds the schema information for the "payments" table.
@@ -161,7 +182,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "payments_users_payment",
-				Columns:    []*schema.Column{PaymentsColumns[2]},
+				Columns:    []*schema.Column{PaymentsColumns[8]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -248,6 +269,7 @@ var (
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "omise_bank_token", Type: field.TypeString, Nullable: true},
 		{Name: "citizen_id", Type: field.TypeString, Unique: true},
+		{Name: "omise_customer_id", Type: field.TypeString, Nullable: true},
 		{Name: "schedule_tutor", Type: field.TypeUUID, Unique: true},
 		{Name: "user_tutor", Type: field.TypeUUID, Unique: true},
 	}
@@ -259,13 +281,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "tutors_schedules_tutor",
-				Columns:    []*schema.Column{TutorsColumns[4]},
+				Columns:    []*schema.Column{TutorsColumns[5]},
 				RefColumns: []*schema.Column{SchedulesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "tutors_users_tutor",
-				Columns:    []*schema.Column{TutorsColumns[5]},
+				Columns:    []*schema.Column{TutorsColumns[6]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -370,13 +392,15 @@ var (
 
 func init() {
 	AppointmentsTable.ForeignKeys[0].RefTable = MatchesTable
+	AppointmentsTable.ForeignKeys[1].RefTable = PaymentsTable
 	CancelRequestsTable.ForeignKeys[0].RefTable = MatchesTable
 	CancelRequestsTable.ForeignKeys[1].RefTable = UsersTable
 	CoursesTable.ForeignKeys[0].RefTable = TutorsTable
 	IssueReportsTable.ForeignKeys[0].RefTable = TutorsTable
 	MatchesTable.ForeignKeys[0].RefTable = CoursesTable
-	MatchesTable.ForeignKeys[1].RefTable = SchedulesTable
-	MatchesTable.ForeignKeys[2].RefTable = StudentsTable
+	MatchesTable.ForeignKeys[1].RefTable = PaymentsTable
+	MatchesTable.ForeignKeys[2].RefTable = SchedulesTable
+	MatchesTable.ForeignKeys[3].RefTable = StudentsTable
 	PaymentsTable.ForeignKeys[0].RefTable = UsersTable
 	PaymentHistoriesTable.ForeignKeys[0].RefTable = PaymentsTable
 	PaymentHistoriesTable.ForeignKeys[1].RefTable = UsersTable

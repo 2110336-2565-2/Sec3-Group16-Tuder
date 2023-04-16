@@ -3,6 +3,7 @@
 package match
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -15,6 +16,8 @@ const (
 	FieldID = "id"
 	// FieldMatchCreatedAt holds the string denoting the match_created_at field in the database.
 	FieldMatchCreatedAt = "match_created_at"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
 	// EdgeStudent holds the string denoting the student edge name in mutations.
 	EdgeStudent = "student"
 	// EdgeCourse holds the string denoting the course edge name in mutations.
@@ -25,6 +28,8 @@ const (
 	EdgeSchedule = "schedule"
 	// EdgeCancelRequest holds the string denoting the cancel_request edge name in mutations.
 	EdgeCancelRequest = "cancel_request"
+	// EdgePayment holds the string denoting the payment edge name in mutations.
+	EdgePayment = "payment"
 	// Table holds the table name of the match in the database.
 	Table = "matches"
 	// StudentTable is the table that holds the student relation/edge.
@@ -62,18 +67,27 @@ const (
 	CancelRequestInverseTable = "cancel_requests"
 	// CancelRequestColumn is the table column denoting the cancel_request relation/edge.
 	CancelRequestColumn = "cancel_request_match"
+	// PaymentTable is the table that holds the payment relation/edge.
+	PaymentTable = "matches"
+	// PaymentInverseTable is the table name for the Payment entity.
+	// It exists in this package in order to avoid circular dependency with the "payment" package.
+	PaymentInverseTable = "payments"
+	// PaymentColumn is the table column denoting the payment relation/edge.
+	PaymentColumn = "payment_match"
 )
 
 // Columns holds all SQL columns for match fields.
 var Columns = []string{
 	FieldID,
 	FieldMatchCreatedAt,
+	FieldStatus,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "matches"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"course_match",
+	"payment_match",
 	"schedule_match",
 	"student_match",
 }
@@ -99,3 +113,31 @@ var (
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
+
+// Status defines the type for the "status" enum field.
+type Status string
+
+// StatusEnrolled is the default value of the Status enum.
+const DefaultStatus = StatusEnrolled
+
+// Status values.
+const (
+	StatusEnrolled   Status = "enrolled"
+	StatusCompleted  Status = "completed"
+	StatusCancelling Status = "cancelling"
+	StatusCanceled   Status = "canceled"
+)
+
+func (s Status) String() string {
+	return string(s)
+}
+
+// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
+func StatusValidator(s Status) error {
+	switch s {
+	case StatusEnrolled, StatusCompleted, StatusCancelling, StatusCanceled:
+		return nil
+	default:
+		return fmt.Errorf("match: invalid enum value for status field: %q", s)
+	}
+}

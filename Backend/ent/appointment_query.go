@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/appointment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/payment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/predicate"
 	"github.com/google/uuid"
 )
@@ -19,12 +20,13 @@ import (
 // AppointmentQuery is the builder for querying Appointment entities.
 type AppointmentQuery struct {
 	config
-	ctx        *QueryContext
-	order      []OrderFunc
-	inters     []Interceptor
-	predicates []predicate.Appointment
-	withMatch  *MatchQuery
-	withFKs    bool
+	ctx         *QueryContext
+	order       []OrderFunc
+	inters      []Interceptor
+	predicates  []predicate.Appointment
+	withMatch   *MatchQuery
+	withPayment *PaymentQuery
+	withFKs     bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -76,6 +78,28 @@ func (aq *AppointmentQuery) QueryMatch() *MatchQuery {
 			sqlgraph.From(appointment.Table, appointment.FieldID, selector),
 			sqlgraph.To(match.Table, match.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, appointment.MatchTable, appointment.MatchColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryPayment chains the current query on the "payment" edge.
+func (aq *AppointmentQuery) QueryPayment() *PaymentQuery {
+	query := (&PaymentClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(appointment.Table, appointment.FieldID, selector),
+			sqlgraph.To(payment.Table, payment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, appointment.PaymentTable, appointment.PaymentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -270,12 +294,13 @@ func (aq *AppointmentQuery) Clone() *AppointmentQuery {
 		return nil
 	}
 	return &AppointmentQuery{
-		config:     aq.config,
-		ctx:        aq.ctx.Clone(),
-		order:      append([]OrderFunc{}, aq.order...),
-		inters:     append([]Interceptor{}, aq.inters...),
-		predicates: append([]predicate.Appointment{}, aq.predicates...),
-		withMatch:  aq.withMatch.Clone(),
+		config:      aq.config,
+		ctx:         aq.ctx.Clone(),
+		order:       append([]OrderFunc{}, aq.order...),
+		inters:      append([]Interceptor{}, aq.inters...),
+		predicates:  append([]predicate.Appointment{}, aq.predicates...),
+		withMatch:   aq.withMatch.Clone(),
+		withPayment: aq.withPayment.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
@@ -290,6 +315,17 @@ func (aq *AppointmentQuery) WithMatch(opts ...func(*MatchQuery)) *AppointmentQue
 		opt(query)
 	}
 	aq.withMatch = query
+	return aq
+}
+
+// WithPayment tells the query-builder to eager-load the nodes that are connected to
+// the "payment" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AppointmentQuery) WithPayment(opts ...func(*PaymentQuery)) *AppointmentQuery {
+	query := (&PaymentClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withPayment = query
 	return aq
 }
 
@@ -372,11 +408,12 @@ func (aq *AppointmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 		nodes       = []*Appointment{}
 		withFKs     = aq.withFKs
 		_spec       = aq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			aq.withMatch != nil,
+			aq.withPayment != nil,
 		}
 	)
-	if aq.withMatch != nil {
+	if aq.withMatch != nil || aq.withPayment != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -403,6 +440,12 @@ func (aq *AppointmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 	if query := aq.withMatch; query != nil {
 		if err := aq.loadMatch(ctx, query, nodes, nil,
 			func(n *Appointment, e *Match) { n.Edges.Match = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withPayment; query != nil {
+		if err := aq.loadPayment(ctx, query, nodes, nil,
+			func(n *Appointment, e *Payment) { n.Edges.Payment = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -434,6 +477,38 @@ func (aq *AppointmentQuery) loadMatch(ctx context.Context, query *MatchQuery, no
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "appointment_match" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (aq *AppointmentQuery) loadPayment(ctx context.Context, query *PaymentQuery, nodes []*Appointment, init func(*Appointment), assign func(*Appointment, *Payment)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Appointment)
+	for i := range nodes {
+		if nodes[i].payment_appointment == nil {
+			continue
+		}
+		fk := *nodes[i].payment_appointment
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(payment.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "payment_appointment" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
