@@ -1306,6 +1306,7 @@ type CourseMutation struct {
 	addprice_per_hour  *int
 	level              *course.Level
 	course_picture_url *string
+	status             *course.Status
 	clearedFields      map[string]struct{}
 	review             map[uuid.UUID]struct{}
 	removedreview      map[uuid.UUID]struct{}
@@ -1778,6 +1779,42 @@ func (m *CourseMutation) ResetCoursePictureURL() {
 	delete(m.clearedFields, course.FieldCoursePictureURL)
 }
 
+// SetStatus sets the "status" field.
+func (m *CourseMutation) SetStatus(c course.Status) {
+	m.status = &c
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *CourseMutation) Status() (r course.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Course entity.
+// If the Course object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CourseMutation) OldStatus(ctx context.Context) (v course.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *CourseMutation) ResetStatus() {
+	m.status = nil
+}
+
 // AddReviewIDs adds the "review" edge to the Review entity by ids.
 func (m *CourseMutation) AddReviewIDs(ids ...uuid.UUID) {
 	if m.review == nil {
@@ -1959,7 +1996,7 @@ func (m *CourseMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CourseMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.title != nil {
 		fields = append(fields, course.FieldTitle)
 	}
@@ -1983,6 +2020,9 @@ func (m *CourseMutation) Fields() []string {
 	}
 	if m.course_picture_url != nil {
 		fields = append(fields, course.FieldCoursePictureURL)
+	}
+	if m.status != nil {
+		fields = append(fields, course.FieldStatus)
 	}
 	return fields
 }
@@ -2008,6 +2048,8 @@ func (m *CourseMutation) Field(name string) (ent.Value, bool) {
 		return m.Level()
 	case course.FieldCoursePictureURL:
 		return m.CoursePictureURL()
+	case course.FieldStatus:
+		return m.Status()
 	}
 	return nil, false
 }
@@ -2033,6 +2075,8 @@ func (m *CourseMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldLevel(ctx)
 	case course.FieldCoursePictureURL:
 		return m.OldCoursePictureURL(ctx)
+	case course.FieldStatus:
+		return m.OldStatus(ctx)
 	}
 	return nil, fmt.Errorf("unknown Course field %s", name)
 }
@@ -2097,6 +2141,13 @@ func (m *CourseMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCoursePictureURL(v)
+		return nil
+	case course.FieldStatus:
+		v, ok := value.(course.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Course field %s", name)
@@ -2212,6 +2263,9 @@ func (m *CourseMutation) ResetField(name string) error {
 		return nil
 	case course.FieldCoursePictureURL:
 		m.ResetCoursePictureURL()
+		return nil
+	case course.FieldStatus:
+		m.ResetStatus()
 		return nil
 	}
 	return fmt.Errorf("unknown Course field %s", name)
