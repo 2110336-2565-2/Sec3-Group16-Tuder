@@ -46,8 +46,7 @@ export default function FormEditProfile({ user }) {
           setIsSubmitting(false);
         });
       }
-    } catch (err) {
-        console.log(err);
+    } catch (error) {
         toast.error("Profile update failed");
         toast.dismiss(loadingToast);
         setIsSubmitting(false);
