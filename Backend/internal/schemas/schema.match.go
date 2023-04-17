@@ -51,8 +51,7 @@ type SchemaGetMatchByCourseID struct {
 	TutorID uuid.UUID `json:"tutor_username"`
 }
 
-type SchemaGetMatchByCourseIDResponse struct {
-	Course_ID           uuid.UUID `json:"course_id"`
+type IndivCourseCard struct {
 	StudentUsername     string    `json:"student_username"`
 	StudentFirstname    string    `json:"student_firstname"`
 	StudentLastname     string    `json:"student_lastname"`
@@ -60,4 +59,10 @@ type SchemaGetMatchByCourseIDResponse struct {
 	UpcomingClass       time.Time `json:"upcoming_class"`
 	Remaining           int       `json:"remaining"`
 	Status              string    `json:"status"`
+}
+
+type SchemaGetMatchByCourseIDResponse struct {
+	CourseID   uuid.UUID          `json:"course_id"`
+	CourseName string             `json:"course_name"`
+	DataCard   []*IndivCourseCard `json:"data_card"`
 }

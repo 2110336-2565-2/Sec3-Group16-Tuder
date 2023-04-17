@@ -10,7 +10,7 @@ import (
 
 type ServiceMatch interface {
 	CreateMatch(sr *schemas.SchemaCreateMatch) (*schemas.SchemaMatch, error)
-	GetMatchByCourseID(sr *schemas.SchemaGetMatchByCourseID) ([]*schemas.SchemaGetMatchByCourseIDResponse, error)
+	GetMatchByCourseID(sr *schemas.SchemaGetMatchByCourseID) (*schemas.SchemaGetMatchByCourseIDResponse, error)
 }
 
 type serviceMatch struct {
@@ -51,13 +51,13 @@ func (s *serviceMatch) CreateMatch(sr *schemas.SchemaCreateMatch) (*schemas.Sche
 	}, nil
 }
 
-func (s *serviceMatch) GetMatchByCourseID(sr *schemas.SchemaGetMatchByCourseID) ([]*schemas.SchemaGetMatchByCourseIDResponse, error) {
+func (s *serviceMatch) GetMatchByCourseID(sr *schemas.SchemaGetMatchByCourseID) (*schemas.SchemaGetMatchByCourseIDResponse, error) {
 	matches, err := s.repository.GetMatchByCourseID(sr)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
-	var response []*schemas.SchemaGetMatchByCourseIDResponse
+	var data []*schemas.IndivCourseCard
 	for _, match := range matches {
 		remaining := 0
 		var upcoming_class time.Time
@@ -71,8 +71,7 @@ func (s *serviceMatch) GetMatchByCourseID(sr *schemas.SchemaGetMatchByCourseID) 
 				}
 			}
 		}
-		response = append(response, &schemas.SchemaGetMatchByCourseIDResponse{
-			Course_ID:           match.ID,
+		data = append(data, &schemas.IndivCourseCard{
 			StudentUsername:     match.Edges.Student.Edges.User.Username,
 			StudentFirstname:    match.Edges.Student.Edges.User.FirstName,
 			StudentLastname:     match.Edges.Student.Edges.User.LastName,
@@ -82,5 +81,11 @@ func (s *serviceMatch) GetMatchByCourseID(sr *schemas.SchemaGetMatchByCourseID) 
 			Status:              match.Status.String(),
 		})
 	}
+	response := &schemas.SchemaGetMatchByCourseIDResponse{
+		CourseID:   sr.ID,
+		CourseName: matches[0].Edges.Course.Title,
+		DataCard:   data,
+	}
+
 	return response, nil
 }
