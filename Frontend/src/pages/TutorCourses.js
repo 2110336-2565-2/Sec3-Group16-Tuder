@@ -47,7 +47,7 @@ export default function TutorCourses(){
                         <Title>My Courses</Title>
                     </Header>
                     <CourseList>
-                        {courses==null?(
+                        {courses===null||courses === []?(
                             <NoCourseContainer>
                                 <p>No course yet.</p>
                             </NoCourseContainer>

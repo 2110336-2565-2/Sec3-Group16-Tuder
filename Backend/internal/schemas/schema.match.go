@@ -52,6 +52,7 @@ type SchemaGetMatchByCourseID struct {
 }
 
 type IndivCourseCard struct {
+	MatchID             uuid.UUID `json:"match_id"`
 	StudentUsername     string    `json:"student_username"`
 	StudentFirstname    string    `json:"student_firstname"`
 	StudentLastname     string    `json:"student_lastname"`

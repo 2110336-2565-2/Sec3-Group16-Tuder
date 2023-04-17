@@ -72,6 +72,7 @@ func (s *serviceMatch) GetMatchByCourseID(sr *schemas.SchemaGetMatchByCourseID) 
 			}
 		}
 		data = append(data, &schemas.IndivCourseCard{
+			MatchID:             match.ID,
 			StudentUsername:     match.Edges.Student.Edges.User.Username,
 			StudentFirstname:    match.Edges.Student.Edges.User.FirstName,
 			StudentLastname:     match.Edges.Student.Edges.User.LastName,
