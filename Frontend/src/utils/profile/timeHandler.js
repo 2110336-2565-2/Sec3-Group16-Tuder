@@ -28,22 +28,24 @@ export const isOverlapped = (timeSlotToAdd, timeSlot) => {
   return false;
 };
 
-export const getMergedTimeSlot = (timeSlot, timeSlotToAdd) => {
-  const mergedTimeSlot = [...timeSlot, timeSlotToAdd];
+export const getMergedTimeSlot = (timeSlot, timeSlotToAdd, isMerge=false) => {
+  let mergedTimeSlot = [...timeSlot, timeSlotToAdd];
     mergedTimeSlot.sort((a, b) => {
       const aMinutes = parseInt(a.from.split(':')[0], 10) * 60 + parseInt(a.from.split(':')[1], 10);
       const bMinutes = parseInt(b.from.split(':')[0], 10) * 60 + parseInt(b.from.split(':')[1], 10);
       return aMinutes - bMinutes;
     });
-    let j = mergedTimeSlot.length - 1;
-    while (j > 0) {
-      let i = j - 1;
-      if (mergedTimeSlot[j].from == mergedTimeSlot[i].to) {
-        mergedTimeSlot[i].to = mergedTimeSlot[j].to;
-        // Remove the overlapped time slot
-        mergedTimeSlot.splice(j, 1);
+    if (isMerge) {
+      let j = mergedTimeSlot.length - 1;
+      while (j > 0) {
+        let i = j - 1;
+        if (mergedTimeSlot[j].from == mergedTimeSlot[i].to) {
+          mergedTimeSlot[i].to = mergedTimeSlot[j].to;
+          // Remove the overlapped time slot
+          mergedTimeSlot.splice(j, 1);
+        }
+        j--;
       }
-      j--;
     }
     return mergedTimeSlot;
 }
