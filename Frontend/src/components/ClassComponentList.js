@@ -6,6 +6,7 @@ import { useQuery } from "react-query";
 import { fetchMatchesByIdHandler } from "../handlers/classesHandler";
 import { getStudentID, getTutorID } from "../utils/jwtGet";
 import { useDataContext } from "../pages/ClassList";
+import { toast } from "react-hot-toast";
 
 export default function ClassComponentList() {
   const { data, setData } = useDataContext();
@@ -21,6 +22,7 @@ export default function ClassComponentList() {
         })
         .catch((err) => {
           console.log(err);
+          toast.error("Something went wrong");
         });
     },
     {

@@ -25,12 +25,12 @@ func NewServiceMatch(repository repository.RepositoryMatch) *serviceMatch {
 func (s *serviceMatch) CreateMatch(sr *schemas.SchemaCreateMatch) (*schemas.SchemaMatch, error) {
 	match, err := s.repository.CreateMatch(sr)
 	if err != nil {
-		fmt.Println(err)
+
 		return nil, err
 	}
 	match, err = s.repository.GetMatchByID(match.ID)
 	if err != nil {
-		fmt.Println(err)
+
 		return nil, err
 	}
 	rawSchedule := &schemas.SchemaRawSchedule{

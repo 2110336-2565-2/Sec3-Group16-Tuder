@@ -36,7 +36,7 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("starting a transaction: %w", err)
+		return nil, fmt.Errorf("failed to start a transaction: %w", err)
 	}
 
 	// wrap the client with the transaction
@@ -52,11 +52,11 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 		Only(r.ctx)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to find course: %w", err)
 	}
 
 	if course.Status != "open" {
-		return nil, fmt.Errorf("course is not open")
+		return nil, fmt.Errorf(" ourse is not open")
 	}
 
 	student, err := txc.Student.
@@ -65,7 +65,7 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 		Only(r.ctx)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to find student: %w", err)
 	}
 
 	// Create Schedule
@@ -74,7 +74,7 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create schedule: %w", err)
 	}
 
 	// Create Appointment
@@ -84,8 +84,7 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 	})
 
 	if err != nil {
-		fmt.Println("Create Appointment: %w", err)
-		return nil, err
+		return nil, fmt.Errorf("failed to create appointment: %w", err)
 	}
 
 	// updating tutor schedule and check if it is available
@@ -95,8 +94,7 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 	})
 
 	if err != nil {
-		fmt.Println("Update Tutor Schedule: %w", err)
-		return nil, err
+		return nil, fmt.Errorf("failed to update tutor schedule: %w", err)
 	}
 
 	//Check if payment exist
@@ -106,15 +104,8 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 		Only(r.ctx)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to find payment: %w", err)
 	}
-
-	// fmt.Println("Create Course: %w", course)
-	// fmt.Println("Create Student: %w", student)
-	// fmt.Println("Create Schedule: %w", schedule)
-	// fmt.Println("Create Appointment: %w", appointments)
-	// fmt.Println("Create Payment: %w", payment)
-
 	//Create Match
 	match, err := txc.Match.
 		Create().
@@ -126,47 +117,22 @@ func (r *repositoryMatch) CreateMatch(sr *schema.SchemaCreateMatch) (*ent.Match,
 		Save(r.ctx)
 
 	if err != nil {
-		fmt.Println("Create Match: %w", err)
-		return nil, err
-	}
-
-	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			err = fmt.Errorf("failed to rollback transaction: %w: %v", err, rerr)
 		}
-		return nil, fmt.Errorf("creating match: %w", err)
+		return nil, fmt.Errorf("failed to create match: %w", err)
 	}
-
-	return match, tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+	return match, nil
 }
-
-// If frontend want to create appointment by new approach, use this function
-// func (r *repositoryMatch) CreateAppointment(sr *schema.SchemaCreateAppointment) ([]*ent.Appointment, error) {
-// 	// Create Appointment
-// 	appointments := make([]*ent.Appointment, 0)
-// 	for _, time := range sr.Appointment_list {
-// 		appointment, err := r.client.Appointment.
-// 			Create().
-// 			SetBeginAt(time.Begin_at).
-// 			SetEndAt(time.End_at).
-// 			SetStatus("pending").
-// 			Save(r.ctx)
-
-// 		appointments = append(appointments, appointment)
-
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 	}
-
-// 	return appointments, nil
-// }
 
 func (r *repositoryMatch) CreateSchedule(sr *schema.SchemaCreateSchedule) (*ent.Schedule, error) {
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("starting a transaction: %w", err)
+		return nil, fmt.Errorf("failed to start a transaction: %w", err)
 	}
 	// wrap the client with the transaction
 	txc := tx.Client()
@@ -189,12 +155,15 @@ func (r *repositoryMatch) CreateSchedule(sr *schema.SchemaCreateSchedule) (*ent.
 
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			err = fmt.Errorf("failed to rollback transaction: %v, %w", rerr, err)
 		}
-		return nil, fmt.Errorf("creating schedule: %w", err)
+		return nil, fmt.Errorf("failed to create schedule: %w", err)
+	}
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
-	return schedule, tx.Commit()
+	return schedule, nil
 }
 
 // Update tutor schedule when creating match
@@ -216,7 +185,7 @@ func (r *repositoryMatch) UpdateTutorSchedule(sr *schema.SchemaUpdateTutorSchedu
 	for _, time := range sr.Schedule {
 		// Check if time is available
 		if !aT[time.Day][time.Hour] {
-			return nil, fmt.Errorf("time is not available")
+			return nil, fmt.Errorf("failed to update tutor schedule: time is not available")
 		}
 
 		// Set time to unavailable
@@ -234,7 +203,7 @@ func (r *repositoryMatch) UpdateTutorSchedule(sr *schema.SchemaUpdateTutorSchedu
 		Save(r.ctx)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to update tutor schedule: %w", err)
 	}
 
 	return schedule, nil
@@ -244,7 +213,7 @@ func (r *repositoryMatch) CreateAppointment(sr *schema.SchemaCreateAppointment) 
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("starting a transaction: %w", err)
+		return nil, fmt.Errorf("failed to start a transaction: %w", err)
 	}
 	// wrap the client with the transaction
 	txc := tx.Client()
@@ -283,7 +252,7 @@ func (r *repositoryMatch) CreateAppointment(sr *schema.SchemaCreateAppointment) 
 			Save(r.ctx)
 
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to create appointment: %w", err)
 		}
 
 		appointments = append(appointments, appointment)
@@ -299,11 +268,15 @@ func (r *repositoryMatch) CreateAppointment(sr *schema.SchemaCreateAppointment) 
 
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			return nil, fmt.Errorf("failed to commit transaction: %v, failed to rollback transaction: %v", err, rerr)
 		}
-		return nil, fmt.Errorf("creating course: %w", err)
+		return nil, fmt.Errorf("failed to commit transaction: %v", err)
+
 	}
-	return appointments, tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+	return appointments, nil
 }
 
 func (r *repositoryMatch) GetNow() time.Time {
@@ -327,9 +300,8 @@ func (r *repositoryMatch) GetMatchByID(id uuid.UUID) (*ent.Match, error) {
 		WithSchedule().
 		WithAppointment().
 		Only(r.ctx)
-
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get match by ID %v: %w", id, err)
 	}
 
 	return match, nil

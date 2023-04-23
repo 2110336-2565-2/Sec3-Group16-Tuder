@@ -18,8 +18,6 @@ export default function FileUploader({ isOpen, setIsOpen, handleChange, name }) 
         },
       });
     };
-    console.log("addedFile", addedFile)
-    console.log("reader.result", reader.result)
     setIsOpen(false);
   };
 

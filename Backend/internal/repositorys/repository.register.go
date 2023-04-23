@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
@@ -62,7 +61,7 @@ func (r repositoryRegister) RegisterUser(sr *schemas.SchemaRegister) (*ent.User,
 		Where(entUser.UsernameEQ(sr.Username)).
 		Only(r.ctx)
 	if err == nil {
-		return nil, errors.New("the username has been used")
+		return nil, errors.New("the username has already been used")
 	}
 	// hash password
 	hashedPassword, _ := utils.HashPassword(sr.Password)
@@ -83,9 +82,9 @@ func (r repositoryRegister) RegisterUser(sr *schemas.SchemaRegister) (*ent.User,
 		Save(r.ctx)
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			return nil, fmt.Errorf("error rolling back transaction: %w", rerr)
 		}
-		return nil, err
+		return nil, fmt.Errorf("error creating user: %w", err)
 	}
 
 	//create a specific role
@@ -124,12 +123,15 @@ func (r repositoryRegister) RegisterUser(sr *schemas.SchemaRegister) (*ent.User,
 	}
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			err = fmt.Errorf("%w: %v", err, rerr)
+			return nil, fmt.Errorf("error rolling back transaction: %w", rerr)
 		}
-		return nil, err
+		return nil, fmt.Errorf("error creating role-specific user data: %w", err)
+	}
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
-	return newUser, tx.Commit()
+	return newUser, nil
 }
 
 func (r *repositoryRegister) CreateOmiseCustomer(sr *schema.SchemaCreateOmiseCustomer) (string, error) {
@@ -139,7 +141,7 @@ func (r *repositoryRegister) CreateOmiseCustomer(sr *schema.SchemaCreateOmiseCus
 	client, err := omise.NewClient(omisePublicKey, omiseSecretKey)
 
 	if err != nil {
-		log.Fatal(err)
+		return "", fmt.Errorf("failed to create Omise client: %w", err)
 	}
 
 	// create a customer
@@ -148,8 +150,8 @@ func (r *repositoryRegister) CreateOmiseCustomer(sr *schema.SchemaCreateOmiseCus
 		Card:  sr.OmiseBankToken,
 	}
 
-	if e := client.Do(customer, createCustomer); e != nil {
-		log.Fatal(e)
+	if err := client.Do(customer, createCustomer); err != nil {
+		return "", fmt.Errorf("failed to create Omise customer: %w", err)
 	}
 
 	return customer.ID, nil

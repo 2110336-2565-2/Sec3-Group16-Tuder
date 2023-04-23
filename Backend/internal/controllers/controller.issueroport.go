@@ -99,7 +99,6 @@ func (cR *controllerIssueReport) UpdateIssueReport(c echo.Context) (err error) {
 
 func (cR *controllerIssueReport) UpdateIssueReportStatus(c echo.Context) (err error) {
 	id, _ := uuid.Parse(c.Param("id"))
-	// fmt.Println(id)
 	uR := &schema.SchemaUpdateIssueReportStatus{
 		ID: id,
 	}
@@ -132,7 +131,6 @@ func (cR *controllerIssueReport) UpdateIssueReportStatus(c echo.Context) (err er
 
 func (cR *controllerIssueReport) DeleteIssueReport(c echo.Context) (err error) {
 	id, _ := uuid.Parse(c.Param("id"))
-	// fmt.Println(id)
 	uR := &schema.SchemaDeleteIssueReport{
 		ID: id,
 	}

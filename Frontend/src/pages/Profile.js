@@ -58,6 +58,43 @@ export default function Profile() {
     }
   }, [role]);
   const navigate = useNavigate();
+
+  const child = (
+    <>
+      <TopSection>
+        <Role>{capitalizeFirstLetter(role)}</Role>
+        <ProfileImageWrapper>
+          <ProfileImage src={user.profile_picture_URL} />
+        </ProfileImageWrapper>
+        <Name>{user.firstname + " " + user.lastname}</Name>
+        <Email>{user.email}</Email>
+      </TopSection>
+      <Wrapper>
+        <MiddleSection>
+          <TitleWrapper>
+            <Title>Information</Title>
+            {isOwner ? (
+              <EditIcon onClick={() => navigate("edit-profile")} />
+            ) : null}
+          </TitleWrapper>
+          {role === "student" ? (
+            <StudentInfo
+              user={user}
+              isOwner={isOwner}
+              othersUsername={othersUsername}
+            />
+          ) : (
+            <TutorInfo
+              user={user}
+              isOwner={isOwner}
+              othersUsername={othersUsername}
+            />
+          )}
+        </MiddleSection>
+      </Wrapper>
+      <Footer />
+    </>
+  );
   // ------------------------------------
 
   if (error) {
@@ -69,41 +106,7 @@ export default function Profile() {
     );
   } else {
     return (
-      <Container>
-        {isOwner ? <IsUser /> : null}
-        <TopSection>
-          <Role>{capitalizeFirstLetter(role)}</Role>
-          <ProfileImageWrapper>
-            <ProfileImage src={user.profile_picture_URL} />
-          </ProfileImageWrapper>
-          <Name>{user.firstname + " " + user.lastname}</Name>
-          <Email>{user.email}</Email>
-        </TopSection>
-        <Wrapper>
-          <MiddleSection>
-            <TitleWrapper>
-              <Title>Information</Title>
-              {isOwner ? (
-                <EditIcon onClick={() => navigate("edit-profile")} />
-              ) : null}
-            </TitleWrapper>
-            {role === "student" ? (
-              <StudentInfo
-                user={user}
-                isOwner={isOwner}
-                othersUsername={othersUsername}
-              />
-            ) : (
-              <TutorInfo
-                user={user}
-                isOwner={isOwner}
-                othersUsername={othersUsername}
-              />
-            )}
-          </MiddleSection>
-        </Wrapper>
-        <Footer />
-      </Container>
+      <Container>{isOwner ? <IsUser>{child}</IsUser> : { child }}</Container>
     );
   }
 }
@@ -160,7 +163,7 @@ const Wrapper = styled.div`
   border-radius: 50px 50px 0px 0px;
   background-color: white;
   margin-top: 10px;
-  width:90%;
+  width: 90%;
   min-height: 50vh;
 `;
 

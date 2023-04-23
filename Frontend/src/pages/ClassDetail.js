@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import Footer from "../components/global/Footer.js";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "react-query";
 import { IsUser } from "../components/IsAuth";
 import ClassDetails from "../components/ClassDetail";
 import { fetchClassDetailById } from "../handlers/classesHandler";
-
+import { toast } from "react-hot-toast";
 export default function ClassDetail() {
   const { id } = useParams();
   const [data, setData] = useState({});
+  const navigate = useNavigate();
 
   const { isLoading, error } = useQuery(
     "classDetail",
@@ -17,11 +18,19 @@ export default function ClassDetail() {
       fetchClassDetailById(id)
         .then((res) => {
           if (res.data.success) {
+            if (
+              res.data.data === null ||
+              res.data.data.status === "cancelled" ||
+              res.data.data.status === "cancelling"
+            ) {
+              navigate("/classes");
+            }
             setData(res.data.data);
           }
         })
         .catch((err) => {
           console.log(err);
+          toast.error("Something went wrong");
         });
     },
     {
@@ -30,7 +39,7 @@ export default function ClassDetail() {
   );
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div></div>;
   }
 
   if (error) {

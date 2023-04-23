@@ -95,8 +95,9 @@ func (r *repositoryCancelRequest) CancelRequest(sc *schemas.SchemaCancelRequest)
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("starting a transaction: %w", err)
+		return nil, fmt.Errorf("failed to start a transaction: %w", err)
 	}
+
 	// wrap the client with the transaction
 	txc := tx.Client()
 
@@ -108,14 +109,13 @@ func (r *repositoryCancelRequest) CancelRequest(sc *schemas.SchemaCancelRequest)
 		).
 		Only(r.ctx)
 	if err != nil {
-		return nil, errors.New("user not found")
+		return nil, fmt.Errorf("failed to identify user: %w", err)
 	}
 
 	// check if user is a reporter
 	if u.Role.String() != sc.ReporterRole.String() {
-		return nil, errors.New("user is not a reporter")
+		return nil, errors.New("user is not authorized to make this request")
 	}
-
 	// identify match
 	m, err := txc.Match.
 		Query().
@@ -138,7 +138,7 @@ func (r *repositoryCancelRequest) CancelRequest(sc *schemas.SchemaCancelRequest)
 		).
 		Only(r.ctx)
 	if err != nil {
-		return nil, errors.New("match not found")
+		return nil, fmt.Errorf("failed to identify match: %w", err)
 	}
 
 	// find the cancel request if already exists
@@ -153,28 +153,28 @@ func (r *repositoryCancelRequest) CancelRequest(sc *schemas.SchemaCancelRequest)
 	if err == nil {
 		// check if class is cancelling
 		if ccr.Status.String() == cancelrequest.StatusPending.String() {
-			return nil, errors.New("match cancelling is already requested")
+			return nil, errors.New("cancellation request for this match is already pending")
 		}
 
 		// check if class is already cancelled
 		if ccr.Status.String() == cancelrequest.StatusApproved.String() {
-			return nil, errors.New("match is already cancelled")
+			return nil, errors.New("this match has already been cancelled")
 		}
 	}
 
+	fmt.Println(sc)
 	// check if student is a student of the match
-	if m.Edges.Student.Edges.User.Role.String() == sc.ReporterRole.String() {
+	if user.RoleStudent.String() == sc.ReporterRole.String() {
 		if m.Edges.Student.Edges.User.ID != u.ID {
 			return nil, errors.New("user is not a student of the match")
 		}
-	} else if m.Edges.Student.Edges.User.Role.String() == sc.ReporterRole.String() {
+	} else if user.RoleTutor.String() == sc.ReporterRole.String() {
 		if m.Edges.Course.Edges.Tutor.Edges.User.ID != u.ID {
 			return nil, errors.New("user is not a tutor of the match")
 		}
 	} else {
 		return nil, errors.New("user is not a student or tutor of the match")
 	}
-
 
 	// cancelling match status
 	_, err = txc.Match.
@@ -188,12 +188,8 @@ func (r *repositoryCancelRequest) CancelRequest(sc *schemas.SchemaCancelRequest)
 		if rerr := tx.Rollback(); rerr != nil {
 			err = fmt.Errorf("%w: %v", err, rerr)
 		}
-		return nil, err
+		return nil, fmt.Errorf("failed to update match status: %w", err)
 	}
-
-
-
-
 
 	// create image url
 	imgURL := fmt.Sprintf("%s/%s/%s", sc.MatchID.String(), sc.UserID.String(), uuid.New())
@@ -215,10 +211,12 @@ func (r *repositoryCancelRequest) CancelRequest(sc *schemas.SchemaCancelRequest)
 		if rerr := tx.Rollback(); rerr != nil {
 			err = fmt.Errorf("%w: %v", err, rerr)
 		}
-		return nil, err
+		return nil, fmt.Errorf("failed to upload image: %w", err)
 	}
-
-	return ccr, tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+	return ccr, nil
 }
 
 func (r *repositoryCancelRequest) AuditRequest(sc *schemas.SchemaCancelRequestApprove) error {
@@ -226,7 +224,7 @@ func (r *repositoryCancelRequest) AuditRequest(sc *schemas.SchemaCancelRequestAp
 	// create a transaction
 	tx, err := r.client.Tx(r.ctx)
 	if err != nil {
-		return fmt.Errorf("starting a transaction: %w", err)
+		return fmt.Errorf("failed to start transaction: %w", err)
 	}
 
 	// wrap the client with the transaction
@@ -238,11 +236,11 @@ func (r *repositoryCancelRequest) AuditRequest(sc *schemas.SchemaCancelRequestAp
 		Only(r.ctx)
 
 	if err != nil {
-		return errors.New("cancel request not found")
+		return fmt.Errorf("failed to find cancel request: %w", err)
 	}
 
 	approve := sc.Approve
-	
+
 	status := cancelrequest.StatusPending
 	mStatus := match.StatusCancelling
 	if approve {
@@ -260,12 +258,11 @@ func (r *repositoryCancelRequest) AuditRequest(sc *schemas.SchemaCancelRequestAp
 			Save(r.ctx)
 		if err != nil {
 			if rerr := tx.Rollback(); rerr != nil {
-				return fmt.Errorf("%w: %v", err, rerr)
+				return fmt.Errorf("failed to update appointments and rollback transaction: %w, %v", err, rerr)
 			}
-			return err
+			return fmt.Errorf("failed to update appointments: %w", err)
 		}
-		
-	
+
 		mStatus = match.StatusCanceled
 	} else {
 		status = cancelrequest.StatusRejected
@@ -284,7 +281,7 @@ func (r *repositoryCancelRequest) AuditRequest(sc *schemas.SchemaCancelRequestAp
 	}
 	if ccr.Status == cancelrequest.StatusRejected {
 		err = errors.New("cancel request is already rejected")
-		
+
 		if err != nil {
 			if rerr := tx.Rollback(); rerr != nil {
 				return fmt.Errorf("%w: %v", err, rerr)
@@ -298,75 +295,28 @@ func (r *repositoryCancelRequest) AuditRequest(sc *schemas.SchemaCancelRequestAp
 		SetStatus(status).
 		Save(r.ctx)
 
-	
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			return fmt.Errorf("%w: %v", err, rerr)
+			return fmt.Errorf("failed to update cancel request and rollback transaction: %w, %v", err, rerr)
 		}
-		return err
+		return fmt.Errorf("failed to update cancel request: %w", err)
 	}
-
 
 	// cancel match
 	_, err = r.client.Match.
 		UpdateOneID(sc.MatchID).
 		SetStatus(mStatus).
 		Save(r.ctx)
-	
+
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			return fmt.Errorf("%w: %v", err, rerr)
+			return fmt.Errorf("failed to update match and rollback transaction: %w, %v", err, rerr)
 		}
-		return err
+		return fmt.Errorf("failed to update match: %w", err)
 	}
-	
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
 	return tx.Commit()
 }
-
-// func (r *repositoryClass) AcknowledgeClassCancellation(s *schemas.SchemaUserAcknowledge) error {
-
-// 	c, err := r.client.Class.
-// 		Query().
-// 		Where(class.IDEQ(s.ClassID)).
-// 		WithMatch(
-// 			func(q *ent.MatchQuery) {
-// 				q.WithStudent(
-// 					func(q *ent.StudentQuery) {
-// 						q.WithUser()
-// 					},
-// 				)
-// 			},
-// 		).
-// 		Only(r.ctx)
-
-// 	if err != nil {
-// 		return errors.New("class not found")
-// 	}
-
-// 	if c.Status != class.StatusRejected {
-// 		return errors.New("class is not rejected")
-// 	}
-
-// 	// check if user is the student of the class
-// 	found := false
-// 	for _, m := range c.Edges.Match {
-// 		if m.Edges.Student.Edges.User.ID == s.UserID {
-// 			found = true
-// 			break
-// 		}
-// 	}
-// 	if !found {
-// 		return errors.New("user is not the student of the class")
-// 	}
-
-// 	_, err = r.client.Class.
-// 		UpdateOne(c).
-// 		SetStatus(class.StatusOngoing).
-// 		Save(r.ctx)
-
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	return nil
-// }

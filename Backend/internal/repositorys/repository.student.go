@@ -32,7 +32,7 @@ func NewRepositoryStudent(c *ent.Client) RepositoryStudent {
 func (rS *repositoryStudent) GetStudents() ([]*ent.Student, error) {
 	students, err := rS.client.Student.Query().WithUser().All(rS.ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get students: %v", err)
 	}
 	return students, nil
 }
@@ -40,7 +40,7 @@ func (rS *repositoryStudent) GetStudents() ([]*ent.Student, error) {
 func (rS *repositoryStudent) GetStudentByUsername(sr *schema.SchemaGetStudent) (*ent.Student, error) {
 	student, err := rS.client.Student.Query().Where(entStudent.HasUserWith(entUser.UsernameEQ(sr.Username))).WithUser().Only(rS.ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get student by username: %v", err)
 	}
 	return student, nil
 }
@@ -49,7 +49,7 @@ func (rS *repositoryStudent) CreateStudent(sr *schema.SchemaCreateStudent) (*ent
 	// create a transaction
 	tx, err := rS.client.Tx(rS.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("starting a transaction: %w", err)
+		return nil, fmt.Errorf("failed to start a transaction: %v", err)
 	}
 	// wrap the client with the transaction
 	txc := tx.Client()
@@ -66,8 +66,9 @@ func (rS *repositoryStudent) CreateStudent(sr *schema.SchemaCreateStudent) (*ent
 
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			return nil, fmt.Errorf("rolling back transaction: %v", rerr)
+			return nil, fmt.Errorf("failed to rollback transaction: %v", rerr)
 		}
+		return nil, fmt.Errorf("failed to create new user: %v", err)
 	}
 	student, err := txc.Student.Create().
 		SetUser(newUser).
@@ -76,19 +77,22 @@ func (rS *repositoryStudent) CreateStudent(sr *schema.SchemaCreateStudent) (*ent
 
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			return nil, fmt.Errorf("rolling back transaction: %v", rerr)
+			return nil, fmt.Errorf("failed to rollback transaction: %v", rerr)
 		}
-		return nil, fmt.Errorf("creating a new student: %w", err)
+		return nil, fmt.Errorf("failed to create new student: %v", err)
 	}
 
-	return student, tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %v", err)
+	}
 
+	return student, nil
 }
 
 func (rS *repositoryStudent) UpdateStudent(sr *schema.SchemaUpdateStudent) (*ent.Student, error) {
 	tx, err := rS.client.Tx(rS.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("starting a transaction: %w", err)
+		return nil, fmt.Errorf("failed to start transaction: %w", err)
 	}
 
 	txc := tx.Client()
@@ -100,15 +104,14 @@ func (rS *repositoryStudent) UpdateStudent(sr *schema.SchemaUpdateStudent) (*ent
 
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			return nil, fmt.Errorf("rolling back transaction: %v", rerr)
+			return nil, fmt.Errorf("failed to rollback transaction: %v", rerr)
 		}
-		return nil, fmt.Errorf("querying a user: %w", err)
+		return nil, fmt.Errorf("failed to query user: %w", err)
 	}
 
 	student := user.Edges.Student
 
 	profilePictureURL := *user.ProfilePictureURL
-	fmt.Println(profilePictureURL)
 	if sr.ProfilePicture != nil {
 		profilePictureURL, _ = utils.GenerateProfilePictureURL(sr.ProfilePicture, sr.Username, "ProfilePicture")
 
@@ -127,13 +130,16 @@ func (rS *repositoryStudent) UpdateStudent(sr *schema.SchemaUpdateStudent) (*ent
 
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			return nil, fmt.Errorf("rolling back transaction: %v", rerr)
+			return nil, fmt.Errorf("failed to rollback transaction: %v", rerr)
 		}
-		return nil, fmt.Errorf("updating a user: %w", err)
+		return nil, fmt.Errorf("failed to update user: %w", err)
 	}
 
 	student.Edges.User = user
-	return student, tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+	return student, nil
 }
 
 func (rS *repositoryStudent) DeleteStudent(sr *schema.SchemaDeleteStudent) error {
@@ -150,11 +156,10 @@ func (rS *repositoryStudent) DeleteStudent(sr *schema.SchemaDeleteStudent) error
 
 	if err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
-			return fmt.Errorf("starting a transaction %w", rerr)
+			return fmt.Errorf("failed to rollback transaction: %v", rerr)
 		}
-		return err
+		return fmt.Errorf("failed to delete student: %w", err)
 	}
-
 	return nil
 
 }

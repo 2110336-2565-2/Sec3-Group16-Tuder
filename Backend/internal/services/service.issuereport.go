@@ -1,8 +1,6 @@
 package services
 
 import (
-	"fmt"
-
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	repository "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -43,7 +41,6 @@ func (s *serviceIssueReport) PackToSchema(issueReports []*ent.IssueReport) []*sc
 func (s *serviceIssueReport) GetIssueReports() ([]*schemas.SchemaIssueReport, error) {
 	issueReports, err := s.repository.GetIssueReports()
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 	IssueReportResponses := s.PackToSchema(issueReports)

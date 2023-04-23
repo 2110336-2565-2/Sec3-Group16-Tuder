@@ -14,7 +14,6 @@ export default function CourseReviews() {
   const { courseID } = useParams();
 
   useEffect(() => {
-    console.log(courseID);
     getCourseReviewHandler(courseID)
       .then((res) => {
         setReviews(res.data.data);
@@ -34,18 +33,19 @@ export default function CourseReviews() {
   } else {
     return (
       <Container>
-        <IsStudent />
-        <TitleWrapper>
-          <Title>{reviews.course_title}</Title>
-        </TitleWrapper>
-        {reviews.total_review > 0 ? (
-          <Reviews reviews={reviews} />
-        ) : (
-          <NoReviewContainer>
-            <p>No review yet.</p>
-          </NoReviewContainer>
-        )}
-        <Footer />
+        <IsStudent>
+          <TitleWrapper>
+            <Title>{reviews.course_title}</Title>
+          </TitleWrapper>
+          {reviews.total_review > 0 ? (
+            <Reviews reviews={reviews} />
+          ) : (
+            <NoReviewContainer>
+              <p>No review yet.</p>
+            </NoReviewContainer>
+          )}
+          <Footer />
+        </IsStudent>
       </Container>
     );
   }

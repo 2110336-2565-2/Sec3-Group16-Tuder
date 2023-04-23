@@ -24,7 +24,7 @@ export default function Report(){
             await submitIssueReportHandler(reportData)
             toast.success('Thank you for your attention.')
         } catch (error){
-            toast.error(error.message)
+            toast.error("Something went wrong");
         }
     }
 

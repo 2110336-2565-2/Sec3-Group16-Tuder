@@ -44,66 +44,69 @@ export default function AdminTuitionFeesTransfer() {
   ];
   function paymentCallback(appointmentID) {
     // Change this to PUT /appointment/updatestatus/:appointmentID with status = "completed"
-    changeStatusHandler(appointmentID, "completed").then((res) => {
-      toast.success("Update status successfully");
-      navigate("/admin-tuition-fees");
-    }).catch((err) => {
-      toast.error("Something went wrong");
-    });
+    changeStatusHandler(appointmentID, "completed")
+      .then((res) => {
+        toast.success("Update status successfully");
+        navigate("/admin-tuition-fees");
+      })
+      .catch((err) => {
+        toast.error("Something went wrong");
+      });
     // ----------------------------------
   }
   return (
     <>
-      <IsAdmin />
-      <Container>
-        <Wrapper>
-          <Title>Tuition Fee - {data.course_title}</Title>
-          <Card>
-            <ImageWrapper>
-              <Image src={data.course_picture} />
-            </ImageWrapper>
-            <Table>
-              <thead>
-                <Tr>
-                  <Th>Information</Th>
-                </Tr>
-              </thead>
-              <tbody>
-                {tableContent.map((item, index) => (
-                  <Tr key={index}>
-                    <Td>
-                      <FieldName>{fieldNameToTitle(item)}</FieldName>
-                    </Td>
-                    <Td>{data[item]}</Td>
+      <IsAdmin>
+        <Container>
+          <Wrapper>
+            <Title>Tuition Fee - {data.course_title}</Title>
+            <Card>
+              <ImageWrapper>
+                <Image src={data.course_picture} />
+              </ImageWrapper>
+              <Table>
+                <thead>
+                  <Tr>
+                    <Th>Information</Th>
                   </Tr>
-                ))}
-              </tbody>
-            </Table>
-          </Card>
-          <QRWrapper>
-            <QRPayment
-              amount={data["price_per_hour"]}
-              tutorID={data["tutor_id"]}
-              appointmentID={data["appointmentID"]}
-              callback={paymentCallback}
-              callbackData={data["appointmentID"]}
-            />
-          </QRWrapper>
-          <ButtonWrapper>
-            <Button
-              variance="cancel"
-              onClick={() =>
-                navigate(
-                  locationPath.substring(0, locationPath.lastIndexOf("/"))
-                )
-              }
-            >
-              Back
-            </Button>
-          </ButtonWrapper>
-        </Wrapper>
-      </Container>
-      <Footer />
+                </thead>
+                <tbody>
+                  {tableContent.map((item, index) => (
+                    <Tr key={index}>
+                      <Td>
+                        <FieldName>{fieldNameToTitle(item)}</FieldName>
+                      </Td>
+                      <Td>{data[item]}</Td>
+                    </Tr>
+                  ))}
+                </tbody>
+              </Table>
+            </Card>
+            <QRWrapper>
+              <QRPayment
+                amount={data["price_per_hour"]}
+                tutorID={data["tutor_id"]}
+                appointmentID={data["appointmentID"]}
+                callback={paymentCallback}
+                callbackData={data["appointmentID"]}
+              />
+            </QRWrapper>
+            <ButtonWrapper>
+              <Button
+                variance="cancel"
+                onClick={() =>
+                  navigate(
+                    locationPath.substring(0, locationPath.lastIndexOf("/"))
+                  )
+                }
+              >
+                Back
+              </Button>
+            </ButtonWrapper>
+          </Wrapper>
+        </Container>
+        <Footer />
+      </IsAdmin>
     </>
   );
 }
