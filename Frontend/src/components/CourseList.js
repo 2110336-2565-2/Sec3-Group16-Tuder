@@ -4,6 +4,7 @@ import { useQuery } from "react-query";
 import { fetchCourseHandler } from "../handlers/searchCourseHandler";
 import { useDataContext } from "../pages/Courses";
 import React from "react";
+import { toast } from "react-hot-toast";
 
 export default function CourseList() {
   const { data, setData } = useDataContext();
@@ -19,6 +20,7 @@ export default function CourseList() {
         })
         .catch((err) => {
           console.log(err);
+          toast.error("Something went wrong");
         });
     },
     {

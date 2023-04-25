@@ -30,7 +30,6 @@ export default function Enroll() {
         setError(true);
       });
   }, [courseID]);
-  console.log(course, "course");
   if (error) {
     return (
       <>
@@ -40,14 +39,15 @@ export default function Enroll() {
     );
   } else {
     return (
-      <Container>
-        <IsEnroll />
-        <TitleWrapper>
-          <Title>Enroll - {course.title}</Title>
-        </TitleWrapper>
-        <FormEnrollCourse course={course} courseSchedule={courseSchedule} />
-        <WaveFooter backgroundColor="white" />
-      </Container>
+      <IsEnroll>
+        <Container>
+          <TitleWrapper>
+            <Title>Enroll - {course.title}</Title>
+          </TitleWrapper>
+          <FormEnrollCourse course={course} courseSchedule={courseSchedule} />
+          <WaveFooter backgroundColor="white" />
+        </Container>
+      </IsEnroll>
     );
   }
 }

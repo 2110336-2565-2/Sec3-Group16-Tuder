@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-hot-toast";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import useUsername from "../hooks/useUsername.js";
@@ -20,8 +21,6 @@ export default function TutorReviews() {
   const username = isOwner ? myUsername : othersUsername;
 
   const [reviews, setReviews] = useState({});
-
-  // console.log("username: ", username);
   useEffect(() => {
     const res = fetchTutorReviews(username)
       .then((res) => {
@@ -29,10 +28,34 @@ export default function TutorReviews() {
       })
       .catch((err) => {
         console.log("Tutor not found");
+        toast.error("Something went wrong");
         setError(true);
       });
   }, []);
   // ---------------------------------------------
+
+  const child = (
+    <>
+      <TitleWrapper>
+        <Title>
+          {isOwner
+            ? "My Reviews"
+            : reviews.tutor_firstname + " " + reviews.tutor_lastname}
+        </Title>
+      </TitleWrapper>
+      {reviews.total_review > 0 ? (
+        <Reviews reviews={reviews} />
+      ) : (
+        <NoReviewContainer>
+          <p>No review yet.</p>
+        </NoReviewContainer>
+      )}
+      <Footer />
+    </>
+  );
+
+  //
+
   if (error) {
     return (
       <>
@@ -42,24 +65,7 @@ export default function TutorReviews() {
     );
   } else {
     return (
-      <Container>
-        {isOwner ? <IsTutor /> : null}
-        <TitleWrapper>
-          <Title>
-            {isOwner
-              ? "My Reviews"
-              : reviews.tutor_firstname + " " + reviews.tutor_lastname}
-          </Title>
-        </TitleWrapper>
-        {reviews.total_review > 0 ? (
-          <Reviews reviews={reviews} />
-        ) : (
-          <NoReviewContainer>
-            <p>No review yet.</p>
-          </NoReviewContainer>
-        )}
-        <Footer />
-      </Container>
+      <Container>{isOwner ? <IsTutor>{child}</IsTutor> : { child }}</Container>
     );
   }
 }

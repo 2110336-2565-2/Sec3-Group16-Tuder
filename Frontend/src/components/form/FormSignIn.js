@@ -33,7 +33,7 @@ export default function FormSignIn(props){
         } catch (error){
             // Handle by do sth
             toast.dismiss(loadingToast);
-            toast.error(error.message)
+            toast.error("Invalid Username or Password");
             setStatus('error');
         }
     }

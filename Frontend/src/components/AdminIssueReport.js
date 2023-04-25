@@ -15,7 +15,6 @@ export default function AdminIssueReport(props) {
       IssueReportId: props.issuereport_id,
       status: statusState,
     };
-    console.log(data);
     submitSaveStateHandler(data)
       .then((res) => {
         if (res.data.success) {
@@ -25,12 +24,12 @@ export default function AdminIssueReport(props) {
         }
       })
       .catch((err) => {
-        console.log(err);
+        console.log(err)
+        toast.error("Something went wrong");
       });
   };
   
   const handleComplete = () => {
-    console.log("complete")
     setStatusState((prevState) => {
       let newState;
       if (prevState === "completed") {
@@ -43,7 +42,6 @@ export default function AdminIssueReport(props) {
   };
 
   const handleReject = () => {
-    console.log("reject")
     setStatusState((prevState) => {
       let newState;
       if (prevState === "rejected") {
@@ -91,6 +89,7 @@ export default function AdminIssueReport(props) {
       })
       .catch((err) => {
         console.log(err);
+        toast.error("Something went wrong");
       });
     props.onDelete(props.issuereport_id);
   };

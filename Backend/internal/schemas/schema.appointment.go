@@ -39,6 +39,7 @@ type SchemaAppointmentsFromMatchID struct {
 	EstimeateTime     int                  `json:"estimate_time"`
 	CoursePictureURL  string               `json:"course_picture_url"`
 	Appointments      []*SchemaAppointment `json:"appointments"`
+	Status 		  string               `json:"status"`
 }
 
 type SchemaUpdateAppointmentStatus struct {

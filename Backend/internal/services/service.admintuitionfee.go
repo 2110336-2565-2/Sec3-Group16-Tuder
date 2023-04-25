@@ -1,8 +1,6 @@
 package services
 
 import (
-	"fmt"
-
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	repository "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/schemas"
@@ -47,7 +45,7 @@ func (s *serviceAdminTuitionFee) PackToSchema(adminTuitionFees []*ent.Appointmen
 func (s *serviceAdminTuitionFee) GetAdminTuitionFees() ([]*schemas.SchemaAdminTuitionFee, error) {
 	adminTuitionFees, err := s.repository.GetAdminTuitionFees()
 	if err != nil {
-		fmt.Println(err)
+
 		return nil, err
 	}
 	AdminTuitionFeeResponses := s.PackToSchema(adminTuitionFees)

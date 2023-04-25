@@ -2,7 +2,7 @@ package repositorys
 
 import (
 	"context"
-	"errors"
+	"fmt"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	appointment "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/appointment"
@@ -38,7 +38,7 @@ func (r *repositoryAdminTuitionFee) GetAdminTuitionFees() ([]*ent.Appointment, e
 		Order(ent.Asc(appointment.FieldEndAt)).
 		All(r.ctx)
 	if err != nil {
-		return nil, errors.New("Appointment not found")
+		return nil, fmt.Errorf("failed to query appointments: %w", err)
 	}
 
 	return adminTuitionFees, nil

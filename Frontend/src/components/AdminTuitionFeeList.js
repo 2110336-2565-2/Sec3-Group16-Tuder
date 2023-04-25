@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Toast } from "react-hot-toast";
 import { useQuery } from "react-query";
 import { fetchAdminTuitionFeeHandler } from "../handlers/AdminTuitionFeeHandler";
 import { useDataContext } from "../pages/AdminTuitionFeeList";
@@ -18,10 +19,9 @@ export default function AdminTuitionFeeList() {
           if (res.data.success) {
             if (res.data.result !== null) setData(res.data.result);
           }
-          console.log(res.data)
         })
         .catch((err) => {
-          console.log(err);
+          toast.error(err)
         });
     },
     {

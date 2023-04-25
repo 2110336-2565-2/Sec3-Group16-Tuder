@@ -3,7 +3,7 @@ package repositorys
 import (
 	"context"
 	"errors"
-	"log"
+	"fmt"
 	"os"
 
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
@@ -39,7 +39,7 @@ func (r *repositoryPayment) GetQRCodeForCoursePayment(sr *schema.SchemaGetQRCode
 	client, err := omise.NewClient(omisePublicKey, omiseSecretKey)
 
 	if err != nil {
-		log.Fatal(err)
+		return nil, fmt.Errorf("failed to create Omise client: %w", err)
 	}
 	// Convert payment.Amount to int64
 	amount := int64(sr.Amount)
@@ -54,7 +54,7 @@ func (r *repositoryPayment) GetQRCodeForCoursePayment(sr *schema.SchemaGetQRCode
 		Only(r.ctx)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to query course: %w", err)
 	}
 
 	// Create a new source
@@ -64,8 +64,8 @@ func (r *repositoryPayment) GetQRCodeForCoursePayment(sr *schema.SchemaGetQRCode
 		Type:     "promptpay",
 	}
 
-	if e := client.Do(source, createSource); e != nil {
-		log.Fatal(e)
+	if err := client.Do(source, createSource); err != nil {
+		return nil, fmt.Errorf("failed to create source: %w", err)
 	}
 
 	// Create a new charge
@@ -76,8 +76,8 @@ func (r *repositoryPayment) GetQRCodeForCoursePayment(sr *schema.SchemaGetQRCode
 		Source:   source.ID,
 	}
 
-	if e := client.Do(charge, createCharge); e != nil {
-		log.Fatal(e)
+	if err := client.Do(charge, createCharge); err != nil {
+		return nil, fmt.Errorf("failed to create charge: %w", err)
 	}
 
 	qrCodePictureURL := charge.Source.ScannableCode.Image.DownloadURI
@@ -94,7 +94,7 @@ func (r *repositoryPayment) GetQRCodeForCoursePayment(sr *schema.SchemaGetQRCode
 		Save(r.ctx)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create payment: %w", err)
 	}
 
 	return &schema.SchemaQRCode{
@@ -111,7 +111,7 @@ func (r *repositoryPayment) GetQRCodeForTuitionFree(sr *schema.SchemaGetQRCodeFo
 	client, err := omise.NewClient(omisePublicKey, omiseSecretKey)
 
 	if err != nil {
-		log.Fatal(err)
+		return nil, fmt.Errorf("failed to create OMISE client: %v", err)
 	}
 	// Convert payment.Amount to int64
 	amount := int64(sr.Amount)
@@ -124,7 +124,7 @@ func (r *repositoryPayment) GetQRCodeForTuitionFree(sr *schema.SchemaGetQRCodeFo
 		Only(r.ctx)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get tutor: %v", err)
 	}
 
 	// Create a new source
@@ -135,7 +135,7 @@ func (r *repositoryPayment) GetQRCodeForTuitionFree(sr *schema.SchemaGetQRCodeFo
 	}
 
 	if e := client.Do(source, createSource); e != nil {
-		log.Fatal(e)
+		return nil, fmt.Errorf("failed to create OMISE source: %v", e)
 	}
 
 	// Create a new charge
@@ -147,7 +147,7 @@ func (r *repositoryPayment) GetQRCodeForTuitionFree(sr *schema.SchemaGetQRCodeFo
 	}
 
 	if e := client.Do(charge, createCharge); e != nil {
-		log.Fatal(e)
+		return nil, fmt.Errorf("failed to create OMISE charge: %v", e)
 	}
 
 	qrCodePictureURL := charge.Source.ScannableCode.Image.DownloadURI
@@ -165,7 +165,7 @@ func (r *repositoryPayment) GetQRCodeForTuitionFree(sr *schema.SchemaGetQRCodeFo
 		Save(r.ctx)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create payment record: %v", err)
 	}
 
 	return &schema.SchemaQRCode{
@@ -183,8 +183,9 @@ func (r *repositoryPayment) WebhookChargeHandler(sr *schema.SchemaChargeWebhook)
 		Only(r.ctx)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not find payment for charge %q: %w", sr.Data.ID, err)
 	}
+
 	// Check if charge is pending
 	if sr.Data.Status == "pending" {
 		// Check if payment exists
@@ -194,7 +195,7 @@ func (r *repositoryPayment) WebhookChargeHandler(sr *schema.SchemaChargeWebhook)
 			Only(r.ctx)
 
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("could not find payment for charge %q: %w", sr.Data.ID, err)
 		}
 
 		// Update payment status to pending
@@ -204,7 +205,7 @@ func (r *repositoryPayment) WebhookChargeHandler(sr *schema.SchemaChargeWebhook)
 			Save(r.ctx)
 
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to update payment status to pending: %w", err)
 		}
 		return payment, nil
 
@@ -216,7 +217,7 @@ func (r *repositoryPayment) WebhookChargeHandler(sr *schema.SchemaChargeWebhook)
 			Only(r.ctx)
 
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("could not find payment for charge %q: %w", sr.Data.ID, err)
 		}
 
 		// Update payment status to successful
@@ -226,7 +227,7 @@ func (r *repositoryPayment) WebhookChargeHandler(sr *schema.SchemaChargeWebhook)
 			Save(r.ctx)
 
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to update payment status to successful: %w", err)
 		}
 		return payment, nil
 
@@ -238,7 +239,7 @@ func (r *repositoryPayment) WebhookChargeHandler(sr *schema.SchemaChargeWebhook)
 			Only(r.ctx)
 
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("could not find payment for charge %q: %w", sr.Data.ID, err)
 		}
 
 		// Update payment status to successful
@@ -248,7 +249,7 @@ func (r *repositoryPayment) WebhookChargeHandler(sr *schema.SchemaChargeWebhook)
 			Save(r.ctx)
 
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to update payment status to failed: %w", err)
 		}
 		return payment, nil
 

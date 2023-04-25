@@ -1,7 +1,7 @@
 import React, { useEffect,useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components"
-
+import { toast } from "react-hot-toast";
 import Error from "../components/global/Error.js";
 import Footer from "../components/global/Footer.js";
 import Button from "../components/global/Button.js";
@@ -25,7 +25,7 @@ export default function TutorCourses(){
             })
             .catch((err) => {
                 console.log(err)
-                console.log("Tutor not found");
+                toast.error("Something went wrong");
                 setError(true);
             });
 
@@ -47,13 +47,18 @@ export default function TutorCourses(){
                         <Title>My Courses</Title>
                     </Header>
                     <CourseList>
-                        {courses.map((course, index) => {
-                            if (course.status === 'open') {
-                                return <CourseCard course={course} key={index} buttonStatus="Close" setEventTrigger={setEventTrigger}/>
-                            } else {
-                                return <CourseCard course={course} key={index} buttonStatus="Open" setEventTrigger={setEventTrigger}/>
-                            }
-                            })}
+                        {courses===null||courses === []?(
+                            <NoCourseContainer>
+                                <p>No course yet.</p>
+                            </NoCourseContainer>
+                        ):(courses.map((course, index) => {
+                                if (course.status === 'open') {
+                                    return <CourseCard course={course} key={index} buttonStatus="Close" setEventTrigger={setEventTrigger}/>
+                                } else {
+                                    return <CourseCard course={course} key={index} buttonStatus="Open" setEventTrigger={setEventTrigger}/>
+                                }
+                            }))
+                        }
                     </CourseList>
                 </Container>
                 <Wrapper>
@@ -105,4 +110,13 @@ const CourseList = styled.div`
     flex-direction: column;
     align-items: center;
     width: 100%;
+`;
+
+const NoCourseContainer = styled.div`
+  display: flex;
+  width: 100%;
+  background-color: white;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
 `;

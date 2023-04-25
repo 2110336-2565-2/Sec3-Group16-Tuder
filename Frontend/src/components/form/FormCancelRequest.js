@@ -26,7 +26,6 @@ export default function UserCancelRequest() {
       ...formData,
       [event.target.name]: event.target.value,
     });
-    console.log(formData);
   };
 
   const handleSubmit = (event) => {
@@ -40,17 +39,32 @@ export default function UserCancelRequest() {
       img: formData.img.split(",")[1],
       reporter_role: getRole(),
     };
-    submitCancelRequestHandler(data)
-      .then((res) => {
-        if (res.data.success) {
-          toast.success("Success");
+
+    // check if all fields are filled
+    if (!data.title || !data.description) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    if (!data.img) {
+      toast.error("Please upload a QR code");
+      return;
+    }
+
+    // toast promise
+    toast.promise(
+      submitCancelRequestHandler(data),
+      {
+        loading: "Submitting...",
+        success: (res) => {
           navigate("/classes");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error(err.response.data.message);
-      });
+          return res.data.message;
+        },
+        error: (err) => {
+          return err.response.data.message;
+        },
+      },
+      {}
+    );
   };
 
   var title = formData.title;
@@ -79,7 +93,7 @@ export default function UserCancelRequest() {
         />
       </TopicSection>
       <TopicSection>
-        <Topic>Picture</Topic>
+        <Topic>QR Picture For Refund</Topic>
         <RequestPicture
           name="img"
           src={formData.img ? formData.img : defaultImgUrl}

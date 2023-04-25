@@ -4,16 +4,13 @@ import WaveFooter from "../components/global/WaveFooter.js";
 import { IsAdmin } from "../components/IsAuth.js";
 import AdminIssueReportList from "../components/AdminIssueReportList.js";
 
-
 export default function AdminIssueReportListPage() {
-
-
   return (
     <Container>
       <IsAdmin>
-          <ContainerWithHeight margintop="25px">
-            <AdminIssueReportList />
-          </ContainerWithHeight>
+        <ContainerWithHeight margintop="25px">
+          <AdminIssueReportList />
+        </ContainerWithHeight>
       </IsAdmin>
     </Container>
   );
@@ -40,4 +37,3 @@ const Container = styled.div`
   min-height: 100vh;
   width: 100%;
 `;
-

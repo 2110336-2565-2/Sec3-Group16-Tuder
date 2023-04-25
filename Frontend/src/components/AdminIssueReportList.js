@@ -21,13 +21,13 @@ export default function AdminIssueReportList() {
     () => {
       fetchAdminIssueReportHandler()
         .then((res) => {
-          console.log(res.data.result);
           if (res.data.success) {
             if (res.data.result !== null) setItem(res.data.result);
           }
         })
         .catch((err) => {
           console.log(err);
+          toast.error("Something went wrong");
         });
     },
     {
@@ -41,7 +41,6 @@ export default function AdminIssueReportList() {
   if (error) {
     return <div>Error: {error.message}</div>;
   }
-  console.log(item);
   if (item === null) {
     return <div>Error</div>;
   }

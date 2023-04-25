@@ -4,6 +4,7 @@ import Button from "../global/Button.js";
 import { changeStatus } from "../../handlers/changeCourseStatus.js";
 import { confirm } from "../global/ConfirmToast.js";
 import { Link } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 export default function CourseCard({course,buttonStatus,setEventTrigger}) {
 
@@ -18,7 +19,7 @@ export default function CourseCard({course,buttonStatus,setEventTrigger}) {
             })
             .catch((err) => {
                 console.log(err)
-                console.log("course not found");
+                toast.error("Something went wrong");
             });
       };
 
@@ -26,9 +27,10 @@ export default function CourseCard({course,buttonStatus,setEventTrigger}) {
         setStatus(course.status==="open" ? "Close" : "Open")
     }, [course]);
 
+    const route = `/my-course/${course.id}`
 
     return (
-    <Request to="">
+    <Request to={route}>
         <CourseSection>
           <ItemSection>
             <CourseImg src={course.course_picture_url} alt="CourseImg" />
@@ -84,7 +86,7 @@ const Request = styled(Link)`
   padding: 10px;
   border-radius: 10px;
   margin: 20px 50px 20px 50px;
-`
+`;
 
 const CourseSection = styled.div`
   display: grid;

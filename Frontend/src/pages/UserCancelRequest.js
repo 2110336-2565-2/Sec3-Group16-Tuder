@@ -14,8 +14,8 @@ export default function UserCancelRequest() {
         <IsUser>
         <CancelRequest/>
            
-        </IsUser>
         <Footer />
+        </IsUser>
       </Container>
       
     );

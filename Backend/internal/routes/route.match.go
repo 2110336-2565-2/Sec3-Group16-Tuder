@@ -17,6 +17,7 @@ func InitMatchRoutes(client *ent.Client, e *echo.Group) {
 	controllerMatch := controller.NewControllerMatch(serviceMatch)
 	middlewareInst := middlewares.NewAuthMiddleware(os.Getenv("JWT_SECRET"))
 	e.POST("/match", controllerMatch.CreateMatch, middlewareInst.JWT())
+	e.GET("/match/course/:id", controllerMatch.GetMatchByCourseID, middlewareInst.JWT())
 	// e.GET("/match/:id", controllerMatch.GetMatchByMatchID)
 	// e.GET("/matches", controllerMatch.GetMatches)
 	// e.PUT("/match/:id", controllerMatch.UpdateMatch)

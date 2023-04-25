@@ -6,17 +6,14 @@ export default async function changePasswordHandler(Data, navigate){
         let res = response.data;
 
         if (res.success === true) {
-            
-            console.log(res.success); 
             navigate('/profile')
-            
         }
 
     }).catch(function(error){
         // if internal error occurs, MOO will return error message
         if (error.response) {
             let res = error.response.data;
-            console.log("error Wrong password");
+            console.log(res);
             throw new Error(res.message);
         }
     });

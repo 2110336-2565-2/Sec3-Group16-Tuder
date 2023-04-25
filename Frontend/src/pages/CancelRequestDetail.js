@@ -6,7 +6,7 @@ import CancelRequestInfo from "../components/CancelRequestData.js";
 import { useQuery } from "react-query";
 import { fetchCancellingRequestHandler } from "../handlers/cancelRequestHandler";
 import { useParams } from "react-router-dom";
-
+import { toast } from "react-hot-toast";
 export default function CancelRequestDetailPage() {
   const [data, setData] = useState({});
 
@@ -18,11 +18,14 @@ export default function CancelRequestDetailPage() {
       fetchCancellingRequestHandler(id)
         .then((res) => {
           if (res.data.success) {
-            if (res.data.data !== null) setData(res.data.data);
+            if (res.data.data !== null) {
+              setData(res.data.data);
+            }
           }
         })
         .catch((err) => {
           console.log(err);
+          toast.error("Something went wrong");
         });
     },
     {
