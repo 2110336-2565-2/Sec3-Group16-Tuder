@@ -28,7 +28,7 @@ func InitStudentRoutes(client *ent.Client, e *echo.Group) {
 	updateStudentRoute.PUT("", controllerStudent.UpdateStudent)
 	
 	//e.DELETE("/student", controllerStudent.DeleteStudent)
-	deleteStudentRoute := e.Group("/student")
+	deleteStudentRoute := e.Group("/deleteStudent")
 	deleteStudentRoute.Use(authMiddleware.JWT())
 	deleteStudentRoute.Use(authMiddleware.AdminMiddleware)
 	deleteStudentRoute.DELETE("", controllerStudent.DeleteStudent)

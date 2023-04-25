@@ -32,7 +32,7 @@ func InitTutorRoutes(client *ent.Client, e *echo.Group) {
 	updateTutorRoute.PUT("", controllerTutor.UpdateTutor)
 
 	//e.DELETE("/tutor", controllerTutor.DeleteTutor)
-	deleteTutorRoute := e.Group("/tutor")
+	deleteTutorRoute := e.Group("/deleteTutor")
 	deleteTutorRoute.Use(middlewareInst.JWT())
 	deleteTutorRoute.Use(middlewareInst.AdminMiddleware)
 	deleteTutorRoute.DELETE("", controllerTutor.DeleteTutor)
