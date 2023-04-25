@@ -27,9 +27,10 @@ export default function CourseCard({course,buttonStatus,setEventTrigger}) {
         setStatus(course.status==="open" ? "Close" : "Open")
     }, [course]);
 
+    const route = `/my-course/${course.id}`
 
     return (
-    <Request to="">
+    <Request to={route}>
         <CourseSection>
           <ItemSection>
             <CourseImg src={course.course_picture_url} alt="CourseImg" />
@@ -85,7 +86,7 @@ const Request = styled(Link)`
   padding: 10px;
   border-radius: 10px;
   margin: 20px 50px 20px 50px;
-`
+`;
 
 const CourseSection = styled.div`
   display: grid;

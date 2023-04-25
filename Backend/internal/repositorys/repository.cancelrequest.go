@@ -318,5 +318,5 @@ func (r *repositoryCancelRequest) AuditRequest(sc *schemas.SchemaCancelRequestAp
 		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
-	return nil
+	return tx.Commit()
 }
