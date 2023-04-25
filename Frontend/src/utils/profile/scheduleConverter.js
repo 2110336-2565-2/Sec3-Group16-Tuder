@@ -1,5 +1,5 @@
 // Convert the schedules from the backend to the frontend format
-export const convertBackendSchedulesToFrontend = (schedules) => {
+export const convertBackendSchedulesToFrontend = (schedules, isMerge=false) => {
   function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
@@ -21,7 +21,8 @@ export const convertBackendSchedulesToFrontend = (schedules) => {
       if (schedules[day][i]) {
         from = (i < 10 ? "0" : "") + i + ":00"
         to = (i + 1 < 10 ? "0" : "") + (i + 1) + ":00"
-        while(i < 24 && schedules[day][i]) {
+        // merge if isMerge is true
+        while(isMerge && i < 24 && schedules[day][i]) {
           to = (i + 1 < 10 ? "0" : "") + (i + 1) + ":00"
           i++;
         }

@@ -212,6 +212,32 @@ export default function FormSignUp() {
                 </FormT.Select>
               </FormT.Component>
             );
+          } else if (element === "Password" || element === "Confirm Password") {
+            // create regex that disallow Thai characters but still except special characters for password safety
+            const regex = "^[a-zA-Z0-9!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]*$";
+            return (
+              <FormT.Component key={elementindex}>
+                <FormT.Label>{element} :</FormT.Label>
+                <FormT.TextInput
+                  BoxSize={boxsize}
+                  name={name}
+                  type={type}
+                  placeholder={pholder}
+                  value={value}
+                  onChange={onChange}
+                  pattern={regex}
+                  onInvalid={(e) => {
+                    e.target.setCustomValidity(
+                      "Password must not contain Thai characters"
+                    );
+                  }}
+                  onInput={(e) => {
+                    e.target.setCustomValidity("");
+                  }}
+                  required
+                />
+              </FormT.Component>
+            );
           } else {
             return (
               <FormT.Component key={elementindex}>
