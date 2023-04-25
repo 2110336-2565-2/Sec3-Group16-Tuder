@@ -25,13 +25,13 @@ func InitTutorRoutes(client *ent.Client, e *echo.Group) {
 	e.POST("/tutor", controllerTutor.CreateTutor)
 	e.GET("/tutor/:username/reviews", controllerTutor.GetTutorReviews)
 
-	// e.PUT("/tutor", controllerTutor.UpdateTutor)
+	//e.PUT("/tutor", controllerTutor.UpdateTutor)
 	updateTutorRoute := e.Group("/tutor")
 	updateTutorRoute.Use(middlewareInst.JWT())
 	updateTutorRoute.Use(middlewareInst.TutorMiddleware)
 	updateTutorRoute.PUT("", controllerTutor.UpdateTutor)
 
-	// e.DELETE("/tutor", controllerTutor.DeleteTutor)
+	//e.DELETE("/tutor", controllerTutor.DeleteTutor)
 	deleteTutorRoute := e.Group("/tutor")
 	deleteTutorRoute.Use(middlewareInst.JWT())
 	deleteTutorRoute.Use(middlewareInst.AdminMiddleware)

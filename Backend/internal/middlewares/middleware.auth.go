@@ -19,7 +19,7 @@ func (a *authMiddleware) JWT() echo.MiddlewareFunc {
 	return echojwt.WithConfig(
 		echojwt.Config{
 			SigningKey: []byte(a.secret),
-			ErrorHandler: func(c echo.Context, err error) error {
+			ErrorHandler: func(c echo.Context, err error) error {	
 				return c.JSON(401, &schemas.SchemaErrorResponse{
 					Success: false,
 					Message: err.Error() + " : " + "Unauthorized",

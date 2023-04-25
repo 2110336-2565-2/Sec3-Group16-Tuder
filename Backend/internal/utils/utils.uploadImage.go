@@ -12,7 +12,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func GenerateProfilePictureURL(imageBytes []byte, key string, types string) (string, error) {
+func GenerateProfilePictureURL(imageBytes []byte, key string) (string, error) {
 	bucket := "se2-tuder"
 	err := godotenv.Load()
 
@@ -30,7 +30,7 @@ func GenerateProfilePictureURL(imageBytes []byte, key string, types string) (str
 	// Upload the image to S3
 	_, err = uploader.Upload(context.TODO(), &s3.PutObjectInput{
 		Bucket: aws.String(bucket),
-		Key:    aws.String(types + "/" + key + ".jpg"),
+		Key:    aws.String(key + ".jpg"),
 		Body:   bytes.NewReader(imageBytes),
 		ACL:    "public-read ",
 	})
@@ -40,7 +40,7 @@ func GenerateProfilePictureURL(imageBytes []byte, key string, types string) (str
 	}
 
 	// Generate the S3 object URL
-	objectURL := fmt.Sprintf("https://%s.s3.amazonaws.com/%s/%s.jpg", bucket, types, key)
+	objectURL := fmt.Sprintf("https://%s.s3.amazonaws.com/%s.jpg", bucket, key)
 
 	return objectURL, nil
 }
