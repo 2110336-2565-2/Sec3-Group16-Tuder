@@ -33,16 +33,16 @@ func InsertData(client *ent.Client) {
 	// InsertPaymentHistory(client, ctx, user, payment)
 
 	// Insert classes
-	app := InsertAppointment(client, ctx)
+	// app := InsertAppointment(client, ctx)
 
 	// Insert match
-	match := InsertMatch(client, ctx, app, course, student, schedule)
+	// match := InsertMatch(client, ctx, app, course, student, schedule)
 
 	// Insert review
 	InsertReview(client, ctx, student, course)
 
 	// Insert cancel request
-	InsertCancelRequest(client, ctx, user, match)
+	// InsertCancelRequest(client, ctx, user, match)
 
 	// Insert issue report
 	InsertIssueReport(client, ctx)

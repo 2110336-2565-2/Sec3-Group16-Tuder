@@ -14,7 +14,7 @@ func InsertCourse(client *ent.Client, ctx context.Context, tutor []*ent.Tutor) [
 
 	// Create courses
 	course1 := CreateCourse(client, tutor[0], "Mathematics for Boys lovers", "Mathematics", "Algebra", 60, "Algebra is a branch of mathematics that studies the properties of objects under the action of groups, rings, and other algebraic structures.", 100, Course.LevelGrade10, "https://picsum.photos/seed/picsum/200/100")
-	course2 := CreateCourse(client, tutor[1], "Boys licking practice in daily life", "Romantic", "How's Boys smell", 284, "Boys is a kind of thing that we need to know more about it", 2400, Course.LevelGrade12, "https://picsum.photos/seed/picsum/200/100")
+	course2 := CreateCourse(client, tutor[1], "Real men practice in daily life", "Romantic", "How's real men think", 284, "Real men is a type of person that we need to know more about it", 2400, Course.LevelGrade12, "https://picsum.photos/seed/picsum/200/100")
 	course3 := CreateCourse(client, tutor[0], "Introduction to Go programming", "Programming", "Golang", 120, "Learn the basics of Go programming language", 150, Course.LevelGrade11, "https://picsum.photos/seed/picsum/200/100")
 
 	course, err := client.Course.CreateBulk(course1, course2, course3).Save(ctx)
