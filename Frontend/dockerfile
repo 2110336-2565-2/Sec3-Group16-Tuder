@@ -1,21 +1,27 @@
-# FROM node:18.12.1 AS builder
-# WORKDIR /app
-# COPY ./package.json ./package.json
-# RUN npm install
-
-# COPY . .
-# RUN npm run build
-
-FROM node:18.12.1-alpine AS frontend
+FROM node:18.12.1 AS builder
 WORKDIR /app
+
 COPY ./package.json ./package.json
-RUN npm install --production
 
-# COPY --from=builder ./build/ ./build/
+RUN yarn --production
+
 COPY . .
+ARG REACT_APP_API_URL
+ARG REACT_APP_OMISE_PUBLIC_KEY
 
-CMD npm run start
-# CMD npm rum start:pord
-# RUN npm install -g serve
+ENV REACT_APP_API_URL $REACT_APP_API_URL
+ENV REACT_APP_OMISE_PUBLIC_KEY $REACT_APP_OMISE_PUBLIC_KEY
 
-# CMD serve -s build -l 3000
+RUN yarn build
+
+
+FROM node:18.15-alpine AS frontend
+
+WORKDIR /app
+
+RUN npm install -g serve
+COPY --from=builder /app/build/ ./build/
+
+CMD serve -s build -l 3000
+
+
