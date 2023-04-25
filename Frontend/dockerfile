@@ -1,18 +1,21 @@
-FROM node:18.12.1 AS builder
+# FROM node:18.12.1 AS builder
+# WORKDIR /app
+# COPY ./package.json ./package.json
+# RUN npm install
 
-COPY ./package.json ./package.json
-RUN npm install
-
-COPY . .
-RUN npm run build
+# COPY . .
+# RUN npm run build
 
 FROM node:18.12.1-alpine AS frontend
-
+WORKDIR /app
 COPY ./package.json ./package.json
 RUN npm install --production
 
-COPY --from=builder ./build/ ./build/
-# CMD npm rum start:pord
-RUN npm install -g serve
+# COPY --from=builder ./build/ ./build/
+COPY . .
 
-CMD serve -s build -l 3000
+CMD npm run start
+# CMD npm rum start:pord
+# RUN npm install -g serve
+
+# CMD serve -s build -l 3000
