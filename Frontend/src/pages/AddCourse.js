@@ -1,14 +1,14 @@
 import React from "react";
 import styled from "styled-components";
 import FormAddCourse from "../components/form/FormAddCourse";
-import { IsAdmin } from "../components/IsAuth";
+import { IsTutor } from "../components/IsAuth";
 
 export default function Addcourse() {
   return (
     <Container>
-      <IsAdmin>
+      <IsTutor>
         <FormAddCourse />
-      </IsAdmin>
+      </IsTutor>
     </Container>
   );
 }
