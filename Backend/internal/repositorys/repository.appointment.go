@@ -215,8 +215,11 @@ func (r *repositoryAppointment) UpdateAppointmentStatus(sr *schemas.SchemaUpdate
 			}
 			return nil, fmt.Errorf("Can't find match schedule for creating new apoointment after postponed: %w", err2)
 		}
-		hour := last_appointment[0].BeginAt.Hour()
-		day := int(last_appointment[0].BeginAt.Weekday())
+		// create time from database
+		loc, _ := time.LoadLocation("Asia/Bangkok")
+		date := last_appointment[0].BeginAt.In(loc)
+		hour := date.Hour()
+		day := int(date.Weekday())
 		var schedule [7][24]bool
 		schedule[0] = match_schedule.Day0
 		schedule[1] = match_schedule.Day1
@@ -229,9 +232,11 @@ func (r *repositoryAppointment) UpdateAppointmentStatus(sr *schemas.SchemaUpdate
 		for _, arr := range schedule {
 			combined_schedule = append(combined_schedule, arr[:]...)
 		}
+
 		count_hour := 1
 		start := (day * 24) + hour
 		for i := 1; i <= 24*7; i++ {
+			
 			idx := (start + i) % (24 * 7)
 			if combined_schedule[idx] {
 				break
@@ -239,7 +244,7 @@ func (r *repositoryAppointment) UpdateAppointmentStatus(sr *schemas.SchemaUpdate
 				count_hour = count_hour + 1
 			}
 		}
-		next_begin_date := last_appointment[0].BeginAt.Add(time.Duration(count_hour) * time.Hour)
+		next_begin_date := date.Add(time.Duration(count_hour) * time.Hour)
 
 		_, err3 := txc.Appointment.Create().SetBeginAt(next_begin_date).SetEndAt(next_begin_date.Add(1 * time.Hour)).SetStatus("comingsoon").SetMatch(match).Save(r.ctx)
 		if err3 != nil {
