@@ -9,9 +9,9 @@ export const  searchCourseHandler = (searchData)=>{
 }
 
 export const fetchCourseHandler = () => {
-    return api.get('api/v1/courses')
+    return api.get('/api/v1/courses')
 }
 
 export const fetchCourseByIdHandler = (id) => {
-    return api.get(`api/v1/course/${id}`)
+    return api.get(`/api/v1/course/${id}`)
 }
