@@ -195,7 +195,7 @@ func (r *repositoryCancelRequest) CancelRequest(sc *schemas.SchemaCancelRequest)
 	imgURL := fmt.Sprintf("%s/%s/%s", sc.MatchID.String(), sc.UserID.String(), uuid.New())
 
 	// upload image to s3
-	imgURL, err = utils.GenerateProfilePictureURL(sc.Img, imgURL, "ProfilePicture")
+	imgURL, err = utils.GenerateProfilePictureURL(sc.Img, imgURL)
 
 	// create new class cancel request
 	ccr, err = txc.CancelRequest.

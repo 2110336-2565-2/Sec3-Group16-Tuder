@@ -113,7 +113,7 @@ func (rS *repositoryStudent) UpdateStudent(sr *schema.SchemaUpdateStudent) (*ent
 
 	profilePictureURL := *user.ProfilePictureURL
 	if sr.ProfilePicture != nil {
-		profilePictureURL, _ = utils.GenerateProfilePictureURL(sr.ProfilePicture, sr.Username, "ProfilePicture")
+		profilePictureURL, _ = utils.GenerateProfilePictureURL(sr.ProfilePicture, sr.Username)
 
 	}
 

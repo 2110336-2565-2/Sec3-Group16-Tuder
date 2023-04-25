@@ -223,7 +223,7 @@ func (r *repositoryCourse) CreateCourse(sr *schema.SchemaCreateCourse) (*ent.Cou
 
 	imgURL := fmt.Sprintf("%s/%s/%s", sr.Tutor_id, sr.Title, uuid.New())
 	if sr.Course_picture != nil {
-		imgURL, _ = utils.GenerateProfilePictureURL(sr.Course_picture, imgURL, "ProfilePicture")
+		imgURL, _ = utils.GenerateProfilePictureURL(sr.Course_picture, imgURL)
 	}
 
 	// create a new course
@@ -272,7 +272,7 @@ func (r *repositoryCourse) UpdateCourse(sr *schema.SchemaUpdateCourse) (*ent.Cou
 
 	imgURL := fmt.Sprintf("%s/%s/%s", sr.Tutor_id, sr.Title, uuid.New())
 	if sr.Course_picture != nil {
-		imgURL, _ = utils.GenerateProfilePictureURL(sr.Course_picture, imgURL, "ProfilePicture")
+		imgURL, _ = utils.GenerateProfilePictureURL(sr.Course_picture, imgURL)
 	}
 
 	// update a course

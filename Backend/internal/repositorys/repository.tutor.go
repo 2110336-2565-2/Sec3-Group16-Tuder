@@ -174,7 +174,7 @@ func (r *repositoryTutor) UpdateTutor(sr *schema.SchemaUpdateTutor) (*ent.Tutor,
 
 	profilePictureURL := *user.ProfilePictureURL
 	if sr.ProfilePicture != nil {
-		profilePictureURL, _ = utils.GenerateProfilePictureURL(sr.ProfilePicture, sr.Username, "ProfilePicture")
+		profilePictureURL, _ = utils.GenerateProfilePictureURL(sr.ProfilePicture, sr.Username)
 
 	}
 	user, err = txc.User.
