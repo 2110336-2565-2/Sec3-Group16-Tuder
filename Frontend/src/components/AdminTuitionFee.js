@@ -29,7 +29,7 @@ export default function AdminTuitionFee(props) {
             </ClassInfo>
             <ClassInfo>
               <InfoTitle min_w = "72px">Status :</InfoTitle>
-              <InfoDesc>{new Date(props.AppointmentStatus).toLocaleString(Timezone, DateFormat)}</InfoDesc>
+              <InfoDesc>{(props.AppointmentStatus)}</InfoDesc>
             </ClassInfo>
             <ClassInfo>
               <InfoTitle min_w = "72px">End Date :</InfoTitle>

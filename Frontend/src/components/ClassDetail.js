@@ -25,7 +25,7 @@ export default function ClassDetails(props) {
 
   const attend = (e, id) => {
     e.preventDefault();
-    changeStatusHandler(id, "completed").then((res) => {
+    changeStatusHandler(id, "pending").then((res) => {
       if (res.data.success) {
         toast.success("Attendded");
         window.location.reload();
