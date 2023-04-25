@@ -40,12 +40,12 @@ func InsertUser(client *ent.Client, ctx context.Context) []*ent.User {
     }
 
 	// Create users
-	user1 := CreateUser(client, "student1", "P@ssw0rd", "487 ถ.ไม้แดง พัทลุง 85930", "student1@hotmail.com", "0998702095", "STUDENT1", "JUKJEEJID", "female", birthdates[0], "profile url", user.RoleStudent)
-	user2 := CreateUser(client, "student2", "P@ssw0rd", "1 ซ.นกทอง อ.ห้วยขวาง อุตรดิตถ์ 34110", "student2@hotmail.com", "0872445831", "STUDENT2", "JUKJEEJID", "female", birthdates[1], "profile url", user.RoleStudent)
-	user3 := CreateUser(client, "tutor1", "P@ssw0rd", "8/1 ถนนนาถะพินธุ ต.เว่อเล็ก อ.เรณูนคร ลำพูน", "tutor1@hotmail.com", "025659384", "TUTOR1", "JUKJEEJID", "male", birthdates[2], "profile url", user.RoleTutor)
-	user4 := CreateUser(client, "tutor2", "P@ssw0rd", "801 ถ.พงศ์ฉบับนภา กระบี่ 85350", "tutor2@hotmail.com", "052194896", "TUTOR2", "Data", "male", birthdates[3], "profile url", user.RoleTutor)
-	user5 := CreateUser(client, "admin1", "P@ssw0rd", "933/2 ถนนถนิมมาศ บ้านสุขเดือนห้า จ.สุราษฎร์ธานี 51850", "admin1@hotmail.com", "057593829", "ADMIN1", "JUKJEEJID", "male", birthdates[4], "profile url", user.RoleAdmin)
-	user6 := CreateUser(client, "admin2", "P@ssw0rd", "35/123 รังสิต กรุงเทพฯ 10420", "admin2@hotmail.com", "076048766", "ADMIN2", "JUKJEEJID", "male", birthdates[5], "profile url", user.RoleAdmin)
+	user1 := CreateUser(client, "student1", "P@ssw0rd", "487 ถ.ไม้แดง พัทลุง 85930", "student1@hotmail.com", "0998702095", "STUDENT1", "JUKJEEJID", "female", birthdates[0], "https://se2-tuder.s3.us-west-1.amazonaws.com/profile1.jpg", user.RoleStudent)
+	user2 := CreateUser(client, "student2", "P@ssw0rd", "1 ซ.นกทอง อ.ห้วยขวาง อุตรดิตถ์ 34110", "student2@hotmail.com", "0872445831", "STUDENT2", "JUKJEEJID", "female", birthdates[1], "https://se2-tuder.s3.us-west-1.amazonaws.com/profile2.jpg", user.RoleStudent)
+	user3 := CreateUser(client, "tutor1", "P@ssw0rd", "8/1 ถนนนาถะพินธุ ต.เว่อเล็ก อ.เรณูนคร ลำพูน", "tutor1@hotmail.com", "025659384", "TUTOR1", "JUKJEEJID", "male", birthdates[2], "https://se2-tuder.s3.us-west-1.amazonaws.com/profile3.jpg", user.RoleTutor)
+	user4 := CreateUser(client, "tutor2", "P@ssw0rd", "801 ถ.พงศ์ฉบับนภา กระบี่ 85350", "tutor2@hotmail.com", "052194896", "TUTOR2", "Data", "male", birthdates[3], "https://se2-tuder.s3.us-west-1.amazonaws.com/profile4.jpg", user.RoleTutor)
+	user5 := CreateUser(client, "admin1", "P@ssw0rd", "933/2 ถนนถนิมมาศ บ้านสุขเดือนห้า จ.สุราษฎร์ธานี 51850", "admin1@hotmail.com", "057593829", "ADMIN1", "JUKJEEJID", "male", birthdates[4], "https://se2-tuder.s3.us-west-1.amazonaws.com/profile5.jpg", user.RoleAdmin)
+	user6 := CreateUser(client, "admin2", "P@ssw0rd", "35/123 รังสิต กรุงเทพฯ 10420", "admin2@hotmail.com", "076048766", "ADMIN2", "JUKJEEJID", "male", birthdates[5], "https://se2-tuder.s3.us-west-1.amazonaws.com/profile6.jpg", user.RoleAdmin)
 
 	user, err := client.User.CreateBulk(user1, user2, user3, user4, user5, user6).Save(ctx)
 
