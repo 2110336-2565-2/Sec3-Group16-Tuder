@@ -24,17 +24,17 @@ export default function AdminIssueReport(props) {
         }
       })
       .catch((err) => {
-        console.log(err)
+        console.log(err);
         toast.error("Something went wrong");
       });
   };
-  
+
   const handleComplete = () => {
     setStatusState((prevState) => {
       let newState;
       if (prevState === "completed") {
         newState = "ongoing";
-      }  else {
+      } else {
         newState = "completed";
       }
       return newState;
@@ -46,7 +46,7 @@ export default function AdminIssueReport(props) {
       let newState;
       if (prevState === "rejected") {
         newState = "ongoing";
-      }  else {
+      } else {
         newState = "rejected";
       }
       return newState;
@@ -60,19 +60,22 @@ export default function AdminIssueReport(props) {
       return;
     }
     handleSave();
-
   });
 
   const isEnablebutton = () => {
     if (statusState === "ongoing") {
-      return ;
+      return;
     }
     return (
-        <DeleteButton disabled={statusState != "ongoing" ? false : true}
-          value="false" onClick={handleDelete} statusState = {statusState}>
-            Delete
-        </DeleteButton>
-      );
+      <DeleteButton
+        disabled={statusState != "ongoing" ? false : true}
+        value="false"
+        onClick={handleDelete}
+        statusState={statusState}
+      >
+        Delete
+      </DeleteButton>
+    );
   };
 
   const handleDelete = () => {
@@ -100,20 +103,25 @@ export default function AdminIssueReport(props) {
         <ClassInfoSection>
           <ClassFlex>
             <ClassInfo>
-              <InfoTitle min_w = "45px">Title :</InfoTitle>
-              <InfoDesc>{props.title}</InfoDesc>              
+              <InfoTitle min_w="45px">Title :</InfoTitle>
+              <InfoDesc>{props.title}</InfoDesc>
             </ClassInfo>
             <ClassInfo>
-              <InfoTitle min_w = "99px">Description :</InfoTitle>
+              <InfoTitle min_w="99px">Description :</InfoTitle>
               <InfoDesc>{props.description}</InfoDesc>
             </ClassInfo>
             <ClassInfo>
-              <InfoTitle min_w = "72px">Contact :</InfoTitle>
+              <InfoTitle min_w="72px">Contact :</InfoTitle>
               <InfoDesc>{props.contact}</InfoDesc>
             </ClassInfo>
             <ClassInfo>
-              <InfoTitle min_w = "112px">Report_Date :</InfoTitle>
-              <InfoDesc>{new Date(props.report_date).toLocaleString(Timezone, DateFormat)}</InfoDesc>
+              <InfoTitle min_w="112px">Report_Date :</InfoTitle>
+              <InfoDesc>
+                {new Date(props.report_date).toLocaleString(
+                  Timezone,
+                  DateFormat
+                )}
+              </InfoDesc>
             </ClassInfo>
           </ClassFlex>
         </ClassInfoSection>
@@ -121,25 +129,36 @@ export default function AdminIssueReport(props) {
         <StateSection>
           <StateFlex>
             <StateInfo>
-              <CompleteButton value="false" onClick={handleComplete} statusState = {statusState}>
-                completed
-              </CompleteButton>
-              <RejectButton value="false" onClick={handleReject} statusState = {statusState}>
-                rejected
-              </RejectButton>
+              {statusState === "ongoing" ? (
+                <>
+                  <CompleteButton
+                    value="false"
+                    onClick={handleComplete}
+                    statusState={statusState}
+                  >
+                    completed
+                  </CompleteButton>
+                  <RejectButton
+                    value="false"
+                    onClick={handleReject}
+                    statusState={statusState}
+                  >
+                    rejected
+                  </RejectButton>
+                </>
+              ) : (
+                <></>
+              )}
             </StateInfo>
             <StateInfo>
               <InfoTitle>Status :</InfoTitle>
               <InfoDesc>
-                <StatusBlock statusState = {statusState}>
+                <StatusBlock statusState={statusState}>
                   {statusState}
                 </StatusBlock>
               </InfoDesc>
             </StateInfo>
-            <StateInfo>
-              {isEnablebutton()}
-            </StateInfo>
-            
+            <StateInfo>{isEnablebutton()}</StateInfo>
           </StateFlex>
         </StateSection>
       </ClassSection>
@@ -147,35 +166,33 @@ export default function AdminIssueReport(props) {
   );
 }
 
-
 const Request = styled.div`
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    background-color: #EBEBEB;
-    border: 0.5px solid #DADADA ;
-    color: #000;
-    min-height: 167px;
-    gap: 20px;
-    padding: 10px;
-    border-radius: 10px;
-    
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  background-color: #ebebeb;
+  border: 0.5px solid #dadada;
+  color: #000;
+  min-height: 167px;
+  gap: 20px;
+  padding: 10px;
+  border-radius: 10px;
 `;
 
 const ClassSection = styled.div`
-    display: grid;
-    grid-template-columns: 70% 30%;
-    width: 100%;
-    min-width: 750px;
+  display: grid;
+  grid-template-columns: 70% 30%;
+  width: 100%;
+  min-width: 750px;
 `;
 
 const ClassInfoSection = styled.div`
-    gap: 30px;
-    display: grid;
-    padding: 10px;
-    font-size: 30px;
-    width: 100%;
-    min-width: 500px;
+  gap: 30px;
+  display: grid;
+  padding: 10px;
+  font-size: 30px;
+  width: 100%;
+  min-width: 500px;
 `;
 
 const StateSection = styled.div`
@@ -192,12 +209,12 @@ const ButtonSection = styled.div`
   margin-left: 10px;
 `;
 const ClassInfo = styled.div`
-    display: flex;
-    flex-direction: row;
-    gap: 5px;
-    align-items: flex-start;
-    font-weight: 350;
-    font-size: 16px;
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: flex-start;
+  font-weight: 350;
+  font-size: 16px;
 `;
 const StateInfo = styled.div`
   display: flex;
@@ -209,24 +226,24 @@ const StateInfo = styled.div`
 `;
 
 const InfoTitle = styled.div`
-    display: flex;
-    font-size: 16px;
-    font-weight: 500;
-    min-width: ${(props)=>{
-        return props.min_w;
-    }};
+  display: flex;
+  font-size: 16px;
+  font-weight: 500;
+  min-width: ${(props) => {
+    return props.min_w;
+  }};
 `;
 
 const InfoDesc = styled.div`
-    display: flex;
-    font-size: 16px;
-    font-weight: 300;
-`
+  display: flex;
+  font-size: 16px;
+  font-weight: 300;
+`;
 
 const CompleteButton = styled.button`
   width: 95px;
   height: 35px;
-  border: 2px solid #10AA00;
+  border: 2px solid #10aa00;
   border-radius: 5px;
 
   font-family: "Lexend Deca";
@@ -236,9 +253,9 @@ const CompleteButton = styled.button`
   line-height: 20px;
   text-align: center;
   background-color: #009900;
-  color: #FFFFFF;
+  color: #ffffff;
   &:hover {
-    background-color: #10AA00;
+    background-color: #10aa00;
     color: #ffffff;
   }
 
@@ -248,7 +265,7 @@ const CompleteButton = styled.button`
 const RejectButton = styled.button`
   width: 95px;
   height: 35px;
-  border: 2px solid #FF0F39;
+  border: 2px solid #ff0f39;
   border-radius: 5px;
 
   font-family: "Lexend Deca";
@@ -257,22 +274,21 @@ const RejectButton = styled.button`
   font-size: 16px;
   line-height: 20px;
   text-align: center;
-  background-color: #FF0000;
-  color: #FFFFFF;
+  background-color: #ff0000;
+  color: #ffffff;
 
   &:hover {
-    background-color: #FF0F39;
+    background-color: #ff0f39;
     color: #ffffff;
   }
 
   cursor: pointer;
 `;
 
-
 const DeleteButton = styled.button`
   width: 80px;
   height: 35px;
-  border: 2px solid #FF0000;
+  border: 2px solid #ff0000;
   border-radius: 5px;
   min-width: 160px;
 
@@ -284,64 +300,63 @@ const DeleteButton = styled.button`
   text-align: center;
   background-color: ${(props) => {
     if (props.statusState === "ongoing") {
-        return "#D3D3D3";
+      return "#D3D3D3";
     } else {
-        return "#FF0000";
+      return "#FF0000";
     }
   }};
   color: ${(props) => {
     if (props.statusState === "ongoing") {
-        return "#000000";
-    }else {
-        return "#FFFFFF";
+      return "#000000";
+    } else {
+      return "#FFFFFF";
     }
   }};
 
   &:hover {
-    background-color: #FF2000;
-    border: 2px solid #FF2000;
+    background-color: #ff2000;
+    border: 2px solid #ff2000;
     color: #ffffff;
   }
 
   cursor: pointer;
 `;
 
-
 const ClassFlex = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 10px;
-`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+`;
 
 const StateFlex = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 10px;
-`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+`;
 
 const StatusBlock = styled.div`
-    display: flex;
-    padding: 7px;
-    border-radius: 6px;
-    background-color: ${(props) => {
-        if (props.statusState === "rejected") {
-            return "#FF0000";
-        } else if (props.statusState === "completed") {
-            return "#009900";
-        } else {
-            return "#FFFF00";
-        }
-    }};
-    color: ${(props) => {
-        if (props.statusState === "rejected") {
-            return "#FFFFFF";
-        } else if (props.statusState === "completed") {
-            return "#FFFFFF";
-        } else {
-            return "#000000";
-        }
-    }};
-    font-weight: 500;
-`
+  display: flex;
+  padding: 7px;
+  border-radius: 6px;
+  background-color: ${(props) => {
+    if (props.statusState === "rejected") {
+      return "#FF0000";
+    } else if (props.statusState === "completed") {
+      return "#009900";
+    } else {
+      return "#FFFF00";
+    }
+  }};
+  color: ${(props) => {
+    if (props.statusState === "rejected") {
+      return "#FFFFFF";
+    } else if (props.statusState === "completed") {
+      return "#FFFFFF";
+    } else {
+      return "#000000";
+    }
+  }};
+  font-weight: 500;
+`;
