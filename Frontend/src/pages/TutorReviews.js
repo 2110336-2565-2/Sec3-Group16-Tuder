@@ -65,7 +65,7 @@ export default function TutorReviews() {
     );
   } else {
     return (
-      <Container>{isOwner ? <IsTutor>{child}</IsTutor> : { child }}</Container>
+      <Container>{isOwner ? <IsTutor>{child}</IsTutor> :  child }</Container>
     );
   }
 }
