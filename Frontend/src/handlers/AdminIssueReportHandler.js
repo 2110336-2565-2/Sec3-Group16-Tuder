@@ -10,19 +10,17 @@ export const fetchAdminIssueReportHandler = () => {
 }
 export const submitSaveStateHandler = (data) => {
     return api.put('api/v1/issuereport/updatestatus/'+data.IssueReportId, data, {
-        headers:
-        {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
-        }
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("jwtToken"),
+      }
     })    
 }
 export const submitDeleteStateHandler = (data) => {
     return api.delete('api/v1/issuereport/'+data.IssueReportId, data, {
-        headers:
-        {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
-        }
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("jwtToken"),
+      }
     })    
 }

@@ -1,13 +1,14 @@
 package routes
 
 import (
+	"os"
+
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	controller "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/controllers"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/middlewares"
 	repository "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	service "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/services"
 	echo "github.com/labstack/echo/v4"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/middlewares"
-	"os"
 )
 
 func InitIssueReportRoutes(client *ent.Client, e *echo.Group) {
@@ -36,7 +37,5 @@ func InitIssueReportRoutes(client *ent.Client, e *echo.Group) {
 	issueReportRoute.DELETE("/:id", controllerIssueReport.DeleteIssueReport)
 	issueReportRoute.PUT("/updatestatus/:id", controllerIssueReport.UpdateIssueReportStatus)
 	issueReportRoute.PUT("/update/:id", controllerIssueReport.UpdateIssueReport)
-
-
 
 }
