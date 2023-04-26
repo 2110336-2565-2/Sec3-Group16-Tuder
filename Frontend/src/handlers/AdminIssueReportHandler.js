@@ -18,7 +18,7 @@ export const submitSaveStateHandler = (data) => {
     })    
 }
 export const submitDeleteStateHandler = (data) => {
-    return api.delete('api/v1/issuereport/'+data.IssueReportId, data, {
+    return api.delete('api/v1/issuereport/'+data.IssueReportId, {
         headers:
         {
             'Content-Type': 'application/json',

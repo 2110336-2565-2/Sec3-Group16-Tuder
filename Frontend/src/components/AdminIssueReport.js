@@ -60,7 +60,7 @@ export default function AdminIssueReport(props) {
       return;
     }
     handleSave();
-  });
+  }, [statusState]);
 
   const isEnablebutton = () => {
     if (statusState === "ongoing") {
