@@ -106,7 +106,7 @@ export default function Profile() {
     );
   } else {
     return (
-      <Container>{isOwner ? <IsUser>{child}</IsUser> : { child }}</Container>
+      <Container>{isOwner ? <IsUser>{child}</IsUser> : child}</Container>
     );
   }
 }
