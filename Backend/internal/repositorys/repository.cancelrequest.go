@@ -161,8 +161,6 @@ func (r *repositoryCancelRequest) CancelRequest(sc *schemas.SchemaCancelRequest)
 			return nil, errors.New("this match has already been cancelled")
 		}
 	}
-
-	fmt.Println(sc)
 	// check if student is a student of the match
 	if user.RoleStudent.String() == sc.ReporterRole.String() {
 		if m.Edges.Student.Edges.User.ID != u.ID {
@@ -318,5 +316,5 @@ func (r *repositoryCancelRequest) AuditRequest(sc *schemas.SchemaCancelRequestAp
 		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
-	return tx.Commit()
+	return nil
 }

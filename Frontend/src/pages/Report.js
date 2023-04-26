@@ -3,13 +3,14 @@ import { toast } from 'react-hot-toast';
 import Footer from "../components/global/Footer.js";
 import submitIssueReportHandler from '../handlers/submitIssueReportHandler';
 import styled from 'styled-components';
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, Link, useNavigate } from 'react-router-dom';
 
 export default function Report(){
 
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [contact, setContact] = useState('');
+    const navigate = useNavigate();
 
     async function submitHandler(e){
         e.preventDefault();
@@ -23,6 +24,7 @@ export default function Report(){
         try{
             await submitIssueReportHandler(reportData)
             toast.success('Thank you for your attention.')
+            navigate('/')
         } catch (error){
             toast.error("Something went wrong");
         }
