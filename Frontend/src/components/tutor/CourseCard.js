@@ -30,8 +30,8 @@ export default function CourseCard({course,buttonStatus,setEventTrigger}) {
     const route = `/my-course/${course.id}`
 
     return (
-    <Request to={route}>
-        <CourseSection>
+    <Request>
+        <CourseSection to={route}>
           <ItemSection>
             <CourseImg src={course.course_picture_url} alt="CourseImg" />
           </ItemSection>
@@ -72,9 +72,7 @@ export default function CourseCard({course,buttonStatus,setEventTrigger}) {
     );
 }
 
-const Request = styled(Link)`
-  text-decoration: none;
-  color:black;
+const Request = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -88,7 +86,9 @@ const Request = styled(Link)`
   margin: 20px 50px 20px 50px;
 `;
 
-const CourseSection = styled.div`
+const CourseSection = styled(Link) `
+  text-decoration: none;
+  color:black;
   display: grid;
   grid-template-columns: 30% 40% 30%;
   width: 100%;

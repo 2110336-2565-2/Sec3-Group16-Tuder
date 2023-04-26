@@ -40,7 +40,7 @@ export default function FormChangePassword(){
                 </FormT.Content>
     
                 <FormT.Content>
-                    <FormT.Button type='submit'>Send</FormT.Button>
+                    <FormT.Button type='submit'>Submit</FormT.Button>
                 </FormT.Content>
             </FormFormat>
         </form>

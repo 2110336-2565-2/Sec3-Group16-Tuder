@@ -51,7 +51,7 @@ export default function FormEnterNewPassword(){
                     <FormT.TextInput BoxSize='500px' name='email' type='password' placeholder='' value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)}/>
                 </TextInput>
                 <FormT.Content>
-                    <FormT.Button type='submit'>Send</FormT.Button>
+                    <FormT.Button type='submit'>Submit</FormT.Button>
                 </FormT.Content>
                 <FormT.Content>
                     <CancelButton type='cancel' onClick={()=>navigate("/profile")}>Cancel</CancelButton>

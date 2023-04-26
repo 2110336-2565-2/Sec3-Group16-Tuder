@@ -38,9 +38,9 @@ export default function IndivCourse(){
                     <Title>{coursename}</Title>
                 </Header>
                 <ClassList>
-                    {data===null||data===[]?(
+                    {data===null|| data.length == 0?(
                         <NoClassContainer>
-                            <p>No class yet.</p>
+                            <p>No student enrolled this course yet.</p>
                         </NoClassContainer>
                         ):(data.map((item,index) => 
                             <ClassCard data={item} key={index} />
