@@ -72,6 +72,7 @@ const CourseListPage = styled.div`
   gap: 20px;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
 `;
 
 const CourseListcontent = styled.div`

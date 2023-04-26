@@ -1,9 +1,9 @@
 name: Tuder GitHub Actions
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on:
   push:
     branches:
-      - docker-file
+      - develop
+
 jobs:
   initialize-the-application:
     runs-on: ubuntu-latest
@@ -28,70 +28,50 @@ jobs:
       PORT: ${{vars.PORT}}
       REACT_APP_API_URL: ${{vars.REACT_APP_API_URL}}
       REACT_APP_OMISE_PUBLIC_KEY: ${{vars.REACT_APP_OMISE_PUBLIC_KEY}}
+      DOCKER_ACCESS_TOKEN: ${{secrets.DOCKER_ACCESS_TOKEN}}
 
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
       - name: Check out repository code
         uses: actions/checkout@v3
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
-        run: |
-          ls ${{ github.workspace }}
-      - name: Print all env
-        run: |
-          echo $MODE
-          echo $SERVER_PORT
-          echo $SERVER_HOST
-          echo $DB_USER
-          echo $DB_PASSWORD
-          echo $DB_NAME
-          echo $DB_PORT
-          echo $JWT_SECRET
-          echo $JWT_EXPIRES_MINUTES
-          echo $FRONTEND_URL
-          echo $AWS_REGION
-          echo $AWS_ACCESS_KEY_ID
-          echo $AWS_SECRET_ACCESS_KEY
-          echo $OMISE_PUBLIC_KEY
-          echo $OMISE_SECRET_KEY
-          echo $PORT
-          echo $REACT_APP_API_URL
-          echo $REACT_APP_OMISE_PUBLIC_KEY
-      - run: echo "🍏 This job's status is ${{ job.status }}."
-      # pull from git
       - name: Pull from git
         uses: actions/checkout@v3
         with:
           repository: ${{ github.repository }}
-          ref: "docker-file"
-          path: "tuder"
-      - run: ls ${{ github.workspace }}
+          ref: "develop"
+      - name: ls workspace
+        run: ls ${{ github.workspace }}
+      - name: Create .env in backend
+        run: |
+          cd Backend
+          touch .env
+          cd ..
+      - name: Login to DockerHub Registry
+        run: echo ${{ secrets.DOCKER_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
       - name: Docker compose up
         run: |
           docker-compose up -d --build
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+      - name: Push image to DockerHub Registry
+        run: docker-compose push
+      - name: echo "🍏 This job's status is ${{ job.status }}."
+        run: echo "🍏 This job's status is ${{ job.status }}."
+
   Deploy:
-    needs: build
+    needs: initialize-the-application
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Deploy in EC2
         env:
-          PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY  }}
-          HOSTNAME: ${{ secrets.HOSTNAME  }}
-          USER_NAME: ${{ secrets.USER_NAME  }}
+          PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY }}
+          HOSTNAME: ${{ secrets.HOSTNAME }}
+          USER_NAME: ${{ secrets.USER_NAME }}
 
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
-
-            #Now we have got the access of EC2 and we will start the deploy .
-            cd Sec3-Group16-Tuder &&
-            git fetch -a &&
-            git checkout origin/test-cd &&
-            docker-compose up -d --build 
+            # Now we have got the access of EC2 and we will start the deploy.
+            sudo docker-compose down &&
+            sudo docker-compose pull &&
+            sudo docker-compose up -d
           '

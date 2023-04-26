@@ -1,0 +1,3 @@
+# ignore env dir for venv
+env
+results

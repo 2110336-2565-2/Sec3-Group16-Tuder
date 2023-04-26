@@ -42,7 +42,7 @@ func InitTutorRoutes(client *ent.Client, e *echo.Group) {
 	// e.GET("/tutor/schedule/:courseId", controllerTutor.GetTutorScheduleByCourseId)
 	scheduleRoute := e.Group("/tutor/schedule")
 	scheduleRoute.Use(middlewareInst.JWT())
-	scheduleRoute.Use(middlewareInst.TutorMiddleware)
+	// scheduleRoute.Use(middlewareInst.TutorMiddleware)
 	scheduleRoute.PUT("", controllerTutor.UpdateSchedule)
 	scheduleRoute.GET("", controllerTutor.GetTutorSchedule)
 	scheduleRoute.GET("/:courseId", controllerTutor.GetTutorScheduleByCourseId)
@@ -50,6 +50,6 @@ func InitTutorRoutes(client *ent.Client, e *echo.Group) {
 	//e.GET("/tutor/courses", controllerTutor.GetTutorCourses, middlewareInst.JWT())
 	getTutorCoursesRoute := e.Group("/tutor/courses")
 	getTutorCoursesRoute.Use(middlewareInst.JWT())
-	getTutorCoursesRoute.Use(middlewareInst.TutorMiddleware)
+	// getTutorCoursesRoute.Use(middlewareInst.TutorMiddleware)
 	getTutorCoursesRoute.GET("", controllerTutor.GetTutorCourses)
 }

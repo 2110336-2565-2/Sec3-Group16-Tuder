@@ -28,7 +28,7 @@ func InitCourseRoutes(client *ent.Client, e *echo.Group) {
 	//e.PUT("/course/:id", controllerCourse.UpdateCourse)
 	courseRoute := e.Group("/course")
 	courseRoute.Use(middlewareInst.JWT())
-	courseRoute.Use(middlewareInst.TutorMiddleware)
+	// courseRoute.Use(middlewareInst.TutorMiddleware)
 	courseRoute.PUT("/status/:id", controllerCourse.UpdateCourseStatus)
 	courseRoute.DELETE("/:id", controllerCourse.DeleteCourse)
 	courseRoute.POST("", controllerCourse.CreateCourse)

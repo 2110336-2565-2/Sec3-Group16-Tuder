@@ -1,7 +1,12 @@
 import api from './apiHandler';
 
 export default async function changePasswordHandler(Data, navigate){
-    await api.post('/api/v1/changepassword', Data).then((response) => {
+    await api.post('/api/v1/changepassword', Data, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("jwtToken"),
+        }
+      }).then((response) => {
         
         let res = response.data;
 

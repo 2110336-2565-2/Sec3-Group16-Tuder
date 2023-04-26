@@ -19,7 +19,12 @@ services:
       - tuder
 
   frontend:
-    build: ./Frontend
+    build: 
+      context: ./Frontend
+      dockerfile: dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL}
+        - REACT_APP_OMISE_PUBLIC_KEY=${REACT_APP_OMISE_PUBLIC_KEY}
     image: champkub6/tuder-frontend
     restart: always
     ports:
@@ -34,8 +39,8 @@ services:
       REACT_APP_OMISE_PUBLIC_KEY: ${REACT_APP_OMISE_PUBLIC_KEY}
     networks:
       - tuder
-    volumes:
-      - ./Frontend:/app
+    # volumes:
+    #   - ./Frontend:/app
 
 
   backend:

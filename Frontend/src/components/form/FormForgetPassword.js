@@ -32,23 +32,26 @@ export default function FormSignIn(){
 
 
     return(
-            <FormT.Div FormW='400px'>
-                <FormT.Header>Forget Password</FormT.Header>
-                <FormT.Content>Sign in and start managing your candidates!</FormT.Content>
-                <FormT.Content>
-                    <FormT.TextInput BoxSize='200px' value={email} onChange={(e)=> setEmail(e.target.value)} type='email' placeholder='Enter your Email'/>
-                </FormT.Content>
-    
-                <FormT.Content>
-                    <FormT.Button onClick={handleSubmit}>Send</FormT.Button>
-                </FormT.Content>
-                <FormT.Content>
-                    <ContentSpace />
-                    <FormT.Link to='/sign-in' underline='none'>back to login</FormT.Link>
-                </FormT.Content>
+            <BorderLineRadius>
+                <FormT.Div FormW='700px'>
+                    <FormT.Header>Forget Password</FormT.Header>
+                    <FormT.Content>Sign in and start managing your candidates!</FormT.Content>
+                    <FormT.Content>
+                        <FormT.TextInput BoxSize='200px' value={email} onChange={(e)=> setEmail(e.target.value)} type='email' placeholder='Enter your Email'/>
+                    </FormT.Content>
+        
+                    <FormT.Content>
+                        <FormT.Button onClick={handleSubmit}>Send</FormT.Button>
+                    </FormT.Content>
+                    <FormT.Content>
+                        <ContentSpace />
+                        <FormT.Link to='/sign-in' underline='none'>back to login</FormT.Link>
+                    </FormT.Content>
 
-                {isLoading && toast.loading('Submitting data...')}
-            </FormT.Div>
+                    {isLoading && toast.loading('Submitting data...')}
+                </FormT.Div>
+            </BorderLineRadius>
+            
         
     )
 }
@@ -59,4 +62,9 @@ const ContentSpace = styled.div`
     padding: 0px 10px;
     align-items: center;
     margin-right: 110px;
+`
+const BorderLineRadius = styled.div`
+    border-radius: 10px;
+    border: 1px solid #000;
+    padding: 20px;
 `

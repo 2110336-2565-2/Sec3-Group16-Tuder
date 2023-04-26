@@ -57,12 +57,13 @@ export default function MyClass(props) {
             </ClassInfo>
           </ClassFlex>
         </ClassInfoSection>
+        <GridSection>
+          {/* put button in here */}
+          <FlexButton>
+            {button}
+          </FlexButton>
+        </GridSection>
       </ClassSection>
-      <GridSection>
-        {/* put button in here */}
-
-        {button}
-      </GridSection>
     </Request>
   );
 }
@@ -83,12 +84,14 @@ const Request = styled.div`
 
 const ClassSection = styled.div`
   display: grid;
-  grid-template-columns: 30% 40% 30%;
+  grid-template-columns: 30% 50% 20%;
   width: 100%;
 `;
 
 const GridSection = styled.div`
   display: grid;
+  align-self: center;
+  justify-self: center;
 `;
 
 const ClassImg = styled.img`
@@ -152,6 +155,7 @@ const Button = styled.button`
   padding: 10px;
   font-size: 16px;
   font-weight: 400;
+  color:white;
   cursor: pointer;
   background-color: #ff7008;
 
@@ -161,3 +165,7 @@ const Button = styled.button`
     color: #ffffff;
   }
 `;
+
+const FlexButton = styled.div`
+  display: flex;
+`
