@@ -2,7 +2,7 @@ name: Tuder GitHub Actions
 on:
   push:
     branches:
-      - cd
+      - develop
 
 jobs:
   initialize-the-application:
@@ -37,16 +37,14 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: ${{ github.repository }}
-          ref: "cd"
+          ref: "develop"
       - name: ls workspace
         run: ls ${{ github.workspace }}
       - name: Create .env in backend
         run: |
           cd Backend
           touch .env
-          ls
           cd ..
-          ls
       - name: Login to DockerHub Registry
         run: echo ${{ secrets.DOCKER_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
       - name: Docker compose up
