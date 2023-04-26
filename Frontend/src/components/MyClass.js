@@ -1,10 +1,12 @@
 import React from "react";
+import { getRole } from "../utils/jwtGet.js";
 import { useNavigate } from "react-router";
 import styled from "styled-components";
 
 import { Timezone, DateFormat } from "../datas/DateFormat.js";
 
 export default function MyClass(props) {
+  const role = getRole();
   const course_picture_url = props.data.course_picture_url;
   const course_name = props.data.course_name;
   const tutor_name = props.data.tutor_name;
@@ -18,14 +20,19 @@ export default function MyClass(props) {
       : "No Upcoming Class";
 
   var button = null;
-  if (status !== "canceled" && status !== "cancelling") {
+  if (status === "completed" && role === "student") {
+    button = (
+      <Button onClick={(e) => navigate(`/reviews/${props.data.course_id}`)}>
+        Review Course
+      </Button>
+    );
+  } else if (status !== "canceled" && status !== "cancelling" && status !== "completed") {
     button = (
       <Button onClick={(e) => navigate(`/classes/${props.data.match_id}`)}>
         View Info
       </Button>
     );
-  }
-
+  } 
 
   return (
     <Request>

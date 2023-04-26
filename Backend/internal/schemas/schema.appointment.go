@@ -18,13 +18,14 @@ type SchemaGetMatchByID struct {
 }
 
 type SchemaMatchesFromID struct {
-	MatchID       uuid.UUID `json:"match_id"`
-	CourseName    string    `json:"course_name"`
-	TutorName     string    `json:"tutor_name"`
-	UpcomingClass time.Time `json:"upcoming_class"`
-	Remaining     int       `json:"remaining"`
-	CoursePictureURL string `json:"course_picture_url"`
-	Status 	  string    `json:"status"`
+	MatchID          uuid.UUID `json:"match_id"`
+	CourseName       string    `json:"course_name"`
+	CourseID         uuid.UUID `json:"course_id"`
+	TutorName        string    `json:"tutor_name"`
+	UpcomingClass    time.Time `json:"upcoming_class"`
+	Remaining        int       `json:"remaining"`
+	CoursePictureURL string    `json:"course_picture_url"`
+	Status           string    `json:"status"`
 }
 
 type SchemaGetAppointmentByMatchID struct {
@@ -39,7 +40,7 @@ type SchemaAppointmentsFromMatchID struct {
 	EstimeateTime     int                  `json:"estimate_time"`
 	CoursePictureURL  string               `json:"course_picture_url"`
 	Appointments      []*SchemaAppointment `json:"appointments"`
-	Status 		  string               `json:"status"`
+	Status            string               `json:"status"`
 }
 
 type SchemaUpdateAppointmentStatus struct {
