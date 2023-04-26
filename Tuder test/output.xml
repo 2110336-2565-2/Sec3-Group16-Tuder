@@ -1,0 +1,518 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 6.0.2 (Python 3.11.2 on darwin)" generated="20230426 20:33:48.346" rpa="false" schemaversion="3">
+<suite id="s1" name="tudorTest" source="/Users/natts/Desktop/ClassRepo/SE/Tuder test/testcases/master/tudorTest.robot">
+<test id="s1-t1" name="TC-8e1 Register Failed password is similar to firstname" line="199">
+<kw name="Get Current Date" library="DateTime">
+<var>${date}</var>
+<arg>result_format=%Y%m%d%H%M%S</arg>
+<doc>Returns current local or UTC time with an optional increment.</doc>
+<msg timestamp="20230426 20:33:48.426" level="INFO">${date} = 20230426203348</msg>
+<status status="PASS" starttime="20230426 20:33:48.426" endtime="20230426 20:33:48.428"/>
+</kw>
+<kw name="Open browser Register page" library="register">
+<kw name="Open Browser" library="SeleniumLibrary">
+<arg>${WEB_URL}/sign-up</arg>
+<arg>${WEB_BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<msg timestamp="20230426 20:33:48.429" level="INFO">Opening browser 'chrome' to base url 'http://localhost:3000/sign-up'.</msg>
+<status status="PASS" starttime="20230426 20:33:48.428" endtime="20230426 20:33:50.862"/>
+</kw>
+<kw name="Maximize Browser Window" library="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" starttime="20230426 20:33:50.863" endtime="20230426 20:33:51.287"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:48.428" endtime="20230426 20:33:51.287"/>
+</kw>
+<kw name="Wait until register page is loaded" library="register">
+<kw name="Wait Until Element Is Visible" library="SeleniumLibrary">
+<arg>//*[.='create account']</arg>
+<arg>10</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" starttime="20230426 20:33:51.287" endtime="20230426 20:33:51.299"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.287" endtime="20230426 20:33:51.299"/>
+</kw>
+<kw name="Verify Empty for student" library="register">
+<kw name="Verify Firstname is empty" library="register">
+<kw name="Get Value" library="SeleniumLibrary">
+<var>${tfirstname}</var>
+<arg>//input[@name='firstname']</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.311" level="INFO">${tfirstname} = </msg>
+<status status="PASS" starttime="20230426 20:33:51.300" endtime="20230426 20:33:51.311"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${tfirstname}</arg>
+<arg>${EMPTY}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20230426 20:33:51.312" endtime="20230426 20:33:51.312"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.299" endtime="20230426 20:33:51.312"/>
+</kw>
+<kw name="Verify Lastname is empty" library="register">
+<kw name="Get Value" library="SeleniumLibrary">
+<var>${tlastname}</var>
+<arg>//input[@name='lastname']</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.322" level="INFO">${tlastname} = </msg>
+<status status="PASS" starttime="20230426 20:33:51.312" endtime="20230426 20:33:51.322"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${tlastname}</arg>
+<arg>${EMPTY}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20230426 20:33:51.323" endtime="20230426 20:33:51.323"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.312" endtime="20230426 20:33:51.323"/>
+</kw>
+<kw name="Verify Email is empty" library="register">
+<kw name="Get Value" library="SeleniumLibrary">
+<var>${temail}</var>
+<arg>//input[@name='email']</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.331" level="INFO">${temail} = </msg>
+<status status="PASS" starttime="20230426 20:33:51.323" endtime="20230426 20:33:51.331"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${temail}</arg>
+<arg>${EMPTY}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20230426 20:33:51.331" endtime="20230426 20:33:51.331"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.323" endtime="20230426 20:33:51.331"/>
+</kw>
+<kw name="Verify Password is empty" library="register">
+<kw name="Get Value" library="SeleniumLibrary">
+<var>${tpassword}</var>
+<arg>//input[@name='password']</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.339" level="INFO">${tpassword} = </msg>
+<status status="PASS" starttime="20230426 20:33:51.332" endtime="20230426 20:33:51.339"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${tpassword}</arg>
+<arg>${EMPTY}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20230426 20:33:51.339" endtime="20230426 20:33:51.340"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.331" endtime="20230426 20:33:51.340"/>
+</kw>
+<kw name="Verify Confirm Password is empty" library="register">
+<kw name="Get Value" library="SeleniumLibrary">
+<var>${tconfirm_password}</var>
+<arg>//input[@name='confirmpassword']</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.347" level="INFO">${tconfirm_password} = </msg>
+<status status="PASS" starttime="20230426 20:33:51.340" endtime="20230426 20:33:51.347"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${tconfirm_password}</arg>
+<arg>${EMPTY}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20230426 20:33:51.347" endtime="20230426 20:33:51.348"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.340" endtime="20230426 20:33:51.348"/>
+</kw>
+<kw name="Verify Address is empty" library="register">
+<kw name="Get Value" library="SeleniumLibrary">
+<var>${taddress}</var>
+<arg>//input[@name='address']</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.355" level="INFO">${taddress} = </msg>
+<status status="PASS" starttime="20230426 20:33:51.348" endtime="20230426 20:33:51.355"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${taddress}</arg>
+<arg>${EMPTY}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20230426 20:33:51.355" endtime="20230426 20:33:51.356"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.348" endtime="20230426 20:33:51.356"/>
+</kw>
+<kw name="Verify Contact Number is empty" library="register">
+<kw name="Get Value" library="SeleniumLibrary">
+<var>${tcontact_number}</var>
+<arg>//input[@name='contactnumber']</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.364" level="INFO">${tcontact_number} = </msg>
+<status status="PASS" starttime="20230426 20:33:51.356" endtime="20230426 20:33:51.364"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${tcontact_number}</arg>
+<arg>${EMPTY}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20230426 20:33:51.364" endtime="20230426 20:33:51.365"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.356" endtime="20230426 20:33:51.365"/>
+</kw>
+<kw name="Verify Gender is empty" library="register">
+<kw name="Get Value" library="SeleniumLibrary">
+<var>${tgender}</var>
+<arg>//select[@name='gender']</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.373" level="INFO">${tgender} = </msg>
+<status status="PASS" starttime="20230426 20:33:51.365" endtime="20230426 20:33:51.373"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${tgender}</arg>
+<arg>${EMPTY}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20230426 20:33:51.373" endtime="20230426 20:33:51.374"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.365" endtime="20230426 20:33:51.374"/>
+</kw>
+<kw name="Verify Birth Date is empty" library="register">
+<kw name="Get Value" library="SeleniumLibrary">
+<var>${tbirth_date}</var>
+<arg>//input[@name='birthdate']</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.382" level="INFO">${tbirth_date} = </msg>
+<status status="PASS" starttime="20230426 20:33:51.374" endtime="20230426 20:33:51.382"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${tbirth_date}</arg>
+<arg>${EMPTY}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20230426 20:33:51.382" endtime="20230426 20:33:51.383"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.374" endtime="20230426 20:33:51.383"/>
+</kw>
+<kw name="Verify Role is empty" library="register">
+<kw name="Get Value" library="SeleniumLibrary">
+<var>${trole}</var>
+<arg>//select[@name='role']</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.391" level="INFO">${trole} = </msg>
+<status status="PASS" starttime="20230426 20:33:51.383" endtime="20230426 20:33:51.391"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${trole}</arg>
+<arg>${EMPTY}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20230426 20:33:51.391" endtime="20230426 20:33:51.391"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.383" endtime="20230426 20:33:51.392"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.299" endtime="20230426 20:33:51.392"/>
+</kw>
+<kw name="Input and Verify Firstname" library="register">
+<kw name="Input Text" library="SeleniumLibrary">
+<arg>//input[@name='firstname']</arg>
+<arg>${firstname}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.392" level="INFO">Typing text 'john' into text field '//input[@name='firstname']'.</msg>
+<status status="PASS" starttime="20230426 20:33:51.392" endtime="20230426 20:33:51.523"/>
+</kw>
+<kw name="Get Value" library="SeleniumLibrary">
+<var>${tfirstname}</var>
+<arg>//input[@name='firstname']</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.534" level="INFO">${tfirstname} = john</msg>
+<status status="PASS" starttime="20230426 20:33:51.523" endtime="20230426 20:33:51.535"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${tfirstname}</arg>
+<arg>${firstname}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20230426 20:33:51.535" endtime="20230426 20:33:51.535"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.392" endtime="20230426 20:33:51.536"/>
+</kw>
+<kw name="Input and Verify Lastname" library="register">
+<kw name="Input Text" library="SeleniumLibrary">
+<arg>//input[@name='lastname']</arg>
+<arg>${lastname}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.537" level="INFO">Typing text 'doe' into text field '//input[@name='lastname']'.</msg>
+<status status="PASS" starttime="20230426 20:33:51.537" endtime="20230426 20:33:51.572"/>
+</kw>
+<kw name="Get Value" library="SeleniumLibrary">
+<var>${tlastname}</var>
+<arg>//input[@name='lastname']</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.579" level="INFO">${tlastname} = doe</msg>
+<status status="PASS" starttime="20230426 20:33:51.573" endtime="20230426 20:33:51.579"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${tlastname}</arg>
+<arg>${lastname}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20230426 20:33:51.579" endtime="20230426 20:33:51.579"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.536" endtime="20230426 20:33:51.579"/>
+</kw>
+<kw name="Input and Verify Username" library="register">
+<arg>${date}</arg>
+<kw name="Input Text" library="SeleniumLibrary">
+<arg>//input[@name='username']</arg>
+<arg>${username}${date}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.580" level="INFO">Typing text 'johndoe1120230426203348' into text field '//input[@name='username']'.</msg>
+<status status="PASS" starttime="20230426 20:33:51.580" endtime="20230426 20:33:51.650"/>
+</kw>
+<kw name="Get Value" library="SeleniumLibrary">
+<var>${tusername}</var>
+<arg>//input[@name='username']</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.658" level="INFO">${tusername} = johndoe1120230426203348</msg>
+<status status="PASS" starttime="20230426 20:33:51.650" endtime="20230426 20:33:51.658"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${tusername}</arg>
+<arg>${username}${date}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20230426 20:33:51.658" endtime="20230426 20:33:51.659"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.579" endtime="20230426 20:33:51.659"/>
+</kw>
+<kw name="Input and Verify Email" library="register">
+<kw name="Input Text" library="SeleniumLibrary">
+<arg>//input[@name='email']</arg>
+<arg>${email}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.659" level="INFO">Typing text 'iamnumbeR1@somemail.com' into text field '//input[@name='email']'.</msg>
+<status status="PASS" starttime="20230426 20:33:51.659" endtime="20230426 20:33:51.720"/>
+</kw>
+<kw name="Get Value" library="SeleniumLibrary">
+<var>${temail}</var>
+<arg>//input[@name='email']</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.726" level="INFO">${temail} = iamnumbeR1@somemail.com</msg>
+<status status="PASS" starttime="20230426 20:33:51.720" endtime="20230426 20:33:51.726"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${temail}</arg>
+<arg>${email}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20230426 20:33:51.727" endtime="20230426 20:33:51.727"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.659" endtime="20230426 20:33:51.727"/>
+</kw>
+<kw name="Input and Verify Password similar to email" library="register">
+<kw name="Input Text" library="SeleniumLibrary">
+<arg>//input[@name='password']</arg>
+<arg>${password_similar_to_email}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.727" level="INFO">Typing text 'iamnumbeR1.com' into text field '//input[@name='password']'.</msg>
+<status status="PASS" starttime="20230426 20:33:51.727" endtime="20230426 20:33:51.770"/>
+</kw>
+<kw name="Get Value" library="SeleniumLibrary">
+<var>${tpassword}</var>
+<arg>//input[@name='password']</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.777" level="INFO">${tpassword} = iamnumbeR1.com</msg>
+<status status="PASS" starttime="20230426 20:33:51.771" endtime="20230426 20:33:51.777"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${tpassword}</arg>
+<arg>${password_similar_to_email}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20230426 20:33:51.777" endtime="20230426 20:33:51.777"/>
+</kw>
+<kw name="Input Text" library="SeleniumLibrary">
+<arg>//input[@name='confirmpassword']</arg>
+<arg>${password_similar_to_email}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.777" level="INFO">Typing text 'iamnumbeR1.com' into text field '//input[@name='confirmpassword']'.</msg>
+<status status="PASS" starttime="20230426 20:33:51.777" endtime="20230426 20:33:51.817"/>
+</kw>
+<kw name="Get Value" library="SeleniumLibrary">
+<var>${tconfirmpassword}</var>
+<arg>//input[@name='confirmpassword']</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.824" level="INFO">${tconfirmpassword} = iamnumbeR1.com</msg>
+<status status="PASS" starttime="20230426 20:33:51.818" endtime="20230426 20:33:51.824"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${tconfirmpassword}</arg>
+<arg>${password_similar_to_email}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20230426 20:33:51.824" endtime="20230426 20:33:51.824"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.727" endtime="20230426 20:33:51.824"/>
+</kw>
+<kw name="Input and Verify Address" library="register">
+<kw name="Input Text" library="SeleniumLibrary">
+<arg>//input[@name='address']</arg>
+<arg>${address}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.825" level="INFO">Typing text '1234 Main St' into text field '//input[@name='address']'.</msg>
+<status status="PASS" starttime="20230426 20:33:51.825" endtime="20230426 20:33:51.867"/>
+</kw>
+<kw name="Get Value" library="SeleniumLibrary">
+<var>${taddress}</var>
+<arg>//input[@name='address']</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.874" level="INFO">${taddress} = 1234 Main St</msg>
+<status status="PASS" starttime="20230426 20:33:51.867" endtime="20230426 20:33:51.874"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${taddress}</arg>
+<arg>${address}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20230426 20:33:51.874" endtime="20230426 20:33:51.875"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.825" endtime="20230426 20:33:51.875"/>
+</kw>
+<kw name="Input and Verify Contact Number" library="register">
+<kw name="Input Text" library="SeleniumLibrary">
+<arg>//input[@name='contactnumber']</arg>
+<arg>${contactnumber}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.875" level="INFO">Typing text '1234567890' into text field '//input[@name='contactnumber']'.</msg>
+<status status="PASS" starttime="20230426 20:33:51.875" endtime="20230426 20:33:51.913"/>
+</kw>
+<kw name="Get Value" library="SeleniumLibrary">
+<var>${tcontact_number}</var>
+<arg>//input[@name='contactnumber']</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.920" level="INFO">${tcontact_number} = 1234567890</msg>
+<status status="PASS" starttime="20230426 20:33:51.913" endtime="20230426 20:33:51.920"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${tcontact_number}</arg>
+<arg>${contactnumber}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20230426 20:33:51.920" endtime="20230426 20:33:51.920"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.875" endtime="20230426 20:33:51.920"/>
+</kw>
+<kw name="Select and Verify Gender Male" library="register">
+<kw name="Click Element" library="commonKeywords">
+<arg>//option[@value='male']</arg>
+<doc>${locator} - could be any selenium locator and webelement object
+${timeout} - &lt;optional&gt;
+Make sure that 15 can be accessed globally</doc>
+<kw name="Wait Until Element Is Visible" library="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>timeout=${timeout}</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" starttime="20230426 20:33:51.922" endtime="20230426 20:33:51.932"/>
+</kw>
+<kw name="Click Element" library="SeleniumLibrary">
+<arg>${locator}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.932" level="INFO">Clicking element '//option[@value='male']'.</msg>
+<status status="PASS" starttime="20230426 20:33:51.932" endtime="20230426 20:33:51.946"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.922" endtime="20230426 20:33:51.946"/>
+</kw>
+<kw name="Get Value" library="SeleniumLibrary">
+<var>${tgender}</var>
+<arg>//select[@name='gender']</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.956" level="INFO">${tgender} = male</msg>
+<status status="PASS" starttime="20230426 20:33:51.947" endtime="20230426 20:33:51.956"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${tgender}</arg>
+<arg>${gender_male}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20230426 20:33:51.956" endtime="20230426 20:33:51.956"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.920" endtime="20230426 20:33:51.956"/>
+</kw>
+<kw name="Input and Verify Birthdate" library="register">
+<kw name="Input Text" library="SeleniumLibrary">
+<arg>//input[@name='birthdate']</arg>
+<arg>${birthdate}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.957" level="INFO">Typing text '11-03-2002' into text field '//input[@name='birthdate']'.</msg>
+<status status="PASS" starttime="20230426 20:33:51.957" endtime="20230426 20:33:51.989"/>
+</kw>
+<kw name="Get Value" library="SeleniumLibrary">
+<var>${tbirthdate}</var>
+<arg>//input[@name='birthdate']</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:51.995" level="INFO">${tbirthdate} = 2002-03-11</msg>
+<status status="PASS" starttime="20230426 20:33:51.989" endtime="20230426 20:33:51.995"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${tbirthdate}</arg>
+<arg>${expected_birthdate}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20230426 20:33:51.995" endtime="20230426 20:33:51.996"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.957" endtime="20230426 20:33:51.996"/>
+</kw>
+<kw name="Select and Verify Role student" library="register">
+<kw name="Click Element" library="commonKeywords">
+<arg>//option[@value='student']</arg>
+<doc>${locator} - could be any selenium locator and webelement object
+${timeout} - &lt;optional&gt;
+Make sure that 15 can be accessed globally</doc>
+<kw name="Wait Until Element Is Visible" library="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>timeout=${timeout}</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" starttime="20230426 20:33:51.997" endtime="20230426 20:33:52.006"/>
+</kw>
+<kw name="Click Element" library="SeleniumLibrary">
+<arg>${locator}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:52.006" level="INFO">Clicking element '//option[@value='student']'.</msg>
+<status status="PASS" starttime="20230426 20:33:52.006" endtime="20230426 20:33:52.016"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.997" endtime="20230426 20:33:52.016"/>
+</kw>
+<kw name="Get Value" library="SeleniumLibrary">
+<var>${trole}</var>
+<arg>//select[@name='role']</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:52.023" level="INFO">${trole} = student</msg>
+<status status="PASS" starttime="20230426 20:33:52.016" endtime="20230426 20:33:52.023"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${trole}</arg>
+<arg>${role_student}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20230426 20:33:52.023" endtime="20230426 20:33:52.023"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:51.996" endtime="20230426 20:33:52.023"/>
+</kw>
+<kw name="Click Register Button" library="register">
+<kw name="Click Button" library="SeleniumLibrary">
+<arg>//button[.='Sign Up']</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<msg timestamp="20230426 20:33:52.024" level="INFO">Clicking button '//button[.='Sign Up']'.</msg>
+<status status="PASS" starttime="20230426 20:33:52.024" endtime="20230426 20:33:52.053"/>
+</kw>
+<status status="PASS" starttime="20230426 20:33:52.024" endtime="20230426 20:33:52.053"/>
+</kw>
+<kw name="Verify Register Failed Password is Similar to Email" library="register">
+<kw name="Wait Until Element Contains" library="SeleniumLibrary">
+<arg>//div[@role='status']</arg>
+<arg>${error_password_is_similar_to_email}</arg>
+<arg>5</arg>
+<doc>Waits until the element ``locator`` contains ``text``.</doc>
+<msg timestamp="20230426 20:33:57.681" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-27.png"&gt;&lt;img src="selenium-screenshot-27.png" width="800px"&gt;&lt;/a&gt;</msg>
+<msg timestamp="20230426 20:33:57.681" level="FAIL">Element '//div[@role='status']' did not get text 'error creating user: ent: constraint failed: pq: duplicate key value violates unique constraint "users_username_key"' in 5 seconds.</msg>
+<status status="FAIL" starttime="20230426 20:33:52.054" endtime="20230426 20:33:57.683"/>
+</kw>
+<status status="FAIL" starttime="20230426 20:33:52.054" endtime="20230426 20:33:57.683"/>
+</kw>
+<kw name="Close Browser" library="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="NOT RUN" starttime="20230426 20:33:57.684" endtime="20230426 20:33:57.684"/>
+</kw>
+<kw name="Close All Browsers" library="SeleniumLibrary" type="TEARDOWN">
+<doc>Closes all open browsers and resets the browser cache.</doc>
+<status status="PASS" starttime="20230426 20:33:57.684" endtime="20230426 20:33:57.767"/>
+</kw>
+<status status="FAIL" starttime="20230426 20:33:48.426" endtime="20230426 20:33:57.767">Element '//div[@role='status']' did not get text 'error creating user: ent: constraint failed: pq: duplicate key value violates unique constraint "users_username_key"' in 5 seconds.</status>
+</test>
+<status status="FAIL" starttime="20230426 20:33:48.348" endtime="20230426 20:33:57.768"/>
+</suite>
+<statistics>
+<total>
+<stat pass="0" fail="1" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat pass="0" fail="1" skip="0" id="s1" name="tudorTest">tudorTest</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
