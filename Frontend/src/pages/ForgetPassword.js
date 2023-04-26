@@ -7,7 +7,7 @@ export default function ForgetPassword(){
 
     return(
         <IsGuest>
-            <ContainerWithHeight margintop='100px'>
+            <ContainerWithHeight margintop='150px'>
                 <FormForgetPassword />
             </ContainerWithHeight>
         </IsGuest>

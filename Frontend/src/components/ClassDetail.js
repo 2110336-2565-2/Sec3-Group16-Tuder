@@ -121,6 +121,7 @@ export default function ClassDetails(props) {
                         {" "}
                         Attend Class
                       </Button>
+                      <SpaceBox></SpaceBox>
                       <Button onClick={(e) => postpone(e, app.id)}>
                         {" "}
                         Postpone Class
@@ -175,6 +176,10 @@ export default function ClassDetails(props) {
     </>
   );
 }
+
+const SpaceBox = styled.div`
+  padding: 4px;
+`
 
 const DetailRight = styled.div`
   display: flex;
@@ -285,7 +290,7 @@ const AppointmentTitle = styled.div`
 `;
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: 80% 20%;
+  grid-template-columns: 75% 25%;
   width: 100%;
   min-width: 750px;
   border: 1px solid #e0e0e0;
@@ -312,7 +317,7 @@ const Button = styled.button`
   border-radius: 5px;
   color: #ff7908;
   background-color: #ffffff;
-
+  width: 165px;
   &:hover {
     background-color: #ff7908;
     color: #ffffff;
