@@ -1,27 +1,26 @@
 FROM node:18.12.1 AS builder
-WORKDIR /app
 
 COPY ./package.json ./package.json
 
-RUN yarn --production
+RUN npm install
 
 COPY . .
-ARG REACT_APP_API_URL
-ARG REACT_APP_OMISE_PUBLIC_KEY
 
+ARG REACT_APP_API_URL
 ENV REACT_APP_API_URL $REACT_APP_API_URL
+
+ARG REACT_APP_OMISE_PUBLIC_KEY
 ENV REACT_APP_OMISE_PUBLIC_KEY $REACT_APP_OMISE_PUBLIC_KEY
 
-RUN yarn build
+RUN npm run build
 
 
 FROM node:18.15-alpine AS frontend
 
-WORKDIR /app
-
 RUN npm install -g serve
-COPY --from=builder /app/build/ ./build/
+COPY --from=builder ./build/ ./build/
 
 CMD serve -s build -l 3000
+
 
 
