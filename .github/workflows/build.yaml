@@ -3,7 +3,7 @@ run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on:
   push:
     branches:
-      - docker-file
+      - cd
 jobs:
   initialize-the-application:
     runs-on: ubuntu-latest
@@ -28,6 +28,7 @@ jobs:
       PORT: ${{vars.PORT}}
       REACT_APP_API_URL: ${{vars.REACT_APP_API_URL}}
       REACT_APP_OMISE_PUBLIC_KEY: ${{vars.REACT_APP_OMISE_PUBLIC_KEY}}
+      DOCKER_ACCESS_TOKEN: ${{secrets.DOCKER_ACCESS_TOKEN}}
 
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
@@ -60,18 +61,24 @@ jobs:
           echo $PORT
           echo $REACT_APP_API_URL
           echo $REACT_APP_OMISE_PUBLIC_KEY
+          echo $REACT_APP_OMISE_PUBLIC_KEY
+          echo $DOCKER_ACCESS_TOKEN
       - run: echo "🍏 This job's status is ${{ job.status }}."
       # pull from git
       - name: Pull from git
         uses: actions/checkout@v3
         with:
           repository: ${{ github.repository }}
-          ref: "docker-file"
-          path: "tuder"
+          ref: "cd"
+          # path: "tuder"
       - run: ls ${{ github.workspace }}
+      - name: Login to DockerHub Registry
+        run: echo ${{ secrets.DOCKER_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
       - name: Docker compose up
         run: |
           docker-compose up -d --build
+      - name: Push image to DockerHub Registry
+          docker-compose push
       - run: echo "🍏 This job's status is ${{ job.status }}."
   Deploy:
     needs: build
@@ -90,8 +97,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
 
             #Now we have got the access of EC2 and we will start the deploy .
-            cd Sec3-Group16-Tuder &&
-            git fetch -a &&
-            git checkout origin/test-cd &&
-            docker-compose up -d --build 
+            sudo docker-compose down &&
+            sudo docker-compose pull &&
+            sudo docker-compose up -d &&
           '
