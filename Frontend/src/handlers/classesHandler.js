@@ -9,5 +9,14 @@ export const fetchClassDetailById = (id) => {
 };
 
 export const changeStatusHandler = (id, status) => {
-  return api.put(`api/v1/appointment/updatestatus/${id}`, { status: status });
+  return api.put(
+    `api/v1/appointment/updatestatus/${id}`,
+    { status: status },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("jwtToken"),
+      },
+    }
+  );
 };
