@@ -26,7 +26,7 @@ type RepositoryCourse interface {
 	SearchByTopicRepository(sr *schema.CourseSearch) ([]*ent.Course, error)
 	SearchByTutorRepository(sr *schema.CourseSearch) ([]*ent.Course, error)
 	SearchByDayRepository(sr *schema.CourseSearch) ([]*ent.Course, error)
-	checkTimeAvailable(d [24]bool) bool
+	//checkTimeAvailable(d [24]bool) bool
 	UpdateCourseStatus(sr *schema.SchemaUpdateCourseStatus) (*ent.Course, error)
 }
 
