@@ -23,6 +23,5 @@ func InitAppointmentRoutes(client *ent.Client, e *echo.Group) {
 	e.GET("/appointments/:match_id", controllerAppointment.GetAppointmentByMatchID)
 	updateStatusRoute := e.Group("/appointment/updatestatus/:id")
 	updateStatusRoute.Use(middlewareInst.JWT())
-	updateStatusRoute.Use(middlewareInst.StudentMiddleware)
 	updateStatusRoute.PUT("", controllerAppointment.UpdateAppointmentStatus)
 }
