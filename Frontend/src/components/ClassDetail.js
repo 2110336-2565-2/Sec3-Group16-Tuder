@@ -4,10 +4,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Timezone, DateFormat } from "../datas/DateFormat";
 import { changeStatusHandler } from "../handlers/classesHandler";
 import { toast } from "react-hot-toast";
+import { getRole } from "../utils/jwtGet";
 
 export default function ClassDetails(props) {
   const data = props.classDetail;
   const navigate = useNavigate();
+  const role = getRole();
 
   const { id } = useParams();
   const handleCancel = () => {
@@ -117,15 +119,21 @@ export default function ClassDetails(props) {
                       </AppointmentDetail>
                     </GridLeft>
                     <GridRight>
-                      <Button onClick={(e) => attend(e, app.id)}>
-                        {" "}
-                        Attend Class
-                      </Button>
-                      <SpaceBox></SpaceBox>
-                      <Button onClick={(e) => postpone(e, app.id)}>
-                        {" "}
-                        Postpone Class
-                      </Button>
+                      {role === "student" ? (
+                        <>
+                          <Button onClick={(e) => attend(e, app.id)}>
+                            {" "}
+                            Attend Class
+                          </Button>
+                          <SpaceBox></SpaceBox>
+                          <Button onClick={(e) => postpone(e, app.id)}>
+                            {" "}
+                            Postpone Class
+                          </Button>
+                        </>
+                      ) : (
+                        <div></div>
+                      )}
                     </GridRight>
                   </Grid>
                 );
@@ -179,7 +187,7 @@ export default function ClassDetails(props) {
 
 const SpaceBox = styled.div`
   padding: 4px;
-`
+`;
 
 const DetailRight = styled.div`
   display: flex;

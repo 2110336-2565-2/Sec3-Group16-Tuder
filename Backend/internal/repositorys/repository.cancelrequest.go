@@ -9,7 +9,10 @@ import (
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent"
 	appointment "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/appointment"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/cancelrequest"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/course"
 	match "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/match"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/schedule"
+	"github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/tutor"
 	user "github.com/2110336-2565-2/Sec3-Group16-Tuder/ent/user"
 	utils "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/utils"
 	"github.com/google/uuid"
@@ -259,6 +262,66 @@ func (r *repositoryCancelRequest) AuditRequest(sc *schemas.SchemaCancelRequestAp
 				return fmt.Errorf("failed to update appointments and rollback transaction: %w, %v", err, rerr)
 			}
 			return fmt.Errorf("failed to update appointments: %w", err)
+		}
+
+		// return available time to tutor
+		var new_schedule [7][24]bool
+		Tutor, err1 := txc.Tutor.Query().Where(tutor.HasCourseWith(course.HasMatchWith(match.IDEQ(sc.MatchID)))).Only(r.ctx)
+		if err1 != nil {
+			if rerr := tx.Rollback(); rerr != nil {
+				err1 = fmt.Errorf("%w: %v", err1, rerr)
+			}
+			return fmt.Errorf("Tutor not found: %w", err1)
+		}
+		match_schedule, err2 := txc.Schedule.Query().Where(schedule.HasMatchWith(match.IDEQ(sc.MatchID))).Only(r.ctx)
+		if err2 != nil {
+			if rerr := tx.Rollback(); rerr != nil {
+				err2 = fmt.Errorf("%w: %v", err2, rerr)
+			}
+			return fmt.Errorf("Match not found: %w", err2)
+		}
+		tutor_schedule, err3 := txc.Schedule.Query().Where(schedule.HasTutorWith(tutor.IDEQ(Tutor.ID))).Only(r.ctx)
+		if err3 != nil {
+			if rerr := tx.Rollback(); rerr != nil {
+				err3 = fmt.Errorf("%w: %v", err3, rerr)
+			}
+			return fmt.Errorf("Tutor's schedule not found: %w", err3)
+		}
+		for i := 0; i < 24; i++ {
+			new_schedule[0][i] = match_schedule.Day0[i] || tutor_schedule.Day0[i]
+		}
+		for i := 0; i < 24; i++ {
+			new_schedule[1][i] = match_schedule.Day1[i] || tutor_schedule.Day1[i]
+		}
+		for i := 0; i < 24; i++ {
+			new_schedule[2][i] = match_schedule.Day2[i] || tutor_schedule.Day2[i]
+		}
+		for i := 0; i < 24; i++ {
+			new_schedule[3][i] = match_schedule.Day3[i] || tutor_schedule.Day3[i]
+		}
+		for i := 0; i < 24; i++ {
+			new_schedule[4][i] = match_schedule.Day4[i] || tutor_schedule.Day4[i]
+		}
+		for i := 0; i < 24; i++ {
+			new_schedule[5][i] = match_schedule.Day5[i] || tutor_schedule.Day5[i]
+		}
+		for i := 0; i < 24; i++ {
+			new_schedule[6][i] = match_schedule.Day6[i] || tutor_schedule.Day6[i]
+		}
+		_, err4 := tutor_schedule.Update().
+			SetDay0(new_schedule[0]).
+			SetDay1(new_schedule[1]).
+			SetDay2(new_schedule[2]).
+			SetDay3(new_schedule[3]).
+			SetDay4(new_schedule[4]).
+			SetDay5(new_schedule[5]).
+			SetDay6(new_schedule[6]).
+			Save(r.ctx)
+		if err4 != nil {
+			if rerr := tx.Rollback(); rerr != nil {
+				err4 = fmt.Errorf("%w: %v", err4, rerr)
+			}
+			return fmt.Errorf("updating tutor's schedule: %w", err4)
 		}
 
 		mStatus = match.StatusCanceled

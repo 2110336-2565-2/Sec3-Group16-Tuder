@@ -276,7 +276,7 @@ func (r *repositoryAppointment) UpdateAppointmentStatus(sr *schemas.SchemaUpdate
 
 	state := true
 	for _, app := range appointments {
-		if app.Status.String() != "completed" {
+		if app.Status.String() != "completed" && app.Status.String() != "postponed" {
 			state = false
 			break
 		}

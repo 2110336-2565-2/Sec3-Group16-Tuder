@@ -14,8 +14,8 @@ func InsertSchedule(client *ent.Client, ctx context.Context) []*ent.Schedule {
 	free_day, busy_day, some_day := GenerateDay()
 
 	// Create schedules
-	schedule1 := CreateSchedule(client, free_day, busy_day, some_day, free_day, busy_day, some_day, busy_day)
-	schedule2 := CreateSchedule(client, busy_day, some_day, free_day, busy_day, busy_day, free_day, free_day)
+	schedule1 := CreateSchedule(client, free_day, busy_day, some_day, free_day, some_day, some_day, busy_day)
+	schedule2 := CreateSchedule(client, busy_day, some_day, free_day, busy_day, free_day, free_day, free_day)
 	schedule3 := CreateSchedule(client, free_day, busy_day, free_day, busy_day, free_day, busy_day, free_day)
 	schedule4 := CreateSchedule(client, some_day, some_day, busy_day, free_day, busy_day, free_day, free_day)
 
