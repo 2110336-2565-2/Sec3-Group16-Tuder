@@ -6,7 +6,7 @@ export default function Home(){
         <>
             <HomeContainer>
                 <HomeHeader>
-                    <HomeTitle>Welcome to Tudor</HomeTitle>
+                    <HomeTitle>Welcome to Tuder</HomeTitle>
                     <HomeSubtitle>The ultimate platform for online learning</HomeSubtitle>
                 </HomeHeader>
                 <Container>

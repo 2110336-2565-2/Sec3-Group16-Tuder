@@ -72,7 +72,7 @@ export default function CourseSearchForm(props) {
             <SearchInput
               boxsize="350px"
               key="searchBar"
-              placeholder="Search by a Course Name"
+              placeholder="Course Name"
               value={coursename}
               onChange={(e) => setCoursename(e.target.value)}
             />
@@ -82,7 +82,7 @@ export default function CourseSearchForm(props) {
           <SearchInput
             boxsize="350px"
             key="topic"
-            placeholder="Topic Name"
+            placeholder="Topic"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
           />
@@ -102,7 +102,7 @@ export default function CourseSearchForm(props) {
           <SearchInput
             boxsize="350px"
             key="subject"
-            placeholder="Subject Name"
+            placeholder="Subject"
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
           />
