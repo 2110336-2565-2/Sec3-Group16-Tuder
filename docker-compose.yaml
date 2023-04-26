@@ -70,6 +70,8 @@ services:
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       OMISE_PUBLIC_KEY: ${OMISE_PUBLIC_KEY}
       OMISE_SECRET_KEY: ${OMISE_SECRET_KEY}
+      EMAIL: ${EMAIL}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}    
     
     networks:
       - tuder
