@@ -38,9 +38,15 @@ jobs:
         with:
           repository: ${{ github.repository }}
           ref: "cd"
-          # path: "tuder"
       - name: ls workspace
         run: ls ${{ github.workspace }}
+      - name: Create .env in backend
+        run: |
+          cd Backend
+          touch .env
+          ls
+          cd ..
+          ls
       - name: Login to DockerHub Registry
         run: echo ${{ secrets.DOCKER_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
       - name: Docker compose up
