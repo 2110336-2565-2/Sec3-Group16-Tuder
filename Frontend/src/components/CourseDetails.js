@@ -12,7 +12,7 @@ export default function CourseDetails(props) {
     if (getRole() !== "admin" && getRole() !== "tutor") {
       return (
         <Content fsize="16px" fweight="400">
-          <ButtonCourse to="Enroll">Enroll</ButtonCourse>
+          <ButtonCourse to="enroll">Enroll</ButtonCourse>
         </Content>
       );
     }

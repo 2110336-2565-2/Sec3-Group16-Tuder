@@ -21,7 +21,7 @@ export default function Footer() {
       <Wrapper>
         <HR borderWidth="1.3px" color="#EB7B42" />
         <MainSection>
-          <AppLogo>Tudor</AppLogo>
+          <AppLogo>Tuder</AppLogo>
           <InfoContainter>
             <InfoWrapper gridColumn="1 / 3">
               <EnvironmentFilled style={iconStyle} />
