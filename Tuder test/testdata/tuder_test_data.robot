@@ -38,7 +38,7 @@ ${expected_birthdate}    2002-03-11
 ${role_student}    student
 ${role_tutor}    tutor
 # for tutor only
-${citizen_id}    1234567890123
+# ${citizen_id}    1234567890123
 ${description}    I am a tutor
 ${card_holder_name}    John Doe
 ${card_number}    4162 0260 0572 2393
