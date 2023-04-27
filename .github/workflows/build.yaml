@@ -74,4 +74,6 @@ jobs:
             sudo docker-compose down &&
             sudo docker-compose pull &&
             sudo docker-compose up -d
+            # Remove unused image
+            sudo docker image prune
           '
