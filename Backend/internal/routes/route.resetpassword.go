@@ -6,8 +6,6 @@ import (
 	repository "github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/repositorys"
 	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/services"
 	"github.com/labstack/echo/v4"
-	"github.com/2110336-2565-2/Sec3-Group16-Tuder/internal/middlewares"
-	"os"
 )
 
 func InitResetPasswordRoute(c *ent.Client, e *echo.Group) {

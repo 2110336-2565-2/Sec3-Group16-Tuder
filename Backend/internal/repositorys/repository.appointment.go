@@ -67,6 +67,7 @@ func (r *repositoryAppointment) GetMatchByStudentID(sr *schemas.SchemaGetMatchBy
 		schemaAppointments = append(schemaAppointments, &schemas.SchemaMatchesFromID{
 			MatchID:          match.ID,
 			CourseName:       match.Edges.Course.Title,
+			CourseID:         match.Edges.Course.ID,
 			TutorName:        tutorName,
 			UpcomingClass:    upcoming_class,
 			Remaining:        remaining,
@@ -112,6 +113,7 @@ func (r *repositoryAppointment) GetMatchByTutorID(sr *schemas.SchemaGetMatchByID
 		schemaAppointments = append(schemaAppointments, &schemas.SchemaMatchesFromID{
 			MatchID:          match.ID,
 			CourseName:       match.Edges.Course.Title,
+			CourseID:         match.Edges.Course.ID,
 			TutorName:        tutorName,
 			UpcomingClass:    upcoming_class,
 			Remaining:        remaining,
@@ -236,7 +238,7 @@ func (r *repositoryAppointment) UpdateAppointmentStatus(sr *schemas.SchemaUpdate
 		count_hour := 1
 		start := (day * 24) + hour
 		for i := 1; i <= 24*7; i++ {
-			
+
 			idx := (start + i) % (24 * 7)
 			if combined_schedule[idx] {
 				break

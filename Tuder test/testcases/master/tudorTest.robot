@@ -18,7 +18,7 @@ Test Sign In
 
 
 
-TC-0 Register Fail Existed Username
+TC1-1 Register Fail Existed Username
     # ${date}=    Get Current Date    result_format=%Y%m%d%H%M%S
     # print ${date} to console
     Open browser Register page
@@ -38,7 +38,7 @@ TC-0 Register Fail Existed Username
     Verify Register Failed Username Used
     Close Browser
 
-TC-1 Register Failed password missmatch
+TC1-2 Register Failed password missmatch
     ${date}=    Get Current Date    result_format=%Y%m%d%H%M%S
     Open Browser Register page
     Wait until register page is loaded
@@ -58,7 +58,7 @@ TC-1 Register Failed password missmatch
     Verify Register Failed Password Missmatch
     Close Browser
 
-TC-2 Register Failed password too short
+TC1-3 Register Failed password too short
     ${date}=    Get Current Date    result_format=%Y%m%d%H%M%S
     Open Browser Register page
     Wait until register page is loaded
@@ -77,7 +77,7 @@ TC-2 Register Failed password too short
     Verify Register Failed Password Too Short
     Close Browser
 
-TC-3 Register Failed password too long
+TC1-4 Register Failed password too long
     ${date}=    Get Current Date    result_format=%Y%m%d%H%M%S
     Open Browser Register page
     Wait until register page is loaded
@@ -96,7 +96,7 @@ TC-3 Register Failed password too long
     Verify Register Failed Password Too Long
     Close Browser
 
-TC-4 Register Failed password contains invalid char
+TC1-5 Register Failed password contains invalid char
     ${date}=    Get Current Date    result_format=%Y%m%d%H%M%S
     Open Browser Register page
     Wait until register page is loaded
@@ -116,7 +116,7 @@ TC-4 Register Failed password contains invalid char
     Verify Form is Not Submitted
     Close Browser
 
-TC-5 Register Failed password not contain lowercase
+TC1-6 Register Failed password not contain lowercase
     ${date}=    Get Current Date    result_format=%Y%m%d%H%M%S
     Open Browser Register page
     Wait until register page is loaded
@@ -136,7 +136,7 @@ TC-5 Register Failed password not contain lowercase
     Verify Register Failed Password No Lowercase
     Close Browser
 
-TC-6 Register Failed password not contain uppercase
+TC1-7 Register Failed password not contain uppercase
     ${date}=    Get Current Date    result_format=%Y%m%d%H%M%S
     Open Browser Register page
     Wait until register page is loaded
@@ -156,7 +156,7 @@ TC-6 Register Failed password not contain uppercase
     Verify Register Failed Password No Uppercase
     Close Browser
 
-TC-7 Register Failed password not contain number
+TC1-8 Register Failed password not contain number
     ${date}=    Get Current Date    result_format=%Y%m%d%H%M%S
     Open Browser Register page
     Wait until register page is loaded
@@ -176,7 +176,7 @@ TC-7 Register Failed password not contain number
     Verify Register Failed Password No Number
     Close Browser
 
-TC-8 Register Failed password is similar to email
+TC1-9.1 Register Failed password is similar to email
     ${date}=    Get Current Date    result_format=%Y%m%d%H%M%S
     Open Browser Register page
     Wait until register page is loaded
@@ -196,7 +196,7 @@ TC-8 Register Failed password is similar to email
     Verify Register Failed Password is Similar to Email
     Close Browser
 
-TC-8e1 Register Failed password is similar to firstname
+TC1-9.2 Register Failed password is similar to firstname
     ${date}=    Get Current Date    result_format=%Y%m%d%H%M%S
     Open Browser Register page
     Wait until register page is loaded
@@ -216,7 +216,9 @@ TC-8e1 Register Failed password is similar to firstname
     Verify Register Failed Password is Similar to Email
     Close Browser
 
-Register Success as Student
+
+
+TC1-11 Register Success as Student
     ${date}=    Get Current Date    result_format=%Y%m%d%H%M%S
     # print ${date} to console
     Open browser Register page
@@ -241,9 +243,10 @@ Register Success as Student
     Verify Sign In Success
     Close Browser
 
-Register Success as Tutor
+TC1-12 Register Success as Tutor
     ${date}=    Get Current Date    result_format=%Y%m%d%H%M%S
     # print ${date} to console
+    Sleep  1
     Open browser Register page
     Wait until register page is loaded
     Verify Empty for student

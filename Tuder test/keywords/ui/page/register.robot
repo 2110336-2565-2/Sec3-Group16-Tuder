@@ -383,6 +383,7 @@ Select and Verify Role tutor
 
 Input and Verify Citizen ID
     # input the citizen id into the input field with name "citizen_id"
+    ${citizen_id}   Generate Random String    13    [NUMBERS]
     Input Text    //input[@name='citizen_id']    ${citizen_id}
     # get the value of the input field with name "citizen_id"
     ${tcitizen_id}    Get Value    //input[@name='citizen_id']
